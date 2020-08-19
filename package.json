@@ -1,7 +1,6 @@
 {
-  "name": "australian_writing_academy",
+  "name": "nextjs-tailwindcss-starter",
   "version": "0.1.0",
-  "private": true,
   "scripts": {
     "dev": "next dev",
     "build": "next build",
@@ -11,5 +10,9 @@
     "next": "9.5.2",
     "react": "16.13.1",
     "react-dom": "16.13.1"
+  },
+  "devDependencies": {
+    "postcss-preset-env": "^6.7.0",
+    "tailwindcss": "^1.7.0"
   }
 }
