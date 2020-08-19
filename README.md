@@ -1,6 +1,6 @@
-This is a [Next.js](https://nextjs.org/) & [Tailwind CSS](https://tailwindcss.com/) starter project.
+#This is a [Next.js](https://nextjs.org/) & [Tailwind CSS](https://tailwindcss.com/) starter project.
 
-Some additional experimental features are enabled in `tailwind.config.js`
+_Some additional experimental features are enabled in `tailwind.config.js`_
 
 ## Getting Started
 
