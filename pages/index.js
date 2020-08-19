@@ -1,5 +1,5 @@
-import Head from 'next/head'
-import Layout from '../src/components/Layout'
+import Head from "next/head";
+import Layout from "../src/components/Layout";
 
 export default function Home() {
   return (
@@ -7,9 +7,9 @@ export default function Home() {
       <Head>
         <title>Next.js Tailwind CSS Starter</title>
       </Head>
-      <h1 className='text-6xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-teal-400 to-blue-500'>
-        Next.js Tailwind CSS starter
+      <h1 className="text-6xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-teal-400 to-blue-500">
+        Next.js Tailwind CSS Starter
       </h1>
     </Layout>
-  )
+  );
 }
