@@ -3,7 +3,7 @@
 - [Framer Motion](https://www.framer.com/motion/) is inlcluded.
 - [react-intersection-observer](https://github.com/thebuilder/react-intersection-observer) is inlcluded.
 
-_Some additional experimental features are enabled in `tailwind.config.js`_
+Some additional experimental features are enabled in `tailwind.config.js`: _uniformColorPalette, extendedSpacingScale, extendedFontSizeScale_
 
 ## Getting Started
 
