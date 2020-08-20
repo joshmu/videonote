@@ -1,5 +1,8 @@
 # This is a [Next.js](https://nextjs.org/) & [Tailwind CSS](https://tailwindcss.com/) starter project.
 
+- [Framer Motion](https://www.framer.com/motion/) is inlcluded.
+- [react-intersection-observer](https://github.com/thebuilder/react-intersection-observer) is inlcluded.
+
 _Some additional experimental features are enabled in `tailwind.config.js`_
 
 ## Getting Started
