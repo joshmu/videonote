@@ -1,5 +1,7 @@
 # VideoNote
 
+A timestamping todo appication with slick intuitive controls to create notes on the fly whilst observing a video. ✨
+
 Feel free to get in touch or fly my some feedback on how I could improve this. ✌️
 
 ## Tech Stack
