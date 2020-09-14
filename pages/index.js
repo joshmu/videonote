@@ -1,4 +1,5 @@
 import Layout from '../src/components/Layout'
+import List from '../src/components/List/List'
 import Reveal from '../src/components/Reveal'
 import { useThemeContext } from '../src/context/themeContext'
 
@@ -20,6 +21,7 @@ export default function Home() {
           <span className='uppercase animate-pulse text-themeHighlight'>r</span>
         </h1>
       </Reveal>
+      <List />
     </Layout>
   )
 }

@@ -11,7 +11,7 @@ export default function Layout({ children }) {
       <div
         className={`${
           theme === 'light' ? 'theme-light' : 'theme-dark'
-        } text-themeText min-h-screen bg-themeBackground transition-colors duration-300 ease-in-out font-sans overflow-hidden`}
+        } text-themeText relative min-h-screen bg-themeBackground transition-colors duration-300 ease-in-out font-sans overflow-hidden`}
       >
         <div className='container mx-auto'>
           <main>{children}</main>
