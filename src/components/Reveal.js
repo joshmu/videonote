@@ -23,13 +23,13 @@ export default function Reveal({
         animate={controls}
         exit='exit'
         variants={{
-          initial: { opacity: 0, y: 25 },
+          initial: { opacity: 0, y: 10 },
           animate: { opacity: 1, y: 0 },
-          exit: { opacity: 0, y: 25 },
+          exit: { opacity: 0, y: 10 },
           ...variants,
         }}
         transition={{
-          duration: 0.8,
+          duration: 0.6,
           ease: [0.6, 0.05, -0.01, 0.9],
           ...transition,
         }}

@@ -17,7 +17,7 @@ export default function Home() {
           className='p-8 text-6xl font-bold cursor-pointer'
         >
           Next.js Tailwind CSS Starte
-          <span className='uppercase animate-pulse'>r</span>
+          <span className='uppercase animate-pulse text-themeHighlight'>r</span>
         </h1>
       </Reveal>
     </Layout>
