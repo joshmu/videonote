@@ -1,5 +1,5 @@
 import { useEffect } from 'react'
-import { motion, useAnimation } from 'framer-motion'
+import { motion, useAnimation, AnimatePresence } from 'framer-motion'
 import { useInView } from 'react-intersection-observer'
 
 export default function Reveal({
@@ -12,31 +12,31 @@ export default function Reveal({
   const [ref, inView] = useInView()
 
   useEffect(() => {
-    if (inView) controls.start('visible')
+    if (inView) controls.start('animate')
   }, [controls, inView])
 
   return (
-    <>
+    <AnimatePresence>
       <motion.div
         ref={ref}
+        initial='initial'
         animate={controls}
-        initial='hidden'
-        variants={
-          variants || {
-            visible: { opacity: 1, y: 0 },
-            hidden: { opacity: 0, y: 25 },
-          }
-        }
-        transition={
-          transition || {
-            delay: 0.4,
-            duration: 0.8,
-          }
-        }
+        exit='exit'
+        variants={{
+          initial: { opacity: 0, y: 25 },
+          animate: { opacity: 1, y: 0 },
+          exit: { opacity: 0, y: 25 },
+          ...variants,
+        }}
+        transition={{
+          duration: 0.8,
+          ease: [0.6, 0.05, -0.01, 0.9],
+          ...transition,
+        }}
         {...props}
       >
         {children}
       </motion.div>
-    </>
+    </AnimatePresence>
   )
 }

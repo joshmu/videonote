@@ -1,3 +1,21 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+:root {
+  --light: #ffffff;
+  --dark: #202020;
+  --special: rgba(255, 138, 76, 1);
+}
+
+.theme-light {
+  --text: var(--dark);
+  --background: var(--light);
+  --highlight: var(--special);
+}
+
+.theme-dark {
+  --text: var(--light);
+  --background: var(--dark);
+  --highlight: var(--special);
+}
