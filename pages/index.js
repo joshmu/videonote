@@ -1,7 +1,7 @@
 import Layout from '../src/components/Layout'
-import List from '../src/components/List/List'
-import Reveal from '../src/components/Reveal'
+import Reveal from '../src/components/shared/Reveal'
 import { useThemeContext } from '../src/context/themeContext'
+import StyledLink from '../src/components/shared/StyledLink'
 
 export default function Home() {
   const { toggleTheme } = useThemeContext()
@@ -21,7 +21,7 @@ export default function Home() {
           <span className='uppercase animate-pulse text-themeHighlight'>r</span>
         </h1>
       </Reveal>
-      <List />
+      <StyledLink href='/login'>Let's login</StyledLink>
     </Layout>
   )
 }
