@@ -5,12 +5,12 @@ import ThemeToggle from '../src/components/ThemeToggle'
 export default function Login() {
   return (
     <Layout>
-    <ThemeToggle />
+      <ThemeToggle />
       <section className='absolute w-full h-full bg-themeBg'>
         <div className='container relative z-10 h-full px-4 mx-auto'>
           <div className='flex items-center content-center justify-center h-full'>
             <div className='w-full px-4 lg:w-4/12'>
-              <div className='relative flex flex-col w-full min-w-0 mb-6 break-words border-0 rounded shadow-lg bg-highlight-100'>
+              <div className='relative flex flex-col w-full min-w-0 mb-6 break-words bg-gray-100 border-0 rounded shadow-lg'>
                 <div className='flex-auto px-4 py-10 pt-7 lg:px-10'>
                   <form>
                     <div className='relative w-full mb-3'>

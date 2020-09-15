@@ -16,7 +16,7 @@ export default function Reveal({
   }, [controls, inView])
 
   return (
-    <AnimatePresence>
+    <AnimatePresence exitBeforeEnter>
       <motion.div
         ref={ref}
         initial='initial'

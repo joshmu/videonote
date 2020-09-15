@@ -1,27 +1,25 @@
 import Head from 'next/head'
 import { useThemeContext } from '../context/themeContext'
-import { AnimatePresence, motion } from 'framer-motion'
+import { motion } from 'framer-motion'
 
 export default function Layout({ children }) {
   const { theme } = useThemeContext()
   return (
-    <AnimatePresence>
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+    >
+      <Head>
+        <title>VideoNote</title>
+      </Head>
+      <div
+        className={`${
+          theme === 'light' ? 'theme-light' : 'theme-dark'
+        } text-themeText relative min-h-screen bg-themeBackground transition-colors duration-300 ease-in-out font-sans overflow-hidden`}
       >
-        <Head>
-          <title>Next.js Tailwind CSS Starter</title>
-        </Head>
-        <div
-          className={`${
-            theme === 'light' ? 'theme-light' : 'theme-dark'
-          } text-themeText relative min-h-screen bg-themeBackground transition-colors duration-300 ease-in-out font-sans overflow-hidden`}
-        >
-          <main>{children}</main>
-        </div>
-      </motion.div>
-    </AnimatePresence>
+        <main>{children}</main>
+      </div>
+    </motion.div>
   )
 }

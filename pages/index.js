@@ -3,7 +3,7 @@ import { useThemeContext } from '../src/context/themeContext'
 import NavBtn from '../src/components/shared/NavBtn'
 import { Heading } from '../src/components/shared/Text'
 import ThemeToggle from '../src/components/ThemeToggle'
-import { AnimatePresence, motion } from 'framer-motion'
+import { motion } from 'framer-motion'
 import Reveal from '../src/components/shared/Reveal'
 
 export default function Home() {
@@ -32,7 +32,7 @@ export default function Home() {
         <div className='relative flex items-center justify-end w-full h-full'>
           <Heading
             onClick={handleClick}
-            className='z-10 cursor-pointer text-8xl text-themeBackground'
+            className='z-10 transition-colors duration-300 ease-in-out cursor-pointer text-8xl text-themeBackground'
           >
             Video
           </Heading>
