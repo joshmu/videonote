@@ -2,10 +2,13 @@ import { AnimatePresence, motion } from 'framer-motion'
 import { HiSun as SunIcon } from 'react-icons/hi'
 import { BsMoon as MoonIcon } from 'react-icons/bs'
 import { useThemeContext } from '../context/themeContext'
+import Reveal from './shared/Reveal'
 
 export default function ThemeToggle({
   lightColor = 'text-themeText',
   darkColor = 'text-themeText',
+  revealVariants = {},
+  revealTransition = {},
   className = '',
   ...props
 }) {
@@ -16,12 +19,14 @@ export default function ThemeToggle({
   }
 
   return (
-    <div
+    <Reveal
       onClick={handleClick}
       className={`${className} ${
         theme === 'dark' ? lightColor : darkColor
-      } absolute top-0 right-0 z-50 p-4 transition-colors duration-300 ease-in-out cursor-pointer hover:text-themeHighlight`}
+      } absolute text-2xl top-0 right-0 z-50 p-4 transition-colors duration-300 ease-in-out cursor-pointer hover:text-themeHighlight`}
       {...props}
+      variants={revealVariants}
+      transition={revealTransition}
     >
       <AnimatePresence exitBeforeEnter>
         {theme === 'dark' ? (
@@ -46,6 +51,6 @@ export default function ThemeToggle({
           </motion.div>
         )}
       </AnimatePresence>
-    </div>
+    </Reveal>
   )
 }
