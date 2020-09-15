@@ -1,7 +1,8 @@
 import Layout from '../src/components/Layout'
-import Reveal from '../src/components/shared/Reveal'
 import { useThemeContext } from '../src/context/themeContext'
-import StyledLink from '../src/components/shared/StyledLink'
+import NavBtn from '../src/components/shared/NavBtn'
+import { Heading, Text } from '../src/components/shared/Text'
+import Compressor from '../src/components/shared/Compressor'
 
 export default function Home() {
   const { toggleTheme } = useThemeContext()
@@ -12,16 +13,14 @@ export default function Home() {
 
   return (
     <Layout>
-      <Reveal>
-        <h1
-          onClick={handleClick}
-          className='p-8 text-6xl font-bold cursor-pointer'
-        >
-          Next.js Tailwind CSS Starte
-          <span className='uppercase animate-pulse text-themeHighlight'>r</span>
-        </h1>
-      </Reveal>
-      <StyledLink href='/login'>Let's login</StyledLink>
+      <Heading onClick={handleClick}>
+        <span className='font-semibold text-themeHighlight'>V</span>
+        ideo
+        <span className='font-semibold text-themeHighlight'>N</span>
+        ote
+      </Heading>
+      <Text>Here is some text.</Text>
+      <NavBtn href='/login'>Let's login</NavBtn>
     </Layout>
   )
 }

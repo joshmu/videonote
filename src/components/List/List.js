@@ -34,8 +34,8 @@ export default function List() {
         >
           <table className='w-full'>
             <tbody className=''>
-              {data.map(item => (
-                <ListItem {...item} />
+              {data.map((item, idx) => (
+                <ListItem {...item} key={idx} />
               ))}
             </tbody>
           </table>

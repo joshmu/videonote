@@ -14,6 +14,11 @@
     "react-intersection-observer": "^8.27.0"
   },
   "devDependencies": {
+    "imagemin-mozjpeg": "^9.0.0",
+    "imagemin-optipng": "^8.0.0",
+    "imagemin-svgo": "^8.0.0",
+    "next-compose-plugins": "^2.2.0",
+    "next-optimized-images": "^2.6.2",
     "postcss-preset-env": "^6.7.0",
     "sass": "^1.26.10",
     "tailwindcss": "^1.7.0"

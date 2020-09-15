@@ -1,12 +1,13 @@
-import Link from 'next/link'
 import Layout from '../src/components/Layout'
 import List from '../src/components/List/List'
-import StyledLink from '../src/components/shared/StyledLink'
+import ProgressBar from '../src/components/shared/ProgressBar'
+import NavBtn from '../src/components/shared/NavBtn'
 
 export default function Main() {
   return (
     <Layout>
-      <StyledLink>Back Home</StyledLink>
+      <NavBtn>Back Home</NavBtn>
+      <ProgressBar />
       <List />
     </Layout>
   )

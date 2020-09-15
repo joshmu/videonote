@@ -19,9 +19,7 @@ export default function Layout({ children }) {
             theme === 'light' ? 'theme-light' : 'theme-dark'
           } text-themeText relative min-h-screen bg-themeBackground transition-colors duration-300 ease-in-out font-sans overflow-hidden`}
         >
-          <div className='container mx-auto'>
-            <main>{children}</main>
-          </div>
+          <main>{children}</main>
         </div>
       </motion.div>
     </AnimatePresence>
