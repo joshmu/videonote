@@ -1,25 +1,25 @@
-export function Heading(props) {
+export function Heading({ className = '', ...props }) {
   return (
     <h1
-      className='mt-0 mb-2 text-6xl font-normal leading-normal tracking-tight'
+      className={`${className} mt-0 mb-2 text-6xl font-normal leading-normal tracking-tight`}
       {...props}
     ></h1>
   )
 }
 
-export function SubHeading(props) {
+export function SubHeading({ className = '', ...props }) {
   return (
     <h2
-      className='mt-0 mb-2 text-2xl font-normal leading-normal tracking-tight'
+      className={`${className} mt-0 mb-2 text-2xl font-normal leading-normal tracking-tight`}
       {...props}
     ></h2>
   )
 }
 
-export function Text(props) {
+export function Text({ className = '', ...props }) {
   return (
     <p
-      className='mt-0 mb-4 text-base leading-relaxed text-gray-800'
+      className={`${className} mt-0 mb-4 text-base leading-relaxed text-gray-800`}
       {...props}
     ></p>
   )
