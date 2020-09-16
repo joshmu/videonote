@@ -19,3 +19,7 @@
   --background: var(--dark);
   --highlight: var(--special);
 }
+
+body {
+  -webkit-tap-highlight-color: transparent;
+}
