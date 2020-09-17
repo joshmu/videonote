@@ -5,10 +5,13 @@ export default function ListItem({
   done = false,
 }) {
   return (
-    <tr className='relative py-1 text-xs transform scale-100 bg-blue-800 bg-opacity-25 border-b-2 border-blue-100 cursor-default'>
+    <tr className='relative py-1 text-xs transform scale-100 bg-white border-b-2 cursor-default border-themeText-100'>
       <td className='pl-5 pr-3'>
-        <div className='text-gray-400'>{done && '✔️'}</div>
-        {time && <div>{time}</div>}
+        {time && (
+          <div className={`${done && 'line-through'} text-gray-400`}>
+            {time}
+          </div>
+        )}
       </td>
 
       <td className='px-2 py-2'>

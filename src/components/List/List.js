@@ -1,6 +1,6 @@
 import ListItem from './ListItem'
 // @ts-ignore
-import style from './listStyle.module.scss'
+import style from './list.module.scss'
 
 export default function List() {
   const data = [
@@ -23,23 +23,15 @@ export default function List() {
     },
   ]
   return (
-    <div className='container flex justify-center h-screen py-10 mx-auto'>
-      <div className='flex flex-col w-4/12 h-full pl-4'>
-        <div className='px-5 py-2 text-sm font-bold text-gray-500 bg-white border-b border-gray-300 shadow'>
-          VideoNote
-        </div>
-
-        <div
-          className={`${style.scrollbar} w-full h-full overflow-auto bg-white shadow`}
-        >
-          <table className='w-full'>
-            <tbody className=''>
-              {data.map((item, idx) => (
-                <ListItem {...item} key={idx} />
-              ))}
-            </tbody>
-          </table>
-        </div>
+    <div className='flex flex-col w-1/3 h-auto sm:w-1/4'>
+      <div className={`${style.scrollbar} w-full h-full overflow-auto shadow`}>
+        <table className='w-full bg-white'>
+          <tbody className=''>
+            {data.map((item, idx) => (
+              <ListItem {...item} key={idx} />
+            ))}
+          </tbody>
+        </table>
       </div>
     </div>
   )

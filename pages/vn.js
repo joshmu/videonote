@@ -1,16 +1,20 @@
 import Layout from '../src/components/Layout'
-import List from '../src/components/List/List'
-import ProgressBar from '../src/components/shared/ProgressBar'
-import NavBtn from '../src/components/shared/NavBtn'
 import ThemeToggle from '../src/components/ThemeToggle'
+import VideoPlayer from '../src/components/VideoPlayer/VideoPlayer'
+import List from '../src/components/List/List'
 
 export default function Main() {
   return (
     <Layout>
       <ThemeToggle />
-      <NavBtn>Back Home</NavBtn>
-      <ProgressBar />
-      <List />
+      <div className='flex flex-col w-full h-screen overflow-hidden'>
+        <div className='text-3xl'>navbar</div>
+
+        <div className='flex flex-1 w-full h-full'>
+          <VideoPlayer />
+          <List />
+        </div>
+      </div>
     </Layout>
   )
 }
