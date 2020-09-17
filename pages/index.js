@@ -18,59 +18,105 @@ export default function Home() {
       <ThemeToggle
         lightColor='text-themeHighlight'
         darkColor='text-themeHighlight'
-        revealVariants={{
-          initial: { opacity: 0, rotate: -180, scale: 0 },
-          animate: { opacity: 1, rotate: 0, scale: 1 },
-          exit: { opacity: 0, rotate: 180, scale: 0 },
-        }}
-        revealTransition={{
-          delay: 0.8,
-        }}
       />
       <div className='absolute top-0 flex w-full h-full'>
         {/* left */}
         <div className='relative flex items-center justify-end w-full h-full'>
-          <Heading
-            onClick={handleClick}
-            className='z-10 transition-colors duration-300 ease-in-out cursor-pointer text-8xl text-themeBackground'
+          <motion.div
+            key='video'
+            initial={{ opacity: 1 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0, transition: { delay: 0 } }}
+            className='z-10'
           >
-            Video
-          </Heading>
+            <Heading
+              onClick={handleClick}
+              className='z-10 transition-colors duration-300 ease-in-out cursor-pointer text-8xl text-themeBackground'
+            >
+              Video
+            </Heading>
+          </motion.div>
 
-          <Reveal transition={{ delay: 0.7 }}>
+          <Tada
+            k='navbtn'
+            animate={{ transition: { delay: 0.7 } }}
+            exit={{ transition: { delay: 0 } }}
+            className='relative'
+          >
             <NavBtn
               href='/login'
               className='absolute z-10 -mb-32 bottom-1/2 bg-themeBackground hover:text-themeBackground'
             >
               Let's Go
             </NavBtn>
-          </Reveal>
+          </Tada>
 
           {/* orange background slider */}
           <motion.div
+            key='orangeBg'
             initial={{ x: '-100%' }}
-            animate={{ x: 0 }}
-            exit={{ x: '-100%' }}
-            transition={{
-              duration: 0.8,
-              ease: [0.6, 0.05, -0.01, 0.9],
+            animate={{
+              x: 0,
+              transition: {
+                duration: 0.8,
+              },
+            }}
+            exit={{
+              x: '-100%',
+              transition: {
+                delay: 0.6,
+                duration: 0.8,
+              },
             }}
             className='absolute z-0 w-full h-full bg-themeHighlight'
           ></motion.div>
         </div>
 
         {/* right */}
-        <div className='flex items-center justify-start w-full h-full transition-colors duration-300 ease-in-out bg-themeBackground'>
-          <Reveal transition={{ delay: 0.5 }}>
+        <div className='flex items-center justify-start flex-shrink w-full h-full transition-colors duration-300 ease-in-out bg-themeBackground'>
+          <Tada
+            k='note'
+            animate={{ transition: { delay: 0.5 } }}
+            exit={{ transition: { delay: 0 } }}
+          >
             <Heading
               onClick={handleClick}
               className='cursor-pointer text-themeHighlight text-8xl'
             >
               Note
             </Heading>
-          </Reveal>
+          </Tada>
         </div>
       </div>
     </Layout>
+  )
+}
+
+function Tada({ k, initial = {}, animate = {}, exit = {}, ...props }) {
+  const variants = {
+    initial: {
+      opacity: 0,
+      y: 10,
+      ...initial,
+    },
+    animate: {
+      opacity: 1,
+      y: 0,
+      ...animate,
+    },
+    exit: {
+      opacity: 0,
+      ...exit,
+    },
+  }
+  return (
+    <motion.div
+      key={k}
+      initial='initial'
+      animate='animate'
+      exit='exit'
+      variants={variants}
+      {...props}
+    ></motion.div>
   )
 }

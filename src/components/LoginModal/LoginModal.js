@@ -1,13 +1,22 @@
+import { motion } from 'framer-motion'
+import Link from 'next/link'
+
 export default function LoginModal() {
   return (
-    <div className='w-full max-w-sm mx-auto overflow-hidden bg-white rounded-lg shadow-md'>
+    <motion.div
+      key='login-modal'
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      className='w-full max-w-sm mx-auto overflow-hidden rounded shadow-md bg-highlight-200'
+    >
       <div className='px-6 py-4'>
-        <h2 className='text-3xl font-bold text-center text-gray-700'>
+        <h2 className='text-3xl font-bold text-center text-highlight-800'>
           VideoNote
         </h2>
 
         <h3 className='mt-1 text-xl font-medium text-center text-gray-600'>
-          Welcome Back
+          Welcome back!
         </h3>
 
         <p className='mt-1 text-center text-gray-500'>
@@ -38,12 +47,14 @@ export default function LoginModal() {
               Forget Password?
             </a>
 
-            <button
-              className='px-4 py-2 text-white bg-gray-700 rounded hover:bg-gray-600 focus:outline-none'
-              type='button'
-            >
-              Login
-            </button>
+            <Link href='/vn'>
+              <button
+                className='px-4 py-2 text-white bg-gray-700 rounded hover:bg-gray-600 focus:outline-none'
+                type='button'
+              >
+                Login
+              </button>
+            </Link>
           </div>
         </form>
       </div>
@@ -58,6 +69,6 @@ export default function LoginModal() {
           Register
         </a>
       </div>
-    </div>
+    </motion.div>
   )
 }
