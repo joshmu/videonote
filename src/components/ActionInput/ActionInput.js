@@ -5,18 +5,19 @@ const ActionInput = () => {
     msg: '',
     timestamp: null,
   })
+  const [active, setActive] = useState(false)
 
   // todo object = {msg: '', timestamp: 2039482093, done: false}
 
   // * listen to input and append timestamp when it is populated
 
   // * add new todo on submit
-  const onSubmit = e => {
+  const handleSubmit = e => {
     e.preventDefault()
   }
 
   // * update todo on entry but exclude initial char if it is a space for play/pause logic
-  const onChange = e => {
+  const handleChange = e => {
     setTodo({ ...todo, msg: e.target.value === ' ' ? '' : e.target.value })
 
     /*
@@ -27,8 +28,15 @@ const ActionInput = () => {
     */
   }
 
+  const handleFocus = e => {
+    if (!active) setActive(true)
+  }
+  const handleBlur = e => {
+    if (active) setActive(false)
+  }
+
   // * keypress logic: space = play/pause, left-right = seek, up-down = volume
-  const onKeyDown = e => {
+  const handleKeyDown = e => {
     // keyboard shortcuts on empty todo
     if (todo.msg === '') {
       console.log('key', e.key)
@@ -73,11 +81,17 @@ const ActionInput = () => {
 
   return (
     <div className='relative flex items-center w-full h-full'>
-      <div className='flex items-center self-center justify-center h-full px-2 text-gray-400 bg-white bg-opacity-75 rounded-r-none'>
+      <div
+        className={`${
+          active ? 'bg-opacity-75' : 'bg-opacity-25'
+        } flex items-center transition-all duration-150 ease-in-out self-center justify-center h-full px-2 text-gray-400 bg-white rounded-r-none`}
+      >
         <span>TIME</span>
       </div>
       <input
-        className='relative w-full h-full px-2 py-1 text-sm text-gray-700 placeholder-gray-400 bg-white bg-opacity-75 rounded-sm rounded-l-none focus:outline-none'
+        className={`${
+          active ? 'bg-opacity-75' : 'bg-opacity-25'
+        } relative w-full transition-all duration-150 ease-in-out h-full px-2 py-1 text-sm text-gray-700 placeholder-gray-400 bg-white rounded-sm rounded-l-none focus:outline-none`}
         autoFocus={true}
         id='addTodo'
         name='addTodo'
@@ -85,8 +99,10 @@ const ActionInput = () => {
         placeholder='Add note...'
         value={todo.msg}
         autoComplete='off'
-        onChange={onChange}
-        onKeyDown={onKeyDown}
+        onChange={handleChange}
+        onKeyDown={handleKeyDown}
+        onFocus={handleFocus}
+        onBlur={handleBlur}
       />
     </div>
   )

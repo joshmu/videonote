@@ -27,7 +27,8 @@ export default function VideoPlayer() {
           height='100%'
         />
       </div>
-
+      {/* list toggle btn */}
+      <div className='absolute top-0 right-0'></div>
       {/* input wrapper */}
       <div className='absolute bottom-0 z-50 w-2/3 h-12 mb-8 transform -translate-x-1/2 left-1/2'>
         <ActionInput />
