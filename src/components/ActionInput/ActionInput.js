@@ -1,7 +1,10 @@
-import { useRef, useEffect } from 'react'
+import { useEffect, useState } from 'react'
 
 const ActionInput = () => {
-  const inputRef = useRef()
+  const [todo, setTodo] = useState({
+    msg: '',
+    timestamp: null,
+  })
 
   // todo object = {msg: '', timestamp: 2039482093, done: false}
 
@@ -14,6 +17,8 @@ const ActionInput = () => {
 
   // * update todo on entry but exclude initial char if it is a space for play/pause logic
   const onChange = e => {
+    setTodo({ ...todo, msg: e.target.value === ' ' ? '' : e.target.value })
+
     /*
     updateNewTodo({
       // don't apply space when toggling play/pause on empty input
@@ -23,37 +28,39 @@ const ActionInput = () => {
   }
 
   // * keypress logic: space = play/pause, left-right = seek, up-down = volume
-  const onKeyDown = e => {}
-  /*
   const onKeyDown = e => {
     // keyboard shortcuts on empty todo
-    if (newTodo.msg === '') {
+    if (todo.msg === '') {
       console.log('key', e.key)
       if (e.key === ' ') {
-        togglePlay()
+        window.alert('play')
+        // togglePlay()
       }
-      if (e.key === 'ArrowLeft') {
-        const destination = progress.playedSeconds - 10
-        if (destination > 0) {
-          seekTo(destination)
-        } else {
-          // start of clip
-          seekTo(0)
-        }
-      }
-      if (e.key === 'ArrowRight') {
-        const destination = progress.playedSeconds + 10
-        seekTo(destination)
-      }
-      if (e.key === 'ArrowUp') {
-        // todo: volume?
-      }
-      if (e.key === 'ArrowDown') {
-        // todo: volume?
-      }
+
+      // if (e.key === 'ArrowLeft') {
+      //   const destination = progress.playedSeconds - 10
+      //   if (destination > 0) {
+      //     seekTo(destination)
+      //   } else {
+      //     start of clip
+      //     seekTo(0)
+      //   }
+      // }
+
+      // if (e.key === 'ArrowRight') {
+      //   const destination = progress.playedSeconds + 10
+      //   seekTo(destination)
+      // }
+
+      // if (e.key === 'ArrowUp') {
+      //   // todo: volume?
+      // }
+
+      // if (e.key === 'ArrowDown') {
+      //   // todo: volume?
+      // }
     }
   }
-  */
 
   // input bar
   // timeline
@@ -65,19 +72,18 @@ const ActionInput = () => {
   // onKeydown = video player logic
 
   return (
-    <div className='relative flex flex-wrap items-stretch w-full mb-3'>
-      <span className='absolute z-10 items-center justify-center w-8 h-full py-3 pl-3 text-base font-normal leading-snug text-center text-gray-400 bg-transparent rounded'>
-        <i className='fas fa-lock'></i>
-      </span>
+    <div className='relative flex items-center w-full h-full'>
+      <div className='flex items-center self-center justify-center h-full px-2 text-gray-400 bg-white bg-opacity-75 rounded-r-none'>
+        <span>TIME</span>
+      </div>
       <input
-        className='relative w-full px-2 py-1 pl-10 text-sm text-gray-700 placeholder-gray-400 bg-white rounded shadow outline-none focus:outline-none focus:shadow-outline'
+        className='relative w-full h-full px-2 py-1 text-sm text-gray-700 placeholder-gray-400 bg-white bg-opacity-75 rounded-sm rounded-l-none focus:outline-none'
         autoFocus={true}
-        ref={inputRef}
         id='addTodo'
         name='addTodo'
         type='text'
         placeholder='Add note...'
-        value={'blah'} // todo.message
+        value={todo.msg}
         autoComplete='off'
         onChange={onChange}
         onKeyDown={onKeyDown}
