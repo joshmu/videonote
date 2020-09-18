@@ -65,22 +65,23 @@ const ActionInput = () => {
   // onKeydown = video player logic
 
   return (
-    <div>
-      <form onSubmit={onSubmit}>
-        <label htmlFor='addTodo'></label>
-        <input
-          autoFocus={true}
-          ref={inputRef}
-          id='addTodo'
-          name='addTodo'
-          type='text'
-          placeholder='Add note...'
-          value={'blah'} // todo.message
-          autoComplete='off'
-          onChange={onChange}
-          onKeyDown={onKeyDown}
-        />
-      </form>
+    <div className='relative flex flex-wrap items-stretch w-full mb-3'>
+      <span className='absolute z-10 items-center justify-center w-8 h-full py-3 pl-3 text-base font-normal leading-snug text-center text-gray-400 bg-transparent rounded'>
+        <i className='fas fa-lock'></i>
+      </span>
+      <input
+        className='relative w-full px-2 py-1 pl-10 text-sm text-gray-700 placeholder-gray-400 bg-white rounded shadow outline-none focus:outline-none focus:shadow-outline'
+        autoFocus={true}
+        ref={inputRef}
+        id='addTodo'
+        name='addTodo'
+        type='text'
+        placeholder='Add note...'
+        value={'blah'} // todo.message
+        autoComplete='off'
+        onChange={onChange}
+        onKeyDown={onKeyDown}
+      />
     </div>
   )
 }

@@ -1,4 +1,3 @@
-import { useEffect } from 'react'
 import ReactPlayer from 'react-player'
 import style from './videoPlayer.module.scss'
 

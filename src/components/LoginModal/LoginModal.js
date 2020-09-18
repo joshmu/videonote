@@ -8,7 +8,7 @@ export default function LoginModal() {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className='w-full max-w-sm mx-auto overflow-hidden rounded shadow-md bg-highlight-200'
+      className='w-full max-w-sm mx-auto overflow-hidden rounded-sm shadow-md bg-gray-50'
     >
       <div className='px-6 py-4'>
         <h2 className='text-3xl font-bold text-center text-highlight-800'>
@@ -26,7 +26,7 @@ export default function LoginModal() {
         <form>
           <div className='w-full mt-4'>
             <input
-              className='block w-full px-4 py-2 mt-2 text-gray-700 placeholder-gray-500 bg-white border border-gray-300 rounded focus:border-blue-500 focus:outline-none focus:shadow-outline'
+              className='block w-full px-4 py-2 mt-2 text-gray-700 placeholder-gray-500 bg-white border border-gray-300 rounded-sm focus:border-blue-500 focus:outline-none focus:shadow-outline'
               type='email'
               placeholder='Email Address'
               aria-label='Email Address'
@@ -35,7 +35,7 @@ export default function LoginModal() {
 
           <div className='w-full mt-4'>
             <input
-              className='block w-full px-4 py-2 mt-2 text-gray-700 placeholder-gray-500 bg-white border border-gray-300 rounded focus:border-blue-500 focus:outline-none focus:shadow-outline'
+              className='block w-full px-4 py-2 mt-2 text-gray-700 placeholder-gray-500 bg-white border border-gray-300 rounded-sm focus:border-blue-500 focus:outline-none focus:shadow-outline'
               type='password'
               placeholder='Password'
               aria-label='Password'
@@ -49,7 +49,7 @@ export default function LoginModal() {
 
             <Link href='/vn'>
               <button
-                className='px-4 py-2 text-white bg-gray-700 rounded hover:bg-gray-600 focus:outline-none'
+                className='px-4 py-2 text-white bg-gray-700 rounded-sm hover:bg-gray-600 focus:outline-none'
                 type='button'
               >
                 Login

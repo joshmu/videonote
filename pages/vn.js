@@ -6,9 +6,8 @@ import List from '../src/components/List/List'
 export default function Main() {
   return (
     <Layout>
-      <ThemeToggle />
       <div className='flex flex-col w-full h-screen overflow-hidden'>
-        <div className='text-3xl'>navbar</div>
+        {/* <div className='text-3xl'>navbar</div> */}
 
         <div className='flex flex-1 w-full h-full'>
           <VideoPlayer />
