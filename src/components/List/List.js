@@ -38,7 +38,7 @@ export default function List() {
   return (
     <div
       className={`${
-        listOpen ? 'w-1/3 sm:w-1/4' : 'w-0'
+        listOpen ? 'w-1/3' : 'w-0'
       } relative flex flex-col h-auto transition-all duration-500 ease-in-out`}
     >
       <div className='relative flex items-center'>

@@ -1,5 +1,13 @@
-export default function TimeDisplay({ seconds }) {
-  return <div>{format(seconds)}</div>
+export default function TimeDisplay({ seconds, lock }) {
+  return (
+    <div
+      className={`${
+        lock ? 'text-highlight-700' : ''
+      } transition-colors duration-300 ease-in-out`}
+    >
+      {format(seconds)}
+    </div>
+  )
 }
 
 function format(seconds) {

@@ -1,5 +1,4 @@
 import Layout from '../src/components/Layout'
-import ThemeToggle from '../src/components/ThemeToggle'
 import VideoPlayer from '../src/components/VideoPlayer/VideoPlayer'
 import List from '../src/components/List/List'
 
