@@ -5,7 +5,7 @@ import TimeDisplay from '../TimeDisplay/TimeDisplay'
 import { useGlobalContext } from '../../context/globalContext'
 
 const ActionInput = () => {
-  const { togglePlay, changeVolume, seekTo } = useVideoContext()
+  const { emptyInputControls } = useVideoContext()
   const [todo, setTodo] = useState({
     msg: '',
     time: null,
@@ -52,27 +52,7 @@ const ActionInput = () => {
 
     // keyboard shortcuts on empty todo
     if (todo.msg === '') {
-      if (e.key === ' ') {
-        togglePlay()
-      }
-
-      if (e.key === 'ArrowLeft') {
-        const destination = progress.playedSeconds - 10
-        seekTo(destination > 0 ? destination : 0)
-      }
-
-      if (e.key === 'ArrowRight') {
-        const destination = progress.playedSeconds + 10
-        seekTo(destination)
-      }
-
-      if (e.key === 'ArrowUp') {
-        changeVolume(0.1)
-      }
-
-      if (e.key === 'ArrowDown') {
-        changeVolume(-0.1)
-      }
+      emptyInputControls(e.key)
     }
   }
 

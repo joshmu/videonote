@@ -1,4 +1,5 @@
-import { createContext, useContext, useState, useRef } from 'react'
+import { createContext, useContext, useState, useEffect, useRef } from 'react'
+import { useGlobalContext } from './globalContext'
 
 const videoContext = createContext({
   ready: false,
@@ -6,13 +7,25 @@ const videoContext = createContext({
   volume: 0.5,
   progress: { playedSeconds: 0, played: 0, loadedSeconds: 0, loaded: 0 },
 })
+const tempUrl = 'https://www.youtube.com/watch?v=gdZLi9oWNZg'
+const tempUrl2 = 'https://www.youtube.com/watch?v=Jelbqbs80Ms'
 
 export function VideoProvider(props) {
+  const { settings } = useGlobalContext()
   const playerRef = useRef(null)
-  const [url, setUrl] = useState('https://www.youtube.com/watch?v=gdZLi9oWNZg')
+  const [url, setUrl] = useState(tempUrl)
   const [playing, setPlaying] = useState(false)
   const [volume, setVolume] = useState(0.5)
   const [progress, setProgress] = useState({})
+
+  // useEffect(() => {
+  //   setTimeout(() => {
+  //     setUrl(tempUrl)
+  //     setTimeout(() => {
+  //       setUrl(tempUrl2)
+  //     }, 10000)
+  //   }, 10000)
+  // }, [])
 
   const handleReady = reactPlayer => {
     // assign react player
@@ -44,7 +57,34 @@ export function VideoProvider(props) {
     // validate
     if (Number(secs) === NaN) return
 
-    playerRef.current.seekTo(secs, 'seconds')
+    // settings offset
+    const playPosition = secs + settings.playOffset
+
+    playerRef.current.seekTo(playPosition, 'seconds')
+  }
+
+  const emptyInputControls = key => {
+    if (key === ' ') {
+      togglePlay()
+    }
+
+    if (key === 'ArrowLeft') {
+      const destination = progress.playedSeconds - 10
+      seekTo(destination > 0 ? destination : 0)
+    }
+
+    if (key === 'ArrowRight') {
+      const destination = progress.playedSeconds + 10
+      seekTo(destination)
+    }
+
+    if (key === 'ArrowUp') {
+      changeVolume(0.1)
+    }
+
+    if (key === 'ArrowDown') {
+      changeVolume(-0.1)
+    }
   }
 
   const value = {
@@ -58,6 +98,7 @@ export function VideoProvider(props) {
     progress,
     seekTo,
     playerRef,
+    emptyInputControls,
   }
 
   return <videoContext.Provider value={value} {...props} />

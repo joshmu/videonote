@@ -3,11 +3,14 @@ import { createContext, useContext, useEffect, useState } from 'react'
 // todo: global data could be
 // [{ user: {}, projects: [{ src: '', todos: [], created: '', updated: '', deleted: '' }] }]
 
-const globalContext = createContext({ todos: [] })
+const globalContext = createContext({ todos: [], settings: { playOffset: -4 } })
 
 export function GlobalProvider(props) {
   const [todos, setTodos] = useState([])
   const [search, setSearch] = useState('')
+  const [settings, setSettings] = useState({
+    playOffset: -4,
+  })
 
   // initial load, check for localStorage
   useEffect(() => {
@@ -44,10 +47,8 @@ export function GlobalProvider(props) {
     setTodos(updatedTodos)
   }
 
-  const handleSearch = e => {
-    const value = e.target.value
-    // disable empty space for start of search
-    setSearch(value === ' ' ? '' : value)
+  const updateSearch = txt => {
+    setSearch(txt)
   }
 
   const listSort = todos => {
@@ -68,8 +69,9 @@ export function GlobalProvider(props) {
     updateTodo,
     removeTodo,
     search,
-    handleSearch,
+    updateSearch,
     listSort,
+    settings,
   }
 
   return <globalContext.Provider value={value} {...props} />

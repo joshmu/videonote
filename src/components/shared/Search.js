@@ -1,7 +1,22 @@
 import { useGlobalContext } from '../../context/globalContext'
+import { useVideoContext } from '../../context/videoContext'
 
 export default function Search() {
-  const { search, handleSearch } = useGlobalContext()
+  const { search, updateSearch } = useGlobalContext()
+  const { emptyInputControls } = useVideoContext()
+
+  const handleChange = e => {
+    const value = e.target.value
+    // disable empty space for start of search
+    updateSearch(value === ' ' ? '' : value)
+  }
+
+  const handleKeyDown = e => {
+    // keyboard logic on empty field
+    if (e.target.value === '') {
+      emptyInputControls(e.key)
+    }
+  }
 
   return (
     <input
@@ -9,7 +24,8 @@ export default function Search() {
       type='text'
       placeholder='Search'
       value={search}
-      onChange={handleSearch}
+      onChange={handleChange}
+      onKeyDown={handleKeyDown}
     />
   )
 }
