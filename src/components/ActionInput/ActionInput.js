@@ -2,19 +2,23 @@ import { useEffect, useState } from 'react'
 import ProgressBar from '../shared/ProgressBar'
 import { useVideoContext } from '../../context/videoContext'
 import TimeDisplay from '../TimeDisplay/TimeDisplay'
+import { useGlobalContext } from '../../context/globalContext'
 
 const ActionInput = () => {
-  const { togglePlay, changeVolume, seekTo, ready } = useVideoContext()
+  const { togglePlay, changeVolume, seekTo } = useVideoContext()
   const [todo, setTodo] = useState({
     msg: '',
-    timestamp: null,
+    time: null,
   })
   const [active, setActive] = useState(false)
   const { progress } = useVideoContext()
+  const { addTodo } = useGlobalContext()
 
   // * add new todo on submit
-  const handleSubmit = e => {
-    e.preventDefault()
+  const handleSubmit = () => {
+    addTodo(todo)
+    // reset todo state
+    setTodo({ msg: '', time: null })
   }
 
   // * update todo on entry but exclude initial char if it is a space for play/pause logic
@@ -26,12 +30,12 @@ const ActionInput = () => {
   // alter todo timestamp based on whether we have txt data or not
   useEffect(() => {
     // if we have data then add timestamp
-    if (todo.msg.length > 0 && todo.timestamp === null)
-      setTodo({ ...todo, timestamp: progress.playedSeconds })
+    if (todo.msg.length > 0 && todo.time === null)
+      setTodo({ ...todo, time: progress.playedSeconds })
     // if we delete data and have a timestamp then reset
-    if (todo.msg.length === 0 && todo.timestamp !== null)
-      setTodo({ ...todo, timestamp: null })
-  }, [todo.msg, todo.timestamp, progress.playedSeconds])
+    if (todo.msg.length === 0 && todo.time !== null)
+      setTodo({ ...todo, time: null })
+  }, [todo.msg, todo.time, progress.playedSeconds])
 
   const handleFocus = e => {
     if (!active) setActive(true)
@@ -42,21 +46,19 @@ const ActionInput = () => {
 
   // * keypress logic: space = play/pause, left-right = seek, up-down = volume
   const handleKeyDown = e => {
+    if (todo.msg.length > 0) {
+      if (e.key === 'Enter') handleSubmit()
+    }
+
     // keyboard shortcuts on empty todo
     if (todo.msg === '') {
-      console.log('key', e.key)
       if (e.key === ' ') {
         togglePlay()
       }
 
       if (e.key === 'ArrowLeft') {
         const destination = progress.playedSeconds - 10
-        if (destination > 0) {
-          seekTo(destination)
-        } else {
-          // start of clip
-          seekTo(0)
-        }
+        seekTo(destination > 0 ? destination : 0)
       }
 
       if (e.key === 'ArrowRight') {
@@ -74,15 +76,6 @@ const ActionInput = () => {
     }
   }
 
-  // input bar
-  // timeline
-  // timestamp = represents video timer and switch to todo.timestamp when there is input
-  // autoFocus
-  // placeholder = 'Add note...'
-  // autocomplete off
-  // onChange = todo content manipulation
-  // onKeydown = video player logic
-
   return (
     <div className='relative flex items-center w-full h-full'>
       <div
@@ -91,8 +84,8 @@ const ActionInput = () => {
         } flex items-center transition-all duration-150 ease-in-out self-center justify-center h-full px-2 text-gray-400 bg-white rounded-r-none`}
       >
         <TimeDisplay
-          seconds={todo.timestamp ? todo.timestamp : progress.playedSeconds}
-          lock={!!todo.timestamp}
+          seconds={todo.time ? todo.time : progress.playedSeconds}
+          lock={!!todo.time}
         />
       </div>
       <input

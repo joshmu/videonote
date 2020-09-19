@@ -1,39 +1,24 @@
 import { useState } from 'react'
 import { GoChevronRight as ArrowIcon } from 'react-icons/go'
+import { MdSettings as SettingsIcon } from 'react-icons/md'
 import ListItem from './ListItem'
 // @ts-ignore
 import style from './list.module.scss'
-
-const data = [
-  {
-    message: 'I cannot stop.',
-    person: 'josh mu',
-    time: '05:30',
-    done: false,
-  },
-  {
-    message: 'what you gonna do about it, not sure how this can work',
-    time: '12:30',
-    done: true,
-  },
-  {
-    message: 'hello from the other side',
-    person: 'josh mu',
-    time: '02:30',
-    done: false,
-  },
-]
+import { useGlobalContext } from '../../context/globalContext'
+import Search from '../shared/Search'
 
 export default function List() {
   const [listOpen, setListOpen] = useState(true)
+
+  const { todos, listSort } = useGlobalContext()
+
   const toggleListOpen = () => {
     setListOpen(!listOpen)
   }
 
-  // todo: try removing the list completely with framer motion - unmount
-  // todo: research how to slide flex div out of the way
-  // * continue to privledge responsiveness
-  // todo: place toggle arrow back within list component rather than within player wrapper
+  const handleSettingsClick = () => {
+    window.alert('settings')
+  }
 
   return (
     <div
@@ -41,24 +26,36 @@ export default function List() {
         listOpen ? 'w-1/3' : 'w-0'
       } relative flex flex-col h-auto transition-all duration-500 ease-in-out`}
     >
-      <div className='relative flex items-center'>
-        <div
-          onClick={toggleListOpen}
-          className={`${
-            listOpen ? 'rotate-0' : 'rotate-180 -translate-x-full'
-          } relative text-3xl transform text-highlight-700 z-50 bg-transparent transition-all hover:text-highlight-400 duration-500 ease-in-out cursor-pointer`}
-        >
-          <ArrowIcon className='fill-current' />
-        </div>
-        <h1 className='tracking-widest uppercase text-highlight-700'>
+      {/* list header */}
+      <div className='relative flex items-center justify-between border-b border-black'>
+        <div className='flex'>
+          <div
+            onClick={toggleListOpen}
+            className={`${
+              listOpen ? 'rotate-0' : 'rotate-180 -translate-x-full'
+            } relative text-3xl mr-2 transform text-highlight-700 z-50 bg-transparent transition-all hover:text-highlight-400 duration-500 ease-in-out cursor-pointer`}
+          >
+            <ArrowIcon className='fill-current' />
+          </div>
+          {/* <h1 className='tracking-widest uppercase text-highlight-700'>
           videonote
-        </h1>
+        </h1> */}
+          <Search />
+        </div>
+        <div
+          onClick={handleSettingsClick}
+          className='mr-2 text-gray-600 transition-colors duration-300 ease-in-out cursor-pointer hover:text-themeHighlight'
+        >
+          <SettingsIcon className='text-xl fill-current' />
+        </div>
       </div>
+
+      {/* list content */}
       <div className={`${style.scrollbar} w-full h-full overflow-auto shadow `}>
         <table className='w-full bg-white'>
           <tbody className=''>
-            {data.map((item, idx) => (
-              <ListItem {...item} key={idx} />
+            {listSort(todos).map(todo => (
+              <ListItem todo={todo} key={todo.id} />
             ))}
           </tbody>
         </table>

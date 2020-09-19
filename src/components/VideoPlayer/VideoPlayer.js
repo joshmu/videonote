@@ -8,14 +8,13 @@ import style from './videoPlayer.module.scss'
 
 export default function VideoPlayer() {
   const {
+    url,
     playing,
     volume,
-    ready,
+    playerRef,
     handleReady,
     handleProgress,
-    videoRef,
   } = useVideoContext()
-  const url = 'https://www.youtube.com/watch?v=gdZLi9oWNZg'
 
   // todo: how can we always center video vertically?
   // todo: wrapper for theme toggle otherwise insert in to navbar
@@ -26,7 +25,6 @@ export default function VideoPlayer() {
       {/* resposive wrapper */}
       <div className={`${style.playerWrapper} w-full h-full`}>
         <ReactPlayer
-          ref={videoRef}
           url={url}
           controls={false}
           playing={playing}
@@ -46,7 +44,7 @@ export default function VideoPlayer() {
         />
       </div>
       {/* input wrapper */}
-      {ready && (
+      {playerRef.current && (
         <motion.div
           key='action-input'
           initial={{ opacity: 0, y: 10 }}

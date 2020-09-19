@@ -8,11 +8,16 @@ const videoContext = createContext({
 })
 
 export function VideoProvider(props) {
-  const videoRef = useRef(null)
-  const [ready, setReady] = useState(false)
+  const playerRef = useRef(null)
+  const [url, setUrl] = useState('https://www.youtube.com/watch?v=gdZLi9oWNZg')
   const [playing, setPlaying] = useState(false)
   const [volume, setVolume] = useState(0.5)
   const [progress, setProgress] = useState({})
+
+  const handleReady = reactPlayer => {
+    // assign react player
+    playerRef.current = reactPlayer
+  }
 
   const togglePlay = () => {
     setPlaying(!playing)
@@ -39,18 +44,12 @@ export function VideoProvider(props) {
     // validate
     if (Number(secs) === NaN) return
 
-    videoRef.current.seekTo(secs, 'seconds')
-  }
-
-  const handleReady = e => {
-    console.log('ready?', e)
-    setReady(true)
+    playerRef.current.seekTo(secs, 'seconds')
   }
 
   const value = {
-    videoRef,
     handleReady,
-    ready,
+    url,
     playing,
     togglePlay,
     volume,
@@ -58,6 +57,7 @@ export function VideoProvider(props) {
     handleProgress,
     progress,
     seekTo,
+    playerRef,
   }
 
   return <videoContext.Provider value={value} {...props} />

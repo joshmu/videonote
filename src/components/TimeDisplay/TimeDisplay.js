@@ -1,4 +1,4 @@
-export default function TimeDisplay({ seconds, lock }) {
+export default function TimeDisplay({ seconds = 0, lock = false }) {
   return (
     <div
       className={`${
