@@ -2,12 +2,21 @@ import Link from 'next/link'
 import { useGlobalContext } from '../../context/globalContext'
 
 export default function SettingsDropdown({ open, ...props }) {
-  const { toggleSettingsOpen, toggleModalOpen } = useGlobalContext()
+  const {
+    toggleSettingsOpen,
+    toggleModalOpen,
+    resetGlobalState,
+  } = useGlobalContext()
 
   const handleClick = e => {
     const modalId = e.target.getAttribute('data-modal')
     toggleModalOpen(modalId)
     toggleSettingsOpen()
+  }
+
+  const handleSignOutClick = () => {
+    toggleSettingsOpen()
+    resetGlobalState()
   }
 
   return (
@@ -37,7 +46,7 @@ export default function SettingsDropdown({ open, ...props }) {
           </p>
           <Link href='/'>
             <p
-              onClick={toggleSettingsOpen}
+              onClick={handleSignOutClick}
               className='block px-4 py-2 text-sm text-gray-700 capitalize hover:bg-blue-500 hover:text-white'
             >
               Sign Out

@@ -1,7 +1,19 @@
+import { useState } from 'react'
 import { motion } from 'framer-motion'
 import Link from 'next/link'
+import { useGlobalContext } from '../../context/globalContext'
 
 export default function LoginModal() {
+  const { login } = useGlobalContext()
+  const [user, setUser] = useState({ username: '' })
+
+  const handleChange = e => {
+    setUser({ ...user, username: e.target.value })
+  }
+  const handleLogin = () => {
+    login(user)
+  }
+
   return (
     <motion.div
       key='login-modal'
@@ -30,6 +42,8 @@ export default function LoginModal() {
               type='email'
               placeholder='Email Address'
               aria-label='Email Address'
+              value={user.username}
+              onChange={handleChange}
             />
           </div>
 
@@ -49,6 +63,7 @@ export default function LoginModal() {
 
             <Link href='/vn'>
               <button
+                onClick={handleLogin}
                 className='px-4 py-2 text-white bg-gray-700 rounded-sm hover:bg-gray-600 focus:outline-none'
                 type='button'
               >
