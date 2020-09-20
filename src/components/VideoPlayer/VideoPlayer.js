@@ -51,7 +51,7 @@ export default function VideoPlayer() {
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -10 }}
         >
-          <div className='absolute bottom-0 z-50 w-2/3 h-12 mb-8 transform -translate-x-1/2 left-1/2'>
+          <div className='absolute bottom-0 z-10 w-2/3 h-12 mb-8 transform -translate-x-1/2 left-1/2'>
             <ActionInput />
           </div>
         </motion.div>

@@ -34,6 +34,9 @@ export function GlobalProvider(props) {
 
   const [project, setProject] = useState(null)
 
+  const [settingsOpen, setSettingsOpen] = useState(false)
+  const [modalOpen, setModalOpen] = useState(null)
+
   // initial load, check for localStorage
   useEffect(() => {
     const accountJson = window.localStorage.getItem('account')
@@ -74,6 +77,14 @@ export function GlobalProvider(props) {
   }
   const updateSettings = data => setSettings({ ...settings, ...data })
 
+  const toggleSettingsOpen = () => {
+    setSettingsOpen(!settingsOpen)
+  }
+  const toggleModalOpen = modalName => {
+    console.log('open modal', modalName)
+    setModalOpen(modalOpen === modalName ? null : modalName)
+  }
+
   const value = {
     account,
     updateAccount,
@@ -82,6 +93,10 @@ export function GlobalProvider(props) {
     project,
     settings,
     updateSettings,
+    settingsOpen,
+    toggleSettingsOpen,
+    modalOpen,
+    toggleModalOpen,
   }
 
   return <globalContext.Provider value={value} {...props} />

@@ -1,6 +1,8 @@
 import Layout from '../src/components/Layout'
 import VideoPlayer from '../src/components/VideoPlayer/VideoPlayer'
-import List from '../src/components/List/List'
+import Sidebar from '../src/components/Sidebar/Sidebar'
+import ProjectModal from '../src/components/ProjectModal/ProjectModal'
+import AccountModal from '../src/components/AccountModal/AccountModal'
 
 export default function Main() {
   return (
@@ -10,8 +12,11 @@ export default function Main() {
 
         <div className='flex flex-1 w-full h-full'>
           <VideoPlayer />
-          <List />
+          <Sidebar />
         </div>
+
+        <AccountModal />
+        <ProjectModal />
       </div>
     </Layout>
   )

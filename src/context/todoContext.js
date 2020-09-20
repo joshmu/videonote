@@ -49,7 +49,7 @@ export function TodoProvider(props) {
     setSearch(txt)
   }
 
-  const listSort = todos => {
+  const sort = todos => {
     // default is to sort chronologically
     let sorted = todos.sort((p, c) => p.time - c.time)
 
@@ -68,7 +68,7 @@ export function TodoProvider(props) {
     removeTodo,
     search,
     updateSearch,
-    listSort,
+    sort,
     settings,
   }
 
