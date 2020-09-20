@@ -2,11 +2,12 @@ import { useGlobalContext } from '../../context/globalContext'
 import { useVideoContext } from '../../context/videoContext'
 import TimeDisplay from '../TimeDisplay/TimeDisplay'
 import { motion } from 'framer-motion'
+import { useTodoContext } from '../../context/todoContext'
 
 export default function ListItem({ todo }) {
   const { id, msg, person = null, time, done = false } = todo
   const { seekTo } = useVideoContext()
-  const { updateTodo, removeTodo } = useGlobalContext()
+  const { updateTodo, removeTodo } = useTodoContext()
 
   const handleTimeClick = () => {
     const updatedTodo = { ...todo, done: !todo.done }

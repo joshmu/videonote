@@ -1,18 +1,18 @@
 import { useEffect, useState } from 'react'
 import ProgressBar from '../shared/ProgressBar'
-import { useVideoContext } from '../../context/videoContext'
 import TimeDisplay from '../TimeDisplay/TimeDisplay'
-import { useGlobalContext } from '../../context/globalContext'
+import { useVideoContext } from '../../context/videoContext'
+import { useTodoContext } from '../../context/todoContext'
 
 const ActionInput = () => {
-  const { emptyInputControls } = useVideoContext()
+  const { smartControls, progress } = useVideoContext()
+  const { addTodo } = useTodoContext()
+
   const [todo, setTodo] = useState({
     msg: '',
     time: null,
   })
   const [active, setActive] = useState(false)
-  const { progress } = useVideoContext()
-  const { addTodo } = useGlobalContext()
 
   // * add new todo on submit
   const handleSubmit = () => {
@@ -52,7 +52,7 @@ const ActionInput = () => {
 
     // keyboard shortcuts on empty todo
     if (todo.msg === '') {
-      emptyInputControls(e.key)
+      smartControls(e.key)
     }
   }
 

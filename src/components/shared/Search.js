@@ -1,9 +1,11 @@
 import { useGlobalContext } from '../../context/globalContext'
 import { useVideoContext } from '../../context/videoContext'
+import { useTodoContext } from '../../context/todoContext'
 
 export default function Search() {
-  const { search, updateSearch } = useGlobalContext()
-  const { emptyInputControls } = useVideoContext()
+  const { search } = useGlobalContext()
+  const { updateSearch } = useTodoContext()
+  const { smartControls } = useVideoContext()
 
   const handleChange = e => {
     const value = e.target.value
@@ -14,7 +16,7 @@ export default function Search() {
   const handleKeyDown = e => {
     // keyboard logic on empty field
     if (e.target.value === '') {
-      emptyInputControls(e.key)
+      smartControls(e.key)
     }
   }
 

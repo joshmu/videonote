@@ -1,77 +1,87 @@
 import { createContext, useContext, useEffect, useState } from 'react'
 
-// todo: global data could be
-// [{ user: {}, projects: [{ src: '', todos: [], created: '', updated: '', deleted: '' }] }]
+// const temp = {
+//   account: {
+//     username: 'josh',
+//     email: 'mu@joshmu.com',
+//   },
+//   projects: [
+//     {
+//       id: '', // todo: maybe?
+//       src: 'https://www.youtube.com/watch?v=gdZLi9oWNZg',
+//       todos: [],
+//       created: new Date(),
+//       updated: undefined,
+//       deleted: undefined,
+//     },
+//   ],
+//   settings: {
+//     playOffset: -4,
+//   },
+// }
 
-const globalContext = createContext({ todos: [], settings: { playOffset: -4 } })
+const globalContext = createContext({
+  account: {},
+  projects: [],
+  settings: {},
+  project: null,
+})
 
 export function GlobalProvider(props) {
-  const [todos, setTodos] = useState([])
-  const [search, setSearch] = useState('')
-  const [settings, setSettings] = useState({
-    playOffset: -4,
-  })
+  const [account, setAccount] = useState(null)
+  const [projects, setProjects] = useState([])
+  const [settings, setSettings] = useState(null)
+
+  const [project, setProject] = useState(null)
 
   // initial load, check for localStorage
   useEffect(() => {
-    const data = window.localStorage.getItem('todos')
-    if (data) setTodos(JSON.parse(data))
+    const accountJson = window.localStorage.getItem('account')
+    const projectsJson = window.localStorage.getItem('projects')
+    const settingsJson = window.localStorage.getItem('settings')
+    if (accountJson) setAccount(JSON.parse(accountJson))
+    if (projectsJson) setProjects(JSON.parse(projectsJson))
+    if (settingsJson) setSettings(JSON.parse(settingsJson))
   }, [])
 
-  // update local storage whenever our todos change
+  // update if any change
   useEffect(() => {
     updateLocalStorage()
-  }, [todos])
+  }, [account, projects, settings])
+
+  useEffect(() => {
+    // if we have projects and no current then autoselect first project
+    if (projects.length > 0 && project === null) setProject(projects[0])
+    // whenever projects change then lets update storage
+    updateLocalStorage()
+  }, [projects])
 
   const updateLocalStorage = () => {
-    window.localStorage.setItem('todos', JSON.stringify(todos))
+    if (account !== null)
+      window.localStorage.setItem('account', JSON.stringify(account))
+    if (projects.length > 0)
+      window.localStorage.setItem('projects', JSON.stringify(projects))
+    if (settings !== null)
+      window.localStorage.setItem('settings', JSON.stringify(settings))
   }
 
-  const addTodo = todo => {
-    const newTodo = {
-      id: Date.now(),
-      msg: todo.msg,
-      time: todo.time,
-      done: false,
-    }
-    setTodos([...todos, newTodo])
+  const updateAccount = data => setAccount({ ...account, ...data })
+  const updateProjects = project => {
+    const updatedProjects = projects.map(p => {
+      return p.src === project.src ? project : p
+    })
+    setProjects(updatedProjects)
   }
-
-  const updateTodo = todo => {
-    const updatedTodos = todos.map(t => (t.id === todo.id ? todo : t))
-    setTodos(updatedTodos)
-  }
-
-  const removeTodo = id => {
-    const updatedTodos = todos.filter(todo => todo.id !== id)
-    setTodos(updatedTodos)
-  }
-
-  const updateSearch = txt => {
-    setSearch(txt)
-  }
-
-  const listSort = todos => {
-    // default is to sort chronologically
-    let sorted = todos.sort((p, c) => p.time - c.time)
-
-    // search
-    if (search !== '') {
-      sorted = sorted.filter(todo => todo.msg.includes(search))
-    }
-
-    return sorted
-  }
+  const updateSettings = data => setSettings({ ...settings, ...data })
 
   const value = {
-    todos,
-    addTodo,
-    updateTodo,
-    removeTodo,
-    search,
-    updateSearch,
-    listSort,
+    account,
+    updateAccount,
+    projects,
+    updateProjects,
+    project,
     settings,
+    updateSettings,
   }
 
   return <globalContext.Provider value={value} {...props} />

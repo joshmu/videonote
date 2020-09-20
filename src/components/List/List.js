@@ -4,13 +4,13 @@ import { MdSettings as SettingsIcon } from 'react-icons/md'
 import ListItem from './ListItem'
 // @ts-ignore
 import style from './list.module.scss'
-import { useGlobalContext } from '../../context/globalContext'
 import Search from '../shared/Search'
+import { useTodoContext } from '../../context/todoContext'
 
 export default function List() {
   const [listOpen, setListOpen] = useState(true)
 
-  const { todos, listSort } = useGlobalContext()
+  const { todos, listSort } = useTodoContext()
 
   const toggleListOpen = () => {
     setListOpen(!listOpen)

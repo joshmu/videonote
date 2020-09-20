@@ -4,28 +4,23 @@ import { useGlobalContext } from './globalContext'
 const videoContext = createContext({
   ready: false,
   playing: false,
-  volume: 0.5,
+  volume: 0.75,
   progress: { playedSeconds: 0, played: 0, loadedSeconds: 0, loaded: 0 },
 })
-const tempUrl = 'https://www.youtube.com/watch?v=gdZLi9oWNZg'
-const tempUrl2 = 'https://www.youtube.com/watch?v=Jelbqbs80Ms'
 
 export function VideoProvider(props) {
-  const { settings } = useGlobalContext()
+  const { project, settings } = useGlobalContext()
   const playerRef = useRef(null)
-  const [url, setUrl] = useState(tempUrl)
+  const [url, setUrl] = useState(null)
   const [playing, setPlaying] = useState(false)
-  const [volume, setVolume] = useState(0.5)
+  const [volume, setVolume] = useState(0.75)
   const [progress, setProgress] = useState({})
 
-  // useEffect(() => {
-  //   setTimeout(() => {
-  //     setUrl(tempUrl)
-  //     setTimeout(() => {
-  //       setUrl(tempUrl2)
-  //     }, 10000)
-  //   }, 10000)
-  // }, [])
+  useEffect(() => {
+    if (project) {
+      if (project.src) setUrl(project.src)
+    }
+  }, [project])
 
   const handleReady = reactPlayer => {
     // assign react player
@@ -63,7 +58,7 @@ export function VideoProvider(props) {
     playerRef.current.seekTo(playPosition, 'seconds')
   }
 
-  const emptyInputControls = key => {
+  const smartControls = key => {
     if (key === ' ') {
       togglePlay()
     }
@@ -98,7 +93,7 @@ export function VideoProvider(props) {
     progress,
     seekTo,
     playerRef,
-    emptyInputControls,
+    smartControls,
   }
 
   return <videoContext.Provider value={value} {...props} />
