@@ -73,7 +73,7 @@ const ActionInput = () => {
           active ? 'bg-opacity-90' : 'bg-opacity-25'
         } relative w-full transition-all duration-150 ease-in-out h-full px-2 py-1 text-sm text-gray-700 placeholder-gray-400 bg-white rounded-sm rounded-b-none rounded-l-none focus:outline-none`}
         autoFocus={true}
-        id='addTodo'
+        id='actionInput'
         name='addTodo'
         type='text'
         placeholder='Add Note...'

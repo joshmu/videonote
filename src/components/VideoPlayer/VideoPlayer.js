@@ -5,6 +5,7 @@ import { motion } from 'framer-motion'
 import { useVideoContext } from '../../context/videoContext'
 
 import style from './videoPlayer.module.scss'
+import { useTodoContext } from '../../context/todoContext'
 
 export default function VideoPlayer() {
   const {
@@ -15,9 +16,11 @@ export default function VideoPlayer() {
     handleReady,
     handleProgress,
   } = useVideoContext()
+  const { sidebar } = useTodoContext()
 
   // todo: how can we always center video vertically?
   // todo: wrapper for theme toggle otherwise insert in to navbar
+  // todo: update packages especially tailwind
 
   return (
     // wrapper to position input

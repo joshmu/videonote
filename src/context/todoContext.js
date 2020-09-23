@@ -11,6 +11,11 @@ export function TodoProvider(props) {
   const [todos, setTodos] = useState([])
   const [search, setSearch] = useState('')
 
+  const [sidebar, setSidebar] = useState({
+    width: 400,
+    resizing: false,
+  })
+
   // when a project is selected pre-fill the todos
   useEffect(() => {
     if (project !== null) setTodos(project.todos)
@@ -61,6 +66,36 @@ export function TodoProvider(props) {
     return sorted
   }
 
+  // resizable sidebar
+  const sidebarResizeStart = () => {
+    if (!sidebar.resizing) {
+      console.log('start resize')
+      setSidebar({ ...sidebar, resizing: true })
+      document.addEventListener('mousemove', sidebarResizeMove)
+      document.addEventListener('mouseup', sidebarResizeEnd)
+      // iframe fix
+      document.getElementsByTagName('iframe')[0].style.pointerEvents = 'none'
+      // remove transition duration
+      document.getElementById('sidebar').style.transitionDuration = '0'
+    }
+  }
+  const sidebarResizeMove = e => {
+    console.log('resizing')
+    setSidebar({ ...sidebar, width: window.innerWidth - e.clientX })
+  }
+  const sidebarResizeEnd = e => {
+    console.log('end resize')
+    const newWidth = window.innerWidth - e.clientX
+    setSidebar({ ...sidebar, width: newWidth, resizing: false })
+
+    document.removeEventListener('mousemove', sidebarResizeMove)
+    document.removeEventListener('mouseup', sidebarResizeEnd)
+    // iframe fix
+    document.getElementsByTagName('iframe')[0].style.pointerEvents = 'auto'
+    // resume transition duration
+    document.getElementById('sidebar').style.transitionDuration = '500'
+  }
+
   const value = {
     todos,
     addTodo,
@@ -70,6 +105,10 @@ export function TodoProvider(props) {
     updateSearch,
     sort,
     settings,
+    sidebar,
+    sidebarResizeStart,
+    sidebarResizeMove,
+    sidebarResizeEnd,
   }
 
   return <todoContext.Provider value={value} {...props} />
