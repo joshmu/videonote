@@ -57,21 +57,20 @@ const ActionInput = () => {
   }
 
   return (
-    <div className='relative flex items-center w-full h-full'>
-      <div
-        className={`${
-          active ? 'bg-opacity-90' : 'bg-opacity-25'
-        } flex items-center transition-all duration-150 ease-in-out self-center justify-center h-full px-2 text-gray-400 bg-white rounded-r-none`}
-      >
+    <div
+      className={`${
+        active ? 'bg-opacity-90' : 'bg-opacity-25'
+      } relative flex items-center w-full h-full bg-white`}
+    >
+      <div className='flex items-center self-center justify-center h-full px-2 text-gray-400 transition-all duration-150 ease-in-out bg-transparent rounded-r-none '>
         <TimeDisplay
           seconds={todo.time ? todo.time : progress.playedSeconds}
           lock={!!todo.time}
         />
       </div>
+
       <input
-        className={`${
-          active ? 'bg-opacity-90' : 'bg-opacity-25'
-        } relative w-full transition-all duration-150 ease-in-out h-full px-2 py-1 text-sm text-gray-700 placeholder-gray-400 bg-white rounded-sm rounded-b-none rounded-l-none focus:outline-none`}
+        className='relative w-full h-full px-2 py-1 text-sm text-gray-700 placeholder-gray-400 transition-all duration-150 ease-in-out bg-transparent rounded-sm rounded-b-none rounded-l-none focus:outline-none'
         autoFocus={true}
         id='actionInput'
         name='addTodo'
