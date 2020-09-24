@@ -7,12 +7,12 @@
     "start": "next start"
   },
   "dependencies": {
-    "framer-motion": "^2.5.1",
+    "framer-motion": "^2.7.1",
     "next": "9.5.2",
     "react": "16.13.1",
     "react-dom": "16.13.1",
     "react-icons": "^3.11.0",
-    "react-intersection-observer": "^8.27.0",
+    "react-intersection-observer": "^8.28.5",
     "react-player": "^2.6.2"
   },
   "devDependencies": {
@@ -22,7 +22,7 @@
     "next-compose-plugins": "^2.2.0",
     "next-optimized-images": "^2.6.2",
     "postcss-preset-env": "^6.7.0",
-    "sass": "^1.26.10",
-    "tailwindcss": "^1.7.0"
+    "sass": "^1.26.11",
+    "tailwindcss": "^1.8.10"
   }
 }

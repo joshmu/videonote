@@ -1,7 +1,9 @@
 const defaultTheme = require('tailwindcss/defaultTheme')
 
 module.exports = {
-  purge: ['./pages/**/*.js', './src/components/**/*.js'],
+  purge: {
+    content: ['./pages/**/*.js', './src/components/**/*.js'],
+  },
   theme: {
     extend: {
       fontFamily: {
@@ -46,6 +48,7 @@ module.exports = {
   plugins: [],
   future: {
     removeDeprecatedGapUtilities: true,
+    purgeLayersByDefault: true,
   },
   experimental: {
     uniformColorPalette: true, // color shades are similar brightness
