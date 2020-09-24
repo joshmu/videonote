@@ -7,7 +7,12 @@ import { useGlobalContext } from './globalContext'
 const todoContext = createContext({ todos: [] })
 
 export function TodoProvider(props) {
-  const { project, updateProjects, settings } = useGlobalContext()
+  const {
+    project,
+    updateProjects,
+    settings,
+    updateSettings,
+  } = useGlobalContext()
   const [todos, setTodos] = useState([])
   const [search, setSearch] = useState('')
 
@@ -15,6 +20,13 @@ export function TodoProvider(props) {
     width: 400,
     resizing: false,
   })
+
+  // update sidebar state when sidebar settings change
+  useEffect(() => {
+    if (settings.sidebarWidth !== sidebar.width) {
+      setSidebar({ ...sidebar, width: settings.sidebarWidth })
+    }
+  }, [settings.sidebarWidth])
 
   // when a project is selected pre-fill the todos
   useEffect(() => {
@@ -75,6 +87,8 @@ export function TodoProvider(props) {
       document.addEventListener('mouseup', sidebarResizeEnd)
       // lock resize cursor
       document.body.style.cursor = 'ew-resize'
+      // disable text selection
+      document.body.classList.add('disable-select')
       // iframe fix
       document.getElementsByTagName('iframe')[0].style.pointerEvents = 'none'
       // remove transition duration
@@ -90,11 +104,14 @@ export function TodoProvider(props) {
     console.log('end resize')
     const newWidth = window.innerWidth - e.clientX
     setSidebar({ ...sidebar, width: newWidth, resizing: false })
+    updateSettings({ sidebarWidth: newWidth })
 
     document.removeEventListener('mousemove', sidebarResizeMove)
     document.removeEventListener('mouseup', sidebarResizeEnd)
     // remove resize cursor
     document.body.style.cursor = 'default'
+    // resume text selection
+    document.body.classList.remove('disable-select')
     // iframe fix
     document.getElementsByTagName('iframe')[0].style.pointerEvents = 'auto'
     // resume transition duration
