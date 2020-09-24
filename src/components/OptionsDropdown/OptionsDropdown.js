@@ -1,7 +1,8 @@
 import Link from 'next/link'
 import { useGlobalContext } from '../../context/globalContext'
+import ThemeToggle from '../ThemeToggle'
 
-export default function SettingsDropdown({ open, ...props }) {
+export default function OptionsDropdown({ open, ...props }) {
   const {
     toggleSettingsOpen,
     toggleModalOpen,
@@ -39,6 +40,13 @@ export default function SettingsDropdown({ open, ...props }) {
           </p>
           <p
             onClick={handleClick}
+            data-modal='settings'
+            className='block px-4 py-2 text-sm text-gray-700 capitalize hover:bg-blue-500 hover:text-white'
+          >
+            settings
+          </p>
+          <p
+            onClick={handleClick}
             data-modal='account'
             className='block px-4 py-2 text-sm text-gray-700 capitalize hover:bg-blue-500 hover:text-white'
           >
@@ -52,6 +60,9 @@ export default function SettingsDropdown({ open, ...props }) {
               Sign Out
             </p>
           </Link>
+          <div className='relative flex items-center block px-4 py-2 text-gray-700 capitalize text-md hover:bg-blue-500 hover:text-white '>
+            <ThemeToggle darkColor='text-gray-700' lightColor='text-gray-700' />
+          </div>
         </div>
       )}
     </div>

@@ -1,10 +1,6 @@
 export default function TimeDisplay({ seconds = 0, lock = false }) {
   return (
-    <div
-      className={`${
-        lock ? 'text-highlight-700' : ''
-      } transition-colors duration-300 ease-in-out`}
-    >
+    <div className={`${lock ? 'text-highlight-700' : ''}`}>
       {format(seconds)}
     </div>
   )

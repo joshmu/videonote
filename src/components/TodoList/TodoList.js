@@ -5,7 +5,7 @@ export default function TodoList() {
   const { todos, sort } = useTodoContext()
 
   return (
-    <div className='w-full bg-white'>
+    <div className='w-full bg-transparent'>
       {sort(todos).map(todo => (
         <TodoItem todo={todo} key={todo.id} />
       ))}

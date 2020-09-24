@@ -4,8 +4,7 @@ import { MdSettings as SettingsIcon } from 'react-icons/md'
 import { useGlobalContext } from '../../context/globalContext'
 import Search from '../shared/Search'
 import TodoList from '../TodoList/TodoList'
-import SettingsDropdown from '../SettingsDropdown/SettingsDropdown'
-// import { useTodoContext } from '../../context/todoContext'
+import OptionsDropdown from '../OptionsDropdown/OptionsDropdown'
 import { useResizable } from '../../hooks/useResizable'
 
 export default function Sidebar(props) {
@@ -15,7 +14,6 @@ export default function Sidebar(props) {
     settings,
     updateSettings,
   } = useGlobalContext()
-  // const { sidebar, sidebarResizeStart } = useTodoContext()
   const { state: resizeState, handleStartResize } = useResizable({
     initialSize: settings.sidebarWidth,
   })
@@ -77,7 +75,7 @@ export default function Sidebar(props) {
               className='text-xl fill-current'
             />
 
-            <SettingsDropdown open={settingsOpen} />
+            <OptionsDropdown open={settingsOpen} />
           </div>
         </div>
 

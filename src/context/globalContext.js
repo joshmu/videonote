@@ -146,13 +146,25 @@ export function GlobalProvider(props) {
     const newProject = { ...project, todos: [], id: Date.now() }
     setProjects([...projects, newProject])
     setProject(newProject)
+    updateSettings({ currentProject: newProject.id })
   }
 
   const switchProject = id => {
     console.log('switch to project id', id)
-    const project = projects.find(p => p.id === id)
+    let project = projects.find(p => p.id === id)
+
+    // if there is no project then just set to any
+    if (!project) project = projects[0]
+
     setProject(project)
     updateSettings({ currentProject: project.id })
+  }
+
+  const removeProject = id => {
+    const updatedProjects = projects.filter(p => p.id !== id)
+    setProjects(updatedProjects)
+    // switch project if we are removing the currently viewed project
+    if (settings.currentProject === id) switchProject(updatedProjects[0].id)
   }
 
   const value = {
@@ -160,6 +172,7 @@ export function GlobalProvider(props) {
     updateAccount,
     projects,
     updateProjects,
+    removeProject,
     project,
     settings,
     updateSettings,

@@ -14,10 +14,12 @@ export default function Home() {
 
   return (
     <Layout>
-      <ThemeToggle
-        lightColor='text-themeHighlight'
-        darkColor='text-themeHighlight'
-      />
+      <div className='absolute top-0 right-0 z-50 p-4 text-2xl hover:text-themeHighlight'>
+        <ThemeToggle
+          lightColor='text-themeHighlight'
+          darkColor='text-themeHighlight'
+        />
+      </div>
       <div className='absolute top-0 flex w-full h-full'>
         {/* left */}
         <div className='relative flex items-center justify-end w-full h-full'>

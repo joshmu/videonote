@@ -20,7 +20,7 @@ export default function ThemeToggle({
       onClick={handleClick}
       className={`${className} ${
         theme === 'light' ? lightColor : darkColor
-      } absolute text-2xl top-0 right-0 z-50 p-4 transition-colors duration-300 ease-in-out cursor-pointer hover:text-themeHighlight`}
+      } transition-colors duration-300 ease-in-out cursor-pointer w-full h-full relative flex items-center`}
       {...props}
     >
       {theme === 'dark' ? (

@@ -1,24 +1,21 @@
-import { useEffect } from 'react'
 import Layout from '../src/components/Layout'
 import VideoPlayer from '../src/components/VideoPlayer/VideoPlayer'
 import Sidebar from '../src/components/Sidebar/Sidebar'
-import { useGlobalContext } from '../src/context/globalContext'
 import Modals from '../src/components/Modals/Modals'
 
 // todo: speech to text synthesis on actionInput
-// todo: load local file
 // todo: easy share project (read only privledges option?, url link and no account required?)
 // todo: prioritize speed of workflow
+// todo: notification system
+// todo: warning if bad local file
+// todo: warning if using local file that you will not be able to share
+// todo: export option
+// todo: simplify colorscheme
+// todo: formalize universal style components
+// todo: think about mobile variant
+// todo: auto focus on actionInput after project load
 
 export default function Main() {
-  const { account, login, loadProject } = useGlobalContext()
-
-  // ! on initial load check if we have data and if not default for development
-  useEffect(() => {
-    if (!account) login({ username: 'mu@joshmu.com' })
-    loadProject()
-  }, [])
-
   return (
     <Layout>
       <div className='flex flex-col w-full h-screen overflow-hidden'>

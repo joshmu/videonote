@@ -25,7 +25,7 @@ export default function TodoItem({ todo }) {
       motionKey={id}
       className={`${
         done && 'text-gray-400'
-      } relative text-gray-700 py-1 transition-all duration-200 ease-in-out bg-white border-b cursor-pointer hover:bg-highlight-100`}
+      }  px-4 py-2 text-gray-700 cursor-pointer hover:bg-blue-500 hover:text-white relative bg-white border-b`}
     >
       <div className='flex items-center justify-start w-full h-full text-base'>
         <div
