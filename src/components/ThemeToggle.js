@@ -1,8 +1,7 @@
-import { AnimatePresence, motion } from 'framer-motion'
+import { motion } from 'framer-motion'
 import { HiSun as SunIcon } from 'react-icons/hi'
 import { BsMoon as MoonIcon } from 'react-icons/bs'
 import { useThemeContext } from '../context/themeContext'
-import Reveal from './shared/Reveal'
 
 export default function ThemeToggle({
   lightColor = 'text-themeText',
@@ -25,25 +24,25 @@ export default function ThemeToggle({
       {...props}
     >
       {theme === 'dark' ? (
-        <motion.div
-          key='dark'
+        <motion.button
+          key='themeToggle-dark'
           initial={{ opacity: 0, rotate: -180, scale: 0 }}
           animate={{ opacity: 1, rotate: 0, scale: 1 }}
           exit={{ opacity: 0, rotate: 180, scale: 0 }}
-          className='relative'
+          className='relative focus:outline-none'
         >
           <MoonIcon className='fill-current' />
-        </motion.div>
+        </motion.button>
       ) : (
-        <motion.div
-          key='light'
+        <motion.button
+          key='themeToggle-light'
           initial={{ opacity: 0, rotate: -180, scale: 0 }}
           animate={{ opacity: 1, rotate: 0, scale: 1 }}
           exit={{ opacity: 0, rotate: 180, scale: 0 }}
-          className='relative'
+          className='relative focus:outline-none'
         >
           <SunIcon className='fill-current' />
-        </motion.div>
+        </motion.button>
       )}
     </div>
   )

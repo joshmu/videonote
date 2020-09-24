@@ -73,9 +73,12 @@ export function TodoProvider(props) {
       setSidebar({ ...sidebar, resizing: true })
       document.addEventListener('mousemove', sidebarResizeMove)
       document.addEventListener('mouseup', sidebarResizeEnd)
+      // lock resize cursor
+      document.body.style.cursor = 'ew-resize'
       // iframe fix
       document.getElementsByTagName('iframe')[0].style.pointerEvents = 'none'
       // remove transition duration
+      document.getElementById('videoContent').style.transitionDuration = '0'
       document.getElementById('sidebar').style.transitionDuration = '0'
     }
   }
@@ -90,9 +93,12 @@ export function TodoProvider(props) {
 
     document.removeEventListener('mousemove', sidebarResizeMove)
     document.removeEventListener('mouseup', sidebarResizeEnd)
+    // remove resize cursor
+    document.body.style.cursor = 'default'
     // iframe fix
     document.getElementsByTagName('iframe')[0].style.pointerEvents = 'auto'
     // resume transition duration
+    document.getElementById('videoContent').style.transitionDuration = '300'
     document.getElementById('sidebar').style.transitionDuration = '500'
   }
 

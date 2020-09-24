@@ -4,7 +4,6 @@ import NavBtn from '../src/components/shared/NavBtn'
 import { Heading } from '../src/components/shared/Text'
 import ThemeToggle from '../src/components/ThemeToggle'
 import { motion } from 'framer-motion'
-import Reveal from '../src/components/shared/Reveal'
 
 export default function Home() {
   const { toggleTheme } = useThemeContext()
@@ -23,7 +22,7 @@ export default function Home() {
         {/* left */}
         <div className='relative flex items-center justify-end w-full h-full'>
           <motion.div
-            key='video'
+            key='videoTitle'
             initial={{ opacity: 1 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0, y: -10, transition: { delay: 0 } }}
@@ -45,7 +44,7 @@ export default function Home() {
           >
             <NavBtn
               href='/login'
-              className='absolute z-10 -mb-32 bottom-1/2 bg-themeBackground hover:text-themeBackground'
+              className='absolute z-10 -mb-32 text-left focus:outline-none bottom-1/2 bg-themeBackground hover:text-themeBackground'
             >
               Let's Go
             </NavBtn>

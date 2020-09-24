@@ -24,7 +24,7 @@ export default function VideoPlayer() {
 
   return (
     // wrapper to position input
-    <div className='relative w-full h-full'>
+    <div id='videoContent' className='relative w-full h-full'>
       {/* resposive wrapper */}
       <div className={`${style.playerWrapper} w-full h-full`}>
         <ReactPlayer

@@ -38,7 +38,7 @@ export default function LoginModal() {
         <form>
           <div className='w-full mt-4'>
             <input
-              className='block w-full px-4 py-2 mt-2 text-gray-700 placeholder-gray-500 bg-white border border-gray-300 rounded-sm focus:border-blue-500 focus:outline-none focus:shadow-outline'
+              className='block w-full px-4 py-2 mt-2 text-gray-700 placeholder-gray-500 bg-white border border-gray-300 rounded-sm focus:border-gray-500 focus:outline-none'
               type='email'
               placeholder='Email Address'
               aria-label='Email Address'
@@ -49,7 +49,7 @@ export default function LoginModal() {
 
           <div className='w-full mt-4'>
             <input
-              className='block w-full px-4 py-2 mt-2 text-gray-700 placeholder-gray-500 bg-white border border-gray-300 rounded-sm focus:border-blue-500 focus:outline-none focus:shadow-outline'
+              className='block w-full px-4 py-2 mt-2 text-gray-700 placeholder-gray-500 bg-white border border-gray-300 rounded-sm focus:border-gray-500 focus:outline-none'
               type='password'
               placeholder='Password'
               aria-label='Password'
@@ -64,8 +64,13 @@ export default function LoginModal() {
             <Link href='/vn'>
               <button
                 onClick={handleLogin}
-                className='px-4 py-2 text-white bg-gray-700 rounded-sm hover:bg-gray-600 focus:outline-none'
+                className={`${
+                  user.username.length > 0
+                    ? 'bg-gray-700 hover:bg-gray-600'
+                    : 'bg-gray-300 pointer-events-none'
+                } px-4 py-2 text-white rounded-sm focus:outline-none`}
                 type='button'
+                disabled={user.username.length === 0}
               >
                 Login
               </button>
