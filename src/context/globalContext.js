@@ -26,6 +26,7 @@ const globalContext = createContext({
   settings: {
     playOffset: -4,
     sidebarWidth: 400,
+    currentProject: null,
   },
   project: null,
 })
@@ -33,7 +34,11 @@ const globalContext = createContext({
 export function GlobalProvider(props) {
   const [account, setAccount] = useState(null)
   const [projects, setProjects] = useState([])
-  const [settings, setSettings] = useState({ playOffset: -4 })
+  const [settings, setSettings] = useState({
+    playOffset: -4,
+    sidebarWidth: 400,
+    currentProject: null,
+  })
 
   const [project, setProject] = useState(null)
 
@@ -43,21 +48,11 @@ export function GlobalProvider(props) {
   const resetGlobalState = () => {
     setAccount(null)
     setProjects([])
-    setSettings({ playOffset: -4, sidebarWidth: 400 })
+    setSettings({ playOffset: -4, sidebarWidth: 400, currentProject: null })
     setProject(null)
     setSettingsOpen(false)
     setModalOpen(false)
   }
-
-  // // initial load, check for localStorage
-  // useEffect(() => {
-  //   const accountJson = window.localStorage.getItem('account')
-  //   const projectsJson = window.localStorage.getItem('projects')
-  //   const settingsJson = window.localStorage.getItem('settings')
-  //   if (accountJson) setAccount(JSON.parse(accountJson))
-  //   if (projectsJson) setProjects(JSON.parse(projectsJson))
-  //   if (settingsJson) setSettings(JSON.parse(settingsJson))
-  // }, [])
 
   const login = user => {
     let data = window.localStorage.getItem('vn')
@@ -78,32 +73,24 @@ export function GlobalProvider(props) {
     if (userData.account) setAccount(userData.account)
     if (userData.projects) setProjects(userData.projects)
     if (userData.settings) setSettings(userData.settings)
+
+    loadProject()
   }
 
   const createUserDefaults = user => {
     return {
       account: user,
       projects: [],
-      settings: { playOffset: -4, sidebarWidth: 400 },
+      settings: { playOffset: -4, sidebarWidth: 400, currentProject: null },
     }
   }
 
   // update if any change
   useEffect(() => {
-    if (account && projects && settings) updateLocalStorage()
-  }, [account, projects, settings])
-
-  useEffect(() => {
-    // only update when we have projects available
-    if (projects.length === 0) {
-      console.log('>> you need to create a project')
-      return
-    }
-    // if we have projects and no current then autoselect first project
-    if (projects.length > 0 && project === null) setProject(projects[0])
-    // whenever projects change then lets update storage
-    updateLocalStorage()
-  }, [projects])
+    if (account && projects && settings && project) updateLocalStorage()
+    if (projects.length > 0 && settings.currentProject && project === null)
+      loadProject()
+  }, [account, projects, settings, project])
 
   const updateLocalStorage = () => {
     console.log('update storage', { account, projects, settings })
@@ -116,7 +103,26 @@ export function GlobalProvider(props) {
     window.localStorage.setItem('vn', JSON.stringify(db))
   }
 
+  const loadProject = () => {
+    // only update when we have projects available
+    if (projects.length === 0) {
+      console.log('>> you need to create a project')
+      return
+    }
+    // if we have projects and no current then autoselect first project
+    if (projects.length > 0) {
+      if (settings.currentProject) {
+        switchProject(settings.currentProject)
+      } else {
+        // auto select first project
+        setProject(projects[0])
+        updateSettings({ currentProject: projects[0].id })
+      }
+    }
+  }
+
   const updateAccount = data => setAccount({ ...account, ...data })
+
   const updateProjects = project => {
     const updatedProjects = projects.map(p => {
       return p.src === project.src ? project : p
@@ -129,13 +135,24 @@ export function GlobalProvider(props) {
     setSettingsOpen(!settingsOpen)
   }
   const toggleModalOpen = modalName => {
+    console.log({ modalName })
+    if (!modalName) return setModalOpen(null)
+    if (modalName === modalOpen) return setModalOpen(null)
+    setModalOpen(modalName)
     console.log('open modal', modalName)
     setModalOpen(modalOpen === modalName ? null : modalName)
   }
   const createProject = project => {
-    const newProject = { ...project, todos: [] }
+    const newProject = { ...project, todos: [], id: Date.now() }
     setProjects([...projects, newProject])
     setProject(newProject)
+  }
+
+  const switchProject = id => {
+    console.log('switch to project id', id)
+    const project = projects.find(p => p.id === id)
+    setProject(project)
+    updateSettings({ currentProject: project.id })
   }
 
   const value = {
@@ -153,6 +170,8 @@ export function GlobalProvider(props) {
     login,
     createProject,
     resetGlobalState,
+    switchProject,
+    loadProject,
   }
 
   return <globalContext.Provider value={value} {...props} />

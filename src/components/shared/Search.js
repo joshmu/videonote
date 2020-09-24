@@ -1,10 +1,8 @@
-import { useGlobalContext } from '../../context/globalContext'
 import { useVideoContext } from '../../context/videoContext'
 import { useTodoContext } from '../../context/todoContext'
 
 export default function Search() {
-  const { search } = useGlobalContext()
-  const { updateSearch } = useTodoContext()
+  const { search, updateSearch } = useTodoContext()
   const { smartControls } = useVideoContext()
 
   const handleChange = e => {
@@ -22,7 +20,7 @@ export default function Search() {
 
   return (
     <input
-      className='placeholder-gray-300 focus:outline-none'
+      className='w-full placeholder-gray-300 focus:outline-none'
       type='text'
       placeholder='Search'
       value={search}

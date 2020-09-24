@@ -8,14 +8,8 @@ import Animate from '../shared/Animate'
 // todo: update
 // todo: onChange handle all inputs
 
-export default function ProjectModal() {
-  const {
-    modalOpen,
-    toggleModalOpen,
-    settings,
-    updateSettings,
-    createProject,
-  } = useGlobalContext()
+export default function CreateProjectModal({ open, toggle }) {
+  const { settings, updateSettings, createProject } = useGlobalContext()
 
   const [project, setProject] = useState({
     title: '',
@@ -25,7 +19,7 @@ export default function ProjectModal() {
   const handleCreate = e => {
     e.preventDefault()
     if (project.title.length > 0 && project.src) createProject(project)
-    toggleModalOpen('project')
+    toggle()
   }
 
   const handleChange = e => {
@@ -36,9 +30,8 @@ export default function ProjectModal() {
 
   return (
     <>
-      {modalOpen === 'create' && (
-        <Animate motionKey='projectModal'>
-          <div className='absolute top-0 bottom-0 left-0 right-0 bg-black bg-opacity-50'></div>
+      {open && (
+        <Animate motionKey='createProjectModal'>
           <div className='absolute transform -translate-x-1/2 -translate-y-1/2 top-1/2 left-1/2'>
             <div className='max-w-4xl p-6 mx-auto bg-white rounded-sm shadow-md'>
               <h2 className='text-lg font-semibold text-gray-700 capitalize'>

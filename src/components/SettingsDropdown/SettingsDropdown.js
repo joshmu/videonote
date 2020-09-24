@@ -28,14 +28,14 @@ export default function SettingsDropdown({ open, ...props }) {
             data-modal='create'
             className='block px-4 py-2 text-sm text-gray-700 capitalize hover:bg-blue-500 hover:text-white'
           >
-            create project
+            create
           </p>
           <p
             onClick={handleClick}
-            data-modal='project'
+            data-modal='projects'
             className='block px-4 py-2 text-sm text-gray-700 capitalize hover:bg-blue-500 hover:text-white'
           >
-            project settings
+            projects
           </p>
           <p
             onClick={handleClick}

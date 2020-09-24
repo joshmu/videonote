@@ -1,13 +1,10 @@
-import { useGlobalContext } from '../../context/globalContext'
 import Animate from '../shared/Animate'
 
-export default function ProjectModal() {
-  const { modalOpen } = useGlobalContext()
+export default function ProjectModal({ open, toggle }) {
   return (
     <>
-      {modalOpen === 'account' && (
+      {open && (
         <Animate motionKey='accountModal'>
-          <div className='absolute top-0 bottom-0 left-0 right-0 bg-black bg-opacity-50'></div>
           <div className='absolute transform -translate-x-1/2 -translate-y-1/2 top-1/2 left-1/2'>
             <div className='max-w-4xl p-6 mx-auto bg-white rounded-sm shadow-md'>
               <h2 className='text-lg font-semibold text-gray-700 capitalize'>

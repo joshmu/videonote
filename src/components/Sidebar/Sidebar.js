@@ -1,16 +1,33 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { GoChevronRight as ArrowIcon } from 'react-icons/go'
 import { MdSettings as SettingsIcon } from 'react-icons/md'
 import { useGlobalContext } from '../../context/globalContext'
 import Search from '../shared/Search'
 import TodoList from '../TodoList/TodoList'
 import SettingsDropdown from '../SettingsDropdown/SettingsDropdown'
-import { useTodoContext } from '../../context/todoContext'
+// import { useTodoContext } from '../../context/todoContext'
+import { useResizable } from '../../hooks/useResizable'
 
 export default function Sidebar(props) {
-  const { toggleSettingsOpen, settingsOpen } = useGlobalContext()
-  const { sidebar, sidebarResizeStart } = useTodoContext()
+  const {
+    toggleSettingsOpen,
+    settingsOpen,
+    settings,
+    updateSettings,
+  } = useGlobalContext()
+  // const { sidebar, sidebarResizeStart } = useTodoContext()
+  const { state: resizeState, handleStartResize } = useResizable({
+    initialSize: settings.sidebarWidth,
+  })
   const [open, setOpen] = useState(true)
+
+  // update sidebar width once resizing completes
+  useEffect(() => {
+    if (!resizeState.resizing) {
+      console.log('updating sidebar width', { resizeState })
+      updateSettings({ sidebarWidth: resizeState.size })
+    }
+  }, [resizeState.resizing])
 
   const toggleOpen = () => {
     setOpen(!open)
@@ -24,7 +41,7 @@ export default function Sidebar(props) {
     <div
       id='sidebar'
       style={{
-        width: open ? sidebar.width + 'px' : '0px',
+        width: open ? resizeState.size + 'px' : '0px',
       }}
       className='relative flex flex-col h-auto transition-all duration-500 ease-in-out border-l border-gray-300 '
       {...props}
@@ -33,11 +50,14 @@ export default function Sidebar(props) {
       <div
         className='absolute left-0 w-4 h-full transform -translate-x-1/2'
         style={{ cursor: 'ew-resize' }}
-        onMouseDown={sidebarResizeStart}
+        onMouseDown={handleStartResize}
       ></div>
 
       {/* sidebar inner wrapper to maintain width */}
-      <div style={{ width: sidebar.width + 'px' }} className='relative h-full'>
+      <div
+        style={{ width: resizeState.size + 'px' }}
+        className='relative h-full'
+      >
         {/* sidebar header */}
         <div className='relative flex items-center justify-between border-b border-gray-500'>
           <div className='flex items-center h-10'>

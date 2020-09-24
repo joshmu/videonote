@@ -1,32 +1,12 @@
 import { createContext, useContext, useEffect, useState } from 'react'
 import { useGlobalContext } from './globalContext'
 
-// todo: global data could be
-// [{ user: {}, projects: [{ src: '', todos: [], created: '', updated: '', deleted: '' }] }]
-
 const todoContext = createContext({ todos: [] })
 
 export function TodoProvider(props) {
-  const {
-    project,
-    updateProjects,
-    settings,
-    updateSettings,
-  } = useGlobalContext()
+  const { project, updateProjects } = useGlobalContext()
   const [todos, setTodos] = useState([])
   const [search, setSearch] = useState('')
-
-  const [sidebar, setSidebar] = useState({
-    width: 400,
-    resizing: false,
-  })
-
-  // update sidebar state when sidebar settings change
-  useEffect(() => {
-    if (settings.sidebarWidth !== sidebar.width) {
-      setSidebar({ ...sidebar, width: settings.sidebarWidth })
-    }
-  }, [settings.sidebarWidth])
 
   // when a project is selected pre-fill the todos
   useEffect(() => {
@@ -78,47 +58,6 @@ export function TodoProvider(props) {
     return sorted
   }
 
-  // resizable sidebar
-  const sidebarResizeStart = () => {
-    if (!sidebar.resizing) {
-      console.log('start resize')
-      setSidebar({ ...sidebar, resizing: true })
-      document.addEventListener('mousemove', sidebarResizeMove)
-      document.addEventListener('mouseup', sidebarResizeEnd)
-      // lock resize cursor
-      document.body.style.cursor = 'ew-resize'
-      // disable text selection
-      document.body.classList.add('disable-select')
-      // iframe fix
-      document.getElementsByTagName('iframe')[0].style.pointerEvents = 'none'
-      // remove transition duration
-      document.getElementById('videoContent').style.transitionDuration = '0'
-      document.getElementById('sidebar').style.transitionDuration = '0'
-    }
-  }
-  const sidebarResizeMove = e => {
-    console.log('resizing')
-    setSidebar({ ...sidebar, width: window.innerWidth - e.clientX })
-  }
-  const sidebarResizeEnd = e => {
-    console.log('end resize')
-    const newWidth = window.innerWidth - e.clientX
-    setSidebar({ ...sidebar, width: newWidth, resizing: false })
-    updateSettings({ sidebarWidth: newWidth })
-
-    document.removeEventListener('mousemove', sidebarResizeMove)
-    document.removeEventListener('mouseup', sidebarResizeEnd)
-    // remove resize cursor
-    document.body.style.cursor = 'default'
-    // resume text selection
-    document.body.classList.remove('disable-select')
-    // iframe fix
-    document.getElementsByTagName('iframe')[0].style.pointerEvents = 'auto'
-    // resume transition duration
-    document.getElementById('videoContent').style.transitionDuration = '300'
-    document.getElementById('sidebar').style.transitionDuration = '500'
-  }
-
   const value = {
     todos,
     addTodo,
@@ -127,11 +66,6 @@ export function TodoProvider(props) {
     search,
     updateSearch,
     sort,
-    settings,
-    sidebar,
-    sidebarResizeStart,
-    sidebarResizeMove,
-    sidebarResizeEnd,
   }
 
   return <todoContext.Provider value={value} {...props} />

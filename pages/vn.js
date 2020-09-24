@@ -2,9 +2,8 @@ import { useEffect } from 'react'
 import Layout from '../src/components/Layout'
 import VideoPlayer from '../src/components/VideoPlayer/VideoPlayer'
 import Sidebar from '../src/components/Sidebar/Sidebar'
-import ProjectModal from '../src/components/ProjectModal/ProjectModal'
-import AccountModal from '../src/components/AccountModal/AccountModal'
 import { useGlobalContext } from '../src/context/globalContext'
+import Modals from '../src/components/Modals/Modals'
 
 // todo: speech to text synthesis on actionInput
 // todo: load local file
@@ -12,11 +11,12 @@ import { useGlobalContext } from '../src/context/globalContext'
 // todo: prioritize speed of workflow
 
 export default function Main() {
-  const { account, login } = useGlobalContext()
+  const { account, login, loadProject } = useGlobalContext()
 
   // ! on initial load check if we have data and if not default for development
   useEffect(() => {
     if (!account) login({ username: 'mu@joshmu.com' })
+    loadProject()
   }, [])
 
   return (
@@ -29,8 +29,7 @@ export default function Main() {
           <Sidebar />
         </div>
 
-        <AccountModal />
-        <ProjectModal />
+        <Modals />
       </div>
     </Layout>
   )
