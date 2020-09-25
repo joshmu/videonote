@@ -3,9 +3,9 @@ import { useGlobalContext } from './globalContext'
 
 const todoContext = createContext({
   todos: [],
-  addTodo: () => {},
-  updateTodo: () => {},
-  removeTodo: () => {},
+  addTodo: a => {},
+  updateTodo: a => {},
+  removeTodo: a => {},
   updateSearch: () => {},
   sort: a => [],
 })

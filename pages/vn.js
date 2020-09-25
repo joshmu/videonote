@@ -16,6 +16,9 @@ import Notification from '../src/components/Notification/Notification'
 // todo: think about mobile variant
 // todo: auto focus on actionInput after project load
 // todo: highlight (half highlight?) note closest to current play time, (whilst playing only?)
+// todo: mute option
+// todo: autoplay when note is selected? (settings option)
+// todo: convert styles to use primary & secondary
 
 export default function Main() {
   return (

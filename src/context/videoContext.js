@@ -6,6 +6,14 @@ const videoContext = createContext({
   playing: false,
   volume: 0.75,
   progress: { playedSeconds: 0, played: 0, loadedSeconds: 0, loaded: 0 },
+  handleReady: a => {},
+  url: '',
+  togglePlay: (a = 0) => {},
+  changeVolume: a => {},
+  handleProgress: () => {},
+  seekTo: a => {},
+  playerRef: {},
+  smartControls: a => {},
 })
 
 export function VideoProvider(props) {

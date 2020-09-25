@@ -20,7 +20,7 @@ export default function Search() {
 
   return (
     <input
-      className='w-full placeholder-gray-300 focus:outline-none'
+      className='w-full placeholder-gray-500 transition-colors ease-in-out bg-transparent duration-30 focus:outline-none fo5us:outline-none text-temeText'
       type='text'
       placeholder='Search'
       value={search}

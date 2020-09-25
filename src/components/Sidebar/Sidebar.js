@@ -62,7 +62,7 @@ export default function Sidebar(props) {
       style={{
         width: open ? resizeState.size + 'px' : '0px',
       }}
-      className='relative flex flex-col h-auto transition-all duration-500 ease-in-out border-l border-gray-300 '
+      className='relative flex flex-col h-auto transition-all duration-500 ease-in-out'
       {...props}
     >
       {/* sidebar edge for resizing */}
@@ -80,6 +80,7 @@ export default function Sidebar(props) {
         {/* sidebar header */}
         <div className='relative flex items-center justify-between border-b border-gray-500'>
           <div className='flex items-center h-10'>
+            {/* arrow slider icon */}
             <div
               onClick={toggleOpen}
               className={`${
@@ -88,9 +89,12 @@ export default function Sidebar(props) {
             >
               <ArrowIcon className='fill-current' />
             </div>
+
             <Search />
           </div>
-          <div className='relative mr-2 text-gray-600 transition-colors duration-300 ease-in-out cursor-pointer hover:text-themeHighlight'>
+
+          {/* options dropdown*/}
+          <div className='relative mr-2 text-gray-500 transition-colors duration-300 ease-in-out cursor-pointer hover:text-themeHighlight'>
             <SettingsIcon
               onClick={handleSettingsClick}
               className='text-xl fill-current'

@@ -24,8 +24,8 @@ export default function TodoItem({ todo }) {
     <MotionFadeInOut
       motionKey={id}
       className={`${
-        done && 'text-gray-400'
-      }  px-4 py-2 text-gray-700 cursor-pointer hover:bg-blue-500 hover:text-white relative bg-white border-b`}
+        done ? 'text-themeText2' : 'text-themeText'
+      }  px-4 py-2 cursor-pointer hover:bg-blue-500 hover:text-white relative border-b`}
     >
       <div className='flex items-center justify-start w-full h-full text-base'>
         <div

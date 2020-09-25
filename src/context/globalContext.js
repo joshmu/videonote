@@ -17,7 +17,7 @@ const globalContext = createContext({
   settingsOpen: false,
   toggleSettingsOpen: () => {},
   modalOpen: false,
-  toggleModalOpen: () => {},
+  toggleModalOpen: (a = 0) => {},
   login: () => {},
   createProject: a => {},
   resetGlobalState: () => {},

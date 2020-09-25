@@ -33,7 +33,7 @@ export default function Home() {
           >
             <Heading
               onClick={handleClick}
-              className='z-10 transition-colors duration-300 ease-in-out cursor-pointer text-8xl text-themeBackground'
+              className='z-10 transition-colors duration-300 ease-in-out cursor-pointer text-8xl text-themeBg'
             >
               Video
             </Heading>
@@ -47,7 +47,7 @@ export default function Home() {
           >
             <NavBtn
               href='/login'
-              className='absolute z-10 -mb-32 text-left focus:outline-none bottom-1/2 bg-themeBackground hover:text-themeBackground'
+              className='absolute z-10 -mb-32 text-left focus:outline-none bottom-1/2 bg-themeBg hover:text-themeBg'
             >
               Let's Go
             </NavBtn>
@@ -75,7 +75,7 @@ export default function Home() {
         </div>
 
         {/* right */}
-        <div className='flex items-center justify-start flex-shrink w-full h-full transition-colors duration-300 ease-in-out bg-themeBackground'>
+        <div className='flex items-center justify-start flex-shrink w-full h-full transition-colors duration-300 ease-in-out bg-themeBg'>
           <MotionFadeUp
             k='note'
             animate={{ transition: { delay: 0.5 } }}

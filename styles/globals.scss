@@ -3,25 +3,32 @@
 @tailwind utilities;
 
 :root {
-  --light: #ffffff;
+  --light: theme('colors.white');
+  --light2: theme('colors.gray.600');
   --dark: #202020;
+  --dark2: theme('colors.gray.400');
   --special: rgba(255, 138, 76, 1);
 }
 
 .theme-light {
   --text: var(--dark);
-  --background: var(--light);
+  --text2: var(--dark2);
+  --bg: var(--light);
+  --bg2: var(--light2);
   --highlight: var(--special);
 }
 
 .theme-dark {
   --text: var(--light);
-  --background: var(--dark);
+  --text2: var(--light2);
+  --bg: var(--dark);
+  --bg2: var(--dark2);
   --highlight: var(--special);
 }
 
 body {
-  -webkit-tap-highlight-color: transparent;
+  --webkit-font-smoothing: antialiased;
+  --webkit-tap-highlight-color: transparent;
 }
 
 .scrollbar {
