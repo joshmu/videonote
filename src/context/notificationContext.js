@@ -8,7 +8,6 @@ import { VscError as ErrorIcon } from 'react-icons/vsc'
 
 const notificationContext = createContext({
   alerts: [],
-  TYPES: {},
   addAlert: ({}) => {},
   removeAlert: id => {},
 })
