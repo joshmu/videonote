@@ -27,8 +27,8 @@ export default function Home() {
           <motion.div
             key='videoTitle'
             initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0, y: -10, transition: { delay: 0.0 } }}
+            animate={{ opacity: 1, transition: { delay: 0.2 } }}
+            exit={{ opacity: 0, y: -10, transition: { delay: 0 } }}
             className='z-10'
           >
             <Heading
