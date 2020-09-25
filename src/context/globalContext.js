@@ -1,4 +1,5 @@
 import { createContext, useContext, useEffect, useState } from 'react'
+import { useNotificationContext } from './notificationContext'
 
 // const temp = {
 //   account: {
@@ -44,6 +45,7 @@ export function GlobalProvider(props) {
 
   const [settingsOpen, setSettingsOpen] = useState(false)
   const [modalOpen, setModalOpen] = useState(null)
+  const { addAlert } = useNotificationContext()
 
   const resetGlobalState = () => {
     setAccount(null)
@@ -106,8 +108,8 @@ export function GlobalProvider(props) {
   const loadProject = () => {
     // only update when we have projects available
     if (projects.length === 0) {
-      console.log('>> you need to create a project')
-      return
+      // todo: dont load until we are ready - msg received when we are still loading projects
+      addAlert({ type: 'warning', msg: 'you need to create a project' })
     }
     // if we have projects and no current then autoselect first project
     if (projects.length > 0) {
@@ -115,7 +117,7 @@ export function GlobalProvider(props) {
         switchProject(settings.currentProject)
       } else {
         // auto select first project
-        setProject(projects[0])
+        switchProject()
         updateSettings({ currentProject: projects[0].id })
       }
     }
@@ -150,14 +152,16 @@ export function GlobalProvider(props) {
   }
 
   const switchProject = id => {
-    console.log('switch to project id', id)
-    let project = projects.find(p => p.id === id)
-
-    // if there is no project then just set to any
-    if (!project) project = projects[0]
+    let project = projects[0]
+    if (id) {
+      console.log('switch to project id', id)
+      const found = projects.find(p => p.id === id)
+      if (found) project = found
+    }
 
     setProject(project)
     updateSettings({ currentProject: project.id })
+    addAlert({ type: 'success', msg: project.title })
   }
 
   const removeProject = id => {

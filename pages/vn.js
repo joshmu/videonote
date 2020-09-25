@@ -2,6 +2,7 @@ import Layout from '../src/components/Layout'
 import VideoPlayer from '../src/components/VideoPlayer/VideoPlayer'
 import Sidebar from '../src/components/Sidebar/Sidebar'
 import Modals from '../src/components/Modals/Modals'
+import Notification from '../src/components/Notification/Notification'
 
 // todo: speech to text synthesis on actionInput
 // todo: easy share project (read only privledges option?, url link and no account required?)
@@ -14,6 +15,7 @@ import Modals from '../src/components/Modals/Modals'
 // todo: formalize universal style components
 // todo: think about mobile variant
 // todo: auto focus on actionInput after project load
+// todo: highlight (half highlight?) note closest to current play time, (whilst playing only?)
 
 export default function Main() {
   return (
@@ -27,6 +29,7 @@ export default function Main() {
         </div>
 
         <Modals />
+        <Notification />
       </div>
     </Layout>
   )

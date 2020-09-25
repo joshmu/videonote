@@ -27,18 +27,6 @@ module.exports = {
           900: '#331c0f',
         },
       },
-      width: {
-        '1/3-screen': 'calc(100vw * 0.33333)',
-        '1/4-screen': 'calc(100vw * 0.75)',
-      },
-      minWidth: {
-        '1/3-screen': 'calc(100vw * 0.33333)',
-        '1/4-screen': 'calc(100vw * 0.75)',
-      },
-      maxWidth: {
-        '1/3-screen': 'calc(100vw * 0.33333)',
-        '1/4-screen': 'calc(100vw * 0.75)',
-      },
       opacity: {
         90: '0.90',
       },
