@@ -24,25 +24,25 @@ export default function TodoItem({ todo }) {
     <MotionFadeInOut
       motionKey={id}
       className={`${
-        done ? 'text-themeText2' : 'text-themeText'
-      }  px-4 py-2 cursor-pointer hover:bg-blue-500 hover:text-white relative border-b`}
+        done ? 'text-themeText2 line-through' : 'text-themeText'
+      }  px-4 py-2 cursor-pointer hover:bg-blue-500 transition-colors duration-300 ease-in-out hover:text-white relative border-b`}
     >
-      <div className='flex items-center justify-start w-full h-full text-base'>
+      <div className='flex items-center justify-start w-full h-full p-1 text-base'>
         <div
           onClick={handleTimeClick}
           onContextMenu={handleTimeRightClick}
-          className='pl-5 pr-3 text-sm'
+          className='text-xs transition-colors duration-300 ease-in-out text-themeText2'
         >
-          <div className={`${done && 'line-through'}`}>
+          <div>
             <TimeDisplay seconds={time} />
           </div>
         </div>
 
-        <div className='px-2 py-2'>
+        <div className='ml-4'>
           {person && (
-            <div className='font-medium leading-5 capitalize'>{person}</div>
+            <div className='text-sm leading-5 capitalize'>{person}</div>
           )}
-          <div onClick={handleMsgClick} className='leading-5'>
+          <div onClick={handleMsgClick} className='text-sm leading-5'>
             {msg}
           </div>
         </div>

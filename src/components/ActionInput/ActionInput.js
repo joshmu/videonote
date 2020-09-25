@@ -70,7 +70,7 @@ const ActionInput = () => {
       </div>
 
       <input
-        className='relative w-full h-full px-2 py-1 text-sm text-gray-700 placeholder-gray-400 transition-all duration-150 ease-in-out bg-transparent rounded-sm rounded-b-none rounded-l-none focus:outline-none'
+        className='relative w-full h-full px-2 py-1 text-gray-700 placeholder-gray-400 transition-all duration-150 ease-in-out bg-transparent rounded-sm rounded-b-none rounded-l-none text-md focus:outline-none'
         autoFocus={true}
         id='actionInput'
         name='addTodo'

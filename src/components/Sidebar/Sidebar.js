@@ -62,7 +62,7 @@ export default function Sidebar(props) {
       style={{
         width: open ? resizeState.size + 'px' : '0px',
       }}
-      className='relative flex flex-col h-auto transition-all duration-500 ease-in-out'
+      className='relative flex flex-col h-auto transition-all duration-500 ease-in-out border-l border-text-themeText2'
       {...props}
     >
       {/* sidebar edge for resizing */}
@@ -78,7 +78,7 @@ export default function Sidebar(props) {
         className='relative h-full'
       >
         {/* sidebar header */}
-        <div className='relative flex items-center justify-between border-b border-gray-500'>
+        <div className='relative flex items-center justify-between transition-colors duration-300 ease-in-out border-b border-themeText2'>
           <div className='flex items-center h-10'>
             {/* arrow slider icon */}
             <div
@@ -94,7 +94,7 @@ export default function Sidebar(props) {
           </div>
 
           {/* options dropdown*/}
-          <div className='relative mr-2 text-gray-500 transition-colors duration-300 ease-in-out cursor-pointer hover:text-themeHighlight'>
+          <div className='relative mr-2 transition-colors duration-300 ease-in-out cursor-pointer text-highlight-700 hover:text-highlight-400'>
             <SettingsIcon
               onClick={handleSettingsClick}
               className='text-xl fill-current'

@@ -6,8 +6,9 @@ const todoContext = createContext({
   addTodo: a => {},
   updateTodo: a => {},
   removeTodo: a => {},
-  updateSearch: () => {},
+  updateSearch: a => {},
   sort: a => [],
+  search: '',
 })
 
 export function TodoProvider(props) {
