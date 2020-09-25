@@ -1,35 +1,9 @@
 import React, { createContext, useContext, useState, useRef } from 'react'
-import { TiTickOutline as SuccessIcon } from 'react-icons/ti'
-import {
-  AiOutlineInfoCircle as InfoIcon,
-  AiOutlineWarning as WarningIcon,
-} from 'react-icons/ai'
-import { VscError as ErrorIcon } from 'react-icons/vsc'
-
 const notificationContext = createContext({
   alerts: [],
   addAlert: ({}) => {},
   removeAlert: id => {},
 })
-
-const TYPES = {
-  success: {
-    style: 'bg-green-700 text-green-200',
-    icon: () => <SuccessIcon />,
-  },
-  info: {
-    style: 'bg-blue-700 text-blue-200',
-    icon: () => <InfoIcon />,
-  },
-  warning: {
-    style: 'bg-orange-600 text-orange-200',
-    icon: () => <WarningIcon />,
-  },
-  error: {
-    style: 'bg-red-700 text-red-200',
-    icon: () => <ErrorIcon />,
-  },
-}
 
 export const NotificationProvider = ({ children }) => {
   const [alerts, setAlerts] = useState([])
@@ -71,7 +45,6 @@ export const NotificationProvider = ({ children }) => {
     alerts,
     addAlert,
     removeAlert,
-    TYPES,
   }
 
   return (
