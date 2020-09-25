@@ -4,6 +4,7 @@ import NavBtn from '../src/components/shared/NavBtn'
 import { Heading } from '../src/components/shared/Text'
 import ThemeToggle from '../src/components/ThemeToggle'
 import { motion } from 'framer-motion'
+import MotionFadeUp from '../src/components/shared/MotionFadeUp'
 
 export default function Home() {
   const { toggleTheme } = useThemeContext()
@@ -38,7 +39,7 @@ export default function Home() {
             </Heading>
           </motion.div>
 
-          <Tada
+          <MotionFadeUp
             k='navbtn'
             animate={{ transition: { delay: 0.7 } }}
             exit={{ transition: { delay: 0.4 } }}
@@ -50,7 +51,7 @@ export default function Home() {
             >
               Let's Go
             </NavBtn>
-          </Tada>
+          </MotionFadeUp>
 
           {/* orange background slider */}
           <motion.div
@@ -75,7 +76,7 @@ export default function Home() {
 
         {/* right */}
         <div className='flex items-center justify-start flex-shrink w-full h-full transition-colors duration-300 ease-in-out bg-themeBackground'>
-          <Tada
+          <MotionFadeUp
             k='note'
             animate={{ transition: { delay: 0.5 } }}
             exit={{ y: -10, transition: { delay: 0 } }}
@@ -86,38 +87,9 @@ export default function Home() {
             >
               Note
             </Heading>
-          </Tada>
+          </MotionFadeUp>
         </div>
       </div>
     </Layout>
-  )
-}
-
-function Tada({ k, initial = {}, animate = {}, exit = {}, ...props }) {
-  const variants = {
-    initial: {
-      opacity: 0,
-      y: 10,
-      ...initial,
-    },
-    animate: {
-      opacity: 1,
-      y: 0,
-      ...animate,
-    },
-    exit: {
-      opacity: 0,
-      ...exit,
-    },
-  }
-  return (
-    <motion.div
-      key={k}
-      initial='initial'
-      animate='animate'
-      exit='exit'
-      variants={variants}
-      {...props}
-    ></motion.div>
   )
 }

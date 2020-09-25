@@ -1,5 +1,5 @@
 import { useGlobalContext } from '../../context/globalContext'
-import Animate from '../shared/Animate'
+import MotionFadeInOut from '../shared/MotionFadeInOut'
 
 export default function ProjectsModal({ toggle: toggleModal }) {
   const { projects, switchProject, removeProject } = useGlobalContext()
@@ -16,7 +16,7 @@ export default function ProjectsModal({ toggle: toggleModal }) {
   }
 
   return (
-    <Animate motionKey='projectsModal'>
+    <MotionFadeInOut motionKey='projectsModal'>
       <div className='absolute transform -translate-x-1/2 -translate-y-1/2 top-1/2 left-1/2'>
         <div className='max-w-4xl p-6 mx-auto bg-white rounded-sm shadow-md'>
           <h2 className='mb-4 text-lg font-semibold text-gray-700 capitalize'>
@@ -37,6 +37,6 @@ export default function ProjectsModal({ toggle: toggleModal }) {
           </ul>
         </div>
       </div>
-    </Animate>
+    </MotionFadeInOut>
   )
 }

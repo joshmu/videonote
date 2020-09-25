@@ -1,7 +1,14 @@
 import { createContext, useContext, useEffect, useState } from 'react'
 import { useGlobalContext } from './globalContext'
 
-const todoContext = createContext({ todos: [] })
+const todoContext = createContext({
+  todos: [],
+  addTodo: () => {},
+  updateTodo: () => {},
+  removeTodo: () => {},
+  updateSearch: () => {},
+  sort: a => [],
+})
 
 export function TodoProvider(props) {
   const { project, updateProjects } = useGlobalContext()

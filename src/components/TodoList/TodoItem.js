@@ -1,7 +1,7 @@
 import { useVideoContext } from '../../context/videoContext'
 import TimeDisplay from '../TimeDisplay/TimeDisplay'
 import { useTodoContext } from '../../context/todoContext'
-import Animate from '../shared/Animate'
+import MotionFadeInOut from '../shared/MotionFadeInOut'
 
 export default function TodoItem({ todo }) {
   const { id, msg, person = null, time, done = false } = todo
@@ -21,7 +21,7 @@ export default function TodoItem({ todo }) {
   }
 
   return (
-    <Animate
+    <MotionFadeInOut
       motionKey={id}
       className={`${
         done && 'text-gray-400'
@@ -47,6 +47,6 @@ export default function TodoItem({ todo }) {
           </div>
         </div>
       </div>
-    </Animate>
+    </MotionFadeInOut>
   )
 }

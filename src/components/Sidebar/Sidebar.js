@@ -6,6 +6,7 @@ import Search from '../shared/Search'
 import TodoList from '../TodoList/TodoList'
 import OptionsDropdown from '../OptionsDropdown/OptionsDropdown'
 import { useResizable } from '../../hooks/useResizable'
+import { motion } from 'framer-motion'
 
 export default function Sidebar(props) {
   const {
@@ -35,8 +36,28 @@ export default function Sidebar(props) {
     toggleSettingsOpen()
   }
 
+  const sidebarVariants = {
+    initial: {
+      opacity: 0,
+      x: '100%',
+    },
+    animate: {
+      opacity: 1,
+      x: 0,
+    },
+    exit: {
+      opacity: 0,
+      x: '100%',
+    },
+  }
+
   return (
-    <div
+    <motion.div
+      key='sidebar'
+      initial='initial'
+      animate='animate'
+      exit='exit'
+      variants={sidebarVariants}
       id='sidebar'
       style={{
         width: open ? resizeState.size + 'px' : '0px',
@@ -84,6 +105,6 @@ export default function Sidebar(props) {
           <TodoList />
         </div>
       </div>
-    </div>
+    </motion.div>
   )
 }

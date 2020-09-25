@@ -5,7 +5,6 @@ import { motion } from 'framer-motion'
 import { useVideoContext } from '../../context/videoContext'
 
 import style from './videoPlayer.module.scss'
-import { useTodoContext } from '../../context/todoContext'
 
 export default function VideoPlayer() {
   const {
@@ -16,15 +15,36 @@ export default function VideoPlayer() {
     handleReady,
     handleProgress,
   } = useVideoContext()
-  const { sidebar } = useTodoContext()
 
   // todo: how can we always center video vertically?
   // todo: wrapper for theme toggle otherwise insert in to navbar
   // todo: update packages especially tailwind
 
+  const videoContentVariants = {
+    initial: {
+      opacity: 0,
+      x: '-100%',
+    },
+    animate: {
+      opacity: 1,
+      x: 0,
+    },
+    exit: {
+      opacity: 0,
+      x: '-100%',
+    },
+  }
   return (
     // wrapper to position input
-    <div id='videoContent' className='relative w-full h-full'>
+    <motion.div
+      key='videoContent'
+      initial='initial'
+      animate='animate'
+      exit='exit'
+      variants={videoContentVariants}
+      id='videoContent'
+      className='relative w-full h-full'
+    >
       {/* resposive wrapper */}
       <div className={`${style.playerWrapper} w-full h-full`}>
         <ReactPlayer
@@ -59,6 +79,6 @@ export default function VideoPlayer() {
           </div>
         </motion.div>
       )}
-    </div>
+    </motion.div>
   )
 }

@@ -1,11 +1,5 @@
 import { useGlobalContext } from '../../context/globalContext'
-import Animate from '../shared/Animate'
-
-// todo: project title => id
-// todo: lock project title ? or use hidden random id?
-// todo: video src
-// todo: update
-// todo: onChange handle all inputs
+import MotionFadeInOut from '../shared/MotionFadeInOut'
 
 export default function SettingsModal({ toggle: toggleModal }) {
   const { settings, updateSettings } = useGlobalContext()
@@ -16,7 +10,7 @@ export default function SettingsModal({ toggle: toggleModal }) {
   }
 
   return (
-    <Animate motionKey='settingsModal'>
+    <MotionFadeInOut motionKey='settingsModal'>
       <div className='absolute transform -translate-x-1/2 -translate-y-1/2 top-1/2 left-1/2'>
         <div className='max-w-4xl p-6 mx-auto bg-white rounded-sm shadow-md'>
           <h2 className='text-lg font-semibold text-gray-700 capitalize'>
@@ -41,6 +35,6 @@ export default function SettingsModal({ toggle: toggleModal }) {
           </form>
         </div>
       </div>
-    </Animate>
+    </MotionFadeInOut>
   )
 }

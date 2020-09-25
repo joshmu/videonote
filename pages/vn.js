@@ -6,8 +6,8 @@ import Notification from '../src/components/Notification/Notification'
 
 // todo: speech to text synthesis on actionInput
 // todo: easy share project (read only privledges option?, url link and no account required?)
+// accounts which can share public readonly of their project, viewers can only mark off notes but cannot create projects or notes
 // todo: prioritize speed of workflow
-// todo: notification system
 // todo: warning if bad local file
 // todo: warning if using local file that you will not be able to share
 // todo: export option

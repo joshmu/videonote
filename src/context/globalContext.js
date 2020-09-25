@@ -1,26 +1,6 @@
 import { createContext, useContext, useEffect, useState } from 'react'
 import { useNotificationContext } from './notificationContext'
 
-// const temp = {
-//   account: {
-//     username: 'josh',
-//     email: 'mu@joshmu.com',
-//   },
-//   projects: [
-//     {
-//       id: '', // todo: maybe?
-//       src: 'https://www.youtube.com/watch?v=gdZLi9oWNZg',
-//       todos: [],
-//       created: new Date(),
-//       updated: undefined,
-//       deleted: undefined,
-//     },
-//   ],
-//   settings: {
-//     playOffset: -4,
-//   },
-// }
-
 const globalContext = createContext({
   account: {},
   projects: [],
@@ -30,6 +10,19 @@ const globalContext = createContext({
     currentProject: null,
   },
   project: null,
+  updateAccount: () => {},
+  updateProjects: () => {},
+  removeProject: id => {},
+  updateSettings: a => {},
+  settingsOpen: false,
+  toggleSettingsOpen: () => {},
+  modalOpen: false,
+  toggleModalOpen: () => {},
+  login: () => {},
+  createProject: a => {},
+  resetGlobalState: () => {},
+  switchProject: (a = 0) => {},
+  loadProject: () => {},
 })
 
 export function GlobalProvider(props) {

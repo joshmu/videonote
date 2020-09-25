@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion'
 
-export default function Animate({ motionKey, ...props }) {
+export default function MotionFadeInOut({ motionKey, ...props }) {
   return (
     <motion.div
       key={motionKey}
