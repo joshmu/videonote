@@ -16,7 +16,7 @@ const globalContext = createContext({
   updateSettings: a => {},
   settingsOpen: false,
   toggleSettingsOpen: () => {},
-  modalOpen: false,
+  modalOpen: null,
   toggleModalOpen: (a = 0) => {},
   login: a => {},
   createProject: a => {},
@@ -66,10 +66,12 @@ export function GlobalProvider(props) {
     const userData = db[user.username]
     console.log({ userData })
     if (userData.account) setAccount(userData.account)
-    if (userData.projects) setProjects(userData.projects)
+    if (userData.projects.length > 0) {
+      setProjects(userData.projects)
+    } else {
+      addAlert({ type: 'info', msg: 'Create a project to start' })
+    }
     if (userData.settings) setSettings(userData.settings)
-
-    loadProject()
   }
 
   const createUserDefaults = user => {
@@ -99,11 +101,6 @@ export function GlobalProvider(props) {
   }
 
   const loadProject = () => {
-    // only update when we have projects available
-    if (projects.length === 0) {
-      // todo: dont load until we are ready - msg received when we are still loading projects
-      addAlert({ type: 'warning', msg: 'you need to create a project' })
-    }
     // if we have projects and no current then autoselect first project
     if (projects.length > 0) {
       if (settings.currentProject) {
@@ -130,11 +127,9 @@ export function GlobalProvider(props) {
     setSettingsOpen(!settingsOpen)
   }
   const toggleModalOpen = modalName => {
-    console.log({ modalName })
     if (!modalName) return setModalOpen(null)
     if (modalName === modalOpen) return setModalOpen(null)
     setModalOpen(modalName)
-    console.log('open modal', modalName)
     setModalOpen(modalOpen === modalName ? null : modalName)
   }
   const createProject = project => {

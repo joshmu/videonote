@@ -25,7 +25,7 @@ export default function TodoItem({ todo }) {
       motionKey={id}
       className={`${
         done ? 'text-themeText2 line-through' : 'text-themeText'
-      }  px-4 py-2 cursor-pointer hover:bg-blue-500 transition-colors duration-300 ease-in-out hover:text-white relative border-b`}
+      }  px-4 py-2 cursor-pointer hover:bg-blue-500 transition-colors duration-300 ease-in-out hover:text-white relative border-b border-themeText2`}
     >
       <div className='flex items-center justify-start w-full h-full p-1 text-base'>
         <div

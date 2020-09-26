@@ -3,6 +3,8 @@ import AccountModal from '../AccountModal/AccountModal'
 import CreateProjectModal from '../CreateProjectModal/CreateProjectModal'
 import ProjectsModal from '../ProjectsModal/ProjectsModal'
 import SettingsModal from '../SettingsModal/SettingsModal'
+import { IoMdClose as CloseIcon } from 'react-icons/io'
+import { motion } from 'framer-motion'
 
 export default function Modals() {
   const { modalOpen, toggleModalOpen } = useGlobalContext()
@@ -27,9 +29,35 @@ export default function Modals() {
           <CreateProjectModal toggle={toggleModalOpen} />
         )}
         {modalOpen === 'projects' && <ProjectsModal toggle={toggleModalOpen} />}
-        {modalOpen === 'settings' && <SettingsModal toggle={toggleModalOpen} />}
-        {modalOpen === 'account' && <AccountModal toggle={toggleModalOpen} />}
+        {modalOpen === 'settings' && (
+          <SettingsModal
+            toggle={toggleModalOpen}
+            CloseBtn={() => CloseModalBtn(toggleModalOpen)}
+          />
+        )}
+        {modalOpen === 'account' && (
+          <AccountModal
+            toggle={toggleModalOpen}
+            CloseBtn={() => CloseModalBtn(toggleModalOpen)}
+          />
+        )}
       </div>
     </>
+  )
+}
+
+const CloseModalBtn = toggle => {
+  const handleClose = () => toggle()
+
+  return (
+    <motion.div
+      onClick={handleClose}
+      className='absolute top-0 right-0 p-1 text-xl cursor-pointer'
+      whileHover={{
+        rotate: 90,
+      }}
+    >
+      <CloseIcon />
+    </motion.div>
   )
 }

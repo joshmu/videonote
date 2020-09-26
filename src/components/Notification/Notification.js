@@ -13,7 +13,7 @@ export default function Notification() {
 
   return (
     <div className='absolute top-0 left-0 w-full max-w-sm'>
-      <AnimatePresence exitBeforeEnter>
+      <AnimatePresence>
         {alerts.length > 0 &&
           alerts.map(alert => (
             <motion.div
