@@ -14,6 +14,7 @@ export default function VideoPlayer() {
     playerRef,
     handleReady,
     handleProgress,
+    handlePlayerError,
   } = useVideoContext()
 
   // todo: how can we always center video vertically?
@@ -49,6 +50,7 @@ export default function VideoPlayer() {
       <div className={`${style.playerWrapper} w-full h-full`}>
         <ReactPlayer
           url={url}
+          onError={handlePlayerError}
           controls={false}
           playing={playing}
           volume={volume}

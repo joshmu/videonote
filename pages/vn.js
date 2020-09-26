@@ -10,10 +10,8 @@ import { useGlobalContext } from '../src/context/globalContext'
 // todo: easy share project (read only privledges option?, url link and no account required?)
 // accounts which can share public readonly of their project, viewers can only mark off notes but cannot create projects or notes
 // todo: prioritize speed of workflow
-// todo: warning if bad local file
 // todo: warning if using local file that you will not be able to share
 // todo: export option
-// todo: simplify colorscheme
 // todo: formalize universal style components
 // todo: think about mobile variant
 // todo: auto focus on actionInput after project load
@@ -21,6 +19,7 @@ import { useGlobalContext } from '../src/context/globalContext'
 // todo: mute option
 // todo: autoplay when note is selected? (settings option)
 // todo: convert styles to use primary & secondary
+// todo: show locate video file button
 
 export default function Main() {
   const { account, login } = useGlobalContext()

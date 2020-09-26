@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, useEffect, useRef } from 'react'
 import { useGlobalContext } from './globalContext'
+import { useNotificationContext } from './notificationContext'
 
 const videoContext = createContext({
   ready: false,
@@ -14,10 +15,12 @@ const videoContext = createContext({
   seekTo: a => {},
   playerRef: {},
   smartControls: a => {},
+  handlePlayerError: a => {},
 })
 
 export function VideoProvider(props) {
   const { project, settings } = useGlobalContext()
+  const { addAlert } = useNotificationContext()
   const playerRef = useRef(null)
   const [url, setUrl] = useState(null)
   const [playing, setPlaying] = useState(false)
@@ -90,6 +93,21 @@ export function VideoProvider(props) {
     }
   }
 
+  const handlePlayerError = e => {
+    const error = e.target.error
+    console.log('vn error:', error)
+
+    if (error.message.includes('Format error')) {
+      // todo: show locate video file button
+      return addAlert({
+        type: 'warning',
+        msg: 'Please re-select your local video',
+      })
+    }
+
+    addAlert({ type: 'error', msg: error.message })
+  }
+
   const value = {
     handleReady,
     url,
@@ -102,6 +120,7 @@ export function VideoProvider(props) {
     seekTo,
     playerRef,
     smartControls,
+    handlePlayerError,
   }
 
   return <videoContext.Provider value={value} {...props} />
