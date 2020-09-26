@@ -12,10 +12,7 @@ export default function Notification() {
   const { alerts } = useNotificationContext()
 
   return (
-    <div
-      className='absolute top-0 right-0 w-full sm:m-4 sm:w-1/2 md:w-1/3 lg:w-1/4'
-      style={{ zIndex: 99 }}
-    >
+    <div className='absolute top-0 w-full' style={{ zIndex: 99 }}>
       <AnimatePresence exitBeforeEnter>
         {alerts.length > 0 &&
           alerts.map(alert => (
@@ -28,25 +25,66 @@ export default function Notification() {
                 ease: [0.6, 0.05, -0.01, 0.9],
               }}
               style={{ zIndex: 99 }}
-              className={`w-full 
-              ${alert.type === 'success' && ' bg-green-700 text-green-200 '} 
-              ${alert.type === 'info' && ' bg-blue-700 text-blue-200 '} 
-              ${alert.type === 'warning' && ' bg-orange-600 text-orange-200 '} 
-              ${alert.type === 'error' && ' bg-red-700 text-red-200 '} 
-                px-4 py-3 rounded-sm mb-2 shadow`}
+              className='w-full h-full'
             >
-              <p>
-                <span className='inline-block h-4 text-xl'>
-                  {alert.type === 'success' && <SuccessIcon />}
-                  {alert.type === 'info' && <InfoIcon />}
-                  {alert.type === 'warning' && <WarningIcon />}
-                  {alert.type === 'error' && <ErrorIcon />}
-                </span>{' '}
-                {alert.msg}
-              </p>
+              <Alert type={alert.type} msg={alert.msg} />
             </motion.div>
           ))}
       </AnimatePresence>
     </div>
   )
 }
+
+const Alert = ({ type, msg }) => (
+  <div className='flex w-full max-w-sm m-2 mx-auto overflow-hidden bg-white rounded-sm shadow-md'>
+    {type === 'success' && (
+      <div className='flex items-center justify-center w-12 bg-green-500'>
+        <SuccessIcon className='w-6 h-6 text-white fill-current' />
+      </div>
+    )}
+    {type === 'info' && (
+      <div className='flex items-center justify-center w-12 bg-blue-500'>
+        <InfoIcon className='w-6 h-6 text-white fill-current' />
+      </div>
+    )}
+    {type === 'warning' && (
+      <div className='flex items-center justify-center w-12 bg-yellow-500'>
+        <WarningIcon className='w-6 h-6 text-white fill-current' />
+      </div>
+    )}
+    {type === 'error' && (
+      <div className='flex items-center justify-center w-12 bg-red-500'>
+        <ErrorIcon className='w-6 h-6 text-white fill-current' />
+      </div>
+    )}
+
+    <div className='px-4 py-2 -mx-3'>
+      <div className='mx-3'>
+        {type === 'success' && (
+          <>
+            <span className='font-semibold text-green-500'>Success</span>
+            <p className='text-sm text-gray-600'>{msg}</p>
+          </>
+        )}
+        {type === 'info' && (
+          <>
+            <span className='font-semibold text-blue-500'>Info</span>
+            <p className='text-sm text-gray-600'>{msg}</p>
+          </>
+        )}
+        {type === 'warning' && (
+          <>
+            <span className='font-semibold text-yellow-500'>Warning</span>
+            <p className='text-sm text-gray-600'>{msg}</p>
+          </>
+        )}
+        {type === 'error' && (
+          <>
+            <span className='font-semibold text-red-500'>Error</span>
+            <p className='text-sm text-gray-600'>{msg}</p>
+          </>
+        )}
+      </div>
+    </div>
+  </div>
+)

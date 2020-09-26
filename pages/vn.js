@@ -1,8 +1,10 @@
+import { useEffect } from 'react'
 import Layout from '../src/components/Layout'
 import VideoPlayer from '../src/components/VideoPlayer/VideoPlayer'
 import Sidebar from '../src/components/Sidebar/Sidebar'
 import Modals from '../src/components/Modals/Modals'
 import Notification from '../src/components/Notification/Notification'
+import { useGlobalContext } from '../src/context/globalContext'
 
 // todo: speech to text synthesis on actionInput
 // todo: easy share project (read only privledges option?, url link and no account required?)
@@ -21,6 +23,12 @@ import Notification from '../src/components/Notification/Notification'
 // todo: convert styles to use primary & secondary
 
 export default function Main() {
+  const { user, login } = useGlobalContext()
+
+  useEffect(() => {
+    if (!user) login({ username: 'mu@joshmu.com' })
+  }, [])
+
   return (
     <Layout>
       <div className='flex flex-col w-full h-screen overflow-hidden'>

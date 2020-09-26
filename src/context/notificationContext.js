@@ -15,7 +15,7 @@ export const NotificationProvider = ({ children }) => {
   const addAlert = ({
     msg,
     type = 'info',
-    duration = 4000,
+    duration = 8000,
     persistent = false,
   }) => {
     const id = Date.now()

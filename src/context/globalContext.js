@@ -18,7 +18,7 @@ const globalContext = createContext({
   toggleSettingsOpen: () => {},
   modalOpen: false,
   toggleModalOpen: (a = 0) => {},
-  login: () => {},
+  login: a => {},
   createProject: a => {},
   resetGlobalState: () => {},
   switchProject: (a = 0) => {},
@@ -154,7 +154,9 @@ export function GlobalProvider(props) {
 
     setProject(project)
     updateSettings({ currentProject: project.id })
-    addAlert({ type: 'success', msg: project.title })
+
+    // notification
+    addAlert({ type: 'success', msg: `${project.title.toUpperCase()}` })
   }
 
   const removeProject = id => {
