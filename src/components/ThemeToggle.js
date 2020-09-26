@@ -29,7 +29,7 @@ export default function ThemeToggle({
       onClick={handleClick}
       className={`${className} ${
         theme === 'light' ? lightColor : darkColor
-      } cursor-pointer w-full h-full relative flex items-center`}
+      } cursor-pointer relative flex items-center`}
       {...props}
     >
       <AnimatePresence exitBeforeEnter>

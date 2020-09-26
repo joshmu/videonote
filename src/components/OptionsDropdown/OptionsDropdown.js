@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import { useGlobalContext } from '../../context/globalContext'
+import { useThemeContext } from '../../context/themeContext'
 import ThemeToggle from '../ThemeToggle'
 
 export default function OptionsDropdown({ open, ...props }) {
@@ -8,6 +9,7 @@ export default function OptionsDropdown({ open, ...props }) {
     toggleModalOpen,
     resetGlobalState,
   } = useGlobalContext()
+  const { toggleTheme } = useThemeContext()
 
   const handleClick = e => {
     const modalId = e.target.getAttribute('data-modal')
@@ -18,6 +20,10 @@ export default function OptionsDropdown({ open, ...props }) {
   const handleSignOutClick = () => {
     toggleSettingsOpen()
     resetGlobalState()
+  }
+
+  const handleThemeToggleClick = () => {
+    toggleTheme()
   }
 
   return (
@@ -60,7 +66,10 @@ export default function OptionsDropdown({ open, ...props }) {
               Sign Out
             </p>
           </Link>
-          <div className='relative flex items-center px-4 py-2 capitalize transition-colors duration-300 ease-in-out text-themeText text-md hover:bg-blue-500 hover:text-white'>
+          <div
+            onClick={handleThemeToggleClick}
+            className='relative flex items-center px-4 py-2 capitalize transition-colors duration-300 ease-in-out text-themeText text-md hover:bg-blue-500 hover:text-white'
+          >
             <ThemeToggle
               darkColor='text-themeText'
               lightColor='text-themeText'

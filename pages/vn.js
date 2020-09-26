@@ -23,10 +23,10 @@ import { useGlobalContext } from '../src/context/globalContext'
 // todo: convert styles to use primary & secondary
 
 export default function Main() {
-  const { user, login } = useGlobalContext()
+  const { account, login } = useGlobalContext()
 
   useEffect(() => {
-    if (!user) login({ username: 'mu@joshmu.com' })
+    if (!account) login({ username: 'mu@joshmu.com' })
   }, [])
 
   return (

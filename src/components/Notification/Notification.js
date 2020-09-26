@@ -12,7 +12,7 @@ export default function Notification() {
   const { alerts } = useNotificationContext()
 
   return (
-    <div className='absolute top-0 w-full' style={{ zIndex: 99 }}>
+    <div className='absolute top-0 left-0 w-full max-w-sm'>
       <AnimatePresence exitBeforeEnter>
         {alerts.length > 0 &&
           alerts.map(alert => (
@@ -24,8 +24,7 @@ export default function Notification() {
               transition={{
                 ease: [0.6, 0.05, -0.01, 0.9],
               }}
-              style={{ zIndex: 99 }}
-              className='w-full h-full'
+              className='p-2'
             >
               <Alert type={alert.type} msg={alert.msg} />
             </motion.div>
@@ -36,7 +35,7 @@ export default function Notification() {
 }
 
 const Alert = ({ type, msg }) => (
-  <div className='flex w-full max-w-sm m-2 mx-auto overflow-hidden bg-white rounded-sm shadow-md'>
+  <div className='z-50 flex w-full max-w-sm mx-auto overflow-hidden rounded-sm shadow-md bg-themeBg'>
     {type === 'success' && (
       <div className='flex items-center justify-center w-12 bg-green-500'>
         <SuccessIcon className='w-6 h-6 text-white fill-current' />
