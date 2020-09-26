@@ -35,7 +35,7 @@ export default function Notification() {
 }
 
 const Alert = ({ type, msg }) => (
-  <div className='z-50 flex w-full max-w-sm mx-auto overflow-hidden rounded-sm shadow-md bg-themeBg'>
+  <div className='z-50 flex w-full max-w-sm mx-auto overflow-hidden border rounded-sm shadow-md bg-themeBg border-themeText2'>
     {type === 'success' && (
       <div className='flex items-center justify-center w-12 bg-green-500'>
         <SuccessIcon className='w-6 h-6 text-white fill-current' />
@@ -62,25 +62,25 @@ const Alert = ({ type, msg }) => (
         {type === 'success' && (
           <>
             <span className='font-semibold text-green-500'>Success</span>
-            <p className='text-sm text-gray-600'>{msg}</p>
+            <p className='text-sm text-themeText'>{msg}</p>
           </>
         )}
         {type === 'info' && (
           <>
             <span className='font-semibold text-blue-500'>Info</span>
-            <p className='text-sm text-gray-600'>{msg}</p>
+            <p className='text-sm text-themeText'>{msg}</p>
           </>
         )}
         {type === 'warning' && (
           <>
             <span className='font-semibold text-yellow-500'>Warning</span>
-            <p className='text-sm text-gray-600'>{msg}</p>
+            <p className='text-sm text-themeText'>{msg}</p>
           </>
         )}
         {type === 'error' && (
           <>
             <span className='font-semibold text-red-500'>Error</span>
-            <p className='text-sm text-gray-600'>{msg}</p>
+            <p className='text-sm text-themeText'>{msg}</p>
           </>
         )}
       </div>
