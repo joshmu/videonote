@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { useGlobalContext } from '../../context/globalContext'
 import { useThemeContext } from '../../context/themeContext'
+import Select from '../shared/Select'
 import ThemeToggle from '../ThemeToggle'
 
 export default function OptionsDropdown({ open, ...props }) {
@@ -29,52 +30,30 @@ export default function OptionsDropdown({ open, ...props }) {
   return (
     <div {...props}>
       {open && (
-        <div className='absolute right-0 z-20 w-48 py-2 transition-colors duration-300 ease-in-out border rounded-sm shadow-xl bg-themeBg'>
-          <p
-            onClick={handleClick}
-            data-modal='create'
-            className='block px-4 py-2 text-sm capitalize transition-colors duration-300 ease-in-out text-themeText hover:bg-blue-500 hover:text-white'
-          >
+        <div className='absolute right-0 z-20 w-48 py-2 text-sm capitalize transition-colors duration-300 ease-in-out border rounded-sm shadow-xl bg-themeBg'>
+          <Select onClick={handleClick} data-modal='create'>
             create
-          </p>
-          <p
-            onClick={handleClick}
-            data-modal='projects'
-            className='block px-4 py-2 text-sm capitalize transition-colors duration-300 ease-in-out text-themeText hover:bg-blue-500 hover:text-white'
-          >
+          </Select>
+          <Select onClick={handleClick} data-modal='projects'>
             projects
-          </p>
-          <p
-            onClick={handleClick}
-            data-modal='settings'
-            className='block px-4 py-2 text-sm capitalize transition-colors duration-300 ease-in-out text-themeText hover:bg-blue-500 hover:text-white'
-          >
+          </Select>
+          <Select onClick={handleClick} data-modal='settings'>
             settings
-          </p>
-          <p
-            onClick={handleClick}
-            data-modal='account'
-            className='block px-4 py-2 text-sm capitalize transition-colors duration-300 ease-in-out text-themeText hover:bg-blue-500 hover:text-white'
-          >
+          </Select>
+          <Select onClick={handleClick} data-modal='account'>
             account
-          </p>
+          </Select>
           <Link href='/'>
-            <p
-              onClick={handleSignOutClick}
-              className='block px-4 py-2 text-sm capitalize transition-colors duration-300 ease-in-out text-themeText hover:bg-blue-500 hover:text-white'
-            >
-              Sign Out
-            </p>
+            <Select onClick={handleSignOutClick}>Sign Out</Select>
           </Link>
-          <div
-            onClick={handleThemeToggleClick}
-            className='relative flex items-center px-4 py-2 capitalize transition-colors duration-300 ease-in-out text-themeText text-md hover:bg-blue-500 hover:text-white'
-          >
-            <ThemeToggle
-              darkColor='text-themeText'
-              lightColor='text-themeText'
-            />
-          </div>
+          <Select onClick={handleThemeToggleClick}>
+            <div className='relative flex text-md'>
+              <ThemeToggle
+                darkColor='text-themeText'
+                lightColor='text-themeText'
+              />
+            </div>
+          </Select>
         </div>
       )}
     </div>
