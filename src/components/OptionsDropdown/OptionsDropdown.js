@@ -27,10 +27,17 @@ export default function OptionsDropdown({ open, ...props }) {
     toggleTheme()
   }
 
+  const handleMouseLeave = () => {
+    toggleSettingsOpen(false)
+  }
+
   return (
     <div {...props}>
       {open && (
-        <div className='absolute right-0 z-20 w-48 py-2 text-sm capitalize transition-colors duration-300 ease-in-out border rounded-sm shadow-xl bg-themeBg'>
+        <div
+          onMouseLeave={handleMouseLeave}
+          className='absolute right-0 z-40 w-48 py-2 text-sm capitalize transition-colors duration-300 ease-in-out border rounded-sm shadow-xl bg-themeBg'
+        >
           <Select onClick={handleClick} data-modal='create'>
             create
           </Select>
@@ -43,15 +50,14 @@ export default function OptionsDropdown({ open, ...props }) {
           <Select onClick={handleClick} data-modal='account'>
             account
           </Select>
-          <Link href='/'>
-            <Select onClick={handleSignOutClick}>Sign Out</Select>
+          <Link href='/' passHref>
+            <a>
+              <Select onClick={handleSignOutClick}>Sign Out</Select>
+            </a>
           </Link>
           <Select onClick={handleThemeToggleClick}>
             <div className='relative flex text-md'>
-              <ThemeToggle
-                darkColor='text-themeText'
-                lightColor='text-themeText'
-              />
+              <ThemeToggle />
             </div>
           </Select>
         </div>

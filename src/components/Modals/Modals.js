@@ -9,10 +9,6 @@ export default function Modals() {
 
   return (
     <>
-      {/* overlay is shown whilst a modal is open */}
-      {modalOpen && <ModalOverlay toggle={toggleModalOpen} />}
-
-      {/* modals */}
       {modalOpen === 'create' && (
         <CreateProjectModal toggle={toggleModalOpen} />
       )}
@@ -20,18 +16,5 @@ export default function Modals() {
       {modalOpen === 'settings' && <SettingsModal toggle={toggleModalOpen} />}
       {modalOpen === 'account' && <AccountModal toggle={toggleModalOpen} />}
     </>
-  )
-}
-
-export const ModalOverlay = ({ toggle }) => {
-  const handleOverlayClick = () => {
-    toggle()
-  }
-
-  return (
-    <div
-      onClick={handleOverlayClick}
-      className='absolute top-0 bottom-0 left-0 right-0 z-40 bg-black bg-opacity-50'
-    ></div>
   )
 }

@@ -5,8 +5,8 @@ import { useThemeContext } from '../context/themeContext'
 import { AnimatePresence } from 'framer-motion'
 
 export default function ThemeToggle({
-  lightColor = 'text-themeText',
-  darkColor = 'text-themeText',
+  lightColor = '',
+  darkColor = '',
   className = '',
   ...props
 }) {

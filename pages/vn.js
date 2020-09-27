@@ -5,6 +5,7 @@ import Sidebar from '../src/components/Sidebar/Sidebar'
 import Modals from '../src/components/Modals/Modals'
 import Notification from '../src/components/Notification/Notification'
 import { useGlobalContext } from '../src/context/globalContext'
+import Overlay from '../src/components/shared/Overlay'
 
 // todo: speech to text synthesis on actionInput
 // todo: easy share project (read only privledges option?, url link and no account required?)
@@ -40,6 +41,7 @@ export default function Main() {
 
         <Modals />
         <Notification />
+        <Overlay />
       </div>
     </Layout>
   )

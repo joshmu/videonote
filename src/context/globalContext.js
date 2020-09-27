@@ -15,7 +15,7 @@ const globalContext = createContext({
   removeProject: id => {},
   updateSettings: a => {},
   settingsOpen: false,
-  toggleSettingsOpen: () => {},
+  toggleSettingsOpen: (a = undefined) => {},
   modalOpen: null,
   toggleModalOpen: (a = 0) => {},
   login: a => {},
@@ -123,8 +123,9 @@ export function GlobalProvider(props) {
   }
   const updateSettings = data => setSettings({ ...settings, ...data })
 
-  const toggleSettingsOpen = () => {
-    setSettingsOpen(!settingsOpen)
+  const toggleSettingsOpen = (state = undefined) => {
+    const cmd = state ? state : !settingsOpen
+    setSettingsOpen(cmd)
   }
   const toggleModalOpen = modalName => {
     if (!modalName) return setModalOpen(null)

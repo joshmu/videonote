@@ -4,7 +4,7 @@ import MotionFadeInOut from '../shared/MotionFadeInOut'
 
 export function ModalContainer({ toggle, children, ...props }) {
   return (
-    <div className='z-50' {...props}>
+    <div className='z-40' {...props}>
       <MotionFadeInOut motionKey='modal'>
         <div className='absolute transform -translate-x-1/2 -translate-y-1/2 top-1/2 left-1/2'>
           <div className='relative max-w-4xl p-6 mx-auto border rounded-sm shadow-md border-themeText bg-themeBg'>
@@ -31,7 +31,7 @@ export const CloseModalBtn = ({ toggle }) => {
   return (
     <motion.div
       onClick={handleClose}
-      className='absolute top-0 right-0 p-1 text-xl cursor-pointer'
+      className='absolute top-0 right-0 p-2 text-xl transition-colors duration-300 ease-in-out cursor-pointer hover:text-highlight-400 text-highlight-700'
       whileHover={{
         rotate: 90,
       }}
