@@ -1,6 +1,6 @@
 import { useVideoContext } from '../../context/videoContext'
 
-export default function ProgressBar({ active }) {
+export default function orogressBar({ active }) {
   const { progress } = useVideoContext()
 
   const perc = num => {
@@ -11,7 +11,7 @@ export default function ProgressBar({ active }) {
     <div
       className={`${
         active ? 'opacity-100' : 'opacity-90'
-      } relative h-1 overflow-hidden text-xs rounded-sm bg-transparent rounded-t-none`}
+      } relative h-1 overflow-hidden text-xs bg-transparent `}
     >
       <div
         style={{ width: perc(progress.played) }}

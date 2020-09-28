@@ -23,6 +23,7 @@ import Overlay from '../src/components/shared/Overlay'
 // todo: show locate video file button
 // todo: style body tag with theme? tailwind issue
 // todo: remove borders of login modal
+// todo: global smart controls
 
 export default function Main() {
   const { account, login } = useGlobalContext()

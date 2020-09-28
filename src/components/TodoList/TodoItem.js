@@ -28,19 +28,19 @@ export default function TodoItem({ todo }) {
         done ? 'text-themeText2 line-through' : 'text-themeText'
       } cursor-pointer relative border-b border-themeText2`}
     >
-      <Select>
-        <div className='flex items-center justify-start w-full h-full p-1 text-base'>
+      <Select padding='p-0'>
+        <div className='flex items-center justify-start w-full h-full text-base'>
           <div
             onClick={handleTimeClick}
             onContextMenu={handleTimeRightClick}
             className='text-xs transition-colors duration-300 ease-in-out text-themeText2'
           >
-            <div>
+            <div className='px-2'>
               <TimeDisplay seconds={time} />
             </div>
           </div>
 
-          <div className='ml-4'>
+          <div className='w-full h-full py-2 pl-2'>
             {person && (
               <div className='text-sm leading-5 capitalize'>{person}</div>
             )}
