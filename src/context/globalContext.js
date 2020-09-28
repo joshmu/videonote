@@ -71,7 +71,14 @@ export function GlobalProvider(props) {
     }
 
     // convert local storage string to db data object
-    const db = JSON.parse(data)
+    let db = JSON.parse(data)
+
+    //! check for new account setting to decide whether to reset local storage
+    if (!db[user.username].settings.seekJump) {
+      console.log('reseting local storage')
+      window.localStorage.setItem('vn', JSON.stringify({}))
+      return login(user)
+    }
 
     // if no user then create
     if (!db[user.username]) db[user.username] = createUserDefaults(user)

@@ -13,11 +13,12 @@ export default function TodoItem({ todo, close }) {
     const updatedTodo = { ...todo, done: !todo.done }
     updateTodo(updatedTodo)
   }
-  const handleTimeRightClick = e => {
+  const handleRightClick = e => {
+    console.log('click')
     e.preventDefault()
     removeTodo(id)
   }
-  const handleMsgClick = () => {
+  const handleNoteClick = () => {
     seekTo(time)
   }
 
@@ -29,12 +30,12 @@ export default function TodoItem({ todo, close }) {
       }}
       className={`${done ? 'text-themeText2 line-through' : 'text-themeText'} 
       cursor-pointer relative border-b border-themeText2`}
+      onContextMenu={handleRightClick}
     >
       <Select padding='p-0'>
         <div className='flex items-center justify-start w-full h-full text-base'>
           <div
             onClick={handleTimeClick}
-            onContextMenu={handleTimeRightClick}
             className='text-xs transition-colors duration-300 ease-in-out text-themeText2'
           >
             <div className='px-2'>
@@ -42,13 +43,11 @@ export default function TodoItem({ todo, close }) {
             </div>
           </div>
 
-          <div className='w-full h-full py-2 pl-2'>
+          <div className='w-full h-full py-2 pl-2' onClick={handleNoteClick}>
             {person && (
               <div className='text-sm leading-5 capitalize'>{person}</div>
             )}
-            <div onClick={handleMsgClick} className='text-sm leading-5'>
-              {msg}
-            </div>
+            <div className='text-sm leading-5'>{msg}</div>
           </div>
         </div>
       </Select>
