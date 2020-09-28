@@ -1,5 +1,6 @@
 import { useGlobalContext } from '../../context/globalContext'
 import { ModalContainer, ModalHeader, ModalForm, ModalInput } from './Modal'
+import { Toggle, ToggleInput } from '../shared/Toggle'
 
 export default function SettingsModal({ toggle: toggleModal }) {
   const { settings, updateSettings } = useGlobalContext()
@@ -7,6 +8,11 @@ export default function SettingsModal({ toggle: toggleModal }) {
   const handleChange = e => {
     if (e.target.id === 'offset')
       return updateSettings({ playOffset: Number(e.target.value) })
+  }
+
+  const handleToggle = id => {
+    console.log('toggle', id)
+    updateSettings({ [id]: !settings[id] })
   }
 
   return (
@@ -21,6 +27,13 @@ export default function SettingsModal({ toggle: toggleModal }) {
           value={settings.playOffset}
           onChange={handleChange}
         />
+        <div>
+          <ToggleInput
+            title='Show Hints'
+            state={settings.showHints}
+            onClick={() => handleToggle('showHints')}
+          />
+        </div>
       </ModalForm>
     </ModalContainer>
   )

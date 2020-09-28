@@ -5,8 +5,10 @@ import { useVideoContext } from '../../context/videoContext'
 import { useTodoContext } from '../../context/todoContext'
 import { useGlobalContext } from '../../context/globalContext'
 
+const PLACEHOLDER = 'Add Note...'
+
 const ActionInput = () => {
-  const { setOpenSidebar } = useGlobalContext()
+  const { setOpenSidebar, settings } = useGlobalContext()
   const { smartControls, progress } = useVideoContext()
   const { addTodo } = useTodoContext()
 
@@ -15,7 +17,7 @@ const ActionInput = () => {
     time: null,
   })
   const [active, setActive] = useState(false)
-  const [hint, setHint] = useState(randomHint())
+  const [hint, setHint] = useState(randomHint(settings.showHints))
 
   // * add new todo on submit
   const handleSubmit = () => {
@@ -44,7 +46,7 @@ const ActionInput = () => {
     if (!active) setActive(true)
 
     // generate new random hint
-    setHint(randomHint())
+    setHint(randomHint(settings.showHints))
   }
   const handleBlur = e => {
     if (active) setActive(false)
@@ -81,7 +83,7 @@ const ActionInput = () => {
         id='actionInput'
         name='addTodo'
         type='text'
-        placeholder={active ? hint : 'Add Note...'}
+        placeholder={active ? hint : PLACEHOLDER}
         value={todo.msg}
         autoComplete='off'
         onChange={handleChange}
@@ -99,12 +101,14 @@ const ActionInput = () => {
 
 export default ActionInput
 
-function randomHint() {
+const randomHint = show => {
+  if (!show) return PLACEHOLDER
+
   const hints = [
     'Spacebar = Play/Pause',
     'Left/Right = Seek',
     'Up/Down = Volume',
-    'Drag edge to resize List',
+    'Drag List edge to resize',
     'Shift = show/hide List',
   ]
   const randomIndex = Math.floor(Math.random() * hints.length)

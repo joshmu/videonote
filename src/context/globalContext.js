@@ -6,6 +6,7 @@ const globalContext = createContext({
   projects: [],
   settings: {
     playOffset: -4,
+    showHints: true,
     sidebarWidth: 400,
     currentProject: null,
   },
@@ -32,6 +33,7 @@ export function GlobalProvider(props) {
   const [projects, setProjects] = useState([])
   const [settings, setSettings] = useState({
     playOffset: -4,
+    showHints: true,
     sidebarWidth: 400,
     currentProject: null,
   })
@@ -46,7 +48,12 @@ export function GlobalProvider(props) {
   const resetGlobalState = () => {
     setAccount(null)
     setProjects([])
-    setSettings({ playOffset: -4, sidebarWidth: 400, currentProject: null })
+    setSettings({
+      playOffset: -4,
+      showHints: true,
+      sidebarWidth: 400,
+      currentProject: null,
+    })
     setProject(null)
     setSettingsOpen(false)
     setModalOpen(false)
