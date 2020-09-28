@@ -49,8 +49,8 @@ export const ModalForm = ({ children }) => (
 )
 
 export const ModalInput = ({
-  title,
-  id,
+  title = '',
+  id = '',
   type = 'text',
   placeholder = '',
   ...props
