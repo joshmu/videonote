@@ -74,7 +74,7 @@ export function GlobalProvider(props) {
     let db = JSON.parse(data)
 
     //! check for new account setting to decide whether to reset local storage
-    if (!db[user.username].settings.seekJump) {
+    if (!db[user.username]?.settings?.seekJump) {
       console.log('reseting local storage')
       window.localStorage.setItem('vn', JSON.stringify({}))
       return login(user)
