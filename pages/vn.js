@@ -23,6 +23,7 @@ import Overlay from '../src/components/shared/Overlay'
 // todo: style body tag with theme? tailwind issue
 // todo: remove borders of login modal
 // todo: global smart controls
+// todo: convert some ideas in to hooks?
 
 export default function Main() {
   const { account, login } = useGlobalContext()

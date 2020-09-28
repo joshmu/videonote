@@ -5,9 +5,8 @@ import { Toggle, ToggleInput } from '../shared/Toggle'
 export default function SettingsModal({ toggle: toggleModal }) {
   const { settings, updateSettings } = useGlobalContext()
 
-  const handleChange = e => {
-    if (e.target.id === 'offset')
-      return updateSettings({ playOffset: Number(e.target.value) })
+  const handleChangeNum = e => {
+    updateSettings({ [e.target.id]: Number(e.target.value) })
   }
 
   const handleToggle = id => {
@@ -22,10 +21,17 @@ export default function SettingsModal({ toggle: toggleModal }) {
       <ModalForm>
         <ModalInput
           title='Playback Offset (Seconds)'
-          id='offset'
+          id='playOffset'
           type='number'
           value={settings.playOffset}
-          onChange={handleChange}
+          onChange={handleChangeNum}
+        />
+        <ModalInput
+          title='Seek Jump (Seconds)'
+          id='seekJump'
+          type='number'
+          value={settings.seekJump}
+          onChange={handleChangeNum}
         />
         <div>
           <ToggleInput

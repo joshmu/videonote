@@ -27,6 +27,15 @@ export function VideoProvider(props) {
   const [volume, setVolume] = useState(0.75)
   const [progress, setProgress] = useState({})
 
+  const [action, setAction] = useState('')
+  // we want to capture action events and reset so we can receive multiple of the same events elsewhere
+  // so we quickly reset to base state
+  useEffect(() => {
+    setTimeout(() => {
+      setAction('')
+    }, 10)
+  }, [action])
+
   useEffect(() => {
     if (project) {
       if (project.src) setUrl(project.src)
@@ -40,6 +49,8 @@ export function VideoProvider(props) {
 
   const togglePlay = () => {
     setPlaying(!playing)
+
+    setAction(!playing ? 'play' : 'pause')
   }
 
   const changeVolume = increment => {
@@ -51,6 +62,8 @@ export function VideoProvider(props) {
     // limit between 0 - 1
     newVolume = newVolume < 0 ? 0 : newVolume > 1 ? 1 : newVolume
     setVolume(newVolume)
+
+    setAction(increment > 0 ? 'volumeUp' : 'volumeDown')
   }
 
   const handleProgress = e => {
@@ -69,19 +82,31 @@ export function VideoProvider(props) {
     playerRef.current.seekTo(playPosition, 'seconds')
   }
 
+  const jumpBack = () => {
+    const destination = progress.playedSeconds - settings.seekJump
+    seekTo(destination > 0 ? destination : 0)
+
+    setAction('seekBack')
+  }
+
+  const jumpForward = () => {
+    const destination = progress.playedSeconds + settings.seekJump
+    seekTo(destination)
+
+    setAction('seekForward')
+  }
+
   const smartControls = key => {
     if (key === ' ') {
       togglePlay()
     }
 
     if (key === 'ArrowLeft') {
-      const destination = progress.playedSeconds - 10
-      seekTo(destination > 0 ? destination : 0)
+      jumpBack()
     }
 
     if (key === 'ArrowRight') {
-      const destination = progress.playedSeconds + 10
-      seekTo(destination)
+      jumpForward()
     }
 
     if (key === 'ArrowUp') {
@@ -124,6 +149,7 @@ export function VideoProvider(props) {
     playerRef,
     smartControls,
     handlePlayerError,
+    action,
   }
 
   return <videoContext.Provider value={value} {...props} />

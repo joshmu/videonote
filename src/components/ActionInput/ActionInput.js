@@ -4,11 +4,12 @@ import TimeDisplay from '../TimeDisplay/TimeDisplay'
 import { useVideoContext } from '../../context/videoContext'
 import { useTodoContext } from '../../context/todoContext'
 import { useGlobalContext } from '../../context/globalContext'
+import ActionSymbols from './ActionSymbols'
 
 const PLACEHOLDER = 'Add Note...'
 
 const ActionInput = () => {
-  const { setOpenSidebar, settings } = useGlobalContext()
+  const { settings } = useGlobalContext()
   const { smartControls, progress } = useVideoContext()
   const { addTodo } = useTodoContext()
 
@@ -92,6 +93,8 @@ const ActionInput = () => {
         onBlur={handleBlur}
       />
 
+      <ActionSymbols />
+
       <div className='absolute bottom-0 left-0 w-full transform translate-y-full'>
         <ProgressBar active={active} />
       </div>
@@ -110,7 +113,11 @@ const randomHint = show => {
     'Up/Down = Volume',
     'Drag List edge to resize',
     'Shift = show/hide List',
+    'Click Note text = Seek',
+    'Click Note time = Check',
+    'Right Click Note/Project = Remove',
   ]
+
   const randomIndex = Math.floor(Math.random() * hints.length)
   return hints[randomIndex]
 }

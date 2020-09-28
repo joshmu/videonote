@@ -7,6 +7,7 @@ const globalContext = createContext({
   settings: {
     playOffset: -4,
     showHints: true,
+    seekJump: 10,
     sidebarWidth: 400,
     currentProject: null,
   },
@@ -34,6 +35,7 @@ export function GlobalProvider(props) {
   const [settings, setSettings] = useState({
     playOffset: -4,
     showHints: true,
+    seekJump: 10,
     sidebarWidth: 400,
     currentProject: null,
   })
@@ -51,6 +53,7 @@ export function GlobalProvider(props) {
     setSettings({
       playOffset: -4,
       showHints: true,
+      seekJump: 10,
       sidebarWidth: 400,
       currentProject: null,
     })
