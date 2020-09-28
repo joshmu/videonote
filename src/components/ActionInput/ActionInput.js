@@ -20,11 +20,19 @@ const ActionInput = () => {
   const [active, setActive] = useState(false)
   const [hint, setHint] = useState(randomHint(settings.showHints))
 
+  useEffect(() => {
+    // generate new random hint
+    setHint(randomHint(settings.showHints))
+  }, [active])
+
   // * add new todo on submit
   const handleSubmit = () => {
     addTodo(todo)
     // reset todo state
     setTodo({ msg: '', time: null })
+
+    // remove hints after adding note and while still in focus
+    setHint(randomHint(false))
   }
 
   // * update todo on entry but exclude initial char if it is a space for play/pause logic
@@ -45,9 +53,6 @@ const ActionInput = () => {
 
   const handleFocus = e => {
     if (!active) setActive(true)
-
-    // generate new random hint
-    setHint(randomHint(settings.showHints))
   }
   const handleBlur = e => {
     if (active) setActive(false)
@@ -113,8 +118,8 @@ const randomHint = show => {
     'Up/Down = Volume',
     'Drag List edge to resize',
     'Shift = show/hide List',
-    'Click Note text = Seek',
-    'Click Note time = Check',
+    'Click note to jump to time',
+    'Mark note by clicking the time',
     'Right Click Note/Project = Remove',
   ]
 
