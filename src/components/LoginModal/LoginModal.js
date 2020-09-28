@@ -40,6 +40,7 @@ export default function LoginModal() {
           <div className='w-full mt-4'>
             <ModalInput
               type='email'
+              id='loginEmail'
               placeholder='Email Address'
               aria-label='Email Address'
               value={user.username}
@@ -50,6 +51,7 @@ export default function LoginModal() {
           <div className='w-full mt-4'>
             <ModalInput
               type='password'
+              id='loginPassword'
               placeholder='Password'
               aria-label='Password'
             />

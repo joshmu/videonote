@@ -64,7 +64,7 @@ export function GlobalProvider(props) {
 
   const login = user => {
     let data = window.localStorage.getItem('vn')
-    if (!data) {
+    if (!data || data === '{}') {
       // set up app db
       window.localStorage.setItem('vn', JSON.stringify({}))
       data = window.localStorage.getItem('vn')
