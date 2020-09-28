@@ -14,11 +14,12 @@ export default function Sidebar(props) {
     settingsOpen,
     settings,
     updateSettings,
+    openSidebar,
+    toggleSidebar,
   } = useGlobalContext()
   const { state: resizeState, handleStartResize } = useResizable({
     initialSize: settings.sidebarWidth,
   })
-  const [open, setOpen] = useState(true)
 
   // update sidebar width once resizing completes
   useEffect(() => {
@@ -29,7 +30,7 @@ export default function Sidebar(props) {
   }, [resizeState.resizing])
 
   const toggleOpen = () => {
-    setOpen(!open)
+    toggleSidebar()
   }
 
   const handleSettingsClick = () => {
@@ -60,7 +61,7 @@ export default function Sidebar(props) {
       variants={sidebarVariants}
       id='sidebar'
       style={{
-        width: open ? resizeState.size + 'px' : '0px',
+        width: openSidebar ? resizeState.size + 'px' : '0px',
       }}
       className='relative flex flex-col h-auto transition-all duration-500 ease-in-out border-l border-themeText2'
       {...props}
@@ -84,7 +85,7 @@ export default function Sidebar(props) {
             <div
               onClick={toggleOpen}
               className={`${
-                open ? 'rotate-0' : 'rotate-180 -translate-x-full'
+                openSidebar ? 'rotate-0' : 'rotate-180 -translate-x-full'
               } relative text-3xl mr-2 transform text-highlight-700 z-10 bg-transparent transition-all hover:text-highlight-400 duration-500 ease-in-out cursor-pointer`}
             >
               <ArrowIcon className='fill-current' />

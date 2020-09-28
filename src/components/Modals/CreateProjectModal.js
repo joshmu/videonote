@@ -52,6 +52,7 @@ export default function CreateProjectModal({ toggle: toggleModal }) {
 
         <ModalInput
           title='Video Source'
+          placeholder='Paste URL: Dropbox, Youtube, Vimeo...'
           id='src'
           type='text'
           value={project.src}

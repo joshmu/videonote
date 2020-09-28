@@ -6,8 +6,8 @@ export function ModalContainer({ toggle, children, ...props }) {
   return (
     <div className='z-40' {...props}>
       <MotionFadeInOut motionKey='modal'>
-        <div className='absolute transform -translate-x-1/2 -translate-y-1/2 top-1/2 left-1/2'>
-          <div className='relative max-w-4xl p-6 mx-auto border rounded-sm shadow-md border-themeText bg-themeBg'>
+        <div className='absolute w-full max-w-lg transform -translate-x-1/2 -translate-y-1/2 top-1/2 left-1/2'>
+          <div className='relative w-full p-6 mx-auto border rounded-sm shadow-md border-themeText bg-themeBg'>
             <CloseModalBtn toggle={toggle} />
             {children}
           </div>
@@ -44,10 +44,17 @@ export const CloseModalBtn = ({ toggle }) => {
 export const ModalForm = ({ children }) => (
   <form>
     <div className='grid grid-cols-1 gap-6 mt-4 sm:grid-cols-2'>{children}</div>
+    {/* <div className='grid grid-cols-1 gap-6 mt-4'>{children}</div> */}
   </form>
 )
 
-export const ModalInput = ({ title, id, type = 'text', ...props }) => {
+export const ModalInput = ({
+  title,
+  id,
+  type = 'text',
+  placeholder = '',
+  ...props
+}) => {
   return (
     <div>
       <label className='text-themeText' htmlFor={id}>
@@ -56,7 +63,8 @@ export const ModalInput = ({ title, id, type = 'text', ...props }) => {
       <input
         id={id}
         type={type}
-        className='block w-full px-4 py-2 mt-2 border border-gray-300 rounded-sm text-themeText bg-themeBg focus:border-blue-500 focus:outline-none focus:shadow-outline'
+        placeholder={placeholder}
+        className='block w-full px-4 py-2 mt-2 border rounded-sm border-themeText2 text-themeText bg-themeBg focus:border-themeText focus:outline-none'
         {...props}
       />
     </div>

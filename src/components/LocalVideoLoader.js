@@ -6,7 +6,7 @@ export default function LocalVideoLoader({ handleVideoSrc }) {
   }
 
   return (
-    <div className='mt-4'>
+    <div className='mt-3'>
       <label htmlFor='videoFile'>
         <input
           className='hidden'
@@ -15,7 +15,7 @@ export default function LocalVideoLoader({ handleVideoSrc }) {
           type='file'
           onChange={handleFileInput}
         />
-        <span className='px-3 py-2 transition-colors duration-200 ease-in-out rounded-sm cursor-pointer bg-highlight-500 text-highlight-100 hover:bg-highlight-600'>
+        <span className='px-6 py-3 transition-colors duration-200 ease-in-out rounded-sm cursor-pointer bg-highlight-500 text-highlight-100 hover:bg-highlight-600'>
           Load Local Video
         </span>
       </label>

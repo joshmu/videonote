@@ -21,6 +21,8 @@ import Overlay from '../src/components/shared/Overlay'
 // todo: autoplay when note is selected? (settings option)
 // todo: convert styles to use primary & secondary
 // todo: show locate video file button
+// todo: style body tag with theme? tailwind issue
+// todo: remove borders of login modal
 
 export default function Main() {
   const { account, login } = useGlobalContext()

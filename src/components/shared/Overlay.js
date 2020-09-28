@@ -3,7 +3,7 @@ import { useGlobalContext } from '../../context/globalContext'
 
 export default function Overlay() {
   const [open, setOpen] = useState(false)
-  const { modalOpen } = useGlobalContext()
+  const { modalOpen, toggleModalOpen } = useGlobalContext()
 
   useEffect(() => {
     if (modalOpen) setOpen(true)
@@ -12,6 +12,7 @@ export default function Overlay() {
 
   const handleOverlayClick = () => {
     setOpen(false)
+    if (modalOpen) toggleModalOpen()
   }
 
   return (

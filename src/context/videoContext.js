@@ -19,7 +19,7 @@ const videoContext = createContext({
 })
 
 export function VideoProvider(props) {
-  const { project, settings } = useGlobalContext()
+  const { project, settings, toggleSidebar } = useGlobalContext()
   const { addAlert } = useNotificationContext()
   const playerRef = useRef(null)
   const [url, setUrl] = useState(null)
@@ -91,13 +91,16 @@ export function VideoProvider(props) {
     if (key === 'ArrowDown') {
       changeVolume(-0.1)
     }
+
+    if (key === 'Shift') {
+      toggleSidebar()
+    }
   }
 
-  const handlePlayerError = e => {
-    const error = e.target.error
-    console.log('vn error:', error)
+  const handlePlayerError = error => {
+    console.log('vn player error', error)
 
-    if (error.message.includes('Format error')) {
+    if (error.target && error.target.error.message.includes('Format error')) {
       // todo: show locate video file button
       return addAlert({
         type: 'warning',
@@ -105,7 +108,7 @@ export function VideoProvider(props) {
       })
     }
 
-    addAlert({ type: 'error', msg: error.message })
+    addAlert({ type: 'error', msg: 'Video Player: ' + error.message })
   }
 
   const value = {

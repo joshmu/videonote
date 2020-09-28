@@ -23,6 +23,8 @@ const globalContext = createContext({
   resetGlobalState: () => {},
   switchProject: (a = 0) => {},
   loadProject: () => {},
+  openSidebar: true,
+  toggleSidebar: (a = undefined) => {},
 })
 
 export function GlobalProvider(props) {
@@ -36,6 +38,7 @@ export function GlobalProvider(props) {
 
   const [project, setProject] = useState(null)
 
+  const [openSidebar, setOpenSidebar] = useState(true)
   const [settingsOpen, setSettingsOpen] = useState(false)
   const [modalOpen, setModalOpen] = useState(null)
   const { addAlert } = useNotificationContext()
@@ -127,6 +130,10 @@ export function GlobalProvider(props) {
     const cmd = state ? state : !settingsOpen
     setSettingsOpen(cmd)
   }
+  const toggleSidebar = (state = undefined) => {
+    const cmd = state ? state : !openSidebar
+    setOpenSidebar(cmd)
+  }
   const toggleModalOpen = modalName => {
     if (!modalName) return setModalOpen(null)
     if (modalName === modalOpen) return setModalOpen(null)
@@ -180,6 +187,8 @@ export function GlobalProvider(props) {
     resetGlobalState,
     switchProject,
     loadProject,
+    openSidebar,
+    toggleSidebar,
   }
 
   return <globalContext.Provider value={value} {...props} />

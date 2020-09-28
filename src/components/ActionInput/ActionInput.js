@@ -3,8 +3,10 @@ import ProgressBar from '../shared/ProgressBar'
 import TimeDisplay from '../TimeDisplay/TimeDisplay'
 import { useVideoContext } from '../../context/videoContext'
 import { useTodoContext } from '../../context/todoContext'
+import { useGlobalContext } from '../../context/globalContext'
 
 const ActionInput = () => {
+  const { setOpenSidebar } = useGlobalContext()
   const { smartControls, progress } = useVideoContext()
   const { addTodo } = useTodoContext()
 
@@ -13,6 +15,7 @@ const ActionInput = () => {
     time: null,
   })
   const [active, setActive] = useState(false)
+  const [hint, setHint] = useState(randomHint())
 
   // * add new todo on submit
   const handleSubmit = () => {
@@ -39,6 +42,9 @@ const ActionInput = () => {
 
   const handleFocus = e => {
     if (!active) setActive(true)
+
+    // generate new random hint
+    setHint(randomHint())
   }
   const handleBlur = e => {
     if (active) setActive(false)
@@ -75,7 +81,7 @@ const ActionInput = () => {
         id='actionInput'
         name='addTodo'
         type='text'
-        placeholder='Add Note...'
+        placeholder={active ? hint : 'Add Note...'}
         value={todo.msg}
         autoComplete='off'
         onChange={handleChange}
@@ -92,3 +98,15 @@ const ActionInput = () => {
 }
 
 export default ActionInput
+
+function randomHint() {
+  const hints = [
+    'Spacebar = Play/Pause',
+    'Left/Right = Seek',
+    'Up/Down = Volume',
+    'Drag edge to resize List',
+    'Shift = show/hide List',
+  ]
+  const randomIndex = Math.floor(Math.random() * hints.length)
+  return hints[randomIndex]
+}
