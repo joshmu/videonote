@@ -7,7 +7,7 @@ const themeContext = createContext({
 
 export function ThemeProvider(props) {
   // initial default is light theme
-  const [theme, setTheme] = useState('light')
+  const [theme, setTheme] = useState('dark')
 
   // initial theme
   useEffect(() => {
@@ -26,7 +26,7 @@ export function ThemeProvider(props) {
   }, [])
 
   const toggleTheme = () => {
-    const newTheme = theme === 'light' ? 'dark' : 'light'
+    const newTheme = theme === 'dark' ? 'light' : 'dark'
     setTheme(newTheme)
     window.localStorage.setItem('theme', newTheme)
   }
