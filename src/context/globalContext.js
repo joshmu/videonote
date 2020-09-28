@@ -64,7 +64,7 @@ export function GlobalProvider(props) {
 
   const login = user => {
     let data = window.localStorage.getItem('vn')
-    if (!data || data === '{}') {
+    if (!data) {
       // set up app db
       window.localStorage.setItem('vn', JSON.stringify({}))
       data = window.localStorage.getItem('vn')
@@ -73,25 +73,24 @@ export function GlobalProvider(props) {
     // convert local storage string to db data object
     let db = JSON.parse(data)
 
-    //! check for new account setting to decide whether to reset local storage
-    if (!db[user.username]?.settings?.seekJump) {
-      console.log('reseting local storage')
-      window.localStorage.setItem('vn', JSON.stringify({}))
-      return login(user)
-    }
-
     // if no user then create
     if (!db[user.username]) db[user.username] = createUserDefaults(user)
 
     const userData = db[user.username]
     console.log({ userData })
+    // todo: update account based on settings update (do this when we have finished populating account details)
     if (userData.account) setAccount(userData.account)
     if (userData.projects.length > 0) {
       setProjects(userData.projects)
     } else {
       addAlert({ type: 'info', msg: 'Create a project to start' })
     }
-    if (userData.settings) setSettings(userData.settings)
+
+    // merge default settings with saved so we are up to date
+    if (userData.settings) {
+      const updatedSettings = { ...settings, ...userData.settings }
+      setSettings(updatedSettings)
+    }
   }
 
   const createUserDefaults = user => {
