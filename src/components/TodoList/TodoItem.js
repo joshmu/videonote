@@ -45,7 +45,7 @@ export default function TodoItem({ todo, close }) {
     <MotionFadeInOut
       motionKey={id}
       style={{
-        backgroundColor: close ? 'rgba(0, 0, 255, 0.04)' : '',
+        backgroundColor: close ? 'rgba(0, 0, 255, 0.05)' : '',
       }}
       className='relative border-b cursor-pointer border-themeText2'
     >

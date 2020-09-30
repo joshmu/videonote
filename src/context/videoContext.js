@@ -41,6 +41,7 @@ export function VideoProvider(props) {
 
   useEffect(() => {
     if (project) {
+      console.log('project changed setting url')
       if (project.src) setUrl(project.src)
     }
   }, [project])

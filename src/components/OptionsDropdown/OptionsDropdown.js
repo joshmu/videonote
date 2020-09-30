@@ -9,6 +9,7 @@ export default function OptionsDropdown({ open, ...props }) {
     toggleSettingsOpen,
     toggleModalOpen,
     resetGlobalState,
+    project,
   } = useGlobalContext()
   const { toggleTheme } = useThemeContext()
 
@@ -38,6 +39,11 @@ export default function OptionsDropdown({ open, ...props }) {
           onMouseLeave={handleMouseLeave}
           className='absolute right-0 z-40 w-48 py-2 text-sm capitalize transition-colors duration-300 ease-in-out border rounded-sm shadow-xl bg-themeBg'
         >
+          {project && (
+            <Select onClick={handleClick} data-modal='current'>
+              <div className='text-themeHighlight'>{project.title}</div>
+            </Select>
+          )}
           <Select onClick={handleClick} data-modal='create'>
             create
           </Select>

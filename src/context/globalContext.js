@@ -140,6 +140,18 @@ export function GlobalProvider(props) {
     })
     setProjects(updatedProjects)
   }
+
+  const updateProject = data => {
+    const updatedProject = { ...project, ...data }
+    setProject(updatedProject)
+  }
+
+  // update projects when we update the current project
+  useEffect(() => {
+    if (project === null) return
+    updateProjects(project)
+  }, [project])
+
   const updateSettings = data => setSettings({ ...settings, ...data })
 
   const toggleSettingsOpen = (state = undefined) => {
@@ -207,6 +219,7 @@ export function GlobalProvider(props) {
     loadProject,
     openSidebar,
     toggleSidebar,
+    updateProject,
   }
 
   return <globalContext.Provider value={value} {...props} />
