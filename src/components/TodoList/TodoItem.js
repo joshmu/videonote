@@ -13,11 +13,6 @@ export default function TodoItem({ todo, close }) {
     const updatedTodo = { ...todo, done: !todo.done }
     updateTodo(updatedTodo)
   }
-  const handleRightClick = e => {
-    console.log('click')
-    e.preventDefault()
-    removeTodo(id)
-  }
   const handleNoteClick = () => {
     seekTo(time)
   }
@@ -29,10 +24,9 @@ export default function TodoItem({ todo, close }) {
         backgroundColor: close ? 'rgba(0, 0, 255, 0.04)' : '',
       }}
       className='relative border-b cursor-pointer border-themeText2'
-      onContextMenu={handleRightClick}
     >
       <Select padding='p-0'>
-        <div className='flex items-center justify-start w-full h-full text-base '>
+        <div className='relative flex items-center justify-start w-full h-full text-base'>
           <div
             onClick={handleTimeClick}
             className={`${

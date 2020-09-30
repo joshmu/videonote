@@ -9,6 +9,7 @@ const todoContext = createContext({
   updateSearch: a => {},
   sort: a => [],
   search: '',
+  removeCompleted: () => {},
 })
 
 export function TodoProvider(props) {
@@ -66,6 +67,13 @@ export function TodoProvider(props) {
     return sorted
   }
 
+  const removeCompleted = () => {
+    setTodos(currentTodos => {
+      const updatedTodos = currentTodos.filter(todo => !todo.done)
+      return updatedTodos
+    })
+  }
+
   const value = {
     todos,
     addTodo,
@@ -74,6 +82,7 @@ export function TodoProvider(props) {
     search,
     updateSearch,
     sort,
+    removeCompleted,
   }
 
   return <todoContext.Provider value={value} {...props} />

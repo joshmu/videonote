@@ -11,17 +11,16 @@ import Overlay from '../src/components/shared/Overlay'
 // todo: easy share project (read only privledges option?, url link and no account required?)
 // accounts which can share public readonly of their project, viewers can only mark off notes but cannot create projects or notes
 // todo: prioritize speed of workflow
-// todo: warning if using local file that you will not be able to share
 // todo: export option
-// todo: formalize universal style components
 // todo: think about mobile variant
-// todo: auto focus on actionInput after project load
+// todo: method to autofocus, auto focus on actionInput after project load
 // todo: mute option
 // todo: autoplay when note is selected? (settings option)
 // todo: convert styles to use primary & secondary
+// todo: trash can delete method
+
 // todo: show locate video file button
-// todo: global smart controls
-// todo: convert some ideas in to hooks?
+// todo: warning if using local file that you will not be able to share
 
 export default function Main() {
   const { account, login } = useGlobalContext()
