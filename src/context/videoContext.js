@@ -23,7 +23,12 @@ const videoContext = createContext({
 })
 
 export function VideoProvider(props) {
-  const { project, settings, toggleSidebar } = useGlobalContext()
+  const {
+    project,
+    updateProjects,
+    settings,
+    toggleSidebar,
+  } = useGlobalContext()
   const { addAlert } = useNotificationContext()
   const playerRef = useRef(null)
   const [url, setUrl] = useState(null)
@@ -130,11 +135,14 @@ export function VideoProvider(props) {
     console.log('vn player error', error)
 
     if (error.target && error.target.error.message.includes('Format error')) {
-      // todo: show locate video file button
-      return addAlert({
+      addAlert({
         type: 'warning',
         msg: 'Please re-select your local video',
       })
+
+      requestLocalVideo()
+
+      return
     }
 
     addAlert({ type: 'error', msg: 'Video Player: ' + error.message })
@@ -149,6 +157,27 @@ export function VideoProvider(props) {
       console.log('smart controls enabled:', updatedState)
       return updatedState
     })
+  }
+
+  // todo: remove automatic pop up and replace with a button alternative ( or better > auto pop up current project settings modal)
+  const requestLocalVideo = () => {
+    console.log('reqesting local video')
+    var input = document.createElement('input')
+    input.type = 'file'
+
+    input.onchange = e => {
+      const file = e.target.files[0]
+      const url = URL.createObjectURL(file)
+      console.log(url)
+      if (typeof url !== 'string' || url.length === 0) return
+
+      // if we have a src url we will update the project information and reset the React Player URL
+      const updatedProject = { ...project, src: url }
+      updateProjects(updatedProject)
+      setUrl(url)
+    }
+
+    input.click()
   }
 
   const value = {

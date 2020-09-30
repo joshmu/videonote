@@ -13,7 +13,7 @@ const globalContext = createContext({
   },
   project: null,
   updateAccount: () => {},
-  updateProjects: () => {},
+  updateProjects: a => {},
   removeProject: id => {},
   updateSettings: a => {},
   settingsOpen: false,
@@ -136,7 +136,7 @@ export function GlobalProvider(props) {
 
   const updateProjects = project => {
     const updatedProjects = projects.map(p => {
-      return p.src === project.src ? project : p
+      return p.id === project.id ? project : p
     })
     setProjects(updatedProjects)
   }
