@@ -75,7 +75,7 @@ export function VideoProvider(props) {
 
   const seekTo = secs => {
     // validate
-    if (Number(secs) === NaN) return
+    if (Number(secs) === NaN || playerRef === null) return
 
     // settings offset
     const playPosition = secs + settings.playOffset

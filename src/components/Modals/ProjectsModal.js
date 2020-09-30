@@ -16,7 +16,7 @@ export default function ProjectsModal({ toggle: toggleModal }) {
 
   const handleRemoveProject = ({ title, id }) => {
     const answer = window.confirm(
-      `Are you sure you want to delete the project: ${title}`
+      `Are you sure you want to delete the project: ${title.toUpperCase()}`
     )
     if (answer) removeProject(id)
   }

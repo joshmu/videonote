@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react'
 import { useVideoContext } from '../../context/videoContext'
 import TimeDisplay from '../TimeDisplay/TimeDisplay'
 import { useTodoContext } from '../../context/todoContext'
@@ -5,9 +6,16 @@ import MotionFadeInOut from '../shared/MotionFadeInOut'
 import Select from '../shared/Select'
 
 export default function TodoItem({ todo, close }) {
-  const { id, msg, person = null, time, done = false } = todo
-  const { seekTo } = useVideoContext()
+  const { id, msg, person: category = null, time, done = false } = todo
+  const { seekTo, toggleSmartControls } = useVideoContext()
   const { updateTodo, removeTodo } = useTodoContext()
+  const [edit, setEdit] = useState(false)
+
+  // no smart controls whilst editing
+  useEffect(() => {
+    const cmd = !edit
+    toggleSmartControls(cmd)
+  }, [edit])
 
   const handleTimeClick = () => {
     const updatedTodo = { ...todo, done: !todo.done }
@@ -15,6 +23,22 @@ export default function TodoItem({ todo, close }) {
   }
   const handleNoteClick = () => {
     seekTo(time)
+  }
+  const toggleEdit = (willEdit = undefined) => {
+    setEdit(current => {
+      const newState = willEdit === undefined ? !current : willEdit
+      return newState
+    })
+  }
+  const handleEdit = e => {
+    const updatedTodo = { ...todo, msg: e.target.value }
+    updateTodo(updatedTodo)
+  }
+  const handleEditKeys = e => {
+    if (e.key === 'Enter') {
+      setEdit(false)
+      return
+    }
   }
 
   return (
@@ -42,10 +66,28 @@ export default function TodoItem({ todo, close }) {
             onClick={handleNoteClick}
             className={`${done && 'text-themeText2'} w-full h-full py-2 pl-2`}
           >
-            {person && (
-              <div className='text-sm leading-5 capitalize'>{person}</div>
+            {category && (
+              <div className='text-sm leading-5 capitalize'>{category}</div>
             )}
-            <div className='text-sm leading-5'>{msg}</div>
+            {edit ? (
+              <input
+                type='text'
+                value={msg}
+                onChange={handleEdit}
+                onKeyDown={handleEditKeys}
+                onDoubleClick={() => toggleEdit(false)}
+                onBlur={() => toggleEdit(false)}
+                className='bg-themeBg focus:outline-none'
+                autoFocus
+              />
+            ) : (
+              <div
+                onDoubleClick={() => toggleEdit(true)}
+                className='text-sm leading-5'
+              >
+                {msg}
+              </div>
+            )}
           </div>
         </div>
       </Select>
