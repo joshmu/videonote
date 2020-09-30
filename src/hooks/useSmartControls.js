@@ -1,6 +1,6 @@
 import { useEffect } from 'react'
 
-export const useSmartControls = (smartControls, enableSmartControls) => {
+export const useSmartControls = (smartControls, dependencyArray) => {
   useEffect(() => {
     const handleKeys = event => {
       smartControls(event.key)
@@ -9,5 +9,5 @@ export const useSmartControls = (smartControls, enableSmartControls) => {
     return () => {
       globalThis.window.removeEventListener('keydown', handleKeys)
     }
-  }, [enableSmartControls])
+  }, dependencyArray)
 }

@@ -130,7 +130,13 @@ export function VideoProvider(props) {
       toggleSidebar()
     }
   }
-  useSmartControls(smartControls, enableSmartControls)
+
+  useSmartControls(smartControls, [
+    progress,
+    enableSmartControls,
+    settings,
+    playerRef,
+  ])
 
   const handlePlayerError = error => {
     console.log('vn player error', error)
