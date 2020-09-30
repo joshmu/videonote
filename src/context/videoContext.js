@@ -1,6 +1,7 @@
 import { createContext, useContext, useState, useEffect, useRef } from 'react'
 import { useGlobalContext } from './globalContext'
 import { useNotificationContext } from './notificationContext'
+import { useAnounceAction } from '../hooks/useAnounceAction'
 
 const videoContext = createContext({
   ready: false,
@@ -27,14 +28,7 @@ export function VideoProvider(props) {
   const [volume, setVolume] = useState(0.75)
   const [progress, setProgress] = useState({})
 
-  const [action, setAction] = useState('')
-  // we want to capture action events and reset so we can receive multiple of the same events elsewhere
-  // so we quickly reset to base state
-  useEffect(() => {
-    setTimeout(() => {
-      setAction('')
-    }, 10)
-  }, [action])
+  const [action, setAction] = useAnounceAction('')
 
   useEffect(() => {
     if (project) {
