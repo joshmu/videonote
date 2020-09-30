@@ -27,6 +27,8 @@
 }
 
 body {
+  background-color: theme('colors.themeBg');
+  color: theme('colors.themeText');
   --webkit-font-smoothing: antialiased;
   --webkit-tap-highlight-color: transparent;
 }
