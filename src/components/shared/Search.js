@@ -1,21 +1,20 @@
 import { useVideoContext } from '../../context/videoContext'
 import { useTodoContext } from '../../context/todoContext'
+import { useEffect } from 'react'
 
 export default function Search() {
   const { search, updateSearch } = useTodoContext()
-  const { smartControls } = useVideoContext()
+  const { toggleSmartControls } = useVideoContext()
+
+  useEffect(() => {
+    const cmd = search.length === 0
+    toggleSmartControls(cmd)
+  }, [search])
 
   const handleChange = e => {
     const value = e.target.value
     // disable empty space for start of search
     updateSearch(value === ' ' ? '' : value)
-  }
-
-  const handleKeyDown = e => {
-    // keyboard logic on empty field
-    if (e.target.value === '') {
-      smartControls(e.key)
-    }
   }
 
   return (
@@ -25,7 +24,6 @@ export default function Search() {
       placeholder='Search'
       value={search}
       onChange={handleChange}
-      onKeyDown={handleKeyDown}
     />
   )
 }

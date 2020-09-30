@@ -17,10 +17,6 @@ export default function VideoPlayer() {
     handlePlayerError,
   } = useVideoContext()
 
-  // todo: how can we always center video vertically?
-  // todo: wrapper for theme toggle otherwise insert in to navbar
-  // todo: update packages especially tailwind
-
   const videoContentVariants = {
     initial: {
       opacity: 0,

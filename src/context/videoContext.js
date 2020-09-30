@@ -2,6 +2,7 @@ import { createContext, useContext, useState, useEffect, useRef } from 'react'
 import { useGlobalContext } from './globalContext'
 import { useNotificationContext } from './notificationContext'
 import { useAnounceAction } from '../hooks/useAnounceAction'
+import { useSmartControls } from '../hooks/useSmartControls'
 
 const videoContext = createContext({
   ready: false,
@@ -17,6 +18,8 @@ const videoContext = createContext({
   playerRef: {},
   smartControls: a => {},
   handlePlayerError: a => {},
+  enableSmartControls: true,
+  toggleSmartControls: (a = undefined) => {},
 })
 
 export function VideoProvider(props) {
@@ -27,6 +30,7 @@ export function VideoProvider(props) {
   const [playing, setPlaying] = useState(false)
   const [volume, setVolume] = useState(0.75)
   const [progress, setProgress] = useState({})
+  const [enableSmartControls, setEnableSmartControls] = useState(true)
 
   const [action, setAction] = useAnounceAction('')
 
@@ -42,9 +46,12 @@ export function VideoProvider(props) {
   }
 
   const togglePlay = () => {
-    setPlaying(!playing)
-
-    setAction(!playing ? 'play' : 'pause')
+    setPlaying(playing => {
+      const updatedPlayState = !playing
+      // console.log({ playing, newState })
+      setAction(updatedPlayState ? 'play' : 'pause')
+      return updatedPlayState
+    })
   }
 
   const changeVolume = increment => {
@@ -91,6 +98,8 @@ export function VideoProvider(props) {
   }
 
   const smartControls = key => {
+    if (!enableSmartControls) return
+
     if (key === ' ') {
       togglePlay()
     }
@@ -115,6 +124,7 @@ export function VideoProvider(props) {
       toggleSidebar()
     }
   }
+  useSmartControls(smartControls, enableSmartControls)
 
   const handlePlayerError = error => {
     console.log('vn player error', error)
@@ -128,6 +138,17 @@ export function VideoProvider(props) {
     }
 
     addAlert({ type: 'error', msg: 'Video Player: ' + error.message })
+  }
+
+  const toggleSmartControls = cmd => {
+    // don't do anything if no change is required
+    if (cmd === enableSmartControls) return
+
+    setEnableSmartControls(current => {
+      const updatedState = cmd === undefined ? !current : cmd
+      console.log('smart controls enabled:', updatedState)
+      return updatedState
+    })
   }
 
   const value = {
@@ -144,6 +165,8 @@ export function VideoProvider(props) {
     smartControls,
     handlePlayerError,
     action,
+    enableSmartControls,
+    toggleSmartControls,
   }
 
   return <videoContext.Provider value={value} {...props} />

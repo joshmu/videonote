@@ -10,7 +10,7 @@ const PLACEHOLDER = 'Add Note...'
 
 const ActionInput = () => {
   const { settings } = useGlobalContext()
-  const { smartControls, progress } = useVideoContext()
+  const { smartControls, progress, toggleSmartControls } = useVideoContext()
   const { addTodo } = useTodoContext()
 
   const [todo, setTodo] = useState({
@@ -24,6 +24,12 @@ const ActionInput = () => {
     // generate new random hint
     setHint(randomHint(settings.showHints))
   }, [active])
+
+  // disable smart controls when input is not empty
+  useEffect(() => {
+    const cmd = todo.msg.length === 0
+    toggleSmartControls(cmd)
+  }, [todo.msg])
 
   // * add new todo on submit
   const handleSubmit = () => {
@@ -66,7 +72,7 @@ const ActionInput = () => {
 
     // keyboard shortcuts on empty todo
     if (todo.msg === '') {
-      smartControls(e.key)
+      // smartControls(e.key)
     }
   }
 

@@ -147,8 +147,10 @@ export function GlobalProvider(props) {
     setSettingsOpen(cmd)
   }
   const toggleSidebar = (state = undefined) => {
-    const cmd = state ? state : !openSidebar
-    setOpenSidebar(cmd)
+    setOpenSidebar(currentState => {
+      const updatedState = state ? state : !currentState
+      return updatedState
+    })
   }
   const toggleModalOpen = modalName => {
     if (!modalName) return setModalOpen(null)
