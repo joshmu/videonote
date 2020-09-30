@@ -28,22 +28,26 @@ export default function TodoItem({ todo, close }) {
       style={{
         backgroundColor: close ? 'rgba(0, 0, 255, 0.04)' : '',
       }}
-      className={`${done ? 'text-themeText2 line-through' : 'text-themeText'} 
-      cursor-pointer relative border-b border-themeText2`}
+      className='relative border-b cursor-pointer border-themeText2'
       onContextMenu={handleRightClick}
     >
       <Select padding='p-0'>
-        <div className='flex items-center justify-start w-full h-full text-base'>
+        <div className='flex items-center justify-start w-full h-full text-base '>
           <div
             onClick={handleTimeClick}
-            className='text-xs transition-colors duration-300 ease-in-out text-themeText2'
+            className={`${
+              done && 'line-through'
+            } text-xs transition-colors duration-300 ease-in-out text-themeText2`}
           >
             <div className='px-2'>
               <TimeDisplay seconds={time} />
             </div>
           </div>
 
-          <div className='w-full h-full py-2 pl-2' onClick={handleNoteClick}>
+          <div
+            onClick={handleNoteClick}
+            className={`${done && 'text-themeText2'} w-full h-full py-2 pl-2`}
+          >
             {person && (
               <div className='text-sm leading-5 capitalize'>{person}</div>
             )}

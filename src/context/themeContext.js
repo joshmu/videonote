@@ -5,6 +5,11 @@ const themeContext = createContext({
   toggleTheme: () => {},
 })
 
+const TYPES = {
+  dark: 'theme-dark',
+  light: 'theme-light',
+}
+
 export function ThemeProvider(props) {
   // initial default is light theme
   const [theme, setTheme] = useState('dark')
@@ -27,11 +32,10 @@ export function ThemeProvider(props) {
 
   // when theme changes then assign to body tag
   useEffect(() => {
-    globalThis.document.body.classList.remove('theme-light')
-    globalThis.document.body.classList.remove('theme-dark')
-    globalThis.document.body.classList.add(
-      theme === 'dark' ? 'theme-dark' : 'theme-light'
+    Object.entries(TYPES).forEach(([, className]) =>
+      globalThis.document.body.classList.remove(className)
     )
+    globalThis.document.body.classList.add(TYPES[theme])
   }, [theme])
 
   const toggleTheme = () => {

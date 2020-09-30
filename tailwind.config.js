@@ -1,4 +1,5 @@
 const defaultTheme = require('tailwindcss/defaultTheme')
+const plugin = require('tailwindcss/plugin')
 
 module.exports = {
   purge: {
@@ -35,7 +36,18 @@ module.exports = {
     },
   },
   variants: {},
-  plugins: [],
+  plugins: [
+    plugin(function ({ addUtilities, theme }) {
+      const extendLineThrough = {
+        '.line-through': {
+          textDecoration: 'line-through',
+          textDecorationColor: theme('colors.themeHighlight'),
+        },
+      }
+
+      addUtilities(extendLineThrough)
+    }),
+  ],
   future: {
     removeDeprecatedGapUtilities: true,
     purgeLayersByDefault: true,
