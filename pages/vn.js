@@ -17,6 +17,7 @@ import Overlay from '../src/components/shared/Overlay'
 // todo: mute option
 // todo: autoplay when note is selected? (settings option)
 // todo: convert styles to use primary & secondary
+// todo: use date-fns for times?
 
 // todo: show locate video file button
 // todo: warning if using local file that you will not be able to share
