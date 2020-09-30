@@ -25,6 +25,15 @@ export function ThemeProvider(props) {
     }
   }, [])
 
+  // when theme changes then assign to body tag
+  useEffect(() => {
+    globalThis.document.body.classList.remove('theme-light')
+    globalThis.document.body.classList.remove('theme-dark')
+    globalThis.document.body.classList.add(
+      theme === 'dark' ? 'theme-dark' : 'theme-light'
+    )
+  }, [theme])
+
   const toggleTheme = () => {
     const newTheme = theme === 'dark' ? 'light' : 'dark'
     setTheme(newTheme)

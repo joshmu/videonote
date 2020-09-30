@@ -1,18 +1,12 @@
 import Head from 'next/head'
-import { useThemeContext } from '../context/themeContext'
 
 export default function Layout({ children }) {
-  const { theme } = useThemeContext()
   return (
     <>
       <Head>
         <title>VideoNote</title>
       </Head>
-      <div
-        className={`${
-          theme === 'light' ? 'theme-light' : 'theme-dark'
-        } text-themeText antialiased relative min-h-screen bg-themeBg transition-colors duration-300 ease-in-out font-sans overflow-hidden`}
-      >
+      <div className='relative min-h-screen overflow-hidden font-sans antialiased transition-colors duration-300 ease-in-out text-themeText bg-themeBg'>
         <main>{children}</main>
       </div>
     </>
