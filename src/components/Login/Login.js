@@ -4,6 +4,7 @@ import Router from 'next/router'
 import { useGlobalContext } from '../../context/globalContext'
 import { ModalInput, ModalPrimaryBtn } from '../Modals/Modal'
 import { useNotificationContext } from '../../context/notificationContext'
+import isEmail from 'validator/lib/isEmail'
 
 export default function Login({ toggleLoginView }) {
   const { login } = useGlobalContext()
@@ -15,8 +16,7 @@ export default function Login({ toggleLoginView }) {
   }
 
   const isValidCredentials = () => {
-    // todo: better email valid check
-    const validEmail = user.loginEmail.includes('@')
+    const validEmail = isEmail(user.loginEmail)
     const validPassword = user.loginPassword.length > 4
     return validEmail && validPassword
   }

@@ -1,8 +1,9 @@
 import { useState } from 'react'
 import { motion } from 'framer-motion'
-import Link from 'next/link'
 import { ModalInput, ModalPrimaryBtn } from '../Modals/Modal'
 import { useNotificationContext } from '../../context/notificationContext'
+import isEmail from 'validator/lib/isEmail'
+import Router from 'next/router'
 
 export default function Register({ toggleLoginView }) {
   const [user, setUser] = useState({
@@ -16,15 +17,36 @@ export default function Register({ toggleLoginView }) {
     setUser({ ...user, [e.target.id]: e.target.value })
   }
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!isValidCredentials())
       return addAlert({ type: 'error', msg: 'Invalid credentials provided' })
 
     console.log('registering new user')
-    window.alert(JSON.stringify(user, null, 2))
+    const body = {
+      email: user.registerEmail,
+      password: user.registerPassword2,
+    }
+    const res = await fetch('/api/register', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+    })
+    if (res.status === 201) {
+      addAlert({
+        type: 'success',
+        msg: 'Account created! Signing in...',
+        duration: 1000,
+      })
+      setTimeout(() => {
+        Router.push('/vn')
+      }, 1200)
+    } else {
+      const data = await res.json()
+      addAlert({ type: 'error', msg: data.msg })
+    }
   }
   const isValidCredentials = () => {
-    const validEmail = user.registerEmail.includes('@')
+    const validEmail = isEmail(user.registerEmail)
     const validPassword =
       user.registerPassword.length > 4 &&
       user.registerPassword === user.registerPassword2
