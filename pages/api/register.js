@@ -43,7 +43,12 @@ export default async (req, res) => {
     .insertOne({
       _id: nanoid(12),
       email,
+      username: email,
+      projectIds: [],
       password: hashedPassword,
+      created: Date.now(),
+      updated: Date.now(),
+      deleted: null,
     })
     .then(({ ops }) => ops[0])
 

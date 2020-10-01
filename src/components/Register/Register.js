@@ -4,8 +4,10 @@ import { ModalInput, ModalPrimaryBtn } from '../Modals/Modal'
 import { useNotificationContext } from '../../context/notificationContext'
 import isEmail from 'validator/lib/isEmail'
 import Router from 'next/router'
+import { useGlobalContext } from '../../context/globalContext'
 
 export default function Register({ toggleLoginView }) {
+  const { login } = useGlobalContext()
   const [user, setUser] = useState({
     registerEmail: '',
     registerPassword: '',
@@ -17,7 +19,9 @@ export default function Register({ toggleLoginView }) {
     setUser({ ...user, [e.target.id]: e.target.value })
   }
 
-  const handleSubmit = async () => {
+  const handleSubmit = async e => {
+    e.preventDefault()
+
     if (!isValidCredentials())
       return addAlert({ type: 'error', msg: 'Invalid credentials provided' })
     await handleRegister()
@@ -33,8 +37,10 @@ export default function Register({ toggleLoginView }) {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(body),
     })
+    const data = await res.json()
     // 201 = created
     if (res.status === 201) {
+      const user = data.user
       const routeChangeWaitDuration = 1000
       addAlert({
         type: 'success',
@@ -42,10 +48,10 @@ export default function Register({ toggleLoginView }) {
         duration: routeChangeWaitDuration,
       })
       setTimeout(() => {
+        login(user)
         Router.push('/vn')
       }, routeChangeWaitDuration)
     } else {
-      const data = await res.json()
       addAlert({ type: 'error', msg: data.msg })
     }
   }
@@ -113,7 +119,7 @@ export default function Register({ toggleLoginView }) {
           </div>
 
           <div className='flex items-center justify-end mt-4'>
-            <ModalPrimaryBtn onClick={handleSubmit} type='button'>
+            <ModalPrimaryBtn onClick={handleSubmit} type='submit'>
               Register
             </ModalPrimaryBtn>
           </div>
