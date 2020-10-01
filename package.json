@@ -8,6 +8,7 @@
   },
   "dependencies": {
     "framer-motion": "^2.7.1",
+    "mongodb": "^3.6.2",
     "next": "9.5.2",
     "nodemailer": "^6.4.12",
     "react": "16.13.1",
