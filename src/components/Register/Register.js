@@ -32,14 +32,15 @@ export default function Register({ toggleLoginView }) {
       body: JSON.stringify(body),
     })
     if (res.status === 201) {
+      const duration = 1000
       addAlert({
         type: 'success',
         msg: 'Account created! Signing in...',
-        duration: 1000,
+        duration,
       })
       setTimeout(() => {
         Router.push('/vn')
-      }, 1200)
+      }, duration)
     } else {
       const data = await res.json()
       addAlert({ type: 'error', msg: data.msg })
