@@ -1,18 +1,34 @@
 import { useState } from 'react'
 import { motion } from 'framer-motion'
-import Link from 'next/link'
+import Router from 'next/router'
 import { useGlobalContext } from '../../context/globalContext'
 import { ModalInput, ModalPrimaryBtn } from '../Modals/Modal'
+import { useNotificationContext } from '../../context/notificationContext'
 
-export default function LoginModal() {
+export default function Login({ toggleLoginView }) {
   const { login } = useGlobalContext()
-  const [user, setUser] = useState({ username: '' })
+  const [user, setUser] = useState({ loginEmail: '', loginPassword: '' })
+  const { addAlert } = useNotificationContext()
 
   const handleChange = e => {
-    setUser({ ...user, username: e.target.value })
+    setUser({ ...user, [e.target.id]: e.target.value })
   }
-  const handleLogin = () => {
+
+  const isValidCredentials = () => {
+    // todo: better email valid check
+    const validEmail = user.loginEmail.includes('@')
+    const validPassword = user.loginPassword.length > 4
+    return validEmail && validPassword
+  }
+  const handleSubmit = () => {
+    if (!isValidCredentials())
+      return addAlert({ type: 'error', msg: 'Invalid credentials provided' })
+
     login(user)
+    Router.push('/vn')
+  }
+  const handleSwitchView = () => {
+    toggleLoginView(false)
   }
 
   return (
@@ -33,7 +49,7 @@ export default function LoginModal() {
         </h3>
 
         <p className='mt-1 text-center text-themeText2'>
-          Login or create account
+          Sign in to your account
         </p>
 
         <form>
@@ -43,7 +59,7 @@ export default function LoginModal() {
               id='loginEmail'
               placeholder='Email Address'
               aria-label='Email Address'
-              value={user.username}
+              value={user.loginEmail}
               onChange={handleChange}
             />
           </div>
@@ -57,22 +73,10 @@ export default function LoginModal() {
             />
           </div>
 
-          <div className='flex items-center justify-between mt-4'>
-            <a href='#' className='text-sm text-gray-600 hover:text-gray-500'>
-              Forget Password?
-            </a>
-
-            <Link href='/vn' passHref>
-              <a>
-                <ModalPrimaryBtn
-                  onClick={handleLogin}
-                  type='button'
-                  disabled={user.username.length === 0}
-                >
-                  Login
-                </ModalPrimaryBtn>
-              </a>
-            </Link>
+          <div className='flex items-center justify-end mt-4'>
+            <ModalPrimaryBtn onClick={handleSubmit} type='button'>
+              Login
+            </ModalPrimaryBtn>
           </div>
         </form>
       </div>
@@ -80,12 +84,12 @@ export default function LoginModal() {
       <div className='flex items-center justify-center py-4 text-center'>
         <span className='text-sm text-themeText2'>Don't have an account? </span>
 
-        <a
-          href='#'
-          className='mx-2 text-sm font-bold transition-colors duration-300 ease-in-out text-highlight-700 hover:text-highlight-400'
+        <button
+          onClick={handleSwitchView}
+          className='mx-2 text-sm font-bold transition-colors duration-300 ease-in-out focus:outline-none text-highlight-700 hover:text-highlight-400'
         >
           Register
-        </a>
+        </button>
       </div>
     </motion.div>
   )
