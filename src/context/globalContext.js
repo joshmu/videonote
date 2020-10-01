@@ -74,9 +74,9 @@ export function GlobalProvider(props) {
     let db = JSON.parse(data)
 
     // if no user then create
-    if (!db[user.username]) db[user.username] = createUserDefaults(user)
+    if (!db[user.email]) db[user.email] = createUserDefaults(user)
 
-    const userData = db[user.username]
+    const userData = db[user.email]
     console.log({ userData })
     // todo: update account based on settings update (do this when we have finished populating account details)
     if (userData.account) setAccount(userData.account)
@@ -114,7 +114,7 @@ export function GlobalProvider(props) {
     // get db
     const db = JSON.parse(window.localStorage.getItem('vn'))
     // update user account
-    db[account.username] = { account, projects, settings }
+    db[account.email] = { account, projects, settings }
     // update db
     window.localStorage.setItem('vn', JSON.stringify(db))
   }

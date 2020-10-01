@@ -20,7 +20,9 @@ export default function Register({ toggleLoginView }) {
   const handleSubmit = async () => {
     if (!isValidCredentials())
       return addAlert({ type: 'error', msg: 'Invalid credentials provided' })
-
+    await handleRegister()
+  }
+  const handleRegister = async () => {
     console.log('registering new user')
     const body = {
       email: user.registerEmail,
@@ -31,16 +33,17 @@ export default function Register({ toggleLoginView }) {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(body),
     })
+    // 201 = created
     if (res.status === 201) {
-      const duration = 1000
+      const routeChangeWaitDuration = 1000
       addAlert({
         type: 'success',
         msg: 'Account created! Signing in...',
-        duration,
+        duration: routeChangeWaitDuration,
       })
       setTimeout(() => {
         Router.push('/vn')
-      }, duration)
+      }, routeChangeWaitDuration)
     } else {
       const data = await res.json()
       addAlert({ type: 'error', msg: data.msg })

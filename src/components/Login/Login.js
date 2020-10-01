@@ -8,8 +8,8 @@ import isEmail from 'validator/lib/isEmail'
 
 export default function Login({ toggleLoginView }) {
   const { login } = useGlobalContext()
-  const [user, setUser] = useState({ loginEmail: '', loginPassword: '' })
   const { addAlert } = useNotificationContext()
+  const [user, setUser] = useState({ loginEmail: '', loginPassword: '' })
 
   const handleChange = e => {
     setUser({ ...user, [e.target.id]: e.target.value })
@@ -20,13 +20,45 @@ export default function Login({ toggleLoginView }) {
     const validPassword = user.loginPassword.length > 4
     return validEmail && validPassword
   }
-  const handleSubmit = () => {
+  const handleSubmit = e => {
+    e.preventDefault()
+
     if (!isValidCredentials())
       return addAlert({ type: 'error', msg: 'Invalid credentials provided' })
 
-    login(user)
-    Router.push('/vn')
+    handleLogin()
   }
+
+  const handleLogin = async () => {
+    console.log('logging in user')
+    const body = {
+      email: user.loginEmail,
+      password: user.loginPassword,
+    }
+    const res = await fetch('/api/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+    })
+    const data = await res.json()
+    // 302 = found
+    if (res.status === 302) {
+      const user = data.user
+      const routeChangeWaitDuration = 1000
+      addAlert({
+        type: 'success',
+        msg: `Signing in: ${user.username || user.email}`,
+        duration: routeChangeWaitDuration,
+      })
+      setTimeout(() => {
+        login(user)
+        Router.push('/vn')
+      }, routeChangeWaitDuration)
+    } else {
+      addAlert({ type: 'error', msg: data.msg })
+    }
+  }
+
   const handleSwitchView = () => {
     toggleLoginView(false)
   }
@@ -70,11 +102,13 @@ export default function Login({ toggleLoginView }) {
               id='loginPassword'
               placeholder='Password'
               aria-label='Password'
+              value={user.loginPassword}
+              onChange={handleChange}
             />
           </div>
 
           <div className='flex items-center justify-end mt-4'>
-            <ModalPrimaryBtn onClick={handleSubmit} type='button'>
+            <ModalPrimaryBtn onClick={handleSubmit} type='submit'>
               Login
             </ModalPrimaryBtn>
           </div>

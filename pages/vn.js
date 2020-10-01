@@ -6,6 +6,7 @@ import Modals from '../src/components/Modals/Modals'
 import Notification from '../src/components/Notification/Notification'
 import { useGlobalContext } from '../src/context/globalContext'
 import Overlay from '../src/components/shared/Overlay'
+import Router from 'next/router'
 
 // todo: speech to text synthesis on actionInput
 // todo: easy share project (read only privledges option?, url link and no account required?)
@@ -26,7 +27,10 @@ export default function Main() {
   const { account, login } = useGlobalContext()
 
   useEffect(() => {
-    if (!account) login({ username: 'mu@joshmu.com' })
+    if (!account) {
+      Router.push('/login')
+      // login({ username: 'mu@joshmu.com' })
+    }
   }, [])
 
   return (
