@@ -203,6 +203,13 @@ export function GlobalProvider(props) {
   //-------------------------------
   const handleInitialServerData = data => {
     console.log('handle initial server data', data)
+    const { user } = data
+    const { settings, ...account } = user
+    // allocate server data to respective areas
+    console.log({ account, settings })
+    setAccount(account)
+    setSettings(settings)
+    // todo get projects based on their idList and pass back
   }
 
   const value = {

@@ -39,7 +39,7 @@ export default function Register({ toggleLoginView, handleLogin }) {
     if (res.status === 201) {
       addAlert({
         type: 'success',
-        msg: 'Account created! Signing in...',
+        msg: 'Account created',
         duration: 1000,
       })
       handleLogin(data)

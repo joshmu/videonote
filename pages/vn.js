@@ -9,6 +9,9 @@ import Overlay from '../src/components/shared/Overlay'
 import Cookies from 'universal-cookie'
 import absoluteUrl from 'next-absolute-url'
 
+// todo: keep giving back refreshed JWT during usage?
+// todo: only update settings for user when they are not default values
+
 // todo: speech to text synthesis on actionInput
 // todo: decide on 'services' or 'lib' or 'utils' folder? and where?
 // todo: easy share project (read only privledges option?, url link and no account required?)
