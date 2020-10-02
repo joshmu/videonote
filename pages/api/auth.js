@@ -17,7 +17,7 @@ export default async (req, res) => {
     email = await authenticateToken(token)
   } catch (err) {
     console.error(err.message)
-    res.status(401).json({ msg: 'Invalid token' })
+    return res.status(401).json({ msg: 'Invalid token' })
   }
 
   // connect db

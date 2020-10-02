@@ -27,19 +27,13 @@ import absoluteUrl from 'next-absolute-url'
 
 // todo: best way to store date in mongodb
 
-export default function Main({ server }) {
-  console.log('inside', { server })
-  const { account, updateAccount, login } = useGlobalContext()
+export default function Main({ serverData }) {
+  console.log('inside', { serverData })
+  const { handleInitialServerData, account, login } = useGlobalContext()
 
-  // on initial load use server response
+  // on initial load handle server response
   useEffect(() => {
-    const { user } = server
-    updateAccount(user)
-
-    // if no server data then redirect
-    if (!server) {
-      Router.push('/login')
-    }
+    handleInitialServerData(serverData)
   }, [])
 
   return (
@@ -100,5 +94,5 @@ Main.getInitialProps = async ctx => {
   // response data to pass to vn
   const data = await res.json()
 
-  return { server: data }
+  return { serverData: data }
 }

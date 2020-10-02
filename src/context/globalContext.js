@@ -27,6 +27,7 @@ const globalContext = createContext({
   loadProject: () => {},
   openSidebar: true,
   toggleSidebar: (a = undefined) => {},
+  handleInitialServerData: a => {},
 })
 
 export function GlobalProvider(props) {
@@ -199,6 +200,11 @@ export function GlobalProvider(props) {
     if (settings.currentProject === id) switchProject(updatedProjects[0].id)
   }
 
+  //-------------------------------
+  const handleInitialServerData = data => {
+    console.log('handle initial server data', data)
+  }
+
   const value = {
     account,
     updateAccount,
@@ -220,6 +226,7 @@ export function GlobalProvider(props) {
     openSidebar,
     toggleSidebar,
     updateProject,
+    handleInitialServerData,
   }
 
   return <globalContext.Provider value={value} {...props} />
