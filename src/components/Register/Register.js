@@ -3,11 +3,8 @@ import { motion } from 'framer-motion'
 import { ModalInput, ModalPrimaryBtn } from '../Modals/Modal'
 import { useNotificationContext } from '../../context/notificationContext'
 import isEmail from 'validator/lib/isEmail'
-import Router from 'next/router'
-import { useGlobalContext } from '../../context/globalContext'
 
-export default function Register({ toggleLoginView }) {
-  const { login } = useGlobalContext()
+export default function Register({ toggleLoginView, handleLogin }) {
   const [user, setUser] = useState({
     registerEmail: '',
     registerPassword: '',
@@ -40,17 +37,12 @@ export default function Register({ toggleLoginView }) {
     const data = await res.json()
     // 201 = created
     if (res.status === 201) {
-      const user = data.user
-      const routeChangeWaitDuration = 1000
       addAlert({
         type: 'success',
         msg: 'Account created! Signing in...',
-        duration: routeChangeWaitDuration,
+        duration: 1000,
       })
-      setTimeout(() => {
-        login(user)
-        Router.push('/vn')
-      }, routeChangeWaitDuration)
+      handleLogin(data)
     } else {
       addAlert({ type: 'error', msg: data.msg })
     }

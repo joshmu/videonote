@@ -1,8 +1,9 @@
 import isEmail from 'validator/lib/isEmail'
 import normalizeEmail from 'validator/lib/normalizeEmail'
 import bcrypt from 'bcryptjs'
-import { nanoid } from 'nanoid'
 import { connectToDatabase } from '../../utils/mongodb'
+import { extractUser } from '../../utils/apiHelpers'
+import { generateAccessToken } from '../../utils/jwt'
 
 export default async (req, res) => {
   // connect db
@@ -37,18 +38,12 @@ export default async (req, res) => {
     res.status(401).json({ msg: 'Password is incorrect.' })
   }
 
+  // token
+  const token = generateAccessToken(user.email)
+
   // 302 - found
   res.status(302).json({
     user: extractUser(user),
+    token,
   })
-}
-
-// take only needed user fields to avoid sensitive ones (such as password)
-function extractUser(user) {
-  if (!user) return null
-  const { _id, email } = user
-  return {
-    _id,
-    email,
-  }
 }

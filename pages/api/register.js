@@ -1,16 +1,11 @@
-// import nextConnect from 'next-connect';
 import isEmail from 'validator/lib/isEmail'
 import normalizeEmail from 'validator/lib/normalizeEmail'
 import bcrypt from 'bcryptjs'
 import { nanoid } from 'nanoid'
-// import middleware from '../../middlewares/middleware';
-// import { extractUser } from '../../lib/api-helpers'
+import { extractUser } from '../../utils/apiHelpers'
+import { generateAccessToken } from '../../utils/jwt'
 
 import { connectToDatabase } from '../../utils/mongodb'
-
-// const handler = nextConnect();
-
-// handler.use(middleware);
 
 export default async (req, res) => {
   // connect db
@@ -46,24 +41,18 @@ export default async (req, res) => {
       username: email,
       projectIds: [],
       password: hashedPassword,
-      created: Date.now(),
-      updated: Date.now(),
+      created: new Date(),
+      updated: new Date(),
       deleted: null,
     })
     .then(({ ops }) => ops[0])
 
+  // token
+  const token = generateAccessToken(user.email)
+
   // 201 - created
   res.status(201).json({
     user: extractUser(user),
+    token,
   })
-}
-
-// take only needed user fields to avoid sensitive ones (such as password)
-function extractUser(user) {
-  if (!user) return null
-  const { _id, email } = user
-  return {
-    _id,
-    email,
-  }
 }

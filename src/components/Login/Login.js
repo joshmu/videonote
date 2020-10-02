@@ -1,13 +1,10 @@
 import { useState } from 'react'
 import { motion } from 'framer-motion'
-import Router from 'next/router'
-import { useGlobalContext } from '../../context/globalContext'
 import { ModalInput, ModalPrimaryBtn } from '../Modals/Modal'
 import { useNotificationContext } from '../../context/notificationContext'
 import isEmail from 'validator/lib/isEmail'
 
-export default function Login({ toggleLoginView }) {
-  const { login } = useGlobalContext()
+export default function Login({ toggleLoginView, handleLogin }) {
   const { addAlert } = useNotificationContext()
   const [user, setUser] = useState({ loginEmail: '', loginPassword: '' })
 
@@ -26,10 +23,10 @@ export default function Login({ toggleLoginView }) {
     if (!isValidCredentials())
       return addAlert({ type: 'error', msg: 'Invalid credentials provided' })
 
-    handleLogin()
+    requestLogin()
   }
 
-  const handleLogin = async () => {
+  const requestLogin = async () => {
     console.log('logging in user')
     const body = {
       email: user.loginEmail,
@@ -43,17 +40,12 @@ export default function Login({ toggleLoginView }) {
     const data = await res.json()
     // 302 = found
     if (res.status === 302) {
-      const user = data.user
-      const routeChangeWaitDuration = 1000
       addAlert({
         type: 'success',
-        msg: `Signing in: ${user.username || user.email}`,
-        duration: routeChangeWaitDuration,
+        msg: `Signing in: ${data.user.username || data.user.email}`,
+        duration: 1000,
       })
-      setTimeout(() => {
-        login(user)
-        Router.push('/vn')
-      }, routeChangeWaitDuration)
+      handleLogin(data)
     } else {
       addAlert({ type: 'error', msg: data.msg })
     }

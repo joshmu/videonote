@@ -12,7 +12,7 @@ const globalContext = createContext({
     currentProject: null,
   },
   project: null,
-  updateAccount: () => {},
+  updateAccount: a => {},
   updateProjects: a => {},
   removeProject: id => {},
   updateSettings: a => {},

@@ -7,6 +7,8 @@ import Notification from '../src/components/Notification/Notification'
 import { useGlobalContext } from '../src/context/globalContext'
 import Overlay from '../src/components/shared/Overlay'
 import Router from 'next/router'
+import Cookies from 'universal-cookie'
+import absoluteUrl from 'next-absolute-url'
 
 // todo: speech to text synthesis on actionInput
 // todo: easy share project (read only privledges option?, url link and no account required?)
@@ -23,13 +25,20 @@ import Router from 'next/router'
 // todo: mute option
 // todo: export option
 
-export default function Main() {
-  const { account, login } = useGlobalContext()
+// todo: best way to store date in mongodb
 
+export default function Main({ server }) {
+  console.log('inside', { server })
+  const { account, updateAccount, login } = useGlobalContext()
+
+  // on initial load use server response
   useEffect(() => {
-    if (!account) {
+    const { user } = server
+    updateAccount(user)
+
+    // if no server data then redirect
+    if (!server) {
       Router.push('/login')
-      // login({ username: 'mu@joshmu.com' })
     }
   }, [])
 
@@ -49,4 +58,47 @@ export default function Main() {
       </div>
     </Layout>
   )
+}
+
+Main.getInitialProps = async ctx => {
+  const cookies = new Cookies(
+    ctx?.req?.headers?.cookie ? ctx.req.headers.cookie : null
+  )
+  const token = cookies.get('token')
+
+  if (!token) {
+    console.log('no token, redirecting...')
+    // server
+    ctx.res.writeHead(302, {
+      Location: `/`,
+    })
+
+    ctx.res.end()
+    return
+  }
+
+  // request data with JWT token
+  const { origin } = absoluteUrl(ctx.req)
+  const body = { token }
+  const res = await fetch(`${origin}/api/auth`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(body),
+  })
+
+  // if token is invalid
+  if (res.status !== 200) {
+    ctx.res.writeHead(302, {
+      Location: `/login`,
+    })
+    ctx.res.end()
+    return
+  }
+
+  // response data to pass to vn
+  const data = await res.json()
+
+  return { server: data }
 }
