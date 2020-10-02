@@ -203,6 +203,7 @@ export function GlobalProvider(props) {
   //-------------------------------
   const handleInitialServerData = data => {
     console.log('handle initial server data', data)
+    login(data.user)
   }
 
   const value = {
