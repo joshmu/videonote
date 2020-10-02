@@ -47,6 +47,7 @@ export default function Login({ toggleLoginView, handleLogin }) {
       })
       handleLogin(data)
     } else {
+      if (data.msg.includes('registration required')) toggleLoginView(false)
       addAlert({ type: 'error', msg: data.msg })
     }
   }
