@@ -4,9 +4,9 @@ import { authenticateToken } from '../../utils/jwt'
 
 export default async (req, res) => {
   // Gather the jwt access token from the request header
-  // const token = req.headers['authorization']
-  // console.log('headers', { token })
-  const { token } = req.body
+  let token = req.headers['authorization']
+  // strip 'bearer'
+  if (token) token = token.replace(/bearer /i, '')
 
   if (!token) {
     return res.status(401).json({ msg: 'No token. Authorization denied.' })

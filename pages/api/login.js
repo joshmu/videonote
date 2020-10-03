@@ -35,14 +35,14 @@ export default async (req, res) => {
   // compare passwords
   const match = await bcrypt.compare(password, user.password)
   if (!match) {
-    res.status(401).json({ msg: 'Password is incorrect.' })
+    return res.status(401).json({ msg: 'Password is incorrect.' })
   }
 
   // token
   const token = generateAccessToken(user.email)
 
   // 302 - found
-  res.status(302).json({
+  return res.status(302).json({
     user: extractUser(user),
     token,
   })

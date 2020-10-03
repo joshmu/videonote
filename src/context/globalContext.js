@@ -1,16 +1,18 @@
 import { createContext, useContext, useEffect, useState } from 'react'
 import { useNotificationContext } from './notificationContext'
 
+const settingDefaults = {
+  playOffset: -4,
+  showHints: true,
+  seekJump: 10,
+  sidebarWidth: 400,
+  currentProjectId: null,
+}
+
 const globalContext = createContext({
   account: {},
   projects: [],
-  settings: {
-    playOffset: -4,
-    showHints: true,
-    seekJump: 10,
-    sidebarWidth: 400,
-    currentProject: null,
-  },
+  settings: settingDefaults,
   project: null,
   updateAccount: a => {},
   updateProjects: a => {},
@@ -30,18 +32,12 @@ const globalContext = createContext({
   handleInitialServerData: a => {},
 })
 
-export function GlobalProvider(props) {
+export function GlobalProvider({ serverData, ...props }) {
   const [account, setAccount] = useState(null)
   const [projects, setProjects] = useState([])
-  const [settings, setSettings] = useState({
-    playOffset: -4,
-    showHints: true,
-    seekJump: 10,
-    sidebarWidth: 400,
-    currentProject: null,
-  })
+  const [settings, setSettings] = useState(settingDefaults)
 
-  const [project, setProject] = useState(null)
+  const [currentProject, setCurrentProject] = useState(null)
 
   const [openSidebar, setOpenSidebar] = useState(true)
   const [settingsOpen, setSettingsOpen] = useState(false)
@@ -51,87 +47,40 @@ export function GlobalProvider(props) {
   const resetGlobalState = () => {
     setAccount(null)
     setProjects([])
-    setSettings({
-      playOffset: -4,
-      showHints: true,
-      seekJump: 10,
-      sidebarWidth: 400,
-      currentProject: null,
-    })
-    setProject(null)
+    setSettings(settingDefaults)
+    setCurrentProject(null)
     setSettingsOpen(false)
     setModalOpen(false)
   }
 
-  const login = user => {
-    let data = window.localStorage.getItem('vn')
-    if (!data) {
-      // set up app db
-      window.localStorage.setItem('vn', JSON.stringify({}))
-      data = window.localStorage.getItem('vn')
-    }
-
-    // convert local storage string to db data object
-    let db = JSON.parse(data)
-
-    // if no user then create
-    if (!db[user.email]) db[user.email] = createUserDefaults(user)
-
-    const userData = db[user.email]
-    console.log({ userData })
-    // todo: update account based on settings update (do this when we have finished populating account details)
-    if (userData.account) setAccount(userData.account)
-    if (userData.projects.length > 0) {
-      setProjects(userData.projects)
-    } else {
-      addAlert({ type: 'info', msg: 'Create a project to start' })
-    }
-
-    // merge default settings with saved so we are up to date
-    if (userData.settings) {
-      const updatedSettings = { ...settings, ...userData.settings }
-      setSettings(updatedSettings)
-    }
-  }
-
-  const createUserDefaults = user => {
-    return {
-      account: user,
-      projects: [],
-      settings: { playOffset: -4, sidebarWidth: 400, currentProject: null },
-    }
-  }
-
-  // update if any change
+  // initial response from server
   useEffect(() => {
-    if (account && projects && settings && project) updateLocalStorage()
-    if (projects.length > 0 && settings.currentProject && project === null)
-      loadProject()
-  }, [account, projects, settings, project])
+    handleInitialServerData(serverData)
+  }, [])
 
-  const updateLocalStorage = () => {
-    console.log('update storage', { account, projects, settings })
-    if (!account) return
-    // get db
-    const db = JSON.parse(window.localStorage.getItem('vn'))
-    // update user account
-    db[account.email] = { account, projects, settings }
-    // update db
-    window.localStorage.setItem('vn', JSON.stringify(db))
-  }
+  // recommend creating a project if there are no projects
+  useEffect(() => {
+    if (projects.length === 0)
+      addAlert({ type: 'info', msg: 'Create a project to start' })
+  }, [projects])
 
-  const loadProject = () => {
-    // if we have projects and no current then autoselect first project
-    if (projects.length > 0) {
-      if (settings.currentProject) {
-        switchProject(settings.currentProject)
+  // if we have projects and one isn't assigned then let's do it
+  useEffect(() => {
+    if (projects.length > 0 && currentProject === null) {
+      if (settings.currentProjectId) {
+        loadProject(settings.currentProjectId)
       } else {
-        // auto select first project
-        switchProject()
-        updateSettings({ currentProject: projects[0].id })
+        // otherwise use most recent project
+        const recentProjectId = projects.slice(-1)[0]
+        loadProject(recentProjectId)
       }
     }
-  }
+  }, [projects, currentProject, settings.currentProjectId])
+
+  // if current project changes then update settings
+  useEffect(() => {
+    if (currentProject) updateSettings({ currentProjectId: currentProject.id })
+  }, [currentProject])
 
   const updateAccount = data => setAccount({ ...account, ...data })
 
@@ -143,15 +92,15 @@ export function GlobalProvider(props) {
   }
 
   const updateProject = data => {
-    const updatedProject = { ...project, ...data }
-    setProject(updatedProject)
+    const updatedProject = { ...currentProject, ...data }
+    setCurrentProject(updatedProject)
   }
 
   // update projects when we update the current project
   useEffect(() => {
-    if (project === null) return
-    updateProjects(project)
-  }, [project])
+    if (currentProject === null) return
+    updateProjects(currentProject)
+  }, [currentProject])
 
   const updateSettings = data => setSettings({ ...settings, ...data })
 
@@ -172,32 +121,49 @@ export function GlobalProvider(props) {
     setModalOpen(modalOpen === modalName ? null : modalName)
   }
   const createProject = project => {
+    console.log('createProject', { project })
+    // project = {title, src}
+    // todo: api request to create project, assign user id to it
+    // todo: api sends all available projects back
+    // todo: notifications
+    // todo: match input project with response 'projects'
+    // todo: set projects
+    // todo: set new current projects
+    // todo: grab the right one
     const newProject = { ...project, todos: [], id: Date.now() }
     setProjects([...projects, newProject])
-    setProject(newProject)
-    updateSettings({ currentProject: newProject.id })
+    setCurrentProject(newProject)
   }
 
-  const switchProject = id => {
-    let project = projects[0]
-    if (id) {
-      console.log('switch to project id', id)
-      const found = projects.find(p => p.id === id)
-      if (found) project = found
-    }
+  const loadProject = id => {
+    console.log('switch to project id', id)
+    const project = projects.find(p => p.id === id)
 
-    setProject(project)
-    updateSettings({ currentProject: project.id })
+    if (!project) addAlert({ type: 'error', msg: 'Project not found' })
+
+    setCurrentProject(project)
 
     // notification
     addAlert({ type: 'success', msg: `${project.title.toUpperCase()}` })
   }
 
   const removeProject = id => {
-    const updatedProjects = projects.filter(p => p.id !== id)
-    setProjects(updatedProjects)
+    // todo: request project removal from api (provide user token)
+    // todo: mark project 'deleted' timestamp on server
+    // todo: pass back to client all available projects for them
+    // todo: setProjects
+    // todo: notifications
+
+    // this is the success data from api
+    const updatedUserProjects = []
+
+    setProjects(updatedUserProjects)
+
     // switch project if we are removing the currently viewed project
-    if (settings.currentProject === id) switchProject(updatedProjects[0].id)
+    if (settings.currentProjectId === id) {
+      const newCurrentProject = updatedUserProjects.slice(-1)[0]
+      loadProject(newCurrentProject.id)
+    }
   }
 
   //-------------------------------
@@ -209,7 +175,7 @@ export function GlobalProvider(props) {
     console.log({ account, settings })
     setAccount(account)
     setSettings(settings)
-    // todo get projects based on their idList and pass back
+    // todo: get projects based on their idList and pass back
   }
 
   const value = {
@@ -218,18 +184,16 @@ export function GlobalProvider(props) {
     projects,
     updateProjects,
     removeProject,
-    project,
+    project: currentProject,
     settings,
     updateSettings,
     settingsOpen,
     toggleSettingsOpen,
     modalOpen,
     toggleModalOpen,
-    login,
     createProject,
     resetGlobalState,
-    switchProject,
-    loadProject,
+    switchProject: loadProject,
     openSidebar,
     toggleSidebar,
     updateProject,

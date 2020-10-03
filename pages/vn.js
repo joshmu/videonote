@@ -4,13 +4,17 @@ import VideoPlayer from '../src/components/VideoPlayer/VideoPlayer'
 import Sidebar from '../src/components/Sidebar/Sidebar'
 import Modals from '../src/components/Modals/Modals'
 import Notification from '../src/components/Notification/Notification'
-import { useGlobalContext } from '../src/context/globalContext'
+import { GlobalProvider } from '../src/context/globalContext'
 import Overlay from '../src/components/shared/Overlay'
 import Cookies from 'universal-cookie'
 import absoluteUrl from 'next-absolute-url'
+import { VideoProvider } from '../src/context/videoContext'
+import { TodoProvider } from '../src/context/todoContext'
 
 // todo: keep giving back refreshed JWT during usage?
 // todo: only update settings for user when they are not default values
+// todo: '/' path should be the app and new users are redirected to the '/hello'
+// todo: 'easymotion char jump' <leader> s <char> => surround changed to 'S' in normal mode
 
 // todo: speech to text synthesis on actionInput
 // todo: decide on 'services' or 'lib' or 'utils' folder? and where?
@@ -31,28 +35,27 @@ import absoluteUrl from 'next-absolute-url'
 // todo: best way to store date in mongodb
 
 export default function Main({ serverData }) {
-  const { handleInitialServerData } = useGlobalContext()
-
-  // on initial load handle server response
-  useEffect(() => {
-    handleInitialServerData(serverData)
-  }, [])
-
   return (
-    <Layout>
-      <div className='flex flex-col w-full h-screen overflow-hidden'>
-        {/* <div className='text-3xl'>navbar</div> */}
+    <GlobalProvider serverData={serverData}>
+      <VideoProvider>
+        <TodoProvider>
+          <Layout>
+            <div className='flex flex-col w-full h-screen overflow-hidden'>
+              {/* <div className='text-3xl'>navbar</div> */}
 
-        <div className='flex flex-1 w-full h-full'>
-          <VideoPlayer />
-          <Sidebar />
-        </div>
+              <div className='flex flex-1 w-full h-full'>
+                <VideoPlayer />
+                <Sidebar />
+              </div>
 
-        <Modals />
-        <Notification />
-        <Overlay />
-      </div>
-    </Layout>
+              <Modals />
+              <Notification />
+              <Overlay />
+            </div>
+          </Layout>
+        </TodoProvider>
+      </VideoProvider>
+    </GlobalProvider>
   )
 }
 
@@ -75,11 +78,12 @@ Main.getInitialProps = async ctx => {
 
   // request data with JWT token
   const { origin } = absoluteUrl(ctx.req)
-  const body = { token }
+  const body = {}
   const res = await fetch(`${origin}/api/auth`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
     },
     body: JSON.stringify(body),
   })

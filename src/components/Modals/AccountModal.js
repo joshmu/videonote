@@ -21,8 +21,9 @@ export default function AccountModal({ toggle: toggleModal }) {
   })
 
   useEffect(() => {
-    setState({ ...state, username: account.username, email: account.email })
-  }, [])
+    if (account)
+      setState({ ...state, username: account.username, email: account.email })
+  }, [account])
 
   const handleUpdate = e => {
     e.preventDefault()
@@ -73,7 +74,9 @@ export default function AccountModal({ toggle: toggleModal }) {
           type='password'
         />
       </ModalForm>
-      <ModalPrimaryBtn onClick={handleUpdate} type='submit'>Update</ModalPrimaryBtn>
+      <ModalPrimaryBtn onClick={handleUpdate} type='submit'>
+        Update
+      </ModalPrimaryBtn>
     </ModalContainer>
   )
 }
