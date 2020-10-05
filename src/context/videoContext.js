@@ -40,9 +40,9 @@ export function VideoProvider(props) {
   const [action, setAction] = useAnounceAction('')
 
   useEffect(() => {
-    if (project) {
+    if (project !== null && project.src !== null) {
       console.log('project changed setting url')
-      if (project.src) setUrl(project.src)
+      if (project.src !== url) setUrl(project.src)
     }
   }, [project])
 

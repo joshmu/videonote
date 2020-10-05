@@ -40,7 +40,8 @@ export default async (req, res) => {
       await updateProject(project, user, db)
     }
     if (action === 'remove') {
-      await removeProject(project, user, db)
+      const projectData = { ...project, removed: new Date() }
+      await updateProject(projectData, user, db)
     }
     if (!action) {
       return res.status(400).json({ msg: 'Action not specified' })
@@ -80,18 +81,16 @@ const createProject = async (project, user, db) => {
     .then(({ ops }) => ops[0])
 }
 const updateProject = async (project, user, db) => {
-  if (!userOwnsProject(project, user)) return
-  console.warn('todo')
-}
-const removeProject = async (project, user, db) => {
   if (!(await userOwnsProject(project, user, db))) {
     console.log('user does not own this project')
     return
   }
 
+  const { _id, ...data } = project
+
   return db.collection('projects').updateOne(
-    { _id: project._id },
-    { $set: { removed: new Date() } }
+    { _id: _id },
+    { $set: data }
     // { upsert: true }
   )
 }

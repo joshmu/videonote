@@ -3,6 +3,7 @@ import { motion } from 'framer-motion'
 import { ModalInput, ModalPrimaryBtn } from '../Modals/Modal'
 import { useNotificationContext } from '../../context/notificationContext'
 import isEmail from 'validator/lib/isEmail'
+import { fetcher } from '../../../utils/clientHelpers'
 
 export default function Register({ toggleLoginView, handleLogin }) {
   const [user, setUser] = useState({
@@ -29,12 +30,8 @@ export default function Register({ toggleLoginView, handleLogin }) {
       email: user.registerEmail,
       password: user.registerPassword2,
     }
-    const res = await fetch('/api/register', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(body),
-    })
-    const data = await res.json()
+    const { res, data } = await fetcher('/api/register', body)
+
     // 201 = created
     if (res.status === 201) {
       addAlert({

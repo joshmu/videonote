@@ -13,7 +13,7 @@ const todoContext = createContext({
 })
 
 export function TodoProvider(props) {
-  const { project, updateProjects } = useGlobalContext()
+  const { project, updateProject } = useGlobalContext()
   const [todos, setTodos] = useState([])
   const [search, setSearch] = useState('')
 
@@ -28,7 +28,7 @@ export function TodoProvider(props) {
 
     const updatedProject = project
     updatedProject.todos = todos
-    updateProjects(updatedProject)
+    updateProject(updatedProject)
   }, [todos])
 
   const addTodo = todo => {

@@ -83,6 +83,12 @@ export function GlobalProvider({ serverData, ...props }) {
     if (currentProject) updateSettings({ currentProjectId: currentProject._id })
   }, [currentProject])
 
+  // update projects when we update the current project
+  useEffect(() => {
+    if (currentProject === null) return
+    updateProjects(currentProject)
+  }, [currentProject])
+
   const updateUser = data => setUser({ ...user, ...data })
 
   const updateProjects = project => {
@@ -92,16 +98,15 @@ export function GlobalProvider({ serverData, ...props }) {
     setProjects(updatedProjects)
   }
 
-  const updateProject = data => {
-    const updatedProject = { ...currentProject, ...data }
-    setCurrentProject(updatedProject)
-  }
+  const updateProject = async project => {
+    // * todo: todos > currentProject > update this project on server > update projects with server response
+    const response = await handleProjectApi('update', user, project)
+    if (!response) return console.error('api error')
+    const { user, projects } = response
 
-  // update projects when we update the current project
-  useEffect(() => {
-    if (currentProject === null) return
-    updateProjects(currentProject)
-  }, [currentProject])
+    // setCurrentProject(updatedProject)
+    setProjects(projects)
+  }
 
   const updateSettings = data => setSettings({ ...settings, ...data })
 
@@ -122,31 +127,10 @@ export function GlobalProvider({ serverData, ...props }) {
     setModalOpen(modalOpen === modalName ? null : modalName)
   }
   const createProject = async project => {
-    console.log('createProject', { project })
-    // project = {title, src}
-    // api request to create project, assign user id to it
-    const body = {
-      action: 'create',
-      user: user,
-      project,
-    }
-    // api sends all available projects back
-    const {
-      res,
-      data: { user, projects, msg: error },
-    } = await fetcher('/api/project', body)
+    const response = await handleProjectApi('create', user, project)
+    if (!response) return console.error('api error')
+    const { user, projects } = response
 
-    if (res.status !== 200) {
-      addAlert({ type: 'error', error })
-      console.error(error)
-      return
-    }
-
-    // api returns all projects for the user
-    if (!projects) {
-      console.error('projects from server is incorrect')
-      return
-    }
     // reset user's projects
     setProjects(projects)
     // grab newly created project from the server response and set
@@ -155,54 +139,31 @@ export function GlobalProvider({ serverData, ...props }) {
   }
 
   // typically handle project data or presume id has been passed
-  const loadProject = project => {
-    console.log('switch to project', project)
-    if (typeof project === 'string')
-      project = projects.find(p => p._id === project)
+  const loadProject = projectOrId => {
+    console.log('switch to project', projectOrId)
+    // therefor id has been passed and we need to grab the project
+    if (typeof projectOrId === 'string')
+      projectOrId = projects.find(p => p._id === projectOrId)
 
-    if (!project) {
+    const selectedProject = projectOrId
+
+    if (!selectedProject) {
       addAlert({ type: 'error', msg: 'Project not found' })
       return
     }
 
-    setCurrentProject(project)
+    setCurrentProject(selectedProject)
 
     // notification
-    addAlert({ type: 'success', msg: `${project.title.toUpperCase()}` })
+    addAlert({ type: 'success', msg: `${selectedProject.title.toUpperCase()}` })
   }
 
   const removeProject = async _id => {
-    // todo: request project removal from api (provide user token)
-    // todo: mark project 'deleted' timestamp on server
-    // todo: pass back to client all available projects for them
-    // todo: setProjects
-    // todo: notifications
+    const projectData = { _id }
+    const response = await handleProjectApi('remove', user, projectData)
+    if (!response) return console.error('api error')
+    const { user, projects } = response
 
-    console.log('removeProject', { _id })
-    // api request to remove project, assign user id to it
-    const body = {
-      action: 'remove',
-      // todo: should we pass in user as a param?
-      user: user,
-      project: { _id },
-    }
-    // api sends all available projects back
-    const {
-      res,
-      data: { user, projects, msg: error },
-    } = await fetcher('/api/project', body)
-
-    if (res.status !== 200) {
-      addAlert({ type: 'error', error })
-      console.error(error)
-      return
-    }
-
-    // api returns all projects for the user
-    if (!projects) {
-      console.error('projects from server is incorrect')
-      return
-    }
     // reset user's projects with updated version
     setProjects(projects)
 
@@ -222,6 +183,35 @@ export function GlobalProvider({ serverData, ...props }) {
     setUser(user)
     setSettings(settings)
     setProjects(projects)
+  }
+
+  const handleProjectApi = async (action, userData, project) => {
+    console.log(action, { project })
+    // api request to create project, assign user id to it
+    const body = {
+      action: action,
+      user: userData,
+      project,
+    }
+    // api sends all available projects back
+    const {
+      res,
+      data: { user, projects, msg: error },
+    } = await fetcher('/api/project', body)
+
+    if (res.status !== 200) {
+      addAlert({ type: 'error', msg: error })
+      console.error(error)
+      return
+    }
+
+    // api returns all projects for the user
+    if (!projects) {
+      console.error('projects from server is incorrect')
+      return
+    }
+
+    return { user, projects }
   }
 
   const value = {

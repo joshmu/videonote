@@ -3,6 +3,7 @@ import { motion } from 'framer-motion'
 import { ModalInput, ModalPrimaryBtn } from '../Modals/Modal'
 import { useNotificationContext } from '../../context/notificationContext'
 import isEmail from 'validator/lib/isEmail'
+import { fetcher } from '../../../utils/clientHelpers'
 
 export default function Login({ toggleLoginView, handleLogin }) {
   const { addAlert } = useNotificationContext()
@@ -32,12 +33,8 @@ export default function Login({ toggleLoginView, handleLogin }) {
       email: user.loginEmail,
       password: user.loginPassword,
     }
-    const res = await fetch('/api/login', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(body),
-    })
-    const data = await res.json()
+    const { res, data } = await fetcher('/api/login', body)
+
     // 302 = found
     if (res.status === 302) {
       addAlert({
