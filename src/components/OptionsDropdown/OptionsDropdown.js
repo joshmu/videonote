@@ -53,7 +53,7 @@ export default function OptionsDropdown({ open, ...props }) {
           <Select onClick={handleClick} data-modal='settings'>
             settings
           </Select>
-          <Select onClick={handleClick} data-modal='account'>
+          <Select onClick={handleClick} data-modal='user'>
             account
           </Select>
           <Link href='/' passHref>

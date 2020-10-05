@@ -1,6 +1,7 @@
 import { connectToDatabase } from '../../utils/mongodb'
 import { extractUser } from '../../utils/apiHelpers'
 import { authenticateToken } from '../../utils/jwt'
+import { getUserProjects } from './project'
 
 export default async (req, res) => {
   // Gather the jwt access token from the request header
@@ -27,8 +28,11 @@ export default async (req, res) => {
   const user = await db.collection('users').findOne({
     email,
   })
+  // get projects
+  const projects = await getUserProjects(user._id, db)
 
   res.status(200).json({
     user: extractUser(user),
+    projects,
   })
 }

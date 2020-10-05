@@ -1,5 +1,6 @@
 import { createContext, useContext, useEffect, useState } from 'react'
 import { useNotificationContext } from './notificationContext'
+import { fetcher } from '../../utils/clientHelpers'
 
 const settingDefaults = {
   playOffset: -4,
@@ -10,11 +11,11 @@ const settingDefaults = {
 }
 
 const globalContext = createContext({
-  account: {},
+  user: {},
   projects: [],
   settings: settingDefaults,
-  project: null,
-  updateAccount: a => {},
+  currentProject: null,
+  updateUser: a => {},
   updateProjects: a => {},
   removeProject: id => {},
   updateSettings: a => {},
@@ -25,15 +26,15 @@ const globalContext = createContext({
   login: a => {},
   createProject: a => {},
   resetGlobalState: () => {},
-  switchProject: (a = 0) => {},
-  loadProject: () => {},
+  loadProject: a => {},
+  updateProject: a => {},
   openSidebar: true,
   toggleSidebar: (a = undefined) => {},
   handleInitialServerData: a => {},
 })
 
 export function GlobalProvider({ serverData, ...props }) {
-  const [account, setAccount] = useState(null)
+  const [user, setUser] = useState(null)
   const [projects, setProjects] = useState([])
   const [settings, setSettings] = useState(settingDefaults)
 
@@ -45,7 +46,7 @@ export function GlobalProvider({ serverData, ...props }) {
   const { addAlert } = useNotificationContext()
 
   const resetGlobalState = () => {
-    setAccount(null)
+    setUser(null)
     setProjects([])
     setSettings(settingDefaults)
     setCurrentProject(null)
@@ -58,11 +59,11 @@ export function GlobalProvider({ serverData, ...props }) {
     handleInitialServerData(serverData)
   }, [])
 
-  // recommend creating a project if there are no projects
+  // recommend creating a project if there are no projects and we have loaded the user
   useEffect(() => {
-    if (projects.length === 0)
+    if (projects.length === 0 && user)
       addAlert({ type: 'info', msg: 'Create a project to start' })
-  }, [projects])
+  }, [projects, user])
 
   // if we have projects and one isn't assigned then let's do it
   useEffect(() => {
@@ -79,14 +80,14 @@ export function GlobalProvider({ serverData, ...props }) {
 
   // if current project changes then update settings
   useEffect(() => {
-    if (currentProject) updateSettings({ currentProjectId: currentProject.id })
+    if (currentProject) updateSettings({ currentProjectId: currentProject._id })
   }, [currentProject])
 
-  const updateAccount = data => setAccount({ ...account, ...data })
+  const updateUser = data => setUser({ ...user, ...data })
 
   const updateProjects = project => {
     const updatedProjects = projects.map(p => {
-      return p.id === project.id ? project : p
+      return p._id === project._id ? project : p
     })
     setProjects(updatedProjects)
   }
@@ -120,26 +121,49 @@ export function GlobalProvider({ serverData, ...props }) {
     setModalOpen(modalName)
     setModalOpen(modalOpen === modalName ? null : modalName)
   }
-  const createProject = project => {
+  const createProject = async project => {
     console.log('createProject', { project })
     // project = {title, src}
-    // todo: api request to create project, assign user id to it
-    // todo: api sends all available projects back
-    // todo: notifications
-    // todo: match input project with response 'projects'
-    // todo: set projects
-    // todo: set new current projects
-    // todo: grab the right one
-    const newProject = { ...project, todos: [], id: Date.now() }
-    setProjects([...projects, newProject])
-    setCurrentProject(newProject)
+    // api request to create project, assign user id to it
+    const body = {
+      action: 'create',
+      user: user,
+      project,
+    }
+    // api sends all available projects back
+    const {
+      res,
+      data: { user, projects, msg: error },
+    } = await fetcher('/api/project', body)
+
+    if (res.status !== 200) {
+      addAlert({ type: 'error', error })
+      console.error(error)
+      return
+    }
+
+    // api returns all projects for the user
+    if (!projects) {
+      console.error('projects from server is incorrect')
+      return
+    }
+    // reset user's projects
+    setProjects(projects)
+    // grab newly created project from the server response and set
+    const insertedProject = projects.find(p => p.src === project.src)
+    loadProject(insertedProject)
   }
 
-  const loadProject = id => {
-    console.log('switch to project id', id)
-    const project = projects.find(p => p.id === id)
+  // typically handle project data or presume id has been passed
+  const loadProject = project => {
+    console.log('switch to project', project)
+    if (typeof project === 'string')
+      project = projects.find(p => p._id === project)
 
-    if (!project) addAlert({ type: 'error', msg: 'Project not found' })
+    if (!project) {
+      addAlert({ type: 'error', msg: 'Project not found' })
+      return
+    }
 
     setCurrentProject(project)
 
@@ -162,25 +186,24 @@ export function GlobalProvider({ serverData, ...props }) {
     // switch project if we are removing the currently viewed project
     if (settings.currentProjectId === id) {
       const newCurrentProject = updatedUserProjects.slice(-1)[0]
-      loadProject(newCurrentProject.id)
+      loadProject(newCurrentProject._id)
     }
   }
 
   //-------------------------------
   const handleInitialServerData = data => {
     console.log('handle initial server data', data)
-    const { user } = data
-    const { settings, ...account } = user
+    const { user: account, projects } = data
+    const { settings, ...user } = account
     // allocate server data to respective areas
-    console.log({ account, settings })
-    setAccount(account)
+    setUser(user)
     setSettings(settings)
-    // todo: get projects based on their idList and pass back
+    setProjects(projects)
   }
 
   const value = {
-    account,
-    updateAccount,
+    user,
+    updateUser,
     projects,
     updateProjects,
     removeProject,
@@ -193,7 +216,7 @@ export function GlobalProvider({ serverData, ...props }) {
     toggleModalOpen,
     createProject,
     resetGlobalState,
-    switchProject: loadProject,
+    loadProject,
     openSidebar,
     toggleSidebar,
     updateProject,

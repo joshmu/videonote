@@ -14,6 +14,6 @@ export const authenticateToken = async token => {
 export const generateAccessToken = email => {
   // expires after half and hour (1800 seconds = 30 minutes)
   const data = { email }
-  // todo: change token expiration once we are ready
-  return jwt.sign(data, process.env.JWT_TOKEN_SECRET, { expiresIn: 60 * 2 })
+  //! todo: change token expiration once we are ready
+  return jwt.sign(data, process.env.JWT_TOKEN_SECRET, { expiresIn: 60 * 5 })
 }

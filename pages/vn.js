@@ -10,16 +10,18 @@ import Cookies from 'universal-cookie'
 import absoluteUrl from 'next-absolute-url'
 import { VideoProvider } from '../src/context/videoContext'
 import { TodoProvider } from '../src/context/todoContext'
+import { fetcher } from '../utils/clientHelpers'
 
 // todo: keep giving back refreshed JWT during usage?
 // todo: only update settings for user when they are not default values
 // todo: '/' path should be the app and new users are redirected to the '/hello'
 // todo: 'easymotion char jump' <leader> s <char> => surround changed to 'S' in normal mode
+// todo: when page is inactive and we start using it again, check JWT? and boot if expired
 
 // todo: speech to text synthesis on actionInput
 // todo: decide on 'services' or 'lib' or 'utils' folder? and where?
-// todo: easy share project (read only privledges option?, url link and no account required?)
-// accounts which can share public readonly of their project, viewers can only mark off notes but cannot create projects or notes
+// todo: easy share project (read only privledges option?, url link and no user account required?)
+// users accounts can share public readonly of their project, viewers can only mark off notes but cannot create projects or notes
 // todo: prioritize speed of workflow
 // todo: think about mobile variant
 // todo: method to autofocus, auto focus on actionInput after project load, (do this especially on SHIFT when expanded video)
@@ -78,15 +80,9 @@ Main.getInitialProps = async ctx => {
 
   // request data with JWT token
   const { origin } = absoluteUrl(ctx.req)
+  const url = `${origin}/api/auth`
   const body = {}
-  const res = await fetch(`${origin}/api/auth`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${token}`,
-    },
-    body: JSON.stringify(body),
-  })
+  const { res, data } = await fetcher(url, body, token)
 
   // if token is invalid
   if (res.status !== 200) {
@@ -96,9 +92,6 @@ Main.getInitialProps = async ctx => {
     ctx.res.end()
     return
   }
-
-  // response data to pass to vn
-  const data = await res.json()
 
   return { serverData: data }
 }

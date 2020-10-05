@@ -10,8 +10,8 @@ import {
 import { useNotificationContext } from '../../context/notificationContext'
 import { isValidCredentials } from '../../../utils/clientHelpers'
 
-export default function AccountModal({ toggle: toggleModal }) {
-  const { account } = useGlobalContext()
+export default function UserAccountModal({ toggle: toggleModal }) {
+  const { user } = useGlobalContext()
   const { addAlert } = useNotificationContext()
   const [state, setState] = useState({
     username: '',
@@ -21,9 +21,8 @@ export default function AccountModal({ toggle: toggleModal }) {
   })
 
   useEffect(() => {
-    if (account)
-      setState({ ...state, username: account.username, email: account.email })
-  }, [account])
+    if (user) setState({ ...state, username: user.username, email: user.email })
+  }, [user])
 
   const handleUpdate = e => {
     e.preventDefault()

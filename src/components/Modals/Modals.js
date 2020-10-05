@@ -1,7 +1,7 @@
 import { useEffect } from 'react'
 import { useGlobalContext } from '../../context/globalContext'
 import { useVideoContext } from '../../context/videoContext'
-import AccountModal from './AccountModal'
+import UserAccountModal from './UserAccountModal'
 import CreateProjectModal from './CreateProjectModal'
 import CurrentProjectModal from './CurrentProjectModal'
 import ProjectsModal from './ProjectsModal'
@@ -26,7 +26,7 @@ export default function Modals() {
       )}
       {modalOpen === 'projects' && <ProjectsModal toggle={toggleModalOpen} />}
       {modalOpen === 'settings' && <SettingsModal toggle={toggleModalOpen} />}
-      {modalOpen === 'account' && <AccountModal toggle={toggleModalOpen} />}
+      {modalOpen === 'user' && <UserAccountModal toggle={toggleModalOpen} />}
     </>
   )
 }

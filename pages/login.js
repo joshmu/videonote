@@ -4,8 +4,8 @@ import ThemeToggle from '../src/components/ThemeToggle'
 import LoginView from '../src/components/Login/Login'
 import RegisterView from '../src/components/Register/Register'
 import Notification from '../src/components/Notification/Notification'
-import Cookies from 'universal-cookie'
 import Router from 'next/router'
+import { handleJwtToken } from '../utils/clientHelpers'
 
 export default function Login() {
   const [loginView, setLoginView] = useState(true)
@@ -16,15 +16,8 @@ export default function Login() {
   }
 
   const handleLogin = data => {
-    console.log('handleLogin', { data })
-    if (!data.token) console.error('no jwt auth token?')
-    console.log('logging in!', data)
+    handleJwtToken(data.token)
 
-    // save token in cookie for subsequent requests
-    const cookies = new Cookies()
-    cookies.set('token', data.token, { path: '/' })
-
-    // when we hit vn we use the cookie to get data
     // todo: can we pass the user data here to avoid the additional request?
     Router.push('/vn')
   }
