@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect, useState } from 'react'
 import { useNotificationContext } from './notificationContext'
 import { fetcher } from '../../utils/clientHelpers'
+import Router from 'next/router'
 
 const settingDefaults = {
   playOffset: -4,
@@ -196,12 +197,18 @@ export function GlobalProvider({ serverData, ...props }) {
     // api sends all available projects back
     const {
       res,
-      data: { user, projects, msg: error },
+      data: { user, projects, msg },
     } = await fetcher('/api/project', body)
 
     if (res.status !== 200) {
-      addAlert({ type: 'error', msg: error })
-      console.error(error)
+      if (msg.match(/invalid token/i)) {
+        console.log('invalid token, redirecting...')
+        const alertMsg = 'Login expired, please re-enter your credentials'
+        addAlert({ type: 'error', msg: alertMsg })
+        Router.push('/login')
+        return
+      }
+      addAlert({ type: 'error', msg: msg })
       return
     }
 

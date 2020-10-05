@@ -1,4 +1,3 @@
-import { useEffect } from 'react'
 import Layout from '../src/components/Layout'
 import VideoPlayer from '../src/components/VideoPlayer/VideoPlayer'
 import Sidebar from '../src/components/Sidebar/Sidebar'
@@ -17,6 +16,7 @@ import { fetcher } from '../utils/clientHelpers'
 // todo: '/' path should be the app and new users are redirected to the '/hello'
 // todo: 'easymotion char jump' <leader> s <char> => surround changed to 'S' in normal mode
 // todo: when page is inactive and we start using it again, check JWT? and boot if expired
+// todo: on sign out, remove token in cookies
 
 // todo: speech to text synthesis on actionInput
 // todo: decide on 'services' or 'lib' or 'utils' folder? and where?
