@@ -35,6 +35,7 @@ import { fetcher } from '../utils/clientHelpers'
 // todo: export option
 
 // todo: best way to store date in mongodb
+// todo: modal context seperation
 
 export default function Main({ serverData }) {
   return (

@@ -171,22 +171,45 @@ export function GlobalProvider({ serverData, ...props }) {
     addAlert({ type: 'success', msg: `${project.title.toUpperCase()}` })
   }
 
-  const removeProject = id => {
+  const removeProject = async _id => {
     // todo: request project removal from api (provide user token)
     // todo: mark project 'deleted' timestamp on server
     // todo: pass back to client all available projects for them
     // todo: setProjects
     // todo: notifications
 
-    // this is the success data from api
-    const updatedUserProjects = []
+    console.log('removeProject', { _id })
+    // api request to remove project, assign user id to it
+    const body = {
+      action: 'remove',
+      // todo: should we pass in user as a param?
+      user: user,
+      project: { _id },
+    }
+    // api sends all available projects back
+    const {
+      res,
+      data: { user, projects, msg: error },
+    } = await fetcher('/api/project', body)
 
-    setProjects(updatedUserProjects)
+    if (res.status !== 200) {
+      addAlert({ type: 'error', error })
+      console.error(error)
+      return
+    }
+
+    // api returns all projects for the user
+    if (!projects) {
+      console.error('projects from server is incorrect')
+      return
+    }
+    // reset user's projects with updated version
+    setProjects(projects)
 
     // switch project if we are removing the currently viewed project
-    if (settings.currentProjectId === id) {
-      const newCurrentProject = updatedUserProjects.slice(-1)[0]
-      loadProject(newCurrentProject._id)
+    if (settings.currentProjectId === _id) {
+      const newCurrentProject = projects.slice(-1)[0]
+      loadProject(newCurrentProject)
     }
   }
 

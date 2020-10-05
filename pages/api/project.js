@@ -33,14 +33,14 @@ export default async (req, res) => {
 
   try {
     if (action === 'create') {
-      createProject(project, user, db)
+      await createProject(project, user, db)
     }
 
     if (action === 'update') {
-      updateProject(project, user, db)
+      await updateProject(project, user, db)
     }
-    if (action === 'delete') {
-      deleteProject(project, user, db)
+    if (action === 'remove') {
+      await removeProject(project, user, db)
     }
     if (!action) {
       return res.status(400).json({ msg: 'Action not specified' })
@@ -51,7 +51,6 @@ export default async (req, res) => {
 
   // get all projects with user's id
   const projects = await getUserProjects(user._id, db)
-  console.log({ projects })
 
   // token
   const newToken = generateAccessToken(user.email)
@@ -76,7 +75,7 @@ const createProject = async (project, user, db) => {
       userIds: [user._id],
       created: new Date(),
       updated: new Date(),
-      deleted: null,
+      removed: null,
     })
     .then(({ ops }) => ops[0])
 }
@@ -84,23 +83,52 @@ const updateProject = async (project, user, db) => {
   if (!userOwnsProject(project, user)) return
   console.warn('todo')
 }
-const deleteProject = async (project, user, db) => {
-  if (!userOwnsProject(project, user)) return
-  console.warn('todo')
+const removeProject = async (project, user, db) => {
+  if (!(await userOwnsProject(project, user, db))) {
+    console.log('user does not own this project')
+    return
+  }
+
+  return db.collection('projects').updateOne(
+    { _id: project._id },
+    { $set: { removed: new Date() } }
+    // { upsert: true }
+  )
 }
-const userOwnsProject = (project, user) => {
-  // todo: check user exists in project
-  console.warn('todo')
-  return true
+const userOwnsProject = async (project, user, db) => {
+  // todo: convert this entirey to mongo driver
+  const foundProject = await db
+    .collection('projects')
+    .findOne({ _id: project._id })
+  return foundProject.userIds.includes(user._id)
+  // return (
+  //   db
+  //     .collection('projects')
+  //     .find({
+  //       $and: [
+  //         {
+  //           _id: project._id,
+  //         },
+  //         {
+  //           $expr: {
+  //             $in: [user._id, '$userIds'],
+  //           },
+  //         },
+  //       ],
+  //     })
+  //     .count() > 0
+  // )
 }
 export const getUserProjects = async (userId, db) => {
-  // todo: (which aren't deleted)
   return db
     .collection('projects')
     .find({
       $expr: {
         $in: [userId, '$userIds'],
       },
+    })
+    .filter({
+      removed: { $eq: null },
     })
     .toArray()
 }
