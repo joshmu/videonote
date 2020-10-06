@@ -12,7 +12,7 @@ export default async (req, res) => {
     return res.status(401).json({ msg: 'No token. Authorization denied.' })
   }
 
-  const { action, project } = req.body
+  const { action, user } = req.body
 
   let email
   try {
@@ -32,14 +32,14 @@ export default async (req, res) => {
 
   try {
     if (action === 'create') {
-      await createProject(project, user, db)
+      await createProject(user, user, db)
     }
 
     if (action === 'update') {
-      await updateProject(project, user, db)
+      await updateProject(user, user, db)
     }
     if (action === 'remove') {
-      const projectData = { ...project, removed: new Date() }
+      const projectData = { ...user, removed: new Date() }
       await updateProject(projectData, user, db)
     }
     if (!action) {
@@ -62,14 +62,13 @@ export default async (req, res) => {
   })
 }
 
-const createProject = async (project, user, db) => {
-  // create project
-  const projectDoc = await db
+const createProject = async (user, user, db) => {
+  return db
     .collection('projects')
     .insertOne({
       _id: nanoid(12),
-      title: project.title,
-      src: project.src,
+      title: user.title,
+      src: user.src,
       todos: [],
       notes: '',
       private: true,
@@ -79,25 +78,14 @@ const createProject = async (project, user, db) => {
       removed: null,
     })
     .then(({ ops }) => ops[0])
-
-  // add project id to user's projectId's list
-  // todo: use mongo $push instead
-  await db.collection('users').updateOne(
-    {
-      _id: user._id,
-    },
-    { $set: { projectIds: [...user.projectIds, projectDoc._id] } }
-  )
-
-  return projectDoc
 }
-const updateProject = async (project, user, db) => {
-  if (!(await userOwnsProject(project, user, db))) {
-    console.log('user does not own this project')
+const updateProject = async (user, user, db) => {
+  if (!(await userOwnsProject(user, user, db))) {
+    console.log('user does not own this user')
     return
   }
 
-  const { _id, ...data } = project
+  const { _id, ...data } = user
 
   return db.collection('projects').updateOne(
     { _id: _id },
@@ -105,11 +93,11 @@ const updateProject = async (project, user, db) => {
     // { upsert: true }
   )
 }
-const userOwnsProject = async (project, user, db) => {
+const userOwnsProject = async (user, user, db) => {
   // todo: convert this entirey to mongo driver
   const foundProject = await db
     .collection('projects')
-    .findOne({ _id: project._id })
+    .findOne({ _id: user._id })
   return foundProject.userIds.includes(user._id)
   // return (
   //   db
@@ -117,7 +105,7 @@ const userOwnsProject = async (project, user, db) => {
   //     .find({
   //       $and: [
   //         {
-  //           _id: project._id,
+  //           _id: user._id,
   //         },
   //         {
   //           $expr: {
