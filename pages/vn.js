@@ -17,6 +17,10 @@ import { fetcher } from '../utils/clientHelpers'
 // todo: 'easymotion char jump' <leader> s <char> => surround changed to 'S' in normal mode
 // todo: when page is inactive and we start using it again, check JWT? and boot if expired
 // todo: on sign out, remove token in cookies
+// todo: edit timestamp
+// todo: drag progress bar to seek quickly
+// todo: option to change password
+// todo: forget password option?
 
 // todo: speech to text synthesis on actionInput
 // todo: decide on 'services' or 'lib' or 'utils' folder? and where?

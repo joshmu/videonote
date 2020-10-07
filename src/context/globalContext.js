@@ -248,7 +248,7 @@ export function GlobalProvider({ serverData, ...props }) {
     if (res.status !== 200) {
       if (msg.match(/invalid token/i)) {
         console.log('invalid token, redirecting...')
-        const alertMsg = 'Login expired, please re-enter your credentials'
+        const alertMsg = 'Session expired, please re-enter your credentials'
         addAlert({ type: 'error', msg: alertMsg })
         Router.push('/login')
         return true
