@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useEffect } from 'react'
 import { GoChevronRight as ArrowIcon } from 'react-icons/go'
 import { MdSettings as SettingsIcon } from 'react-icons/md'
 import { useGlobalContext } from '../../context/globalContext'
@@ -18,20 +18,27 @@ export default function Sidebar(props) {
     updateSettings,
     openSidebar,
     toggleSidebar,
+    SETTINGS_DEFAULTS,
   } = useGlobalContext()
   const { removeCompleted } = useTodoContext()
 
   const { state: resizeState, handleStartResize } = useResizable({
     initialSize: settings.sidebarWidth,
+    defaultSize: SETTINGS_DEFAULTS.sidebarWidth,
   })
 
   // update sidebar width once resizing completes
+  // don't fire if its the initial default values
   useEffect(() => {
-    if (!resizeState.resizing) {
-      console.log('updating sidebar width', { resizeState })
+    if (
+      !resizeState.resizing &&
+      resizeState.size !== SETTINGS_DEFAULTS.sidebarWidth
+    ) {
+      // console.log('updating sidebar width', { resizeState })
+      console.log('fire from sidebar')
       updateSettings({ sidebarWidth: resizeState.size })
     }
-  }, [resizeState.resizing])
+  }, [resizeState])
 
   const toggleOpen = () => {
     toggleSidebar()

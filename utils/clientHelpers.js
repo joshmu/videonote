@@ -7,7 +7,6 @@ export const isValidCredentials = ({
   password,
   passwordConfirmation = password,
 }) => {
-  console.log({ email, password, passwordConfirmation })
   const validUsername = username === undefined || username.length > 2
   const validEmail = isEmail(email)
   const validPassword = password.length > 4 && password === passwordConfirmation

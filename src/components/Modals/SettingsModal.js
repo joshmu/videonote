@@ -6,7 +6,7 @@ import {
   ModalInput,
   ModalInnerContainer,
 } from './Modal'
-import { Toggle, ToggleInput } from '../shared/Toggle'
+import { ToggleInput } from '../shared/Toggle'
 
 export default function SettingsModal({ toggle: toggleModal }) {
   const { settings, updateSettings } = useGlobalContext()

@@ -1,5 +1,5 @@
 import { connectToDatabase } from '../../utils/mongodb'
-import { extractUser } from '../../utils/apiHelpers'
+import { extractProject, extractUser } from '../../utils/apiHelpers'
 import { authenticateToken, generateAccessToken } from '../../utils/jwt'
 import { nanoid } from 'nanoid'
 
@@ -57,7 +57,7 @@ export default async (req, res) => {
 
   res.status(200).json({
     user: extractUser(user),
-    projects,
+    projects: projects.map(project => extractProject(project)),
     token: newToken,
   })
 }
@@ -101,7 +101,7 @@ const updateProject = async (project, user, db) => {
 
   return db.collection('projects').updateOne(
     { _id: _id },
-    { $set: data }
+    { $set: { ...data, updated: new Date() } }
     // { upsert: true }
   )
 }

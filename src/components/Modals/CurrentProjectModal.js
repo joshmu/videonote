@@ -11,7 +11,7 @@ import {
 } from './Modal'
 
 export default function CurrentProjectModal({ toggle: toggleModal }) {
-  const { updateSettings, updateProject, project } = useGlobalContext()
+  const { updateProject, project } = useGlobalContext()
   const [state, setState] = useState(null)
 
   useEffect(() => {

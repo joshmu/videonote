@@ -41,7 +41,7 @@ export function VideoProvider(props) {
 
   useEffect(() => {
     if (project !== null && project.src !== null) {
-      console.log('project changed setting url')
+      console.log('project changed, setting url')
       if (project.src !== url) setUrl(project.src)
     }
   }, [project])
@@ -161,7 +161,7 @@ export function VideoProvider(props) {
 
     setEnableSmartControls(current => {
       const updatedState = cmd === undefined ? !current : cmd
-      console.log('smart controls enabled:', updatedState)
+      // console.log('smart controls enabled:', updatedState)
       return updatedState
     })
   }

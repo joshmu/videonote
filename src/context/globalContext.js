@@ -3,7 +3,7 @@ import { useNotificationContext } from './notificationContext'
 import { fetcher } from '../../utils/clientHelpers'
 import Router from 'next/router'
 
-const settingDefaults = {
+const SETTINGS_DEFAULTS = {
   playOffset: -4,
   showHints: true,
   seekJump: 10,
@@ -11,33 +11,12 @@ const settingDefaults = {
   currentProjectId: null,
 }
 
-const globalContext = createContext({
-  user: {},
-  projects: [],
-  settings: settingDefaults,
-  currentProject: null,
-  updateUser: a => {},
-  updateProjects: a => {},
-  removeProject: id => {},
-  updateSettings: a => {},
-  settingsOpen: false,
-  toggleSettingsOpen: (a = undefined) => {},
-  modalOpen: null,
-  toggleModalOpen: (a = 0) => {},
-  login: a => {},
-  createProject: a => {},
-  resetGlobalState: () => {},
-  loadProject: a => {},
-  updateProject: a => {},
-  openSidebar: true,
-  toggleSidebar: (a = undefined) => {},
-  handleInitialServerData: a => {},
-})
+const globalContext = createContext({})
 
 export function GlobalProvider({ serverData, ...props }) {
   const [user, setUser] = useState(null)
   const [projects, setProjects] = useState([])
-  const [settings, setSettings] = useState(settingDefaults)
+  const [settings, setSettings] = useState(SETTINGS_DEFAULTS)
 
   const [currentProject, setCurrentProject] = useState(null)
 
@@ -49,7 +28,7 @@ export function GlobalProvider({ serverData, ...props }) {
   const resetGlobalState = () => {
     setUser(null)
     setProjects([])
-    setSettings(settingDefaults)
+    setSettings(SETTINGS_DEFAULTS)
     setCurrentProject(null)
     setSettingsOpen(false)
     setModalOpen(false)
@@ -79,18 +58,11 @@ export function GlobalProvider({ serverData, ...props }) {
     }
   }, [projects, currentProject, settings.currentProjectId])
 
-  // if current project changes then update settings
-  useEffect(() => {
-    if (currentProject) updateSettings({ currentProjectId: currentProject._id })
-  }, [currentProject])
-
   // update projects when we update the current project
   useEffect(() => {
     if (currentProject === null) return
     updateProjects(currentProject)
   }, [currentProject])
-
-  const updateUser = data => setUser({ ...user, ...data })
 
   const updateProjects = project => {
     const updatedProjects = projects.map(p => {
@@ -100,7 +72,8 @@ export function GlobalProvider({ serverData, ...props }) {
   }
 
   const updateProject = async project => {
-    // * todo: todos > currentProject > update this project on server > update projects with server response
+    // * todos > currentProject > update this project on server > update projects with server response
+    // @ts-ignore
     const response = await handleProjectApi('update', user, project)
     if (!response) return console.error('api error')
     const { user, projects } = response
@@ -109,7 +82,64 @@ export function GlobalProvider({ serverData, ...props }) {
     setProjects(projects)
   }
 
-  const updateSettings = data => setSettings({ ...settings, ...data })
+  const updateUser = async userData => {
+    // respect format of user mongo object on server
+    // @ts-ignore
+    console.log('updating user...', userData)
+    // merge settings and user information together match 'user' mongo doc
+    const body = {
+      action: 'update',
+      user: userData,
+    }
+    // send data to update to server, token will hold user information required to authenticate
+    const {
+      res,
+      // @ts-ignore
+      data: { user: account, msg },
+    } = await fetcher('/api/user', body)
+
+    // handle if we get a bad response
+    if (badResponse(res, msg)) return
+
+    // api returns all projects for the user
+    if (!account) {
+      console.error('user from server is incorrect')
+      return
+    }
+
+    const { settings, ...user } = account
+
+    setSettings(settings)
+    setUser(user)
+  }
+
+  const updateSettings = async newSettingsData => {
+    console.log('updating settings...', newSettingsData)
+    // merge settings and user information together match 'user' mongo doc
+    const body = {
+      action: 'update',
+      user: { settings: newSettingsData },
+    }
+    // send updated settings to server, token will hold user information required
+    const {
+      res,
+      // @ts-ignore
+      data: { user: account, msg },
+    } = await fetcher('/api/user', body)
+
+    if (badResponse(res, msg)) return
+
+    // api returns all projects for the user
+    if (!account) {
+      console.error('user from server is incorrect')
+      return
+    }
+
+    const { settings, ...user } = account
+
+    setSettings(settings)
+    setUser(user)
+  }
 
   const toggleSettingsOpen = (state = undefined) => {
     const cmd = state ? state : !settingsOpen
@@ -155,12 +185,15 @@ export function GlobalProvider({ serverData, ...props }) {
 
     setCurrentProject(selectedProject)
 
+    updateSettings({ currentProjectId: selectedProject._id })
+
     // notification
     addAlert({ type: 'success', msg: `${selectedProject.title.toUpperCase()}` })
   }
 
   const removeProject = async _id => {
     const projectData = { _id }
+    // @ts-ignore
     const response = await handleProjectApi('remove', user, projectData)
     if (!response) return console.error('api error')
     const { user, projects } = response
@@ -200,17 +233,7 @@ export function GlobalProvider({ serverData, ...props }) {
       data: { user, projects, msg },
     } = await fetcher('/api/project', body)
 
-    if (res.status !== 200) {
-      if (msg.match(/invalid token/i)) {
-        console.log('invalid token, redirecting...')
-        const alertMsg = 'Login expired, please re-enter your credentials'
-        addAlert({ type: 'error', msg: alertMsg })
-        Router.push('/login')
-        return
-      }
-      addAlert({ type: 'error', msg: msg })
-      return
-    }
+    if (badResponse(res, msg)) return
 
     // api returns all projects for the user
     if (!projects) {
@@ -219,6 +242,21 @@ export function GlobalProvider({ serverData, ...props }) {
     }
 
     return { user, projects }
+  }
+
+  const badResponse = (res, msg) => {
+    if (res.status !== 200) {
+      if (msg.match(/invalid token/i)) {
+        console.log('invalid token, redirecting...')
+        const alertMsg = 'Login expired, please re-enter your credentials'
+        addAlert({ type: 'error', msg: alertMsg })
+        Router.push('/login')
+        return true
+      }
+      addAlert({ type: 'error', msg: msg })
+      return true
+    }
+    return false
   }
 
   const value = {
@@ -241,6 +279,7 @@ export function GlobalProvider({ serverData, ...props }) {
     toggleSidebar,
     updateProject,
     handleInitialServerData,
+    SETTINGS_DEFAULTS,
   }
 
   return <globalContext.Provider value={value} {...props} />

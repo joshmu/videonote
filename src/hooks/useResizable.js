@@ -1,10 +1,16 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 
-export const useResizable = ({ initialSize }) => {
+export const useResizable = ({ initialSize, defaultSize }) => {
   const [state, setState] = useState({
     size: initialSize,
     resizing: false,
   })
+
+  // on initial load, check whether the server responds with something which isn't the default, if so then change
+  useEffect(() => {
+    if (state.size === defaultSize && initialSize !== defaultSize)
+      setState({ ...state, size: initialSize })
+  }, [initialSize])
 
   // resizable sidebar
   const handleStartResize = () => {

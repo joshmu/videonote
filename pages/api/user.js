@@ -1,7 +1,6 @@
 import { connectToDatabase } from '../../utils/mongodb'
 import { extractUser } from '../../utils/apiHelpers'
 import { authenticateToken, generateAccessToken } from '../../utils/jwt'
-import { nanoid } from 'nanoid'
 
 export default async (req, res) => {
   // Gather the jwt access token from the request header
@@ -12,7 +11,7 @@ export default async (req, res) => {
     return res.status(401).json({ msg: 'No token. Authorization denied.' })
   }
 
-  const { action, user } = req.body
+  const { action, user: userData } = req.body
 
   let email
   try {
@@ -31,16 +30,12 @@ export default async (req, res) => {
   })
 
   try {
-    if (action === 'create') {
-      await createProject(user, user, db)
-    }
-
     if (action === 'update') {
-      await updateProject(user, user, db)
+      await updateUser(user, userData, db)
     }
     if (action === 'remove') {
-      const projectData = { ...user, removed: new Date() }
-      await updateProject(projectData, user, db)
+      const userData = { removed: new Date() }
+      await updateUser(user, userData, db)
     }
     if (!action) {
       return res.status(400).json({ msg: 'Action not specified' })
@@ -49,84 +44,34 @@ export default async (req, res) => {
     console.error(error)
   }
 
-  // get all projects with user's id
-  const projects = await getUserProjects(user._id, db)
+  // get updated user
+  const updatedUser = await db.collection('users').findOne({
+    email,
+  })
 
   // token
-  const newToken = generateAccessToken(user.email)
+  const newToken = generateAccessToken(updatedUser.email)
 
   res.status(200).json({
-    user: extractUser(user),
-    projects,
+    user: extractUser(updatedUser),
     token: newToken,
   })
 }
 
-const createProject = async (user, user, db) => {
-  return db
-    .collection('projects')
-    .insertOne({
-      _id: nanoid(12),
-      title: user.title,
-      src: user.src,
-      todos: [],
-      notes: '',
-      private: true,
-      userIds: [user._id],
-      created: new Date(),
-      updated: new Date(),
-      removed: null,
-    })
-    .then(({ ops }) => ops[0])
-}
-const updateProject = async (user, user, db) => {
-  if (!(await userOwnsProject(user, user, db))) {
-    console.log('user does not own this user')
-    return
-  }
+const updateUser = async (user, userData, db) => {
+  const { _id } = user
+  // form entire settings object if we are updating 'settings'
+  if (userData.settings)
+    userData.settings = { ...user.settings, ...userData.settings }
 
-  const { _id, ...data } = user
-
-  return db.collection('projects').updateOne(
+  return db.collection('users').updateOne(
     { _id: _id },
-    { $set: data }
+    {
+      $set: {
+        ...userData,
+        updated: new Date(),
+      },
+    }
     // { upsert: true }
   )
-}
-const userOwnsProject = async (user, user, db) => {
-  // todo: convert this entirey to mongo driver
-  const foundProject = await db
-    .collection('projects')
-    .findOne({ _id: user._id })
-  return foundProject.userIds.includes(user._id)
-  // return (
-  //   db
-  //     .collection('projects')
-  //     .find({
-  //       $and: [
-  //         {
-  //           _id: user._id,
-  //         },
-  //         {
-  //           $expr: {
-  //             $in: [user._id, '$userIds'],
-  //           },
-  //         },
-  //       ],
-  //     })
-  //     .count() > 0
-  // )
-}
-export const getUserProjects = async (userId, db) => {
-  return db
-    .collection('projects')
-    .find({
-      $expr: {
-        $in: [userId, '$userIds'],
-      },
-    })
-    .filter({
-      removed: { $eq: null },
-    })
-    .toArray()
 }

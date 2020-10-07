@@ -15,8 +15,8 @@ export default function LocalVideoLoader({ handleVideoSrc }) {
           type='file'
           onChange={handleFileInput}
         />
-        <span className='px-6 py-3 transition-colors duration-200 ease-in-out rounded-sm cursor-pointer bg-highlight-500 text-highlight-100 hover:bg-highlight-600'>
-          Load Local Video
+        <span className='px-6 py-3 text-white transition-colors duration-200 ease-in-out rounded-sm cursor-pointer hover:bg-highlight-700 hover:bg-opacity-25'>
+          Use Local Video
         </span>
       </label>
     </div>
