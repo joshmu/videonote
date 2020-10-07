@@ -130,17 +130,18 @@ const userOwnsProject = async (project, user, db) => {
   // )
 }
 export const getUserProjects = async (userId, db) => {
-  return (
-    db
-      .collection('projects')
-      .find({
-        $expr: {
-          $in: [userId, '$userIds'],
-        },
-      })
-      // .filter({
-      //   removed: { $eq: null },
-      // })
-      .toArray()
-  )
+  const allProjects = await db
+    .collection('projects')
+    .find({
+      $expr: {
+        $in: [userId, '$userIds'],
+      },
+    })
+    // .filter({
+    //   removed: { $eq: null },
+    // })
+    .toArray()
+
+  const projects = allProjects.filter(project => project.removed === null)
+  return projects
 }

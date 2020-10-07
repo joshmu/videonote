@@ -19,7 +19,7 @@ export function ModalContainer({ toggle, children, ...props }) {
 
 export const ModalHeader = ({ children }) => {
   return (
-    <h2 className='text-lg font-semibold capitalize text-themeText'>
+    <h2 className='mb-2 text-lg font-semibold capitalize text-themeText'>
       {children}
     </h2>
   )
