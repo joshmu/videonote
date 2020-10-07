@@ -3,6 +3,7 @@ import { useGlobalContext } from '../../context/globalContext'
 import LocalVideoLoader from '../LocalVideoLoader'
 import {
   ModalContainer,
+  ModalInnerContainer,
   ModalForm,
   ModalHeader,
   ModalInput,
@@ -41,27 +42,29 @@ export default function CreateProjectModal({ toggle: toggleModal }) {
     <ModalContainer toggle={toggleModal}>
       <ModalHeader>Create Project</ModalHeader>
 
-      <ModalForm>
-        <ModalInput
-          title='Project Title'
-          id='title'
-          type='text'
-          value={project.title}
-          onChange={handleChange}
-        />
+      <ModalInnerContainer>
+        <ModalForm>
+          <ModalInput
+            title='Project Title'
+            id='title'
+            type='text'
+            value={project.title}
+            onChange={handleChange}
+          />
 
-        <ModalInput
-          title='Video Source'
-          placeholder='Paste URL: Dropbox, Youtube, Vimeo...'
-          id='src'
-          type='text'
-          value={project.src}
-          onChange={handleChange}
-        />
-        <LocalVideoLoader handleVideoSrc={handleVideoSrc} />
+          <ModalInput
+            title='Video Source'
+            placeholder='Paste URL: Dropbox, Youtube, Vimeo...'
+            id='src'
+            type='text'
+            value={project.src}
+            onChange={handleChange}
+          />
+          <LocalVideoLoader handleVideoSrc={handleVideoSrc} />
 
-        <ModalPrimaryBtn onClick={handleCreate}>Create</ModalPrimaryBtn>
-      </ModalForm>
+          <ModalPrimaryBtn onClick={handleCreate}>Create</ModalPrimaryBtn>
+        </ModalForm>
+      </ModalInnerContainer>
     </ModalContainer>
   )
 }

@@ -5,6 +5,7 @@ import {
   ModalContainer,
   ModalForm,
   ModalHeader,
+  ModalInnerContainer,
   ModalInput,
   ModalPrimaryBtn,
 } from './Modal'
@@ -43,27 +44,29 @@ export default function CurrentProjectModal({ toggle: toggleModal }) {
         <ModalContainer toggle={toggleModal}>
           <ModalHeader>Project: {state.title}</ModalHeader>
 
-          <ModalForm>
-            <ModalInput
-              title='Project Title'
-              id='title'
-              type='text'
-              value={state.title}
-              onChange={handleChange}
-            />
+          <ModalInnerContainer>
+            <ModalForm>
+              <ModalInput
+                title='Project Title'
+                id='title'
+                type='text'
+                value={state.title}
+                onChange={handleChange}
+              />
 
-            <ModalInput
-              title='Video Source'
-              placeholder='Paste URL: Dropbox, Youtube, Vimeo...'
-              id='src'
-              type='text'
-              value={state.src}
-              onChange={handleChange}
-            />
-            <LocalVideoLoader handleVideoSrc={handleVideoSrc} />
+              <ModalInput
+                title='Video Source'
+                placeholder='Paste URL: Dropbox, Youtube, Vimeo...'
+                id='src'
+                type='text'
+                value={state.src}
+                onChange={handleChange}
+              />
+              <LocalVideoLoader handleVideoSrc={handleVideoSrc} />
 
-            <ModalPrimaryBtn onClick={handleUpdate}>Update</ModalPrimaryBtn>
-          </ModalForm>
+              <ModalPrimaryBtn onClick={handleUpdate}>Update</ModalPrimaryBtn>
+            </ModalForm>
+          </ModalInnerContainer>
         </ModalContainer>
       )}
     </>

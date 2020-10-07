@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useGlobalContext } from '../../context/globalContext'
 import Select from '../shared/Select'
-import { ModalContainer, ModalHeader } from './Modal'
+import { ModalContainer, ModalHeader, ModalInnerContainer } from './Modal'
 import { ImBin2 as TrashIcon } from 'react-icons/im'
 import { motion } from 'framer-motion'
 
@@ -30,7 +30,7 @@ export default function ProjectsModal({ toggle: toggleModal }) {
     <ModalContainer toggle={toggleModal}>
       <ModalHeader>Projects</ModalHeader>
 
-      <div>
+      <ModalInnerContainer>
         {projects.map(project => (
           <Select
             key={project._id}
@@ -59,7 +59,7 @@ export default function ProjectsModal({ toggle: toggleModal }) {
             )}
           </Select>
         ))}
-      </div>
+      </ModalInnerContainer>
     </ModalContainer>
   )
 }

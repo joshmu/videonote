@@ -35,21 +35,19 @@ body {
 
 .scrollbar {
   &::-webkit-scrollbar {
-    width: 4px;
-    cursor: pointer;
+    @apply w-px cursor-pointer;
     /*background-color: rgba(229, 231, 235, var(--bg-opacity));*/
   }
 
   &::-webkit-scrollbar-track {
-    background-color: rgba(229, 231, 235, var(--bg-opacity));
-    cursor: pointer;
+    // background-color: rgba(229, 231, 235, var(--bg-opacity));
+    @apply cursor-pointer;
     /*background: red;*/
   }
 
   &::-webkit-scrollbar-thumb {
-    cursor: pointer;
-    background-color: #a0aec0;
-    /*outline: 1px solid slategrey;*/
+    background-color: var(--text);
+    @apply rounded-full cursor-pointer;
   }
 }
 

@@ -1,5 +1,11 @@
 import { useGlobalContext } from '../../context/globalContext'
-import { ModalContainer, ModalHeader, ModalForm, ModalInput } from './Modal'
+import {
+  ModalContainer,
+  ModalHeader,
+  ModalForm,
+  ModalInput,
+  ModalInnerContainer,
+} from './Modal'
 import { Toggle, ToggleInput } from '../shared/Toggle'
 
 export default function SettingsModal({ toggle: toggleModal }) {
@@ -18,29 +24,31 @@ export default function SettingsModal({ toggle: toggleModal }) {
     <ModalContainer toggle={toggleModal}>
       <ModalHeader>Settings</ModalHeader>
 
-      <ModalForm>
-        <ModalInput
-          title='Playback Offset (Seconds)'
-          id='playOffset'
-          type='number'
-          value={settings.playOffset}
-          onChange={handleChangeNum}
-        />
-        <ModalInput
-          title='Seek Jump (Seconds)'
-          id='seekJump'
-          type='number'
-          value={settings.seekJump}
-          onChange={handleChangeNum}
-        />
-        <div>
-          <ToggleInput
-            title='Show Hints'
-            state={settings.showHints}
-            onClick={() => handleToggle('showHints')}
+      <ModalInnerContainer>
+        <ModalForm>
+          <ModalInput
+            title='Playback Offset (Seconds)'
+            id='playOffset'
+            type='number'
+            value={settings.playOffset}
+            onChange={handleChangeNum}
           />
-        </div>
-      </ModalForm>
+          <ModalInput
+            title='Seek Jump (Seconds)'
+            id='seekJump'
+            type='number'
+            value={settings.seekJump}
+            onChange={handleChangeNum}
+          />
+          <div>
+            <ToggleInput
+              title='Show Hints'
+              state={settings.showHints}
+              onClick={() => handleToggle('showHints')}
+            />
+          </div>
+        </ModalForm>
+      </ModalInnerContainer>
     </ModalContainer>
   )
 }

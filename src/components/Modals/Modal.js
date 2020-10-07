@@ -6,7 +6,7 @@ export function ModalContainer({ toggle, children, ...props }) {
   return (
     <div className='z-40' {...props}>
       <MotionFadeInOut motionKey='modal'>
-        <div className='absolute w-full max-w-lg transform -translate-x-1/2 -translate-y-1/2 top-1/2 left-1/2'>
+        <div className='absolute w-full max-w-lg transform -translate-x-1/2 -translate-y-1/2 max-h-11/12 top-1/2 left-1/2'>
           <div className='relative w-full p-6 mx-auto border rounded-sm shadow-md border-themeText bg-themeBg'>
             <CloseModalBtn toggle={toggle} />
             {children}
@@ -22,6 +22,12 @@ export const ModalHeader = ({ children }) => {
     <h2 className='text-lg font-semibold capitalize text-themeText'>
       {children}
     </h2>
+  )
+}
+
+export const ModalInnerContainer = ({ children }) => {
+  return (
+    <div className='overflow-y-scroll max-h-80vh scrollbar'>{children}</div>
   )
 }
 
