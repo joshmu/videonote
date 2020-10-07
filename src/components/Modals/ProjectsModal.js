@@ -42,7 +42,9 @@ export default function ProjectsModal({ toggle: toggleModal }) {
               className='flex-1'
             >
               <span className='text-sm capitalize'>{project.title} </span>
-              <span className='text-xs'>({project.todos.length} notes)</span>
+              <span className='ml-2 text-xs text-themeText2'>
+                {project.todos.length} notes
+              </span>
             </div>
             {mousingOver === project._id && (
               <motion.div

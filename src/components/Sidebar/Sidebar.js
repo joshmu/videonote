@@ -103,10 +103,12 @@ export default function Sidebar(props) {
 
           {/* options dropdown*/}
           <div className='relative mr-2 transition-colors duration-300 ease-in-out cursor-pointer text-highlight-700 hover:text-highlight-400'>
-            <SettingsIcon
-              onClick={handleSettingsClick}
-              className='text-xl fill-current'
-            />
+            <motion.div whileHover={{ rotate: 90 }}>
+              <SettingsIcon
+                onClick={handleSettingsClick}
+                className='text-xl fill-current'
+              />
+            </motion.div>
 
             <OptionsDropdown open={settingsOpen} />
           </div>
