@@ -195,7 +195,9 @@ export function GlobalProvider({ serverData, ...props }) {
     // reset user's projects
     setProjects(projects)
     // grab newly created project from the server response and set
-    const insertedProject = projects.find(p => p.src === project.src)
+    const insertedProject = projects.find(
+      p => p.src === project.src && p.title === project.title
+    )
     loadProject(insertedProject)
   }
 

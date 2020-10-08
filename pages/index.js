@@ -12,6 +12,7 @@ import { TodoProvider } from '../src/context/todoContext'
 import { fetcher } from '../utils/clientHelpers'
 
 // todo: place notifications above the overlay
+// todo: increase jwt session limit, inactivity check also (when we resume a session if browser left open)
 
 // todo: when page is inactive and we start using it again, check JWT? and boot if expired
 // todo: keep giving back refreshed JWT during usage?

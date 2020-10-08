@@ -19,11 +19,11 @@ export default function CreateProjectModal({ toggle: toggleModal, motionKey }) {
   })
   const [hover, setHover] = useState(false)
 
-  const handleCreate = e => {
+  const handleCreate = async e => {
     e.preventDefault()
     if (project.title.length === 0 || project.src.length === 0) return
 
-    createProject(project)
+    await createProject(project)
     toggleModal()
   }
 
