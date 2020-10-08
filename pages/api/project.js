@@ -72,7 +72,7 @@ const createProject = async (project, user, db) => {
       src: project.src,
       todos: [],
       notes: '',
-      private: true,
+      isPrivate: true,
       userIds: [user._id],
       created: new Date(),
       updated: new Date(),

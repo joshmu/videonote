@@ -19,7 +19,7 @@ export default function SettingsModal({ toggle: toggleModal, motionKey }) {
     playOffset: '',
     seekJump: '',
     showHints: '',
-    private: '',
+    isPrivate: '',
   })
 
   useEffect(() => {

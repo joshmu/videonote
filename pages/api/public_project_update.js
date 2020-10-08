@@ -15,7 +15,8 @@ export default async (req, res) => {
   if (!found) return res.status(404).json({ msg: 'Project does not exist.' })
 
   // project is public
-  if (found.private) return res.status(401).json({ msg: 'Project is private.' })
+  if (found.isPrivate)
+    return res.status(401).json({ msg: 'Project is private.' })
 
   try {
     // update project

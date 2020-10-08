@@ -15,7 +15,7 @@ export default async (req, res) => {
   if (!project) return res.status(400).json({ msg: 'Project does not exist.' })
 
   // project is public
-  if (project.private)
+  if (project.isPrivate)
     return res.status(401).json({ msg: 'Project is private.' })
 
   // pass back as a an array to avoid conflicts since vn typically handles 'projects' on server response
