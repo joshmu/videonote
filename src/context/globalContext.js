@@ -109,6 +109,7 @@ export function GlobalProvider({ serverData, ...props }) {
 
     const { settings, ...user } = account
 
+    console.log({ settings, user })
     setSettings(settings)
     setUser(user)
   }
@@ -191,7 +192,10 @@ export function GlobalProvider({ serverData, ...props }) {
     }
 
     // notification
-    addAlert({ type: 'success', msg: `${selectedProject.title.toUpperCase()}` })
+    addAlert({
+      type: 'success',
+      msg: `Project: ${selectedProject.title.toUpperCase()}`,
+    })
   }
 
   const removeProject = async _id => {
@@ -216,6 +220,10 @@ export function GlobalProvider({ serverData, ...props }) {
     console.log('handle initial server data', data)
     const { user: account, projects } = data
     const { settings, ...user } = account
+
+    // alerts
+    addAlert({ type: 'success', msg: `Logged in: ${user.username}` })
+
     // allocate server data to respective areas
     setUser(user)
     setSettings(settings)

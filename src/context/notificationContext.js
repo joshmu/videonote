@@ -1,4 +1,6 @@
 import React, { createContext, useContext, useState, useRef } from 'react'
+import { nanoid } from 'nanoid'
+
 const notificationContext = createContext({
   alerts: [],
   addAlert: ({}) => {},
@@ -18,7 +20,7 @@ export const NotificationProvider = ({ children }) => {
     duration = 8000,
     persistent = false,
   }) => {
-    const id = Date.now()
+    const id = nanoid(12)
     const newAlert = {
       msg,
       type,

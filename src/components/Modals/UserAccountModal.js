@@ -12,7 +12,7 @@ import { useNotificationContext } from '../../context/notificationContext'
 import { isValidCredentials } from '../../../utils/clientHelpers'
 
 export default function UserAccountModal({ toggle: toggleModal }) {
-  const { user } = useGlobalContext()
+  const { user, updateUser } = useGlobalContext()
   const { addAlert } = useNotificationContext()
   const [state, setState] = useState({
     username: '',
@@ -31,8 +31,14 @@ export default function UserAccountModal({ toggle: toggleModal }) {
     if (!isValidCredentials({ ...state }))
       return addAlert({ type: 'error', msg: 'Invalid credentials provided' })
 
-    addAlert({ type: 'success', msg: `Updating account: ${state.email}` })
+    const name = state.username !== state.email ? state.username : state.email
+    addAlert({ type: 'success', msg: `Updating account: ${name}` })
     console.log('updating account')
+    const updateData = {
+      username: state.username,
+      email: state.email,
+    }
+    updateUser(updateData)
     toggleModal()
   }
 

@@ -38,7 +38,7 @@ export default function Login({ toggleLoginView, handleLogin }) {
     // 302 = found
     if (res.status === 302) {
       addAlert({
-        type: 'success',
+        type: 'info',
         msg: `Signing in: ${data.user.username || data.user.email}`,
         duration: 1000,
       })
