@@ -97,6 +97,7 @@ const updateProject = async (project, user, db) => {
     return
   }
 
+  // remove the id and any nested array/object
   const { _id, ...data } = project
 
   return db.collection('projects').updateOne(

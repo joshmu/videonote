@@ -59,17 +59,17 @@ export function GlobalProvider({ serverData, ...props }) {
   }, [projects, currentProject, settings.currentProjectId])
 
   // update projects when we update the current project
-  useEffect(() => {
-    if (currentProject === null) return
-    updateProjects(currentProject)
-  }, [currentProject])
+  // useEffect(() => {
+  //   if (currentProject === null) return
+  //   updateProjects(currentProject)
+  // }, [currentProject])
 
-  const updateProjects = project => {
-    const updatedProjects = projects.map(p => {
-      return p._id === project._id ? project : p
-    })
-    setProjects(updatedProjects)
-  }
+  // const updateProjects = project => {
+  //   const updatedProjects = projects.map(p => {
+  //     return p._id === project._id ? project : p
+  //   })
+  //   setProjects(updatedProjects)
+  // }
 
   const updateProject = async project => {
     // * todos > currentProject > update this project on server > update projects with server response
@@ -185,7 +185,10 @@ export function GlobalProvider({ serverData, ...props }) {
 
     setCurrentProject(selectedProject)
 
-    updateSettings({ currentProjectId: selectedProject._id })
+    // only update if there is a change
+    if (selectedProject._id !== settings.currentProjectId) {
+      updateSettings({ currentProjectId: selectedProject._id })
+    }
 
     // notification
     addAlert({ type: 'success', msg: `${selectedProject.title.toUpperCase()}` })
@@ -263,7 +266,7 @@ export function GlobalProvider({ serverData, ...props }) {
     user,
     updateUser,
     projects,
-    updateProjects,
+    // updateProjects,
     removeProject,
     project: currentProject,
     settings,

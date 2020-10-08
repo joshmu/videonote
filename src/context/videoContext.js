@@ -23,12 +23,7 @@ const videoContext = createContext({
 })
 
 export function VideoProvider(props) {
-  const {
-    project,
-    updateProjects,
-    settings,
-    toggleSidebar,
-  } = useGlobalContext()
+  const { project, updateProject, settings, toggleSidebar } = useGlobalContext()
   const { addAlert } = useNotificationContext()
   const playerRef = useRef(null)
   const [url, setUrl] = useState(null)
@@ -180,7 +175,7 @@ export function VideoProvider(props) {
 
       // if we have a src url we will update the project information and reset the React Player URL
       const updatedProject = { ...project, src: url }
-      updateProjects(updatedProject)
+      updateProject(updatedProject)
       setUrl(url)
     }
 

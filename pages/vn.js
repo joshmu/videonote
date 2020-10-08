@@ -11,6 +11,7 @@ import { VideoProvider } from '../src/context/videoContext'
 import { TodoProvider } from '../src/context/todoContext'
 import { fetcher } from '../utils/clientHelpers'
 
+// todo: todos are being lost? check flow of data? is local storage doing this or state? compare to mongo db
 // todo: keep giving back refreshed JWT during usage?
 // todo: only update settings for user when they are not default values
 // todo: '/' path should be the app and new users are redirected to the '/hello'

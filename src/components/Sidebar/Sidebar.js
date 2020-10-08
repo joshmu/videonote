@@ -30,14 +30,16 @@ export default function Sidebar(props) {
   // update sidebar width once resizing completes
   // don't fire if its the initial default values
   useEffect(() => {
-    if (
-      !resizeState.resizing &&
-      resizeState.size !== SETTINGS_DEFAULTS.sidebarWidth
-    ) {
-      // console.log('updating sidebar width', { resizeState })
-      console.log('fire from sidebar')
-      updateSettings({ sidebarWidth: resizeState.size })
-    }
+    // don't update durting resize
+    if (resizeState.resizing) return
+    // don't update if we are just setting defaults
+    if (resizeState.size === SETTINGS_DEFAULTS.sidebarWidth) return
+    // don't update if we are settings the server response
+    if (resizeState.size === settings.sidebarWidth) return
+
+    // console.log('updating sidebar width', { resizeState })
+    console.log('fire from sidebar')
+    updateSettings({ sidebarWidth: resizeState.size })
   }, [resizeState])
 
   const toggleOpen = () => {
