@@ -247,7 +247,14 @@ export function GlobalProvider({ serverData, ...props }) {
   //-------------------------------
   const handleInitialServerData = data => {
     console.log('handle initial server data', data)
-    const { user: account, projects } = data
+    const { user: account, projects, msg } = data
+
+    // if msg presume there is an error
+    if (msg) {
+      Router.push('/login')
+      addAlert({ type: 'error', msg })
+      return
+    }
 
     // allocate server data to respective areas
     setProjects(projects)
@@ -258,7 +265,7 @@ export function GlobalProvider({ serverData, ...props }) {
       setSettings(settings)
 
       // alerts
-      addAlert({ type: 'success', msg: `Logged in: ${user.username}` })
+      // addAlert({ type: 'success', msg: `Logged in: ${user.username}` })
     } else {
       // if we receive no account data then we can presume we are in guest mode with a single project
       setGuest(true)
