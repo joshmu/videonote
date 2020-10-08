@@ -84,7 +84,7 @@ export default function Sidebar(props) {
     >
       {/* sidebar edge for resizing */}
       <div
-        className='absolute left-0 w-4 h-full transform -translate-x-1/2'
+        className='absolute left-0 z-10 w-6 h-full transform -translate-x-4/5'
         style={{ cursor: 'ew-resize' }}
         onMouseDown={handleStartResize}
       ></div>

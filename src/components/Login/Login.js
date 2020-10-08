@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import Link from 'next/link'
 import { motion } from 'framer-motion'
 import { ModalInput, PrimaryBtn } from '../Modals/Modal'
 import { useNotificationContext } from '../../context/notificationContext'
@@ -67,9 +68,13 @@ export default function Login({ toggleLoginView, handleLogin, handleEmail }) {
       className='w-full max-w-sm mx-auto overflow-hidden border rounded-sm border-themeText'
     >
       <div className='px-6 py-4'>
-        <h2 className='text-3xl font-bold text-center text-highlight-400'>
-          VideoNote
-        </h2>
+        <Link href='/hello' passHref>
+          <a>
+            <h2 className='text-3xl font-bold text-center text-highlight-400'>
+              VideoNote
+            </h2>
+          </a>
+        </Link>
 
         <h3 className='mt-1 text-xl font-medium text-center text-themeText'>
           Welcome back!

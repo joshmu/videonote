@@ -14,3 +14,18 @@ export const extractProject = project => {
     ...data,
   }
 }
+
+export const extractPublicProject = project => {
+  if (!project) return null
+  const {
+    removed,
+    created,
+    updated,
+    notes,
+    userIds,
+    ...data
+  } = project
+  return {
+    ...data,
+  }
+}

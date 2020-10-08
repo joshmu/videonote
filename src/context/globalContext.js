@@ -23,6 +23,9 @@ export function GlobalProvider({ serverData, ...props }) {
   const [openSidebar, setOpenSidebar] = useState(true)
   const [settingsOpen, setSettingsOpen] = useState(false)
   const [modalOpen, setModalOpen] = useState(null)
+
+  const [guest, setGuest] = useState(false)
+
   const { addAlert } = useNotificationContext()
 
   const resetGlobalState = () => {
@@ -72,6 +75,7 @@ export function GlobalProvider({ serverData, ...props }) {
   // }
 
   const updateProject = async project => {
+    if (guest) return guestUpdateProject(project)
     // * todos > currentProject > update this project on server > update projects with server response
     // @ts-ignore
     const response = await handleProjectApi('update', user, project)
@@ -80,6 +84,29 @@ export function GlobalProvider({ serverData, ...props }) {
 
     // setCurrentProject(updatedProject)
     setProjects(projects)
+  }
+
+  const guestUpdateProject = async project => {
+    console.log('guest is updating project', project)
+    const body = {
+      project,
+    }
+    const res = await fetch('/api/public_project_update', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(body),
+    })
+    const data = await res.json()
+
+    const { project: updatedProject, msg } = data
+
+    // handle if we get a bad response
+    if (badResponse(res, msg)) return
+
+    // success
+    console.log(data.msg)
   }
 
   const updateUser = async userData => {
@@ -115,6 +142,8 @@ export function GlobalProvider({ serverData, ...props }) {
   }
 
   const updateSettings = async newSettingsData => {
+    if (guest) return
+
     console.log('updating settings...', newSettingsData)
     // merge settings and user information together match 'user' mongo doc
     const body = {
@@ -219,15 +248,21 @@ export function GlobalProvider({ serverData, ...props }) {
   const handleInitialServerData = data => {
     console.log('handle initial server data', data)
     const { user: account, projects } = data
-    const { settings, ...user } = account
-
-    // alerts
-    addAlert({ type: 'success', msg: `Logged in: ${user.username}` })
 
     // allocate server data to respective areas
-    setUser(user)
-    setSettings(settings)
     setProjects(projects)
+
+    if (account) {
+      const { settings, ...user } = account
+      setUser(user)
+      setSettings(settings)
+
+      // alerts
+      addAlert({ type: 'success', msg: `Logged in: ${user.username}` })
+    } else {
+      // if we receive no account data then we can presume we are in guest mode with a single project
+      setGuest(true)
+    }
   }
 
   const handleProjectApi = async (action, userData, project) => {
@@ -291,6 +326,7 @@ export function GlobalProvider({ serverData, ...props }) {
     updateProject,
     handleInitialServerData,
     SETTINGS_DEFAULTS,
+    guest,
   }
 
   return <globalContext.Provider value={value} {...props} />

@@ -12,6 +12,7 @@ import { TodoProvider } from '../src/context/todoContext'
 import { fetcher } from '../utils/clientHelpers'
 
 // todo: easy share project (read only privledges option?, url link and no user account required?)
+// todo: change 'private' property to 'public' (avoid conflict with strict mode in js)
 
 // todo: '/' path should be the app and new users are redirected to the '/hello'
 

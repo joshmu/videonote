@@ -10,6 +10,7 @@ export default function OptionsDropdown({ open, ...props }) {
     toggleModalOpen,
     resetGlobalState,
     project,
+    guest,
   } = useGlobalContext()
   const { toggleTheme } = useThemeContext()
 
@@ -39,28 +40,46 @@ export default function OptionsDropdown({ open, ...props }) {
           onMouseLeave={handleMouseLeave}
           className='absolute right-0 z-40 w-48 py-2 text-sm capitalize transition-colors duration-300 ease-in-out border rounded-sm shadow-xl bg-themeBg'
         >
-          {project && (
+          {project && !guest && (
             <Select onClick={handleClick} data-modal='current'>
               <div className='text-highlight-400'>{project.title}</div>
             </Select>
           )}
-          <Select onClick={handleClick} data-modal='create'>
-            create
-          </Select>
-          <Select onClick={handleClick} data-modal='projects'>
-            projects
-          </Select>
+
+          {guest && (
+            <div className='flex items-center px-4 py-2 text-highlight-400'>
+              {project.title}
+            </div>
+          )}
+
+          {!guest && (
+            <>
+              <Select onClick={handleClick} data-modal='create'>
+                create
+              </Select>
+              <Select onClick={handleClick} data-modal='projects'>
+                projects
+              </Select>
+            </>
+          )}
+
           <Select onClick={handleClick} data-modal='settings'>
             settings
           </Select>
-          <Select onClick={handleClick} data-modal='user'>
-            account
-          </Select>
-          <Link href='/' passHref>
-            <a>
-              <Select onClick={handleSignOutClick}>Sign Out</Select>
-            </a>
-          </Link>
+
+          {!guest && (
+            <>
+              <Select onClick={handleClick} data-modal='user'>
+                account
+              </Select>
+              <Link href='/' passHref>
+                <a>
+                  <Select onClick={handleSignOutClick}>Sign Out</Select>
+                </a>
+              </Link>
+            </>
+          )}
+
           <Select onClick={handleThemeToggleClick}>
             <div className='relative flex text-md'>
               <ThemeToggle />
