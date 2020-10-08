@@ -11,8 +11,7 @@ import { VideoProvider } from '../src/context/videoContext'
 import { TodoProvider } from '../src/context/todoContext'
 import { fetcher } from '../utils/clientHelpers'
 
-// todo: easy share project (read only privledges option?, url link and no user account required?)
-// todo: '/' path should be the app and new users are redirected to the '/hello'
+// todo: place notifications above the overlay
 
 // todo: when page is inactive and we start using it again, check JWT? and boot if expired
 // todo: keep giving back refreshed JWT during usage?

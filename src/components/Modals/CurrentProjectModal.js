@@ -89,8 +89,8 @@ export default function CurrentProjectModal({
               />
 
               <ModalInput
-                title='Video Source'
-                placeholder='Paste URL: Dropbox, Youtube, Vimeo...'
+                title='Video URL'
+                placeholder='Dropbox, Youtube, Vimeo...'
                 id='src'
                 type='text'
                 value={state.src}
