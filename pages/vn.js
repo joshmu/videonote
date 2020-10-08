@@ -11,36 +11,35 @@ import { VideoProvider } from '../src/context/videoContext'
 import { TodoProvider } from '../src/context/todoContext'
 import { fetcher } from '../utils/clientHelpers'
 
-// todo: todos are being lost? check flow of data? is local storage doing this or state? compare to mongo db
-// todo: keep giving back refreshed JWT during usage?
-// todo: only update settings for user when they are not default values
-// todo: '/' path should be the app and new users are redirected to the '/hello'
-// todo: 'easymotion char jump' <leader> s <char> => surround changed to 'S' in normal mode
-// todo: when page is inactive and we start using it again, check JWT? and boot if expired
-// todo: on sign out, remove token in cookies
-// todo: edit timestamp
-// todo: drag progress bar to seek quickly
-// todo: option to change password
-// todo: forget password option?
-
-// todo: speech to text synthesis on actionInput
-// todo: decide on 'services' or 'lib' or 'utils' folder? and where?
 // todo: easy share project (read only privledges option?, url link and no user account required?)
-// users accounts can share public readonly of their project, viewers can only mark off notes but cannot create projects or notes
-// todo: prioritize speed of workflow
-// todo: think about mobile variant
-// todo: method to autofocus, auto focus on actionInput after project load, (do this especially on SHIFT when expanded video)
 
-// todo: show locate video file button
-// todo: warning if using local file that you will not be able to share
+// todo: '/' path should be the app and new users are redirected to the '/hello'
 
+// todo: when page is inactive and we start using it again, check JWT? and boot if expired
+// todo: keep giving back refreshed JWT during usage?
+// todo: on sign out, remove token in cookies
+
+// todo: edit timestamp
 // todo: use date-fns for times?
+// todo: drag progress bar to seek quickly
+// todo: method to autofocus, auto focus on actionInput after project load, (do this especially on SHIFT when expanded video)
 // todo: autoplay when note is selected? (settings option)
 // todo: mute option
 // todo: export option
 
+// todo: option to change password
+// todo: forget password option?
+
+// todo: only update settings for user when they are not default values
 // todo: best way to store date in mongodb
-// todo: modal context seperation
+
+// todo: speech to text synthesis on actionInput
+// todo: decide on 'services' or 'lib' or 'utils' folder? and where?
+// users accounts can share public readonly of their project, viewers can only mark off notes but cannot create projects or notes
+// todo: prioritize speed of workflow
+// todo: think about mobile variant
+
+// todo: show locate video file button
 
 export default function Main({ serverData }) {
   return (
