@@ -11,7 +11,7 @@ import {
 import { useNotificationContext } from '../../context/notificationContext'
 import { isValidCredentials } from '../../../utils/clientHelpers'
 
-export default function UserAccountModal({ toggle: toggleModal }) {
+export default function UserAccountModal({ toggle: toggleModal, motionKey }) {
   const { user, updateUser } = useGlobalContext()
   const { addAlert } = useNotificationContext()
   const [state, setState] = useState({
@@ -47,7 +47,7 @@ export default function UserAccountModal({ toggle: toggleModal }) {
   }
 
   return (
-    <ModalContainer toggle={toggleModal}>
+    <ModalContainer toggle={toggleModal} motionKey={motionKey}>
       <ModalHeader>Account Settings</ModalHeader>
 
       <ModalInnerContainer>

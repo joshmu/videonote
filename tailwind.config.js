@@ -45,7 +45,7 @@ module.exports = {
       const extendLineThrough = {
         '.line-through': {
           textDecoration: 'line-through',
-          textDecorationColor: theme('colors.themeHighlight'),
+          textDecorationColor: theme('colors.highlight.400'),
         },
       }
 

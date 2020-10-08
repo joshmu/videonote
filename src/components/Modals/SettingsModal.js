@@ -11,7 +11,7 @@ import {
 import { ToggleInput } from '../shared/Toggle'
 import { useNotificationContext } from '../../context/notificationContext'
 
-export default function SettingsModal({ toggle: toggleModal }) {
+export default function SettingsModal({ toggle: toggleModal, motionKey }) {
   const { settings, updateSettings } = useGlobalContext()
   const { addAlert } = useNotificationContext()
 
@@ -45,7 +45,7 @@ export default function SettingsModal({ toggle: toggleModal }) {
   }
 
   return (
-    <ModalContainer toggle={toggleModal}>
+    <ModalContainer toggle={toggleModal} motionKey={motionKey}>
       <ModalHeader>Settings</ModalHeader>
 
       <ModalInnerContainer>

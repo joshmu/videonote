@@ -2,26 +2,30 @@ import { IoMdClose as CloseIcon } from 'react-icons/io'
 import { motion } from 'framer-motion'
 import MotionFadeInOut from '../shared/MotionFadeInOut'
 
-export function ModalContainer({ toggle, children, ...props }) {
+export function ModalContainer({
+  toggle,
+  children,
+  motionKey = 'modal',
+  ...props
+}) {
   return (
-    <div className='z-40' {...props}>
-      <MotionFadeInOut motionKey='modal'>
-        <div className='absolute w-full max-w-lg transform -translate-x-1/2 -translate-y-1/2 max-h-11/12 top-1/2 left-1/2'>
-          <div className='relative w-full p-6 mx-auto border rounded-sm shadow-md border-themeText bg-themeBg'>
-            <CloseModalBtn toggle={toggle} />
-            {children}
-          </div>
-        </div>
-      </MotionFadeInOut>
+    <div
+      className='absolute z-40 w-full max-w-lg transform -translate-x-1/2 -translate-y-1/2 max-h-11/12 top-1/2 left-1/2'
+      {...props}
+    >
+      <div className='relative w-full p-6 mx-auto border rounded-sm shadow-md border-themeText bg-themeBg'>
+        <CloseModalBtn toggle={toggle} />
+        {children}
+      </div>
     </div>
   )
 }
 
 export const ModalHeader = ({ children }) => {
   return (
-    <div className='mb-6 -ml-6'>
+    <div className='mb-6 -ml-12'>
       <div className='w-4/5 py-2 text-themeBg bg-themeText'>
-        <span className='pl-6 text-lg font-semibold capitalize'>
+        <span className='pl-8 text-lg font-semibold capitalize'>
           {children}
         </span>
       </div>
@@ -82,14 +86,20 @@ export const ModalInput = ({
 }
 
 export const ModalPrimaryBtn = ({ className = '', children, ...props }) => (
-  <div className={`${className} flex justify-end mt-4`}>
-    <motion.button
-      whileHover={{ scale: 0.9, transition: { duration: 0.1 } }}
-      type='submit'
-      className='px-4 py-2 transition-colors duration-200 ease-in-out rounded-sm bg-opacity-90 text-themeBg bg-themeHighlight hover:bg-opacity-100 focus:outline-none'
-      {...props}
+  <>
+    <div className='h-10'></div>
+    <div></div>
+    <div
+      className={`${className} flex justify-end mt-4 absolute bottom-6 -right-6`}
     >
-      {children}
-    </motion.button>
-  </div>
+      <motion.button
+        whileHover={{ scale: 0.9, transition: { duration: 0.1 } }}
+        type='submit'
+        className='w-40 py-2 bg-opacity-100 rounded-sm text-themeBg bg-themeHighlight focus:outline-none'
+        {...props}
+      >
+        {children}
+      </motion.button>
+    </div>
+  </>
 )

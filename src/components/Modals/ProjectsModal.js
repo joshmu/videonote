@@ -5,7 +5,7 @@ import { ModalContainer, ModalHeader, ModalInnerContainer } from './Modal'
 import { ImBin2 as TrashIcon } from 'react-icons/im'
 import { motion } from 'framer-motion'
 
-export default function ProjectsModal({ toggle: toggleModal }) {
+export default function ProjectsModal({ toggle: toggleModal, motionKey }) {
   const { projects, loadProject, removeProject } = useGlobalContext()
   const [mousingOver, setMousingOver] = useState(null)
 
@@ -27,7 +27,7 @@ export default function ProjectsModal({ toggle: toggleModal }) {
   }
 
   return (
-    <ModalContainer toggle={toggleModal}>
+    <ModalContainer toggle={toggleModal} motionKey={motionKey}>
       <ModalHeader>Projects</ModalHeader>
 
       <ModalInnerContainer>

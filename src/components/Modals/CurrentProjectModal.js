@@ -10,7 +10,10 @@ import {
   ModalPrimaryBtn,
 } from './Modal'
 
-export default function CurrentProjectModal({ toggle: toggleModal }) {
+export default function CurrentProjectModal({
+  toggle: toggleModal,
+  motionKey,
+}) {
   const { updateProject, project } = useGlobalContext()
   const [state, setState] = useState(null)
 
@@ -42,7 +45,7 @@ export default function CurrentProjectModal({ toggle: toggleModal }) {
   return (
     <>
       {state && (
-        <ModalContainer toggle={toggleModal}>
+        <ModalContainer toggle={toggleModal} motionKey={motionKey}>
           <ModalHeader>Project: {state.title}</ModalHeader>
 
           <ModalInnerContainer>

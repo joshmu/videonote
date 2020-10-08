@@ -17,9 +17,7 @@ export default function Login() {
 
   const handleLogin = data => {
     handleJwtToken(data.token)
-
-    // todo: can we pass the user data here to avoid the additional request?
-    Router.push('/vn')
+    Router.push('/')
   }
 
   return (
