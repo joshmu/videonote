@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useGlobalContext } from '../../context/globalContext'
-import LocalVideoLoader from '../LocalVideoLoader'
+import LocalVideoForm from '../LocalVideo/LocalVideoForm'
 import {
   ModalContainer,
   ModalInnerContainer,
@@ -63,23 +63,10 @@ export default function CreateProjectModal({ toggle: toggleModal }) {
             value={project.src}
             onChange={handleChange}
           />
-          <div
-            onMouseEnter={() => setHover(true)}
-            onMouseLeave={() => setHover(false)}
-            className='h-10 mx-auto'
-          >
-            <LocalVideoLoader handleVideoSrc={handleVideoSrc} />
-          </div>
-          <div className='relative'>
-            {hover && (
-              <span className='absolute text-xs'>
-                Local videos cannot be shared with other users. For the best
-                experience use web accessible videos.
-              </span>
-            )}
-          </div>
-          <div></div>
 
+          <LocalVideoForm handleVideoSrc={handleVideoSrc} />
+
+          <div></div>
           <ModalPrimaryBtn onClick={handleCreate}>Create</ModalPrimaryBtn>
         </ModalForm>
       </ModalInnerContainer>

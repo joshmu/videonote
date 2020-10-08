@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useGlobalContext } from '../../context/globalContext'
-import LocalVideoLoader from '../LocalVideoLoader'
+import LocalVideoForm from '../LocalVideo/LocalVideoForm'
 import {
   ModalContainer,
   ModalForm,
@@ -21,6 +21,7 @@ export default function CurrentProjectModal({ toggle: toggleModal }) {
   const handleUpdate = e => {
     e.preventDefault()
     if (state.title.length === 0 || state.src.length === 0) return
+    if (state.title === project.title && state.src === project.src) return
 
     updateProject(state)
     toggleModal()
@@ -62,8 +63,10 @@ export default function CurrentProjectModal({ toggle: toggleModal }) {
                 value={state.src}
                 onChange={handleChange}
               />
-              <LocalVideoLoader handleVideoSrc={handleVideoSrc} />
 
+              <LocalVideoForm handleVideoSrc={handleVideoSrc} />
+
+              <div></div>
               <ModalPrimaryBtn onClick={handleUpdate}>Update</ModalPrimaryBtn>
             </ModalForm>
           </ModalInnerContainer>

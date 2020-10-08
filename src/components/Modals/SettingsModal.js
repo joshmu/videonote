@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react'
 import { useGlobalContext } from '../../context/globalContext'
 import {
   ModalContainer,
@@ -5,19 +6,42 @@ import {
   ModalForm,
   ModalInput,
   ModalInnerContainer,
+  ModalPrimaryBtn,
 } from './Modal'
 import { ToggleInput } from '../shared/Toggle'
+import { useNotificationContext } from '../../context/notificationContext'
 
 export default function SettingsModal({ toggle: toggleModal }) {
   const { settings, updateSettings } = useGlobalContext()
+  const { addAlert } = useNotificationContext()
+
+  const [state, setState] = useState({
+    playOffset: '',
+    seekJump: '',
+    showHints: '',
+    private: '',
+  })
+
+  useEffect(() => {
+    if (settings) setState({ ...state, ...settings })
+  }, [settings])
 
   const handleChangeNum = e => {
-    updateSettings({ [e.target.id]: Number(e.target.value) })
+    setState({ ...state, [e.target.id]: Number(e.target.value) })
   }
 
   const handleToggle = id => {
     console.log('toggle', id)
-    updateSettings({ [id]: !settings[id] })
+    setState({ ...state, [id]: !settings[id] })
+  }
+
+  const handleUpdate = e => {
+    e.preventDefault()
+
+    addAlert({ type: 'info', msg: `Updating settings` })
+    console.log('updating account')
+    updateSettings(state)
+    toggleModal()
   }
 
   return (
@@ -30,23 +54,25 @@ export default function SettingsModal({ toggle: toggleModal }) {
             title='Playback Offset (Seconds)'
             id='playOffset'
             type='number'
-            value={settings.playOffset}
+            value={state.playOffset}
             onChange={handleChangeNum}
           />
           <ModalInput
             title='Seek Jump (Seconds)'
             id='seekJump'
             type='number'
-            value={settings.seekJump}
+            value={state.seekJump}
             onChange={handleChangeNum}
           />
           <div>
             <ToggleInput
               title='Show Hints'
-              state={settings.showHints}
+              state={state.showHints}
               onClick={() => handleToggle('showHints')}
             />
           </div>
+
+          <ModalPrimaryBtn onClick={handleUpdate}>Update</ModalPrimaryBtn>
         </ModalForm>
       </ModalInnerContainer>
     </ModalContainer>

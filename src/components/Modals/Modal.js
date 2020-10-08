@@ -49,7 +49,7 @@ export const CloseModalBtn = ({ toggle }) => {
 
 export const ModalForm = ({ children }) => (
   <form>
-    <div className='grid grid-cols-1 gap-6 mt-4 sm:grid-cols-2'>{children}</div>
+    <div className='grid grid-cols-1 gap-6 mt-2 sm:grid-cols-2'>{children}</div>
     {/* <div className='grid grid-cols-1 gap-6 mt-4'>{children}</div> */}
   </form>
 )
@@ -77,13 +77,15 @@ export const ModalInput = ({
   )
 }
 
-export const ModalPrimaryBtn = ({ children, ...props }) => (
-  <div className='flex justify-end mt-4'>
-    <button
-      className='px-4 py-2 text-gray-200 bg-gray-800 rounded-sm hover:bg-gray-700 focus:outline-none focus:bg-gray-700'
+export const ModalPrimaryBtn = ({ className = '', children, ...props }) => (
+  <div className={`${className} flex justify-end mt-4`}>
+    <motion.button
+      whileHover={{ scale: 0.9, transition: { duration: 0.5 } }}
+      type='submit'
+      className='px-4 py-2 rounded-sm text-themeBg bg-themeText focus:outline-none'
       {...props}
     >
       {children}
-    </button>
+    </motion.button>
   </div>
 )

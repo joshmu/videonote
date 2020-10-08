@@ -32,7 +32,7 @@ export default function UserAccountModal({ toggle: toggleModal }) {
       return addAlert({ type: 'error', msg: 'Invalid credentials provided' })
 
     const name = state.username !== state.email ? state.username : state.email
-    addAlert({ type: 'success', msg: `Updating account: ${name}` })
+    addAlert({ type: 'info', msg: `Updating account: ${name}` })
     console.log('updating account')
     const updateData = {
       username: state.username,
@@ -66,7 +66,7 @@ export default function UserAccountModal({ toggle: toggleModal }) {
             id='email'
             type='email'
           />
-          <ModalInput
+          {/* <ModalInput
             value={state.password}
             onChange={handleChange}
             title='Password'
@@ -79,11 +79,12 @@ export default function UserAccountModal({ toggle: toggleModal }) {
             title='Password Confirmation'
             id='passwordConfirmation'
             type='password'
-          />
+          /> */}
+          <div></div>
+          <ModalPrimaryBtn onClick={handleUpdate} type='submit'>
+            Update
+          </ModalPrimaryBtn>
         </ModalForm>
-        <ModalPrimaryBtn onClick={handleUpdate} type='submit'>
-          Update
-        </ModalPrimaryBtn>
       </ModalInnerContainer>
     </ModalContainer>
   )
