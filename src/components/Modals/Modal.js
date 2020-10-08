@@ -19,9 +19,13 @@ export function ModalContainer({ toggle, children, ...props }) {
 
 export const ModalHeader = ({ children }) => {
   return (
-    <h2 className='mb-2 text-lg font-semibold capitalize text-themeText'>
-      {children}
-    </h2>
+    <div className='mb-6 -ml-6'>
+      <div className='w-4/5 py-2 text-themeBg bg-themeText'>
+        <span className='pl-6 text-lg font-semibold capitalize'>
+          {children}
+        </span>
+      </div>
+    </div>
   )
 }
 
@@ -80,7 +84,7 @@ export const ModalInput = ({
 export const ModalPrimaryBtn = ({ className = '', children, ...props }) => (
   <div className={`${className} flex justify-end mt-4`}>
     <motion.button
-      whileHover={{ scale: 0.9, transition: { duration: 0.5 } }}
+      whileHover={{ scale: 0.9, transition: { duration: 0.1 } }}
       type='submit'
       className='px-4 py-2 rounded-sm text-themeBg bg-themeText focus:outline-none'
       {...props}
