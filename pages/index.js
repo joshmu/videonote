@@ -1,98 +1,103 @@
 import Layout from '../src/components/Layout'
-import { useThemeContext } from '../src/context/themeContext'
-import NavBtn from '../src/components/shared/NavBtn'
-import { Heading } from '../src/components/shared/Text'
-import ThemeToggle from '../src/components/ThemeToggle'
-import { motion } from 'framer-motion'
-import MotionFadeUp from '../src/components/shared/MotionFadeUp'
+import VideoPlayer from '../src/components/VideoPlayer/VideoPlayer'
+import Sidebar from '../src/components/Sidebar/Sidebar'
+import Modals from '../src/components/Modals/Modals'
+import Notification from '../src/components/Notification/Notification'
+import { GlobalProvider } from '../src/context/globalContext'
+import Overlay from '../src/components/shared/Overlay'
+import Cookies from 'universal-cookie'
+import absoluteUrl from 'next-absolute-url'
+import { VideoProvider } from '../src/context/videoContext'
+import { TodoProvider } from '../src/context/todoContext'
+import { fetcher } from '../utils/clientHelpers'
 
-export default function Home() {
-  const { toggleTheme } = useThemeContext()
+// todo: easy share project (read only privledges option?, url link and no user account required?)
 
-  const handleClick = () => {
-    toggleTheme()
+// todo: '/' path should be the app and new users are redirected to the '/hello'
+
+// todo: when page is inactive and we start using it again, check JWT? and boot if expired
+// todo: keep giving back refreshed JWT during usage?
+// todo: on sign out, remove token in cookies
+
+// todo: edit timestamp
+// todo: use date-fns for times?
+// todo: drag progress bar to seek quickly
+// todo: method to autofocus, auto focus on actionInput after project load, (do this especially on SHIFT when expanded video)
+// todo: autoplay when note is selected? (settings option)
+// todo: mute option
+// todo: export option
+
+// todo: option to change password
+// todo: forget password option?
+
+// todo: only update settings for user when they are not default values
+// todo: best way to store date in mongodb
+// todo: on login, do occuassional clean up of 'removed' data if its older than... 2 weeks?
+
+// todo: speech to text synthesis on actionInput
+// todo: decide on 'services' or 'lib' or 'utils' folder? and where?
+// users accounts can share public readonly of their project, viewers can only mark off notes but cannot create projects or notes
+// todo: prioritize speed of workflow
+// todo: think about mobile variant
+
+// todo: show locate video file button
+
+export default function Main({ serverData }) {
+  return (
+    <GlobalProvider serverData={serverData}>
+      <VideoProvider>
+        <TodoProvider>
+          <Layout>
+            <div className='flex flex-col w-full h-screen overflow-hidden'>
+              {/* <div className='text-3xl'>navbar</div> */}
+
+              <div className='flex flex-1 w-full h-full'>
+                <VideoPlayer />
+                <Sidebar />
+              </div>
+
+              <Modals />
+              <Notification />
+              <Overlay />
+            </div>
+          </Layout>
+        </TodoProvider>
+      </VideoProvider>
+    </GlobalProvider>
+  )
+}
+
+Main.getInitialProps = async ctx => {
+  const cookies = new Cookies(
+    ctx?.req?.headers?.cookie ? ctx.req.headers.cookie : null
+  )
+  const token = cookies.get('token')
+
+  if (!token) {
+    console.log('no token, redirecting...')
+    // server
+    ctx.res.writeHead(302, {
+      Location: `/hello`,
+    })
+
+    ctx.res.end()
+    return
   }
 
-  return (
-    <Layout>
-      {/* theme toggle */}
-      <div className='absolute top-0 right-0 z-50 p-4 text-2xl hover:text-themeHighlight'>
-        <ThemeToggle
-          lightColor='text-themeHighlight'
-          darkColor='text-themeHighlight'
-        />
-      </div>
+  // request data with JWT token
+  const { origin } = absoluteUrl(ctx.req)
+  const url = `${origin}/api/auth`
+  const body = {}
+  const { res, data } = await fetcher(url, body, token)
 
-      {/* landing */}
-      <div className='absolute top-0 flex w-full h-full'>
-        {/* left */}
-        <div className='relative flex items-center justify-end w-full h-full'>
-          <motion.div
-            key='videoTitle'
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1, transition: { delay: 0.2 } }}
-            exit={{ opacity: 0, y: -10, transition: { delay: 0 } }}
-            className='z-10'
-          >
-            <Heading
-              onClick={handleClick}
-              className='z-10 transition-colors duration-300 ease-in-out cursor-pointer text-8xl text-themeBg'
-            >
-              Video
-            </Heading>
-          </motion.div>
+  // if token is invalid
+  if (res.status !== 200) {
+    ctx.res.writeHead(302, {
+      Location: `/login`,
+    })
+    ctx.res.end()
+    return
+  }
 
-          <MotionFadeUp
-            k='navbtn'
-            animate={{ transition: { delay: 0.7 } }}
-            exit={{ transition: { delay: 0.4 } }}
-            className='relative'
-          >
-            <NavBtn
-              href='/login'
-              className='absolute z-10 -mb-32 text-left focus:outline-none bottom-1/2 bg-themeBg hover:text-themeBg'
-            >
-              Let's Go
-            </NavBtn>
-          </MotionFadeUp>
-
-          {/* orange background slider */}
-          <motion.div
-            key='orangeBg'
-            initial={{ x: '-100%' }}
-            animate={{
-              x: 0,
-              transition: {
-                duration: 0.8,
-              },
-            }}
-            exit={{
-              x: '-100%',
-              transition: {
-                delay: 0.6,
-                duration: 0.8,
-              },
-            }}
-            className='absolute z-0 w-full h-full bg-themeHighlight'
-          ></motion.div>
-        </div>
-
-        {/* right */}
-        <div className='flex items-center justify-start flex-shrink w-full h-full transition-colors duration-300 ease-in-out bg-themeBg'>
-          <MotionFadeUp
-            k='note'
-            animate={{ transition: { delay: 0.5 } }}
-            exit={{ y: -10, transition: { delay: 0 } }}
-          >
-            <Heading
-              onClick={handleClick}
-              className='cursor-pointer text-themeHighlight text-8xl'
-            >
-              Note
-            </Heading>
-          </MotionFadeUp>
-        </div>
-      </div>
-    </Layout>
-  )
+  return { serverData: data }
 }
