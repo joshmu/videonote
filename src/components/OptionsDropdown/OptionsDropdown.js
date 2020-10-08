@@ -41,7 +41,7 @@ export default function OptionsDropdown({ open, ...props }) {
         >
           {project && (
             <Select onClick={handleClick} data-modal='current'>
-              <div className='text-themeHighlight'>{project.title}</div>
+              <div className='text-highlight-400'>{project.title}</div>
             </Select>
           )}
           <Select onClick={handleClick} data-modal='create'>

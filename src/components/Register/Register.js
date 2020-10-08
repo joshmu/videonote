@@ -1,17 +1,22 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
-import { ModalInput, ModalPrimaryBtn } from '../Modals/Modal'
+import { ModalInput, PrimaryBtn } from '../Modals/Modal'
 import { useNotificationContext } from '../../context/notificationContext'
 import isEmail from 'validator/lib/isEmail'
 import { fetcher } from '../../../utils/clientHelpers'
 
-export default function Register({ toggleLoginView, handleLogin }) {
+export default function Register({ toggleLoginView, handleLogin, email }) {
   const [user, setUser] = useState({
     registerEmail: '',
     registerPassword: '',
     registerPassword2: '',
   })
   const { addAlert } = useNotificationContext()
+
+  // if email has been entered accidentally on login page then prefill for register page
+  useEffect(() => {
+    setUser({ ...user, registerEmail: email })
+  }, [email])
 
   const handleChange = e => {
     setUser({ ...user, [e.target.id]: e.target.value })
@@ -108,9 +113,9 @@ export default function Register({ toggleLoginView, handleLogin }) {
           </div>
 
           <div className='flex items-center justify-end mt-4'>
-            <ModalPrimaryBtn onClick={handleSubmit} type='submit'>
+            <PrimaryBtn onClick={handleSubmit} type='submit'>
               Register
-            </ModalPrimaryBtn>
+            </PrimaryBtn>
           </div>
         </form>
       </div>

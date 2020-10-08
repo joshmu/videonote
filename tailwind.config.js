@@ -16,7 +16,7 @@ module.exports = {
         themeText2: 'var(--text2)',
         themeBg: 'var(--bg)',
         themeBg2: 'var(--bg2)',
-        themeHighlight: `rgba(var(--highlight), var(--bg-opacity))`,
+        themeHighlight: `rgba(var(--highlight), var(--bg-opacity))`, // currently not being used, replace with 'highlight-400'
         themeLight: 'var(--light)',
         themeDark: 'var(--dark)',
         highlight: {

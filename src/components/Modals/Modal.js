@@ -95,11 +95,21 @@ export const ModalPrimaryBtn = ({ className = '', children, ...props }) => (
       <motion.button
         whileHover={{ scale: 0.9, transition: { duration: 0.1 } }}
         type='submit'
-        className='w-40 py-2 bg-opacity-100 rounded-sm text-themeBg bg-themeHighlight focus:outline-none'
+        className='w-40 py-2 bg-opacity-100 rounded-sm text-themeBg bg-highlight-400 focus:outline-none'
         {...props}
       >
         {children}
       </motion.button>
     </div>
   </>
+)
+
+export const PrimaryBtn = ({ children, ...props }) => (
+  <motion.button
+    whileHover={{ scale: 0.9, transition: { duration: 0.1 } }}
+    className='px-6 py-2 bg-opacity-100 rounded-sm text-themeBg bg-highlight-400 focus:outline-none'
+    {...props}
+  >
+    {children}
+  </motion.button>
 )

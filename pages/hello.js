@@ -16,10 +16,10 @@ export default function Home() {
   return (
     <Layout>
       {/* theme toggle */}
-      <div className='absolute top-0 right-0 z-50 p-4 text-2xl hover:text-themeHighlight'>
+      <div className='absolute top-0 right-0 z-50 p-4 text-2xl hover:text-highlight-400'>
         <ThemeToggle
-          lightColor='text-themeHighlight'
-          darkColor='text-themeHighlight'
+          lightColor='text-highlight-400'
+          darkColor='text-highlight-400'
         />
       </div>
 
@@ -73,7 +73,7 @@ export default function Home() {
                 duration: 0.8,
               },
             }}
-            className='absolute z-0 w-full h-full bg-themeHighlight'
+            className='absolute z-0 w-full h-full bg-highlight-400'
           ></motion.div>
         </div>
 
@@ -86,7 +86,7 @@ export default function Home() {
           >
             <Heading
               onClick={handleClick}
-              className='cursor-pointer text-themeHighlight text-8xl'
+              className='cursor-pointer text-highlight-400 text-8xl'
             >
               Note
             </Heading>

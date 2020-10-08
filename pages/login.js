@@ -9,6 +9,7 @@ import { handleJwtToken } from '../utils/clientHelpers'
 
 export default function Login() {
   const [loginView, setLoginView] = useState(true)
+  const [email, setEmail] = useState('')
 
   const toggleLoginView = (state = undefined) => {
     const cmd = state === undefined ? !loginView : state
@@ -20,9 +21,11 @@ export default function Login() {
     Router.push('/')
   }
 
+  const handleEmail = email => setEmail(email)
+
   return (
     <Layout>
-      <div className='absolute top-0 right-0 z-50 p-4 text-2xl hover:text-themeHighlight'>
+      <div className='absolute top-0 right-0 z-50 p-4 text-2xl hover:text-highlight-400'>
         <ThemeToggle />
       </div>
       <div className='flex items-center justify-center h-screen'>
@@ -30,11 +33,13 @@ export default function Login() {
           <LoginView
             toggleLoginView={toggleLoginView}
             handleLogin={handleLogin}
+            handleEmail={handleEmail}
           />
         ) : (
           <RegisterView
             toggleLoginView={toggleLoginView}
             handleLogin={handleLogin}
+            email={email}
           />
         )}
       </div>
