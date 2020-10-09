@@ -9,6 +9,7 @@
   --dark2: theme('colors.gray.400');
   --special: 255, 138, 76;
   --special_rgb: rgba(255, 138, 76, 1);
+  --ripple-color: 255, 138, 76;
 }
 
 .theme-light {
@@ -94,4 +95,22 @@ body {
   -khtml-user-select: none; /* Konqueror HTML */
   -moz-user-select: none; /* Firefox */
   -ms-user-select: none; /* Internet Explorer/Edge */
+}
+
+.animate-ripple {
+  animation: ripple 3s linear infinite;
+}
+@keyframes ripple {
+  0% {
+    box-shadow: 0 0 0 0rem rgba(var(--ripple-color), 0.2),
+      0 0 0 1rem rgba(var(--ripple-color), 0.2),
+      0 0 0 2rem rgba(var(--ripple-color), 0.2),
+      0 0 0 5rem rgba(var(--ripple-color), 0.2);
+  }
+  100% {
+    box-shadow: 0 0 0 1rem rgba(var(--ripple-color), 0.2),
+      0 0 0 2rem rgba(var(--ripple-color), 0.2),
+      0 0 0 5rem rgba(var(--ripple-color), 0.2),
+      0 0 0 8rem rgba(var(--ripple-color), 0);
+  }
 }

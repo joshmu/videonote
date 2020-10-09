@@ -86,9 +86,15 @@ export default function Home() {
           >
             <Heading
               onClick={handleClick}
-              className='cursor-pointer text-highlight-400 text-8xl'
+              className='relative cursor-pointer text-highlight-400 text-8xl'
             >
               Note
+              <span
+                className='absolute bottom-0 z-40 p-1 px-2 ml-2 -mb-1 text-2xl tracking-tight transform rounded-sm text-themeBg semi-bold animate-pulse bg-highlight-400'
+                style={{ transform: 'rotate(-15deg)' }}
+              >
+                BETA
+              </span>
             </Heading>
           </MotionFadeUp>
         </div>
