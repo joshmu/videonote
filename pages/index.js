@@ -12,6 +12,8 @@ import { VideoProvider } from '../src/context/videoContext'
 import { TodoProvider } from '../src/context/todoContext'
 import { fetcher } from '../utils/clientHelpers'
 
+// todo: theme highlight needs to be dynamic for both light and dark mode (300, 400, 700)
+
 // todo: edit timestamp
 // todo: use date-fns for times?
 // todo: drag progress bar to seek quickly

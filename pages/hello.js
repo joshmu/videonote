@@ -5,12 +5,13 @@ import { Heading } from '../src/components/shared/Text'
 import ThemeToggle from '../src/components/ThemeToggle'
 import { motion } from 'framer-motion'
 import MotionFadeUp from '../src/components/shared/MotionFadeUp'
+import Router from 'next/router'
 
 export default function Home() {
   const { toggleTheme } = useThemeContext()
 
   const handleClick = () => {
-    toggleTheme()
+    Router.push('/login')
   }
 
   return (
