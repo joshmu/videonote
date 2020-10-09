@@ -29,6 +29,7 @@ export function VideoProvider(props) {
     settings,
     toggleSidebar,
     toggleModalOpen,
+    guest,
   } = useGlobalContext()
   const { addAlert } = useNotificationContext()
   const playerRef = useRef(null)
@@ -40,21 +41,23 @@ export function VideoProvider(props) {
 
   const [action, setAction] = useAnounceAction('')
 
+  // on initial load alert user if project is available however no src is specified
+  // * this could be due to a local video src thus being reset to an empty string when cannot be found
   useEffect(() => {
-    if (project !== null && project.src !== null) {
-      console.log('project changed, setting url')
-      if (project.src !== url) setUrl(project.src)
-    }
-  }, [project])
-
-  useEffect(() => {
-    if (project && project.src.length === 0) {
+    if (project && project.src.length === 0 && !guest) {
       addAlert({
         type: 'warning',
         msg: 'Video source required.',
       })
 
       toggleModalOpen('current')
+    }
+  }, [])
+
+  useEffect(() => {
+    if (project !== null && project.src !== null) {
+      console.log('project changed, setting url')
+      if (project.src !== url) setUrl(project.src)
     }
   }, [project])
 

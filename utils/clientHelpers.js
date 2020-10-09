@@ -39,3 +39,10 @@ export const fetcher = async (url, body, token = false) => {
 
   return { res, data }
 }
+
+export const formatDuration = secStr => {
+  const totalSecs = +secStr
+  const sec = Math.floor(totalSecs % 60)
+  const min = Math.floor(totalSecs / 60)
+  return `${min}:${sec < 10 ? '0' + sec : sec}`
+}

@@ -14,27 +14,22 @@ import { fetcher } from '../utils/clientHelpers'
 
 // todo: theme highlight needs to be dynamic for both light and dark mode (300, 400, 700)
 
-// todo: edit timestamp
-// todo: use date-fns for times?
 // todo: drag progress bar to seek quickly
-// todo: method to autofocus, auto focus on actionInput after project load, (do this especially on SHIFT when expanded video)
-// todo: autoplay when note is selected? (settings option)
+// todo: edit timestamp
+// todo: on login, do occuassional clean up of 'removed' data if its older than... 2 weeks?
+
+// todo: use date-fns for time durations?
 // todo: mute option
-// todo: export option
 
 // todo: option to change password
 // todo: forget password option?
 
 // todo: only update settings for user when they are not default values
-// todo: best way to store date in mongodb
-// todo: on login, do occuassional clean up of 'removed' data if its older than... 2 weeks?
 
 // todo: speech to text synthesis on actionInput
 // todo: decide on 'services' or 'lib' or 'utils' folder? and where?
 // todo: prioritize speed of workflow
 // todo: think about mobile variant
-
-// todo: show locate video file button
 
 export default function Main({ serverData }) {
   return (

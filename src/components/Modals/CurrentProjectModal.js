@@ -12,6 +12,7 @@ import {
 } from './Modal'
 import { ToggleInput } from '../shared/Toggle'
 import { useNotificationContext } from '../../context/notificationContext'
+import Export from '../Export/Export'
 
 export default function CurrentProjectModal({
   toggle: toggleModal,
@@ -70,7 +71,7 @@ export default function CurrentProjectModal({
     <>
       {state && (
         <ModalContainer toggle={toggleModal} motionKey={motionKey}>
-          <ModalHeader>Project: {state.title}</ModalHeader>
+          <ModalHeader>{state.title}</ModalHeader>
 
           <ModalInnerContainer>
             <ModalForm>
@@ -116,7 +117,10 @@ export default function CurrentProjectModal({
                 )}
               </div>
 
-              <div></div>
+              <div className='mt-2'>
+                <Export />
+              </div>
+
               <ModalPrimaryBtn onClick={handleUpdate}>Update</ModalPrimaryBtn>
             </ModalForm>
           </ModalInnerContainer>
