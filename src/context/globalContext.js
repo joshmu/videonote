@@ -28,6 +28,7 @@ export function GlobalProvider({ serverData, ...props }) {
 
   const { addAlert } = useNotificationContext()
 
+  // todo: check if this is still up to date
   const resetGlobalState = () => {
     setUser(null)
     setProjects([])

@@ -3,6 +3,7 @@ import { useGlobalContext } from '../../context/globalContext'
 import { useThemeContext } from '../../context/themeContext'
 import Select from '../shared/Select'
 import ThemeToggle from '../ThemeToggle'
+import Cookie from 'universal-cookie'
 
 export default function OptionsDropdown({ open, ...props }) {
   const {
@@ -23,8 +24,9 @@ export default function OptionsDropdown({ open, ...props }) {
   }
 
   const handleSignOutClick = () => {
-    toggleSettingsOpen()
-    resetGlobalState()
+    // remove JWT token cookie
+    const cookies = new Cookie()
+    cookies.remove('token')
   }
 
   const handleThemeToggleClick = () => {
@@ -87,7 +89,7 @@ export default function OptionsDropdown({ open, ...props }) {
               <Select onClick={handleClick} data-modal='user'>
                 profile
               </Select>
-              <Link href='/' passHref>
+              <Link href='/hello' passHref>
                 <a>
                   <Select onClick={handleSignOutClick}>Sign Out</Select>
                 </a>

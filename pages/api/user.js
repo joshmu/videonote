@@ -49,7 +49,7 @@ export default async (req, res) => {
     email,
   })
 
-  // token
+  // token (keep resetting their session length)
   const newToken = generateAccessToken(updatedUser.email)
 
   res.status(200).json({

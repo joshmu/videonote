@@ -52,7 +52,7 @@ export default async (req, res) => {
   // get all projects with user's id
   const projects = await getUserProjects(user._id, db)
 
-  // token
+  // token (keep resetting their session length)
   const newToken = generateAccessToken(user.email)
 
   res.status(200).json({

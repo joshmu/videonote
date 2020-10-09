@@ -6,16 +6,11 @@ import Notification from '../src/components/Notification/Notification'
 import { GlobalProvider } from '../src/context/globalContext'
 import Overlay from '../src/components/shared/Overlay'
 import Cookies from 'universal-cookie'
+import Router from 'next/router'
 import absoluteUrl from 'next-absolute-url'
 import { VideoProvider } from '../src/context/videoContext'
 import { TodoProvider } from '../src/context/todoContext'
 import { fetcher } from '../utils/clientHelpers'
-
-// todo: inactivity check (when we resume a session if browser left open)
-
-// todo: when page is inactive and we start using it again, check JWT? and boot if expired
-// todo: keep giving back refreshed JWT during usage?
-// todo: on sign out, remove token in cookies
 
 // todo: edit timestamp
 // todo: use date-fns for times?
@@ -76,9 +71,7 @@ Main.getInitialProps = async ctx => {
     ctx.res.writeHead(302, {
       Location: `/hello`,
     })
-
     ctx.res.end()
-    return
   }
 
   // request data with JWT token
@@ -93,7 +86,6 @@ Main.getInitialProps = async ctx => {
       Location: `/login`,
     })
     ctx.res.end()
-    return
   }
 
   return { serverData: data }
