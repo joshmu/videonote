@@ -23,7 +23,13 @@ const videoContext = createContext({
 })
 
 export function VideoProvider(props) {
-  const { project, updateProject, settings, toggleSidebar } = useGlobalContext()
+  const {
+    project,
+    updateProject,
+    settings,
+    toggleSidebar,
+    toggleModalOpen,
+  } = useGlobalContext()
   const { addAlert } = useNotificationContext()
   const playerRef = useRef(null)
   const [url, setUrl] = useState(null)
@@ -38,6 +44,17 @@ export function VideoProvider(props) {
     if (project !== null && project.src !== null) {
       console.log('project changed, setting url')
       if (project.src !== url) setUrl(project.src)
+    }
+  }, [project])
+
+  useEffect(() => {
+    if (project && project.src.length === 0) {
+      addAlert({
+        type: 'warning',
+        msg: 'Video source required.',
+      })
+
+      toggleModalOpen('current')
     }
   }, [project])
 
@@ -139,15 +156,17 @@ export function VideoProvider(props) {
     if (error.target && error.target.error.message.includes('Format error')) {
       addAlert({
         type: 'warning',
-        msg: 'Please re-select your local video',
+        msg: 'Please re-locate your video, via project settings.',
       })
 
-      requestLocalVideo()
+      updateProject({ src: '' })
+      toggleModalOpen('current')
+      // requestLocalVideo()
 
       return
     }
 
-    addAlert({ type: 'error', msg: 'Video Player: ' + error.toString() })
+    addAlert({ type: 'error', msg: 'Player unable to load video.' })
   }
 
   const toggleSmartControls = cmd => {
