@@ -13,12 +13,18 @@ import { TodoProvider } from '../src/context/todoContext'
 import { fetcher } from '../utils/clientHelpers'
 
 // todo: theme highlight needs to be dynamic for both light and dark mode (300, 400, 700)
+// todo: increase the size of the action symbols
+// todo: hints/manual page, about page
+// todo: think about extending landing page
+// todo: reconsider 'beta' badge
+// todo: alert for empty video src is not working
+// todo: double check alert for local video when it begins to fail
+// todo: if date-fns doesn't serve us for the timer duration then just make our own
 
 // todo: drag progress bar to seek quickly
 // todo: edit timestamp
 // todo: on login, do occuassional clean up of 'removed' data if its older than... 2 weeks?
 
-// todo: use date-fns for time durations?
 // todo: mute option
 
 // todo: option to change password
