@@ -24,7 +24,8 @@ export function TodoProvider(props) {
 
   // when todos change, update project
   useEffect(() => {
-    if (!project && todos.length === 0) return
+    // we shouldn't need to update todos if there are none.  even remove todos should still be present
+    if (todos.length === 0) return
     // if the project.todos matches state todos then this is our initial load from server so don't update
     if (JSON.stringify(project.todos) === JSON.stringify(todos)) return
 
