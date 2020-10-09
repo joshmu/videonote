@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import ProgressBar from '../shared/ProgressBar'
 import TimeDisplay from '../TimeDisplay/TimeDisplay'
 import { useVideoContext } from '../../context/videoContext'
@@ -9,8 +9,9 @@ import ActionSymbols from './ActionSymbols'
 const PLACEHOLDER = 'Add Note...'
 
 const ActionInput = () => {
-  const { settings } = useGlobalContext()
-  const { smartControls, progress, toggleSmartControls } = useVideoContext()
+  const inputRef = useRef(null)
+  const { settings, openSidebar } = useGlobalContext()
+  const { progress, toggleSmartControls } = useVideoContext()
   const { addTodo } = useTodoContext()
 
   const [todo, setTodo] = useState({
@@ -30,6 +31,19 @@ const ActionInput = () => {
     const cmd = todo.msg.length === 0
     toggleSmartControls(cmd)
   }, [todo.msg])
+
+  // auto focus
+  useEffect(() => {
+    // focus on full screen
+    if (!openSidebar) {
+      autoFocus()
+    }
+  }, [openSidebar])
+
+  const autoFocus = () => {
+    console.log('autoFocus')
+    inputRef.current.focus()
+  }
 
   // * add new todo on submit
   const handleSubmit = () => {
@@ -90,6 +104,7 @@ const ActionInput = () => {
       </div>
 
       <input
+        ref={inputRef}
         className='relative w-full h-full px-2 py-1 text-gray-700 placeholder-gray-400 transition-all duration-150 ease-in-out bg-transparent rounded-sm rounded-b-none rounded-l-none text-md focus:outline-none'
         autoFocus={true}
         id='actionInput'
