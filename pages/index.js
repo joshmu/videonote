@@ -11,7 +11,6 @@ import { VideoProvider } from '../src/context/videoContext'
 import { TodoProvider } from '../src/context/todoContext'
 import { fetcher } from '../utils/clientHelpers'
 
-// todo: place notifications above the overlay
 // todo: increase jwt session limit, inactivity check also (when we resume a session if browser left open)
 
 // todo: when page is inactive and we start using it again, check JWT? and boot if expired
@@ -55,9 +54,9 @@ export default function Main({ serverData }) {
                 <Sidebar />
               </div>
 
+              <Overlay />
               <Modals />
               <Notification />
-              <Overlay />
             </div>
           </Layout>
         </TodoProvider>

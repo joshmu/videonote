@@ -77,9 +77,9 @@ export default function Sidebar(props) {
       variants={sidebarVariants}
       id='sidebar'
       style={{
-        width: openSidebar ? resizeState.size + 'px' : '0px',
+        width: openSidebar ? resizeState.size : 0,
       }}
-      className='relative flex flex-col h-auto transition-all duration-500 ease-in-out border-l border-themeText2'
+      className='relative flex flex-col h-auto transition-all duration-500 ease-in-out'
       {...props}
     >
       {/* sidebar edge for resizing */}
