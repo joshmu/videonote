@@ -62,21 +62,9 @@ export function GlobalProvider({ serverData, ...props }) {
     }
   }, [projects, currentProject, settings.currentProjectId])
 
-  // update projects when we update the current project
-  // useEffect(() => {
-  //   if (currentProject === null) return
-  //   updateProjects(currentProject)
-  // }, [currentProject])
-
-  // const updateProjects = project => {
-  //   const updatedProjects = projects.map(p => {
-  //     return p._id === project._id ? project : p
-  //   })
-  //   setProjects(updatedProjects)
-  // }
-
   const updateProject = async project => {
     if (guest) return guestUpdateProject(project)
+
     // if no project id is provided then grab it from current project
     // * _id is requird for the api
     if (!project._id) project._id = currentProject._id
@@ -86,8 +74,13 @@ export function GlobalProvider({ serverData, ...props }) {
     if (!response) return console.error('api error')
     const { user, projects } = response
 
-    // setCurrentProject(updatedProject)
+    // update projects from server response
     setProjects(projects)
+
+    // get current project from server response and set
+    const projectId = project._id || currentProject._id
+    const updatedProject = projects.find(p => p._id === projectId)
+    setCurrentProject(updatedProject)
   }
 
   const guestUpdateProject = async project => {

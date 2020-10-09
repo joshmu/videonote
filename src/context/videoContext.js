@@ -147,7 +147,7 @@ export function VideoProvider(props) {
       return
     }
 
-    addAlert({ type: 'error', msg: 'Video Player: ' + error.message })
+    addAlert({ type: 'error', msg: 'Video Player: ' + error.toString() })
   }
 
   const toggleSmartControls = cmd => {

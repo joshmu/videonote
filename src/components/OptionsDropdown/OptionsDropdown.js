@@ -58,15 +58,15 @@ export default function OptionsDropdown({ open, ...props }) {
               </div>
             </Select>
           )}
+          {guest && (
+            <div className='flex items-center px-4 py-2 uppercase text-highlight-400'>
+              {project.title}
+            </div>
+          )}
+
 
           {!guest && (
             <Select onClick={handleShareProject}>Share Project</Select>
-          )}
-
-          {guest && (
-            <div className='flex items-center px-4 py-2 text-highlight-400'>
-              {project.title}
-            </div>
           )}
 
           {!guest && (

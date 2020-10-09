@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useGlobalContext } from '../../context/globalContext'
+import { useNotificationContext } from '../../context/notificationContext'
 import LocalVideoForm from '../LocalVideo/LocalVideoForm'
 import {
   ModalContainer,
@@ -12,6 +13,7 @@ import {
 
 export default function CreateProjectModal({ toggle: toggleModal, motionKey }) {
   const { updateSettings, createProject } = useGlobalContext()
+  const { addAlert } = useNotificationContext()
 
   const [project, setProject] = useState({
     title: '',
@@ -20,18 +22,32 @@ export default function CreateProjectModal({ toggle: toggleModal, motionKey }) {
   const [hover, setHover] = useState(false)
 
   const handleCreate = async e => {
-    e.preventDefault()
-    if (project.title.length === 0 || project.src.length === 0) return
+    const title = project.title.trim()
+    const videoSrc = project.src.trim()
 
-    await createProject(project)
+    e.preventDefault()
+    if (title.length === 0 || videoSrc.length === 0) {
+      if (title.length === 0)
+        addAlert({
+          type: 'error',
+          msg: 'Project title required.',
+          duration: 1000,
+        })
+      if (videoSrc.length === 0)
+        addAlert({
+          type: 'error',
+          msg: 'Video source required.',
+          duration: 1000,
+        })
+      return
+    }
+
+    const newProject = {title, src: videoSrc}
+    await createProject(newProject)
     toggleModal()
   }
 
   const handleChange = e => {
-    if (e.target.id === 'offset') {
-      updateSettings({ playOffset: Number(e.target.value) })
-      return
-    }
     setProject({ ...project, [e.target.id]: e.target.value })
   }
 
