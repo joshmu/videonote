@@ -15,7 +15,9 @@ export const ToggleInput = ({ title, state, onClick }) => {
   return (
     <div className='flex items-center gap-2'>
       <Toggle state={state} onClick={onClick} />
-      <p>{title}</p>
+      <p onClick={onClick} className='cursor-pointer'>
+        {title}
+      </p>
     </div>
   )
 }

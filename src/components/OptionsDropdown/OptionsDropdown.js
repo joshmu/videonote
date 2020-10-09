@@ -11,6 +11,8 @@ export default function OptionsDropdown({ open, ...props }) {
     resetGlobalState,
     project,
     guest,
+    updateProject,
+    copyToClipboard,
   } = useGlobalContext()
   const { toggleTheme } = useThemeContext()
 
@@ -33,6 +35,13 @@ export default function OptionsDropdown({ open, ...props }) {
     toggleSettingsOpen(false)
   }
 
+  const handleShareProject = () => {
+    // set sharing by switching off isPrivate
+    updateProject({ isPrivate: false })
+    // copy link to clipboard
+    copyToClipboard()
+  }
+
   return (
     <div {...props}>
       {open && (
@@ -42,8 +51,14 @@ export default function OptionsDropdown({ open, ...props }) {
         >
           {project && !guest && (
             <Select onClick={handleClick} data-modal='current'>
-              <div className='text-highlight-400'>{project.title}</div>
+              <div className='uppercase text-highlight-400'>
+                {project.title}
+              </div>
             </Select>
+          )}
+
+          {!guest && (
+            <Select onClick={handleShareProject}>Share Project</Select>
           )}
 
           {guest && (
@@ -55,7 +70,7 @@ export default function OptionsDropdown({ open, ...props }) {
           {!guest && (
             <>
               <Select onClick={handleClick} data-modal='create'>
-                create
+                create new
               </Select>
               <Select onClick={handleClick} data-modal='projects'>
                 projects
@@ -70,7 +85,7 @@ export default function OptionsDropdown({ open, ...props }) {
           {!guest && (
             <>
               <Select onClick={handleClick} data-modal='user'>
-                account
+                profile
               </Select>
               <Link href='/' passHref>
                 <a>

@@ -76,6 +76,9 @@ export function GlobalProvider({ serverData, ...props }) {
 
   const updateProject = async project => {
     if (guest) return guestUpdateProject(project)
+    // if no project id is provided then grab it from current project
+    // * _id is requird for the api
+    if (!project._id) project._id = currentProject._id
     // * todos > currentProject > update this project on server > update projects with server response
     // @ts-ignore
     const response = await handleProjectApi('update', user, project)
@@ -299,6 +302,23 @@ export function GlobalProvider({ serverData, ...props }) {
     return { user, projects }
   }
 
+  const copyToClipboard = (txt, alertMsg = 'Copied to clipboard!') => {
+    // if no text is defined presume we are sharing the project url
+    if (!txt) txt = `https://videonote.app/vn/${currentProject._id}`
+
+    // copy to clipboard
+    navigator.clipboard.writeText(txt).then(
+      function () {
+        /* clipboard successfully set */
+        addAlert({ type: 'info', msg: `${alertMsg} ${txt}` })
+      },
+      function () {
+        /* clipboard write failed */
+        console.log('clipboard copy failed')
+      }
+    )
+  }
+
   const badResponse = (res, msg) => {
     if (res.status !== 200) {
       if (msg.match(/invalid token/i)) {
@@ -336,6 +356,7 @@ export function GlobalProvider({ serverData, ...props }) {
     handleInitialServerData,
     SETTINGS_DEFAULTS,
     guest,
+    copyToClipboard,
   }
 
   return <globalContext.Provider value={value} {...props} />

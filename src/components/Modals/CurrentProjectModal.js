@@ -17,7 +17,7 @@ export default function CurrentProjectModal({
   toggle: toggleModal,
   motionKey,
 }) {
-  const { updateProject, project } = useGlobalContext()
+  const { updateProject, project, copyToClipboard } = useGlobalContext()
   const { addAlert } = useNotificationContext()
   const [state, setState] = useState(null)
 
@@ -54,22 +54,16 @@ export default function CurrentProjectModal({
     setState(updatedState)
     // as this is important we will send to the server rather than wait for user to update manually
     updateProject(updatedState)
+    // if we are sharing
+    if (!updated) {
+      // auto copy to clipboard
+      copyToClipboard()
+    }
   }
 
   const handleShareUrlClick = () => {
     if (state.isPrivate) return
-    const url = `https://videonote.app/vn/${project._id}`
-    // copy to clipboard
-    navigator.clipboard.writeText(url).then(
-      function () {
-        /* clipboard successfully set */
-        addAlert({ type: 'info', msg: `Copied to clipboard! ${url}` })
-      },
-      function () {
-        /* clipboard write failed */
-        console.log('clipboard copy failed')
-      }
-    )
+    copyToClipboard()
   }
 
   return (
@@ -110,13 +104,15 @@ export default function CurrentProjectModal({
                   onClick={handleShare}
                 />
                 {!state.isPrivate && (
-                  <motion.span
+                  <motion.a
+                    href={`https://videonote.app/vn/${project._id}`}
+                    target='_blank'
                     whileHover={{ scale: 0.95 }}
                     onClick={handleShareUrlClick}
                     className='absolute italic cursor-pointer -bottom-full text-highlight-400'
                   >
                     videonote.app/vn/{project._id}
-                  </motion.span>
+                  </motion.a>
                 )}
               </div>
 

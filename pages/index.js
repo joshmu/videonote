@@ -11,7 +11,7 @@ import { VideoProvider } from '../src/context/videoContext'
 import { TodoProvider } from '../src/context/todoContext'
 import { fetcher } from '../utils/clientHelpers'
 
-// todo: increase jwt session limit, inactivity check also (when we resume a session if browser left open)
+// todo: inactivity check (when we resume a session if browser left open)
 
 // todo: when page is inactive and we start using it again, check JWT? and boot if expired
 // todo: keep giving back refreshed JWT during usage?
@@ -34,7 +34,6 @@ import { fetcher } from '../utils/clientHelpers'
 
 // todo: speech to text synthesis on actionInput
 // todo: decide on 'services' or 'lib' or 'utils' folder? and where?
-// users accounts can share public readonly of their project, viewers can only mark off notes but cannot create projects or notes
 // todo: prioritize speed of workflow
 // todo: think about mobile variant
 
