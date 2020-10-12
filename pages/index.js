@@ -13,7 +13,6 @@ import Overlay from '@/shared/Modal/Overlay'
 import { fetcher } from '@/utils/clientHelpers'
 
 // todo: theme highlight needs to be dynamic for both light and dark mode (300, 400, 700)
-// todo: increase the size of the action symbols
 // todo: think about extending landing page
 // todo: alert for empty video src is not working
 // todo: double check alert for local video when it begins to fail
@@ -29,13 +28,10 @@ import { fetcher } from '@/utils/clientHelpers'
 
 // todo: option to change password
 // todo: forget password option?
-// todo: landing page needs to infer video and list (neumorphism of square and horizontal lines?)
 
 // todo: only update settings for user when they are not default values
 
 // todo: speech to text synthesis on actionInput
-// todo: decide on 'services' or 'lib' or 'utils' folder? and where?
-// todo: prioritize speed of workflow
 // todo: think about mobile variant
 
 export default function Main({ serverData }) {

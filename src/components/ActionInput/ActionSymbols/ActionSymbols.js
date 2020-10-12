@@ -32,7 +32,7 @@ export default function ActionSymbols() {
   }, [playerAction])
 
   return (
-    <div className='mr-2 text-xl text-highlight-400'>
+    <div className='mr-2 text-2xl text-highlight-400'>
       <AnimatePresence exitBeforeEnter>
         {action === 'play' && (
           <MotionFadeInOut motionKey={action} duration={0.5}>
