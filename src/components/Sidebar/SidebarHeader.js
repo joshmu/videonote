@@ -26,7 +26,7 @@ const SidebarHeader = () => {
 
   return (
     <div className='relative flex items-center justify-between transition-colors duration-300 ease-in-out border-b border-themeText2'>
-      <div className='flex items-center h-10'>
+      <div className='flex items-center w-full h-10'>
         {/* arrow slider icon */}
         <div
           onClick={toggleOpen}
@@ -41,7 +41,7 @@ const SidebarHeader = () => {
       </div>
 
       {/* options dropdown*/}
-      <div className='relative mr-2 transition-colors duration-300 ease-in-out cursor-pointer text-highlight-700 hover:text-highlight-400 disable-select'>
+      <div className='relative px-2 transition-colors duration-300 ease-in-out cursor-pointer text-highlight-700 hover:text-highlight-400 disable-select'>
         <motion.div whileHover={{ rotate: 90 }}>
           <SettingsIcon
             onClick={handleSettingsClick}

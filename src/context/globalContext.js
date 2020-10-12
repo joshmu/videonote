@@ -16,11 +16,11 @@ const HINTS = [
   'Spacebar = Play/Pause',
   'Left/Right = Seek',
   'Up/Down = Volume',
-  'Drag Notes left edge to resize',
-  'Shift Key = show/hide Notes',
+  'Drag list edge to resize',
+  'Shift Key = show/hide notes',
   'Click note to jump to time',
-  'Mark Notes by clicking their time',
-  'Double Click Note = Edit',
+  'Mark notes by clicking their time',
+  'Double click note = Edit',
 ]
 
 const globalContext = createContext({})

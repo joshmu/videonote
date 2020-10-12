@@ -1,3 +1,4 @@
+import { motion } from 'framer-motion'
 import { useEffect, useState } from 'react'
 
 import Select from '@/components/shared/Select/Select'
@@ -7,7 +8,7 @@ import MotionFadeInOut from '@/shared/ux/MotionFadeInOut'
 
 import TimeDisplay from '../../shared/TimeDisplay/TimeDisplay'
 
-export default function TodoItem({ todo, close }) {
+export default function TodoItem({ todo, close, childVariants }) {
   const { id, msg, person: category = null, time, done = false } = todo
   const { seekTo, toggleSmartControls } = useVideoContext()
   const { updateTodo, removeTodo } = useTodoContext()
@@ -44,8 +45,10 @@ export default function TodoItem({ todo, close }) {
   }
 
   return (
-    <MotionFadeInOut
-      motionKey={id}
+    <motion.div
+      key={id}
+      // * childVariants used so we don't pass 'initial', 'animate' etc
+      variants={childVariants}
       style={{
         backgroundColor: close ? 'rgba(0, 0, 255, 0.07)' : '',
       }}
@@ -93,6 +96,6 @@ export default function TodoItem({ todo, close }) {
           </div>
         </div>
       </Select>
-    </MotionFadeInOut>
+    </motion.div>
   )
 }
