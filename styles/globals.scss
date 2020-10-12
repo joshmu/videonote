@@ -18,6 +18,10 @@
   --bg: var(--light);
   --bg2: var(--light2);
   --highlight: var(--special);
+
+  .neu-theme {
+    @apply neu-light;
+  }
 }
 
 .theme-dark {
@@ -26,6 +30,10 @@
   --bg: var(--dark);
   --bg2: var(--dark2);
   --highlight: var(--special);
+
+  .neu-theme {
+    @apply neu-dark;
+  }
 }
 
 body {
@@ -95,4 +103,25 @@ body {
   -khtml-user-select: none; /* Konqueror HTML */
   -moz-user-select: none; /* Firefox */
   -ms-user-select: none; /* Internet Explorer/Edge */
+}
+
+// https://neumorphism.io/#ffa170
+.neu-highlight {
+  @apply rounded-sm;
+  background: linear-gradient(225deg, #e69165, #ffac78);
+  box-shadow: -20px 20px 60px #d9895f, 20px -20px 60px #ffb981;
+}
+
+// https://neumorphism.io/#202020
+.neu-dark {
+  @apply rounded-sm;
+  background: linear-gradient(225deg, #1d1d1d, #222222);
+  box-shadow: -20px 20px 60px #1b1b1b, 20px -20px 60px #252525;
+}
+
+// https://neumorphism.io/#FFFFFF
+.neu-light {
+  @apply rounded-sm;
+  background: linear-gradient(225deg, #e6e6e6, #ffffff);
+  box-shadow: -20px 20px 60px #d9d9d9, 20px -20px 60px #ffffff;
 }

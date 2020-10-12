@@ -25,7 +25,7 @@ export default function Login() {
 
   return (
     <Layout>
-      <div className='absolute top-0 right-0 z-50 p-4 text-2xl hover:text-highlight-400'>
+      <div className='absolute top-0 right-0 z-50 p-4 text-2xl text-highlight-400'>
         <ThemeToggle />
       </div>
       <div className='flex items-center justify-center h-screen'>

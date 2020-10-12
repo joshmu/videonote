@@ -13,9 +13,8 @@ import { fetcher } from '../utils/clientHelpers'
 
 // todo: theme highlight needs to be dynamic for both light and dark mode (300, 400, 700)
 // todo: increase the size of the action symbols
-// todo: hints/manual page, about page
+// todo: hints/manual page
 // todo: think about extending landing page
-// todo: reconsider 'beta' badge
 // todo: alert for empty video src is not working
 // todo: double check alert for local video when it begins to fail
 // todo: if date-fns doesn't serve us for the timer duration then just make our own
@@ -29,6 +28,7 @@ import { fetcher } from '../utils/clientHelpers'
 
 // todo: option to change password
 // todo: forget password option?
+// todo: landing page needs to infer video and list (neumorphism of square and horizontal lines?)
 
 // todo: only update settings for user when they are not default values
 

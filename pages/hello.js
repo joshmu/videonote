@@ -51,7 +51,7 @@ export default function Home() {
           >
             <NavBtn
               href='/login'
-              className='absolute z-10 -mb-32 text-left focus:outline-none bottom-1/2 bg-themeBg hover:text-themeBg'
+              className='absolute z-10 -mb-32 text-left focus:outline-none bottom-1/2 hover:text-themeBg'
             >
               Let's Go
             </NavBtn>
@@ -75,14 +75,19 @@ export default function Home() {
               },
             }}
             className='absolute z-0 w-full h-full bg-highlight-400'
-          ></motion.div>
+          >
+            <div className='flex items-center justify-center w-full h-full'>
+              <div className='w-3/4 neu-highlight h-1/2'></div>
+            </div>
+          </motion.div>
         </div>
 
         {/* right */}
-        <div className='flex items-center justify-start flex-shrink w-full h-full transition-colors duration-300 ease-in-out bg-themeBg'>
+        <div className='relative flex items-center justify-start flex-shrink w-full h-full transition-colors duration-300 ease-in-out bg-themeBg'>
           <MotionFadeUp
             k='note'
             animate={{ transition: { delay: 0.5 } }}
+            className='z-10'
             exit={{ y: -10, transition: { delay: 0 } }}
           >
             <Heading
@@ -92,6 +97,19 @@ export default function Home() {
               Note
             </Heading>
           </MotionFadeUp>
+
+          <div className='absolute z-0 flex items-center justify-center w-full h-full'>
+            <div className='flex flex-col w-3/4 gap-6 h-1/2'>
+              <div className='flex-1 neu-theme'></div>
+              <div className='flex-1 neu-theme'></div>
+              <div className='flex-1 neu-theme'></div>
+              <div className='flex-1 neu-theme'></div>
+              <div className='flex-1 neu-theme'></div>
+              <div className='flex-1 neu-theme'></div>
+              <div className='flex-1 neu-theme'></div>
+              <div className='flex-1 neu-theme'></div>
+            </div>
+          </div>
         </div>
       </div>
     </Layout>
