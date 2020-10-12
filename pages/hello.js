@@ -77,9 +77,17 @@ export default function Home() {
             className='absolute z-0 w-full h-full bg-highlight-400'
           >
             {/* neu video background */}
-            <div className='flex items-center justify-center w-full h-full'>
+            <motion.div
+              key='neu-video-image-bg'
+              initial={{
+                opacity: 0,
+              }}
+              animate={{ opacity: 1, transition: { delay: 0.8 } }}
+              exit={{ opacity: 0 }}
+              className='flex items-center justify-center w-full h-full'
+            >
               <div className='w-3/4 neu-highlight h-1/2'></div>
-            </div>
+            </motion.div>
           </motion.div>
         </div>
 
@@ -103,7 +111,7 @@ export default function Home() {
           <motion.div
             key='neu-notes-bg-image'
             initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
+            animate={{ opacity: 1, transition: { delay: 0.8 } }}
             exit={{ opacity: 0 }}
             className='absolute z-0 flex items-center justify-center w-full h-full'
           >
