@@ -76,6 +76,7 @@ export default function Home() {
             }}
             className='absolute z-0 w-full h-full bg-highlight-400'
           >
+            {/* neu video background */}
             <div className='flex items-center justify-center w-full h-full'>
               <div className='w-3/4 neu-highlight h-1/2'></div>
             </div>
@@ -98,7 +99,14 @@ export default function Home() {
             </Heading>
           </MotionFadeUp>
 
-          <div className='absolute z-0 flex items-center justify-center w-full h-full'>
+          {/* neu notes background */}
+          <motion.div
+            key='neu-notes-bg-image'
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className='absolute z-0 flex items-center justify-center w-full h-full'
+          >
             <div className='flex flex-col w-3/4 gap-6 h-1/2'>
               <div className='flex-1 neu-theme'></div>
               <div className='flex-1 neu-theme'></div>
@@ -109,7 +117,7 @@ export default function Home() {
               <div className='flex-1 neu-theme'></div>
               <div className='flex-1 neu-theme'></div>
             </div>
-          </div>
+          </motion.div>
         </div>
       </div>
     </Layout>
