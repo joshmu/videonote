@@ -12,7 +12,7 @@ const PLACEHOLDER = 'Add Note...'
 
 const ActionInput = () => {
   const inputRef = useRef(null)
-  const { settings, sidebarOpen } = useGlobalContext()
+  const { settings, sidebarOpen, HINTS } = useGlobalContext()
   const { progress, toggleSmartControls } = useVideoContext()
   const { addTodo } = useTodoContext()
 
@@ -21,11 +21,11 @@ const ActionInput = () => {
     time: null,
   })
   const [active, setActive] = useState(false)
-  const [hint, setHint] = useState(getHint(settings.showHints))
+  const [hint, setHint] = useState(getHint(HINTS, settings.showHints))
 
   useEffect(() => {
     // generate new random hint each time we are focused on the input
-    if (active) setHint(getHint(settings.showHints, hint))
+    if (active) setHint(getHint(HINTS, settings.showHints, hint))
   }, [active])
 
   // disable smart controls when input is not empty
@@ -54,7 +54,7 @@ const ActionInput = () => {
     setTodo({ msg: '', time: null })
 
     // remove hints after adding note and while still in focus
-    setHint(getHint(false))
+    setHint(getHint(HINTS, false))
   }
 
   // * update todo on entry but exclude initial char if it is a space for play/pause logic
@@ -132,27 +132,16 @@ const ActionInput = () => {
 
 export default ActionInput
 
-const getHint = (show, prevHint = null) => {
+const getHint = (HINTS, show, prevHint = null) => {
   if (!show) return PLACEHOLDER
 
-  const hints = [
-    'Spacebar = Play/Pause',
-    'Left/Right = Seek',
-    'Up/Down = Volume',
-    'Drag Notes left edge to resize',
-    'Shift Key = show/hide Notes',
-    'Click note to jump to time',
-    'Mark Notes by clicking their time',
-    'Double Click Note = Edit',
-  ]
-
   if (prevHint === null) {
-    const randomIndex = Math.floor(Math.random() * hints.length)
-    return hints[randomIndex]
+    const randomIndex = Math.floor(Math.random() * HINTS.length)
+    return HINTS[randomIndex]
   }
 
   // otherwise iterate over hints
-  const prevIndex = hints.findIndex(hint => hint === prevHint)
-  const nextIndex = prevIndex === hints.length - 1 ? 0 : prevIndex + 1
-  return hints[nextIndex]
+  const prevIndex = HINTS.findIndex(hint => hint === prevHint)
+  const nextIndex = prevIndex === HINTS.length - 1 ? 0 : prevIndex + 1
+  return HINTS[nextIndex]
 }

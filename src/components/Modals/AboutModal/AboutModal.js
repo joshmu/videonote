@@ -2,7 +2,7 @@ import ModalContainer from '@/shared/Modal/ModalContainer'
 import ModalHeader from '@/shared/Modal/ModalHeader'
 import ModalInnerContainer from '@/shared/Modal/ModalInnerContainer'
 
-export default function AboutModal({ toggle: toggleModal, motionKey }) {
+const AboutModal = ({ toggle: toggleModal, motionKey }) => {
   return (
     <ModalContainer toggle={toggleModal} motionKey={motionKey}>
       <ModalHeader>About VideoNote</ModalHeader>
@@ -31,3 +31,4 @@ export default function AboutModal({ toggle: toggleModal, motionKey }) {
     </ModalContainer>
   )
 }
+export default AboutModal

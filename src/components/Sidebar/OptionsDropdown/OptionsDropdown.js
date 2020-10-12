@@ -85,26 +85,30 @@ const OptionsDropdown = ({ open }) => {
           </Select>
 
           {!guest && (
-            <>
-              <Select onClick={handleClick} data-modal='user'>
-                profile
-              </Select>
-              <Link href='/hello' passHref>
-                <a>
-                  <Select onClick={handleSignOutClick}>Sign Out</Select>
-                </a>
-              </Link>
-            </>
+            <Select onClick={handleClick} data-modal='user'>
+              profile
+            </Select>
           )}
-
-          <Select onClick={handleClick} data-modal='about'>
-            About VideoNote
-          </Select>
+          {!guest && (
+            <Link href='/hello' passHref>
+              <a>
+                <Select onClick={handleSignOutClick}>Sign Out</Select>
+              </a>
+            </Link>
+          )}
 
           <Select onClick={handleThemeToggleClick}>
             <div className='relative flex text-md'>
               <ThemeToggle />
             </div>
+          </Select>
+
+          <Select onClick={handleClick} data-modal='help'>
+            Help
+          </Select>
+
+          <Select onClick={handleClick} data-modal='about'>
+            About VideoNote
           </Select>
         </div>
       )}

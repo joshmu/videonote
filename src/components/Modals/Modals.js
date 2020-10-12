@@ -6,6 +6,7 @@ import { useVideoContext } from '@/context/videoContext'
 import AboutModal from './AboutModal/AboutModal'
 import CreateProjectModal from './CreateProjectModal/CreateProjectModal'
 import CurrentProjectModal from './CurrentProjectModal/CurrentProjectModal'
+import HelpModal from './HelpModal/HelpModal'
 import ProjectsModal from './ProjectsModal/ProjectsModal'
 import SettingsModal from './SettingsModal/SettingsModal'
 import UserAccountModal from './UserAccountModal/UserAccountModal'
@@ -44,6 +45,9 @@ export default function Modals() {
           toggle={toggleModalOpen}
           motionKey='userAccountModal'
         />
+      )}
+      {modalOpen === 'help' && (
+        <HelpModal toggle={toggleModalOpen} motionKey='helpModal' />
       )}
       {modalOpen === 'about' && (
         <AboutModal toggle={toggleModalOpen} motionKey='aboutModal' />

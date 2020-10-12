@@ -12,6 +12,17 @@ const SETTINGS_DEFAULTS = {
   currentProjectId: null,
 }
 
+const HINTS = [
+  'Spacebar = Play/Pause',
+  'Left/Right = Seek',
+  'Up/Down = Volume',
+  'Drag Notes left edge to resize',
+  'Shift Key = show/hide Notes',
+  'Click note to jump to time',
+  'Mark Notes by clicking their time',
+  'Double Click Note = Edit',
+]
+
 const globalContext = createContext({})
 
 export function GlobalProvider({ serverData, ...props }) {
@@ -350,6 +361,7 @@ export function GlobalProvider({ serverData, ...props }) {
     updateProject,
     handleInitialServerData,
     SETTINGS_DEFAULTS,
+    HINTS,
     guest,
     copyToClipboard,
   }

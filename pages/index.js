@@ -14,7 +14,6 @@ import { fetcher } from '@/utils/clientHelpers'
 
 // todo: theme highlight needs to be dynamic for both light and dark mode (300, 400, 700)
 // todo: increase the size of the action symbols
-// todo: hints/manual page
 // todo: think about extending landing page
 // todo: alert for empty video src is not working
 // todo: double check alert for local video when it begins to fail
