@@ -6,7 +6,6 @@ import Notification from '../src/components/Notification/Notification'
 import { GlobalProvider } from '../src/context/globalContext'
 import Overlay from '../src/components/shared/Overlay'
 import Cookies from 'universal-cookie'
-import Router from 'next/router'
 import absoluteUrl from 'next-absolute-url'
 import { VideoProvider } from '../src/context/videoContext'
 import { TodoProvider } from '../src/context/todoContext'
@@ -20,6 +19,7 @@ import { fetcher } from '../utils/clientHelpers'
 // todo: alert for empty video src is not working
 // todo: double check alert for local video when it begins to fail
 // todo: if date-fns doesn't serve us for the timer duration then just make our own
+// todo: esc key to close modals
 
 // todo: drag progress bar to seek quickly
 // todo: edit timestamp

@@ -43,7 +43,7 @@ export const CloseModalBtn = ({ toggle }) => {
   return (
     <motion.div
       onClick={handleClose}
-      className='absolute top-0 right-0 p-2 text-xl transition-colors duration-300 ease-in-out cursor-pointer hover:text-highlight-400 text-highlight-700'
+      className='absolute top-0 right-0 p-2 text-xl transition-colors duration-300 ease-in-out cursor-pointer hover:text-themeText text-themeText2'
       whileHover={{
         rotate: 90,
       }}

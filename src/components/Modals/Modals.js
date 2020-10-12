@@ -6,7 +6,7 @@ import CreateProjectModal from './CreateProjectModal'
 import CurrentProjectModal from './CurrentProjectModal'
 import ProjectsModal from './ProjectsModal'
 import SettingsModal from './SettingsModal'
-import { AnimatePresence } from 'framer-motion'
+import AboutModal from './AboutModal'
 
 export default function Modals() {
   const { modalOpen, toggleModalOpen } = useGlobalContext()
@@ -42,6 +42,9 @@ export default function Modals() {
           toggle={toggleModalOpen}
           motionKey='userAccountModal'
         />
+      )}
+      {modalOpen === 'about' && (
+        <AboutModal toggle={toggleModalOpen} motionKey='aboutModal' />
       )}
     </>
   )

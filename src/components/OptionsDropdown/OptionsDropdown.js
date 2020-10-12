@@ -64,7 +64,6 @@ export default function OptionsDropdown({ open, ...props }) {
             </div>
           )}
 
-
           {!guest && (
             <Select onClick={handleShareProject}>Share Project</Select>
           )}
@@ -96,6 +95,10 @@ export default function OptionsDropdown({ open, ...props }) {
               </Link>
             </>
           )}
+
+          <Select onClick={handleClick} data-modal='about'>
+            About VideoNote
+          </Select>
 
           <Select onClick={handleThemeToggleClick}>
             <div className='relative flex text-md'>
