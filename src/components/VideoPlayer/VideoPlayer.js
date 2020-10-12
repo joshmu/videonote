@@ -1,9 +1,9 @@
-import ReactPlayer from 'react-player'
-import ActionInput from '../ActionInput/ActionInput'
 import { motion } from 'framer-motion'
+import ReactPlayer from 'react-player'
 
-import { useVideoContext } from '../../context/videoContext'
+import { useVideoContext } from '@/context/videoContext'
 
+import ActionInput from '../ActionInput/ActionInput'
 import style from './videoPlayer.module.scss'
 
 export default function VideoPlayer() {

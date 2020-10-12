@@ -1,11 +1,11 @@
-import Layout from '../src/components/Layout'
-import { useThemeContext } from '../src/context/themeContext'
-import NavBtn from '../src/components/shared/NavBtn'
-import { Heading } from '../src/components/shared/Text'
-import ThemeToggle from '../src/components/ThemeToggle'
 import { motion } from 'framer-motion'
-import MotionFadeUp from '../src/components/shared/MotionFadeUp'
 import Router from 'next/router'
+
+import Layout from '@/components/Layout/Layout'
+import { Heading } from '@/components/shared/Text/Text'
+import ThemeToggle from '@/components/shared/ThemeToggle/ThemeToggle'
+import { useThemeContext } from '@/context/themeContext'
+import MotionFadeUp from '@/shared/MotionFadeUp'
 
 export default function Home() {
   const { toggleTheme } = useThemeContext()
@@ -49,12 +49,11 @@ export default function Home() {
             exit={{ transition: { delay: 0.4 } }}
             className='relative'
           >
-            <NavBtn
-              href='/login'
-              className='absolute z-10 -mb-32 text-left focus:outline-none bottom-1/2 hover:text-themeBg'
-            >
-              Let's Go
-            </NavBtn>
+            <Link href='/login'>
+              <button className='absolute z-10 px-3 py-2 -mb-32 tracking-wider text-left uppercase transition-colors duration-300 ease-in-out cursor-pointer focus:outline-none bottom-1/2 hover:text-themeBg text-highlight-400 hover:text-themeText hover:bg-highlight-400'>
+                Let's Go
+              </button>
+            </Link>
           </MotionFadeUp>
 
           {/* orange background slider */}

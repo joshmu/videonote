@@ -1,6 +1,6 @@
-import { connectToDatabase } from '../../utils/mongodb'
-import { extractUser } from '../../utils/apiHelpers'
-import { authenticateToken, generateAccessToken } from '../../utils/jwt'
+import { connectToDatabase } from '@/utils/mongodb'
+import { extractUser } from '@/utils/apiHelpers'
+import { authenticateToken, generateAccessToken } from '@/utils/jwt'
 
 export default async (req, res) => {
   // Gather the jwt access token from the request header

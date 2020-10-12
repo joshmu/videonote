@@ -1,8 +1,10 @@
-import { useState, useEffect } from 'react'
-import TodoItem from './TodoItem'
-import { useTodoContext } from '../../context/todoContext'
 import { AnimatePresence } from 'framer-motion'
-import { useVideoContext } from '../../context/videoContext'
+import { useEffect, useState } from 'react'
+
+import { useTodoContext } from '@/context/todoContext'
+import { useVideoContext } from '@/context/videoContext'
+
+import TodoItem from './TodoItem/TodoItem'
 
 export default function TodoList() {
   const { todos, sort } = useTodoContext()

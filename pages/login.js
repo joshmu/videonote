@@ -1,10 +1,12 @@
-import { useState } from 'react'
-import Layout from '../src/components/Layout'
-import ThemeToggle from '../src/components/ThemeToggle'
-import LoginView from '../src/components/Login/Login'
-import RegisterView from '../src/components/Register/Register'
-import Notification from '../src/components/Notification/Notification'
 import Router from 'next/router'
+import { useState } from 'react'
+
+import Layout from '@/components/Layout/Layout'
+import LoginView from '@/components/LoginPage/Login/Login'
+import RegisterView from '@/components/LoginPage/Register/Register'
+import Notification from '@/components/Notification/Notification'
+import ThemeToggle from '@/components/shared/ThemeToggle/ThemeToggle'
+
 import { handleJwtToken } from '../utils/clientHelpers'
 
 export default function Login() {

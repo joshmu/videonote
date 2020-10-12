@@ -1,6 +1,6 @@
-import { connectToDatabase } from '../../utils/mongodb'
-import { extractUser } from '../../utils/apiHelpers'
-import { authenticateToken } from '../../utils/jwt'
+import { connectToDatabase } from '@/utils/mongodb'
+import { extractUser } from '@/utils/apiHelpers'
+import { authenticateToken } from '@/utils/jwt'
 import { getUserProjects } from './project'
 
 export default async (req, res) => {

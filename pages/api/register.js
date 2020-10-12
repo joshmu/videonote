@@ -5,7 +5,7 @@ import { nanoid } from 'nanoid'
 import { extractUser } from '../../utils/apiHelpers'
 import { generateAccessToken } from '../../utils/jwt'
 
-import { connectToDatabase } from '../../utils/mongodb'
+import { connectToDatabase } from '@/utils/mongodb'
 
 export default async (req, res) => {
   // connect db

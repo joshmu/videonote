@@ -1,16 +1,18 @@
-import { useEffect, useState, useRef } from 'react'
-import ProgressBar from '../shared/ProgressBar'
-import TimeDisplay from '../TimeDisplay/TimeDisplay'
-import { useVideoContext } from '../../context/videoContext'
-import { useTodoContext } from '../../context/todoContext'
-import { useGlobalContext } from '../../context/globalContext'
-import ActionSymbols from './ActionSymbols'
+import { useEffect, useRef, useState } from 'react'
+
+import { useGlobalContext } from '@/context/globalContext'
+import { useTodoContext } from '@/context/todoContext'
+import { useVideoContext } from '@/context/videoContext'
+
+import TimeDisplay from '../shared/TimeDisplay/TimeDisplay'
+import ActionSymbols from './ActionSymbols/ActionSymbols'
+import ProgressBar from './ProgressBar/ProgressBar'
 
 const PLACEHOLDER = 'Add Note...'
 
 const ActionInput = () => {
   const inputRef = useRef(null)
-  const { settings, openSidebar } = useGlobalContext()
+  const { settings, sidebarOpen } = useGlobalContext()
   const { progress, toggleSmartControls } = useVideoContext()
   const { addTodo } = useTodoContext()
 
@@ -35,10 +37,10 @@ const ActionInput = () => {
   // auto focus
   useEffect(() => {
     // focus on full screen
-    if (!openSidebar) {
+    if (!sidebarOpen) {
       autoFocus()
     }
-  }, [openSidebar])
+  }, [sidebarOpen])
 
   const autoFocus = () => {
     console.log('autoFocus')

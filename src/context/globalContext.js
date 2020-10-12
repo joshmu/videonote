@@ -1,7 +1,8 @@
-import { createContext, useContext, useEffect, useState } from 'react'
-import { useNotificationContext } from './notificationContext'
-import { fetcher } from '../../utils/clientHelpers'
 import Router from 'next/router'
+import { createContext, useContext, useEffect, useState } from 'react'
+
+import { fetcher } from '../../utils/clientHelpers'
+import { useNotificationContext } from './notificationContext'
 
 const SETTINGS_DEFAULTS = {
   playOffset: -4,
@@ -20,7 +21,7 @@ export function GlobalProvider({ serverData, ...props }) {
 
   const [currentProject, setCurrentProject] = useState(null)
 
-  const [openSidebar, setOpenSidebar] = useState(true)
+  const [sidebarOpen, setSidebarOpen] = useState(true)
   const [settingsOpen, setSettingsOpen] = useState(false)
   const [modalOpen, setModalOpen] = useState(null)
 
@@ -173,7 +174,7 @@ export function GlobalProvider({ serverData, ...props }) {
     setSettingsOpen(cmd)
   }
   const toggleSidebar = (state = undefined) => {
-    setOpenSidebar(currentState => {
+    setSidebarOpen(currentState => {
       const updatedState = state ? state : !currentState
       return updatedState
     })
@@ -344,7 +345,7 @@ export function GlobalProvider({ serverData, ...props }) {
     createProject,
     resetGlobalState,
     loadProject,
-    openSidebar,
+    sidebarOpen,
     toggleSidebar,
     updateProject,
     handleInitialServerData,

@@ -1,26 +1,22 @@
-import { useEffect } from 'react'
-import { GoChevronRight as ArrowIcon } from 'react-icons/go'
-import { MdSettings as SettingsIcon } from 'react-icons/md'
-import { useGlobalContext } from '../../context/globalContext'
-import Search from '../shared/Search'
-import TodoList from '../TodoList/TodoList'
-import OptionsDropdown from '../OptionsDropdown/OptionsDropdown'
-import { useResizable } from '../../hooks/useResizable'
 import { motion } from 'framer-motion'
-import { ImBin2 as TrashIcon } from 'react-icons/im'
-import { useTodoContext } from '../../context/todoContext'
+import { useEffect } from 'react'
+
+import TodoList from '@/components/TodoList/TodoList'
+import { useGlobalContext } from '@/context/globalContext'
+import { useResizable } from '@/hooks/useResizable'
+
+import RemoveNotes from './RemoveNotes/RemoveNotes'
+import SidebarHeader from './SidebarHeader'
 
 export default function Sidebar(props) {
   const {
-    toggleSettingsOpen,
     settingsOpen,
     settings,
     updateSettings,
-    openSidebar,
+    sidebarOpen,
     toggleSidebar,
     SETTINGS_DEFAULTS,
   } = useGlobalContext()
-  const { removeCompleted } = useTodoContext()
 
   const { state: resizeState, handleStartResize } = useResizable({
     initialSize: settings.sidebarWidth,
@@ -41,17 +37,6 @@ export default function Sidebar(props) {
     console.log('fire from sidebar')
     updateSettings({ sidebarWidth: resizeState.size })
   }, [resizeState])
-
-  const toggleOpen = () => {
-    toggleSidebar()
-  }
-
-  const handleSettingsClick = () => {
-    toggleSettingsOpen()
-  }
-  const handleRemoveCompleted = () => {
-    removeCompleted()
-  }
 
   const sidebarVariants = {
     initial: {
@@ -77,7 +62,7 @@ export default function Sidebar(props) {
       variants={sidebarVariants}
       id='sidebar'
       style={{
-        width: openSidebar ? resizeState.size : 0,
+        width: sidebarOpen ? resizeState.size : 0,
       }}
       className='relative flex flex-col h-auto transition-all duration-500 ease-in-out'
       {...props}
@@ -95,46 +80,14 @@ export default function Sidebar(props) {
         className='relative h-full'
       >
         {/* sidebar header */}
-        <div className='relative flex items-center justify-between transition-colors duration-300 ease-in-out border-b border-themeText2'>
-          <div className='flex items-center h-10'>
-            {/* arrow slider icon */}
-            <div
-              onClick={toggleOpen}
-              className={`${
-                openSidebar ? 'rotate-0' : 'rotate-180 -translate-x-full'
-              } relative text-3xl mr-2 transform text-highlight-700 z-10 bg-transparent transition-all hover:text-highlight-400 duration-500 ease-in-out cursor-pointer`}
-            >
-              <ArrowIcon className='fill-current' />
-            </div>
-
-            <Search />
-          </div>
-
-          {/* options dropdown*/}
-          <div className='relative mr-2 transition-colors duration-300 ease-in-out cursor-pointer text-highlight-700 hover:text-highlight-400'>
-            <motion.div whileHover={{ rotate: 90 }}>
-              <SettingsIcon
-                onClick={handleSettingsClick}
-                className='text-xl fill-current'
-              />
-            </motion.div>
-
-            <OptionsDropdown open={settingsOpen} />
-          </div>
-        </div>
+        <SidebarHeader />
 
         {/* sidebar content */}
         <div className='w-full h-full overflow-auto scrollbar'>
           <TodoList />
         </div>
 
-        {/* remove completed notes */}
-        <div
-          onClick={handleRemoveCompleted}
-          className='absolute bottom-0 right-0 p-4 duration-300 ease-in-out cursor-pointer text-themeText2 hover:text-highlight-400 transtion-colors'
-        >
-          <TrashIcon className='fill-current' />
-        </div>
+        <RemoveNotes />
       </div>
     </motion.div>
   )

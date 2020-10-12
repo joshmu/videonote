@@ -1,15 +1,16 @@
-import Layout from '../src/components/Layout'
-import VideoPlayer from '../src/components/VideoPlayer/VideoPlayer'
-import Sidebar from '../src/components/Sidebar/Sidebar'
-import Modals from '../src/components/Modals/Modals'
-import Notification from '../src/components/Notification/Notification'
-import { GlobalProvider } from '../src/context/globalContext'
-import Overlay from '../src/components/shared/Overlay'
-import Cookies from 'universal-cookie'
 import absoluteUrl from 'next-absolute-url'
-import { VideoProvider } from '../src/context/videoContext'
-import { TodoProvider } from '../src/context/todoContext'
-import { fetcher } from '../utils/clientHelpers'
+import Cookies from 'universal-cookie'
+
+import Layout from '@/components/Layout/Layout'
+import Modals from '@/components/Modals/Modals'
+import Notification from '@/components/Notification/Notification'
+import Sidebar from '@/components/Sidebar/Sidebar'
+import VideoPlayer from '@/components/VideoPlayer/VideoPlayer'
+import { GlobalProvider } from '@/context/globalContext'
+import { TodoProvider } from '@/context/todoContext'
+import { VideoProvider } from '@/context/videoContext'
+import Overlay from '@/shared/Modal/Overlay'
+import { fetcher } from '@/utils/clientHelpers'
 
 // todo: theme highlight needs to be dynamic for both light and dark mode (300, 400, 700)
 // todo: increase the size of the action symbols
@@ -19,6 +20,7 @@ import { fetcher } from '../utils/clientHelpers'
 // todo: double check alert for local video when it begins to fail
 // todo: if date-fns doesn't serve us for the timer duration then just make our own
 // todo: esc key to close modals
+// todo: unify text with text components
 
 // todo: drag progress bar to seek quickly
 // todo: edit timestamp

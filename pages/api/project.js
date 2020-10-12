@@ -1,6 +1,6 @@
-import { connectToDatabase } from '../../utils/mongodb'
-import { extractProject, extractUser } from '../../utils/apiHelpers'
-import { authenticateToken, generateAccessToken } from '../../utils/jwt'
+import { connectToDatabase } from '@/utils/mongodb'
+import { extractProject, extractUser } from '@/utils/apiHelpers'
+import { authenticateToken, generateAccessToken } from '@/utils/jwt'
 import { nanoid } from 'nanoid'
 
 export default async (req, res) => {

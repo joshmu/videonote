@@ -1,9 +1,9 @@
 import isEmail from 'validator/lib/isEmail'
 import normalizeEmail from 'validator/lib/normalizeEmail'
 import bcrypt from 'bcryptjs'
-import { connectToDatabase } from '../../utils/mongodb'
-import { extractUser } from '../../utils/apiHelpers'
-import { generateAccessToken } from '../../utils/jwt'
+import { connectToDatabase } from '@/utils/mongodb'
+import { extractUser } from '@/utils/apiHelpers'
+import { generateAccessToken } from '@/utils/jwt'
 
 export default async (req, res) => {
   // connect db

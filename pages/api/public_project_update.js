@@ -1,5 +1,5 @@
-import { connectToDatabase } from '../../utils/mongodb'
-import { extractPublicProject } from '../../utils/apiHelpers'
+import { connectToDatabase } from '@/utils/mongodb'
+import { extractPublicProject } from '@/utils/apiHelpers'
 
 export default async (req, res) => {
   // project

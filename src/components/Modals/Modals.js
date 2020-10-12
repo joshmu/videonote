@@ -1,12 +1,14 @@
 import { useEffect } from 'react'
-import { useGlobalContext } from '../../context/globalContext'
-import { useVideoContext } from '../../context/videoContext'
-import UserAccountModal from './UserAccountModal'
-import CreateProjectModal from './CreateProjectModal'
-import CurrentProjectModal from './CurrentProjectModal'
-import ProjectsModal from './ProjectsModal'
-import SettingsModal from './SettingsModal'
-import AboutModal from './AboutModal'
+
+import { useGlobalContext } from '@/context/globalContext'
+import { useVideoContext } from '@/context/videoContext'
+
+import AboutModal from './AboutModal/AboutModal'
+import CreateProjectModal from './CreateProjectModal/CreateProjectModal'
+import CurrentProjectModal from './CurrentProjectModal/CurrentProjectModal'
+import ProjectsModal from './ProjectsModal/ProjectsModal'
+import SettingsModal from './SettingsModal/SettingsModal'
+import UserAccountModal from './UserAccountModal/UserAccountModal'
 
 export default function Modals() {
   const { modalOpen, toggleModalOpen } = useGlobalContext()

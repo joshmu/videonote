@@ -6,7 +6,7 @@ import {
 import { VscError as ErrorIcon } from 'react-icons/vsc'
 
 import { AnimatePresence, motion } from 'framer-motion'
-import { useNotificationContext } from '../../context/notificationContext'
+import { useNotificationContext } from '@/context/notificationContext'
 
 export default function Notification() {
   const { alerts } = useNotificationContext()

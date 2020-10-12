@@ -1,14 +1,14 @@
-import Layout from '../../src/components/Layout'
-import VideoPlayer from '../../src/components/VideoPlayer/VideoPlayer'
-import Sidebar from '../../src/components/Sidebar/Sidebar'
-import Modals from '../../src/components/Modals/Modals'
-import Notification from '../../src/components/Notification/Notification'
-import { GlobalProvider } from '../../src/context/globalContext'
-import Overlay from '../../src/components/shared/Overlay'
 import absoluteUrl from 'next-absolute-url'
-import { VideoProvider } from '../../src/context/videoContext'
-import { TodoProvider } from '../../src/context/todoContext'
-import { fetcher } from '../../utils/clientHelpers'
+
+import Layout from '@/components/Layout/Layout'
+import Modals from '@/components/Modals/Modals'
+import Notification from '@/components/Notification/Notification'
+import Sidebar from '@/components/Sidebar/Sidebar'
+import VideoPlayer from '@/components/VideoPlayer/VideoPlayer'
+import { GlobalProvider } from '@/context/globalContext'
+import { TodoProvider } from '@/context/todoContext'
+import { VideoProvider } from '@/context/videoContext'
+import Overlay from '@/shared/Overlay'
 
 export default function Main({ serverData }) {
   return (
