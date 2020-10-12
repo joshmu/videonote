@@ -8,7 +8,7 @@ import VideoPlayer from '@/components/VideoPlayer/VideoPlayer'
 import { GlobalProvider } from '@/context/globalContext'
 import { TodoProvider } from '@/context/todoContext'
 import { VideoProvider } from '@/context/videoContext'
-import Overlay from '@/shared/Overlay'
+import Overlay from '@/shared/Modal/Overlay'
 
 export default function Main({ serverData }) {
   return (
