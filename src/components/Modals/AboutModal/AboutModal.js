@@ -9,10 +9,11 @@ const AboutModal = ({ toggle: toggleModal, motionKey }) => {
 
       <ModalInnerContainer>
         <p>
-          VideoNote aims to provide the fastest possible workflow to review
-          video content. Utilising a variety of intuitive keyboard shortcuts,
-          seamless sharing of projects with others and an unopinionated design
-          to keep you focused on what matters most.
+          <span className='font-semibold text-highlight-400'>VideoNote</span>{' '}
+          aims to provide the fastest possible workflow to review video content.
+          Utilising a variety of intuitive keyboard shortcuts, seamless sharing
+          of projects with a minimal design to keep you focused on what matters
+          most.
         </p>
         <p className='mt-2'>
           We are currently in a beta development stage. If you have feature

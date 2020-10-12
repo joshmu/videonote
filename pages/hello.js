@@ -1,11 +1,12 @@
 import { motion } from 'framer-motion'
+import Link from 'next/link'
 import Router from 'next/router'
 
 import Layout from '@/components/Layout/Layout'
 import { Heading } from '@/components/shared/Text/Text'
 import ThemeToggle from '@/components/shared/ThemeToggle/ThemeToggle'
 import { useThemeContext } from '@/context/themeContext'
-import MotionFadeUp from '@/shared/MotionFadeUp'
+import MotionFadeUp from '@/shared/ux/MotionFadeUp'
 
 export default function Home() {
   const { toggleTheme } = useThemeContext()
