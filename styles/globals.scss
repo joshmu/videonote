@@ -56,8 +56,9 @@ body {
   }
 
   &::-webkit-scrollbar-thumb {
-    background-color: var(--text);
-    @apply rounded-full cursor-pointer;
+    // background-color: var(--text);
+    // background-color: rgba(255, 138, 76, 0.5);
+    @apply rounded-full cursor-pointer bg-themeText;
   }
 }
 

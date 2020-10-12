@@ -1,11 +1,11 @@
-import { TiTickOutline as SuccessIcon } from 'react-icons/ti'
+import { AnimatePresence, motion } from 'framer-motion'
 import {
   AiOutlineInfoCircle as InfoIcon,
+  AiOutlineCheck as SuccessIcon,
   AiOutlineWarning as WarningIcon,
 } from 'react-icons/ai'
 import { VscError as ErrorIcon } from 'react-icons/vsc'
 
-import { AnimatePresence, motion } from 'framer-motion'
 import { useNotificationContext } from '@/context/notificationContext'
 
 export default function Notification() {

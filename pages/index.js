@@ -20,6 +20,8 @@ import { fetcher } from '@/utils/clientHelpers'
 // todo: esc key to close modals
 // todo: unify text with text components
 // todo: staggerChildren integrated for list however potential an animatepresence clash is occurring? or it doesn't animate as the list data is dynamic.
+// todo: icons for each dropdown item
+// todo: load project alert rather than success?
 
 // todo: drag progress bar to seek quickly
 // todo: edit timestamp
