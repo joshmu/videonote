@@ -84,30 +84,14 @@ export const ModalInput = ({
 }
 
 export const ModalPrimaryBtn = ({ className = '', children, ...props }) => (
-  <>
-    <div className='h-10'></div>
-    <div></div>
-    <div
-      className={`${className} flex justify-end mt-4 absolute bottom-6 -right-6`}
+  <div className={`${className} flex justify-end mt-4`}>
+    <motion.button
+      whileHover={{ scale: 0.9, transition: { duration: 0.1 } }}
+      type='submit'
+      className='px-6 py-2 rounded-sm text-themeBg bg-highlight-400 focus:outline-none'
+      {...props}
     >
-      <motion.button
-        whileHover={{ scale: 0.9, transition: { duration: 0.1 } }}
-        type='submit'
-        className='w-40 py-2 bg-opacity-100 rounded-sm text-themeBg bg-highlight-400 focus:outline-none'
-        {...props}
-      >
-        {children}
-      </motion.button>
-    </div>
-  </>
-)
-
-export const PrimaryBtn = ({ children, ...props }) => (
-  <motion.button
-    whileHover={{ scale: 0.9, transition: { duration: 0.1 } }}
-    className='px-6 py-2 bg-opacity-100 rounded-sm text-themeBg bg-highlight-400 focus:outline-none'
-    {...props}
-  >
-    {children}
-  </motion.button>
+      {children}
+    </motion.button>
+  </div>
 )

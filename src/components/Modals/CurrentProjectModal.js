@@ -121,6 +121,7 @@ export default function CurrentProjectModal({
                 <Export />
               </div>
 
+              <div></div>
               <ModalPrimaryBtn onClick={handleUpdate}>Update</ModalPrimaryBtn>
             </ModalForm>
           </ModalInnerContainer>

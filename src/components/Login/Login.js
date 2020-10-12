@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { motion } from 'framer-motion'
-import { ModalInput, PrimaryBtn } from '../Modals/Modal'
+import { ModalInput, ModalPrimaryBtn, PrimaryBtn } from '../Modals/Modal'
 import { useNotificationContext } from '../../context/notificationContext'
 import isEmail from 'validator/lib/isEmail'
 import { fetcher } from '../../../utils/clientHelpers'
@@ -108,9 +108,7 @@ export default function Login({ toggleLoginView, handleLogin, handleEmail }) {
           </div>
 
           <div className='flex items-center justify-end mt-4'>
-            <PrimaryBtn onClick={handleSubmit} type='submit'>
-              Login
-            </PrimaryBtn>
+            <ModalPrimaryBtn onClick={handleSubmit}>Login</ModalPrimaryBtn>
           </div>
         </form>
       </div>
