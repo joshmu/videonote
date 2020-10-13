@@ -1,13 +1,13 @@
-import { useState, useEffect } from 'react'
+import { useEffect, useState } from 'react'
+
 import { useGlobalContext } from '@/context/globalContext'
+import { useNotificationContext } from '@/context/notificationContext'
 import ModalContainer from '@/shared/Modal/ModalContainer'
+import ModalForm from '@/shared/Modal/ModalForm'
 import ModalHeader from '@/shared/Modal/ModalHeader'
 import ModalInnerContainer from '@/shared/Modal/ModalInnerContainer'
-import ModalForm from '@/shared/Modal/ModalForm'
 import ModalInput from '@/shared/Modal/ModalInput'
 import ModalPrimaryBtn from '@/shared/Modal/ModalPrimaryBtn'
-
-import { useNotificationContext } from '@/context/notificationContext'
 import { isValidCredentials } from '@/utils/clientHelpers'
 
 export default function UserAccountModal({ toggle: toggleModal, motionKey }) {
@@ -65,14 +65,14 @@ export default function UserAccountModal({ toggle: toggleModal, motionKey }) {
             id='email'
             type='email'
           />
-          {/* <ModalInput
+          <ModalInput
             value={state.password}
             onChange={handleChange}
             title='Password'
             id='password'
             type='password'
           />
-          <ModalInput
+          {/* <ModalInput
             value={state.passwordConfirmation}
             onChange={handleChange}
             title='Password Confirmation'
@@ -80,6 +80,8 @@ export default function UserAccountModal({ toggle: toggleModal, motionKey }) {
             type='password'
           /> */}
           <div></div>
+          <div></div>
+
           <ModalPrimaryBtn onClick={handleUpdate} type='submit'>
             Update
           </ModalPrimaryBtn>

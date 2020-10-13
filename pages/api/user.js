@@ -1,6 +1,6 @@
-import { connectToDatabase } from '@/utils/mongodb'
 import { extractUser } from '@/utils/apiHelpers'
 import { authenticateToken, generateAccessToken } from '@/utils/jwt'
+import { User } from '@/utils/mongoose'
 
 export default async (req, res) => {
   // Gather the jwt access token from the request header
@@ -21,21 +21,17 @@ export default async (req, res) => {
     return res.status(401).json({ msg: 'Invalid token' })
   }
 
-  // connect db
-  const { db } = await connectToDatabase()
-
   // get user
-  const user = await db.collection('users').findOne({
-    email,
-  })
+  const userDoc = await User.findOne({ email })
 
   try {
     if (action === 'update') {
-      await updateUser(user, userData, db)
+      await updateUser(userDoc, userData)
     }
     if (action === 'remove') {
-      const userData = { removed: new Date() }
-      await updateUser(user, userData, db)
+      // todo: test account deletion
+      await userDoc.remove()
+      return res.status(200).json({ msg: `${userDoc.email} removed` })
     }
     if (!action) {
       return res.status(400).json({ msg: 'Action not specified' })
@@ -45,9 +41,7 @@ export default async (req, res) => {
   }
 
   // get updated user
-  const updatedUser = await db.collection('users').findOne({
-    email,
-  })
+  const updatedUser = await User.findOne({ email }).lean()
 
   // token (keep resetting their session length)
   const newToken = generateAccessToken(updatedUser.email)
@@ -58,20 +52,13 @@ export default async (req, res) => {
   })
 }
 
-const updateUser = async (user, userData, db) => {
-  const { _id } = user
-  // form entire settings object if we are updating 'settings'
+const updateUser = async (userDoc, userData) => {
+  // if we have nested objects then lets update them and then overwrite currently stored
   if (userData.settings)
-    userData.settings = { ...user.settings, ...userData.settings }
+    userData.settings = { ...userDoc.settings, ...userData.settings }
 
-  return db.collection('users').updateOne(
-    { _id: _id },
-    {
-      $set: {
-        ...userData,
-        updated: new Date(),
-      },
-    }
-    // { upsert: true }
-  )
+  await userDoc.updateOne({ $set: userData })
+  await userDoc.save()
+
+  return userDoc
 }

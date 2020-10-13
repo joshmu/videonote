@@ -12,6 +12,9 @@ import { VideoProvider } from '@/context/videoContext'
 import Overlay from '@/shared/Modal/Overlay'
 import { fetcher } from '@/utils/clientHelpers'
 
+// todo: switch to project fires twice on intial project (currentProjectId clash?)
+// todo: clear global state when we delete all of our projects (last project state is left)
+// todo: more user friendly sharing? project title instead? (and when clash then add random suffix?) or half id? unique project title specifically for sharing?
 // todo: theme highlight needs to be dynamic for both light and dark mode (300, 400, 700)
 // todo: think about extending landing page
 // todo: alert for empty video src is not working
@@ -22,6 +25,7 @@ import { fetcher } from '@/utils/clientHelpers'
 // todo: staggerChildren integrated for list however potential an animatepresence clash is occurring? or it doesn't animate as the list data is dynamic.
 // todo: icons for each dropdown item
 // todo: load project alert rather than success?
+// todo: create docker instance for demo purposes?
 
 // todo: drag progress bar to seek quickly
 // todo: edit timestamp

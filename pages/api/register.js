@@ -1,16 +1,12 @@
+import bcrypt from 'bcryptjs'
 import isEmail from 'validator/lib/isEmail'
 import normalizeEmail from 'validator/lib/normalizeEmail'
-import bcrypt from 'bcryptjs'
-import { nanoid } from 'nanoid'
-import { extractUser } from '../../utils/apiHelpers'
-import { generateAccessToken } from '../../utils/jwt'
 
-import { connectToDatabase } from '@/utils/mongodb'
+import { extractUser } from '@/utils/apiHelpers'
+import { generateAccessToken } from '@/utils/jwt'
+import { User } from '@/utils/mongoose'
 
 export default async (req, res) => {
-  // connect db
-  const { db } = await connectToDatabase()
-
   // get user data
   const { password } = req.body
   const email = normalizeEmail(req.body.email)
@@ -24,7 +20,7 @@ export default async (req, res) => {
     res.status(400).json({ msg: 'Missing field(s)' })
     return
   }
-  if ((await db.collection('users').countDocuments({ email })) > 0) {
+  if ((await User.countDocuments({ email })) > 0) {
     res.status(403).json({ msg: 'The email has already been used.' })
     return
   }
@@ -33,35 +29,24 @@ export default async (req, res) => {
   const hashedPassword = await bcrypt.hash(password, 10)
 
   // insert
-  const user = await db
-    .collection('users')
-    .insertOne({
-      _id: nanoid(12),
-      email,
-      username: email,
-      projectIds: [],
-      settings: {
-        playOffset: -4,
-        showHints: true,
-        seekJump: 10,
-        sidebarWidth: 400,
-        currentProjectId: null,
-      },
-      role: 'free',
-      notes: '',
-      password: hashedPassword,
-      created: new Date(),
-      updated: new Date(),
-      deleted: null,
-    })
-    .then(({ ops }) => ops[0])
+  const userDoc = new User({
+    email: email,
+    username: email,
+    password: hashedPassword,
+  })
+
+  try {
+    await userDoc.save()
+  } catch (err) {
+    res.status(500).json({ msg: 'Database Error' })
+  }
 
   // token
-  const token = generateAccessToken(user.email)
+  const token = generateAccessToken(userDoc.email)
 
   // 201 - created
   res.status(201).json({
-    user: extractUser(user),
+    user: extractUser(await userDoc.toObject()),
     token,
   })
 }

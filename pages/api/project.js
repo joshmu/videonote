@@ -1,7 +1,6 @@
-import { connectToDatabase } from '@/utils/mongodb'
 import { extractProject, extractUser } from '@/utils/apiHelpers'
 import { authenticateToken, generateAccessToken } from '@/utils/jwt'
-import { nanoid } from 'nanoid'
+import { Project, User } from '@/utils/mongoose'
 
 export default async (req, res) => {
   // Gather the jwt access token from the request header
@@ -22,25 +21,31 @@ export default async (req, res) => {
     return res.status(401).json({ msg: 'Invalid token' })
   }
 
-  // connect db
-  const { db } = await connectToDatabase()
-
   // get user
-  const user = await db.collection('users').findOne({
-    email,
-  })
+  const userDoc = await User.findOne({ email })
 
   try {
     if (action === 'create') {
-      await createProject(project, user, db)
+      const projectDoc = await createProject(project, userDoc)
+
+      // add project id to user's projectId's list
+      userDoc.projectIds.push(projectDoc._id)
+      await userDoc.save()
     }
 
     if (action === 'update') {
-      await updateProject(project, user, db)
+      await updateProject(project, userDoc)
     }
     if (action === 'remove') {
-      const projectData = { ...project, removed: new Date() }
-      await updateProject(projectData, user, db)
+      // get projectDoc
+      const projectDoc = await Project.findById(project._id)
+
+      // remove user's projectIds reference
+      await userDoc.projectIds.pull(projectDoc._id)
+      await userDoc.save()
+
+      // remove project
+      await projectDoc.remove()
     }
     if (!action) {
       return res.status(400).json({ msg: 'Action not specified' })
@@ -50,99 +55,52 @@ export default async (req, res) => {
   }
 
   // get all projects with user's id
-  const projects = await getUserProjects(user._id, db)
+  let updatedProjects = []
+  if (userDoc.projectIds.length > 0) {
+    updatedProjects = await Project.find({ _id: userDoc.projectIds }).lean()
+  }
 
   // token (keep resetting their session length)
-  const newToken = generateAccessToken(user.email)
+  const newToken = generateAccessToken(userDoc.email)
 
   res.status(200).json({
-    user: extractUser(user),
-    projects: projects.map(project => extractProject(project)),
+    user: extractUser(await userDoc.toObject()),
+    projects: updatedProjects.map(project => extractProject(project)),
     token: newToken,
   })
 }
 
-const createProject = async (project, user, db) => {
+const createProject = async (projectData, userDoc) => {
   // create project
-  const projectDoc = await db
-    .collection('projects')
-    .insertOne({
-      _id: nanoid(12),
-      title: project.title,
-      src: project.src,
-      todos: [],
-      notes: '',
-      isPrivate: true,
-      userIds: [user._id],
-      created: new Date(),
-      updated: new Date(),
-      removed: null,
-    })
-    .then(({ ops }) => ops[0])
+  const projectDoc = new Project({
+    title: projectData.title,
+    src: projectData.src,
+    userIds: [userDoc._id],
+  })
 
-  // add project id to user's projectId's list
-  // todo: use mongo $push instead
-  await db.collection('users').updateOne(
-    {
-      _id: user._id,
-    },
-    { $set: { projectIds: [...user.projectIds, projectDoc._id] } }
-  )
+  await projectDoc.save()
 
   return projectDoc
 }
-const updateProject = async (project, user, db) => {
-  if (!(await userOwnsProject(project, user, db))) {
+
+const updateProject = async (projectData, userDoc) => {
+  if (!(await userOwnsProject(projectData, userDoc))) {
     console.log('user does not own this project')
     return
   }
 
   // remove the id and any nested array/object
-  const { _id, ...data } = project
+  const { _id, ...data } = projectData
 
-  return db.collection('projects').updateOne(
-    { _id: _id },
-    { $set: { ...data, updated: new Date() } }
-    // { upsert: true }
-  )
-}
-const userOwnsProject = async (project, user, db) => {
-  // todo: convert this entirey to mongo driver
-  const foundProject = await db
-    .collection('projects')
-    .findOne({ _id: project._id })
-  return foundProject.userIds.includes(user._id)
-  // return (
-  //   db
-  //     .collection('projects')
-  //     .find({
-  //       $and: [
-  //         {
-  //           _id: project._id,
-  //         },
-  //         {
-  //           $expr: {
-  //             $in: [user._id, '$userIds'],
-  //           },
-  //         },
-  //       ],
-  //     })
-  //     .count() > 0
-  // )
-}
-export const getUserProjects = async (userId, db) => {
-  const allProjects = await db
-    .collection('projects')
-    .find({
-      $expr: {
-        $in: [userId, '$userIds'],
-      },
-    })
-    // .filter({
-    //   removed: { $eq: null },
-    // })
-    .toArray()
+  const projectDoc = await Project.findById(_id)
+  await projectDoc.updateOne({ $set: data })
+  await projectDoc.save()
 
-  const projects = allProjects.filter(project => project.removed === null)
-  return projects
+  return projectDoc
+}
+
+const userOwnsProject = async (project, userDoc) => {
+  return Project.findById(project._id).then(projectDoc => {
+    return projectDoc.userIds.includes(userDoc._id)
+  })
 }

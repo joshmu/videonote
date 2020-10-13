@@ -1,18 +1,18 @@
-import { connectToDatabase } from '@/utils/mongodb'
 import { extractPublicProject } from '@/utils/apiHelpers'
 
+// GET 1 PROJECT
 export default async (req, res) => {
   // project id
   const { id } = req.body
 
-  // connect db
-  const { db } = await connectToDatabase()
-
   // get project
-  const project = await db.collection('projects').findOne({ _id: id })
-
-  // project exists
-  if (!project) return res.status(400).json({ msg: 'Project does not exist.' })
+  let project
+  try {
+    project = await Project.findById(id).lean()
+  } catch (error) {
+    // no project found
+    return res.status(400).json({ msg: 'Project does not exist.' })
+  }
 
   // project is public
   if (project.isPrivate)

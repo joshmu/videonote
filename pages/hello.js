@@ -115,15 +115,15 @@ export default function Home() {
             exit={{ opacity: 0 }}
             className='absolute z-0 flex items-center justify-center w-full h-full'
           >
-            <div className='flex flex-col w-3/4 gap-6 h-1/2'>
-              <div className='flex-1 neu-theme'></div>
-              <div className='flex-1 neu-theme'></div>
-              <div className='flex-1 neu-theme'></div>
-              <div className='flex-1 neu-theme'></div>
-              <div className='flex-1 neu-theme'></div>
-              <div className='flex-1 neu-theme'></div>
-              <div className='flex-1 neu-theme'></div>
-              <div className='flex-1 neu-theme'></div>
+            <div className='flex flex-col justify-between w-3/4 h-1/2'>
+              <div className='h-1/12 neu-theme'></div>
+              <div className='h-1/12 neu-theme'></div>
+              <div className='h-1/12 neu-theme'></div>
+              <div className='h-1/12 neu-theme'></div>
+              <div className='h-1/12 neu-theme'></div>
+              <div className='h-1/12 neu-theme'></div>
+              <div className='h-1/12 neu-theme'></div>
+              <div className='h-1/12 neu-theme'></div>
             </div>
           </motion.div>
         </div>

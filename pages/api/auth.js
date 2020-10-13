@@ -1,7 +1,6 @@
-import { connectToDatabase } from '@/utils/mongodb'
 import { extractUser } from '@/utils/apiHelpers'
 import { authenticateToken } from '@/utils/jwt'
-import { getUserProjects } from './project'
+import { Project, User } from '@/utils/mongoose'
 
 export default async (req, res) => {
   // Gather the jwt access token from the request header
@@ -21,18 +20,19 @@ export default async (req, res) => {
     return res.status(401).json({ msg: 'Invalid token' })
   }
 
-  // connect db
-  const { db } = await connectToDatabase()
-
   // get user via email
-  const user = await db.collection('users').findOne({
-    email,
-  })
+  const user = await User.findOne({ email }).lean()
+
+  if (user === null) return res.status(400).json({ msg: 'No user found.' })
+
   // get projects
-  const projects = await getUserProjects(user._id, db)
+  let projects = []
+  if (user.projectIds.length > 0) {
+    projects = await Project.find({ _id: user.projectIds }).lean()
+  }
 
   res.status(200).json({
     user: extractUser(user),
-    projects,
+    projects: projects,
   })
 }

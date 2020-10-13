@@ -71,8 +71,10 @@ export function GlobalProvider({ serverData, ...props }) {
         const recentProjectId = projects.slice(-1)[0]
         loadProject(recentProjectId)
       }
+    } else {
+      // todo: reset state here for empty projects after deletion?
     }
-  }, [projects, currentProject, settings.currentProjectId])
+  }, [projects, currentProject, settings])
 
   const updateProject = async project => {
     if (guest) return guestUpdateProject(project)
@@ -212,6 +214,8 @@ export function GlobalProvider({ serverData, ...props }) {
 
   // typically handle project data or presume id has been passed
   const loadProject = projectOrId => {
+    // todo: when projectOrId is undefined then can we reset global state?
+
     console.log('switch to project', projectOrId)
     // therefor id has been passed and we need to grab the project
     if (typeof projectOrId === 'string')
@@ -273,7 +277,16 @@ export function GlobalProvider({ serverData, ...props }) {
     if (account) {
       const { settings, ...user } = account
       setUser(user)
-      setSettings(settings)
+
+      // avoid null values from mongo if we have any in settings and assign defaults
+      if (settings) {
+        // if we have any null settings lets use the defaults
+        Object.entries(settings).forEach(([key, val]) => {
+          if (settings[key] === null) settings[key] = SETTINGS_DEFAULTS[key]
+        })
+      }
+
+      setSettings({ ...SETTINGS_DEFAULTS, ...settings })
 
       // alerts
       // addAlert({ type: 'success', msg: `Logged in: ${user.username}` })

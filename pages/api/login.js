@@ -1,14 +1,12 @@
+import bcrypt from 'bcryptjs'
 import isEmail from 'validator/lib/isEmail'
 import normalizeEmail from 'validator/lib/normalizeEmail'
-import bcrypt from 'bcryptjs'
-import { connectToDatabase } from '@/utils/mongodb'
+
 import { extractUser } from '@/utils/apiHelpers'
 import { generateAccessToken } from '@/utils/jwt'
+import { User } from '@/utils/mongoose'
 
 export default async (req, res) => {
-  // connect db
-  const { db } = await connectToDatabase()
-
   // get user data
   const { password } = req.body
   const email = normalizeEmail(req.body.email)
@@ -22,15 +20,13 @@ export default async (req, res) => {
     res.status(400).json({ msg: 'Missing field(s)' })
     return
   }
-  if ((await db.collection('users').countDocuments({ email })) === 0) {
+  if ((await User.countDocuments({ email })) === 0) {
     res.status(404).json({ msg: 'Email not found, registration required.' })
     return
   }
 
   // get user via email
-  const user = await db.collection('users').findOne({
-    email,
-  })
+  const user = await User.findOne({ email }).lean()
 
   // compare passwords
   const match = await bcrypt.compare(password, user.password)
