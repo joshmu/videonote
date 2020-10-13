@@ -1,8 +1,9 @@
 import { extractPublicProject } from '@/utils/apiHelpers'
+import { Project } from '@/utils/mongoose'
 
 // GET 1 PROJECT
 export default async (req, res) => {
-  // project id
+  // project share id
   const { id } = req.body
 
   // get project

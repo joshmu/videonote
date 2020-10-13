@@ -58,8 +58,6 @@ Main.getInitialProps = async ctx => {
   // parse
   const data = await res.json()
 
-  console.log({ data })
-
   // pass to react
   return { serverData: data }
 }
