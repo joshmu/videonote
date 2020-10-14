@@ -37,6 +37,13 @@ export default function Login({ toggleLoginView, handleLogin, handleEmail }) {
 
   const requestLogin = async () => {
     console.log('logging in user')
+
+    addAlert({
+      type: 'info',
+      msg: `Logging in: ${user.loginEmail}`,
+      duration: 2000,
+    })
+
     const body = {
       email: user.loginEmail,
       password: user.loginPassword,
@@ -45,11 +52,6 @@ export default function Login({ toggleLoginView, handleLogin, handleEmail }) {
 
     // 302 = found
     if (res.status === 302) {
-      // addAlert({
-      //   type: 'info',
-      //   msg: `Signing in: ${data.user.username || data.user.email}`,
-      //   duration: 1000,
-      // })
       handleLogin(data)
     } else {
       if (data.msg.includes('registration required')) toggleLoginView(false)
