@@ -237,8 +237,8 @@ export function GlobalProvider({ serverData, ...props }) {
 
     // notification
     addAlert({
-      type: 'success',
-      msg: `Project: ${selectedProject.title.toUpperCase()}`,
+      type: 'project',
+      msg: `${selectedProject.title.toUpperCase()}`,
     })
   }
 
@@ -289,7 +289,7 @@ export function GlobalProvider({ serverData, ...props }) {
       setSettings({ ...SETTINGS_DEFAULTS, ...settings })
 
       // alerts
-      // addAlert({ type: 'success', msg: `Logged in: ${user.username}` })
+      addAlert({ type: 'success', msg: `Logged in: ${user.username}` })
     } else {
       // if we receive no account data then we can presume we are in guest mode with a single project
       setGuest(true)

@@ -19,7 +19,6 @@ export default function CreateProjectModal({ toggle: toggleModal, motionKey }) {
     title: '',
     src: '',
   })
-  const [hover, setHover] = useState(false)
 
   const handleCreate = async e => {
     const title = project.title.trim()
@@ -59,7 +58,9 @@ export default function CreateProjectModal({ toggle: toggleModal, motionKey }) {
 
   return (
     <ModalContainer toggle={toggleModal} motionKey={motionKey}>
-      <ModalHeader>Create Project</ModalHeader>
+      <ModalHeader>
+        Create Project {project.title && `- ${project.title}`}
+      </ModalHeader>
 
       <ModalInnerContainer>
         <ModalForm>

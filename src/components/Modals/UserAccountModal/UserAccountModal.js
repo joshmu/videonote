@@ -68,7 +68,7 @@ export default function UserAccountModal({ toggle: toggleModal, motionKey }) {
           <ModalInput
             value={state.password}
             onChange={handleChange}
-            title='Password'
+            title='Confirm Password'
             id='password'
             type='password'
           />
