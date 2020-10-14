@@ -5,13 +5,10 @@ export default async (req, res) => {
   const { project } = req.body
 
   // get project
-  let projectDoc
-  try {
-    projectDoc = await Project.findById(project._id)
-  } catch (error) {
-    // project exists
+  const projectDoc = await Project.findById(project._id)
+  // not found
+  if (projectDoc === null)
     return res.status(404).json({ msg: 'Project does not exist.' })
-  }
 
   // project is public
   if (projectDoc.isPrivate)

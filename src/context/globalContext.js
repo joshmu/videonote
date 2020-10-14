@@ -36,7 +36,7 @@ export function GlobalProvider({ serverData, ...props }) {
   const [settingsOpen, setSettingsOpen] = useState(false)
   const [modalOpen, setModalOpen] = useState(null)
 
-  const [guest, setGuest] = useState(false)
+  const [admin, setAdmin] = useState(true)
 
   const { addAlert } = useNotificationContext()
 
@@ -76,15 +76,15 @@ export function GlobalProvider({ serverData, ...props }) {
     }
   }, [projects, currentProject, settings])
 
-  const updateProject = async project => {
-    if (guest) return guestUpdateProject(project)
+  const updateProject = async projectData => {
+    if (admin) return adminUpdateProject(projectData)
 
     // if no project id is provided then grab it from current project
     // * _id is requird for the api
-    if (!project._id) project._id = currentProject._id
+    if (!projectData._id) projectData._id = currentProject._id
     // * todos > currentProject > update this project on server > update projects with server response
     // @ts-ignore
-    const response = await handleProjectApi('update', user, project)
+    const response = await handleProjectApi('update', user, projectData)
     if (!response) return console.error('api error')
     const { user, projects } = response
 
@@ -92,13 +92,13 @@ export function GlobalProvider({ serverData, ...props }) {
     setProjects(projects)
 
     // get current project from server response and set
-    const projectId = project._id || currentProject._id
+    const projectId = projectData._id || currentProject._id
     const updatedProject = projects.find(p => p._id === projectId)
     setCurrentProject(updatedProject)
   }
 
-  const guestUpdateProject = async project => {
-    console.log('guest is updating project', project)
+  const adminUpdateProject = async project => {
+    console.log('admin is updating project', project)
     const body = {
       project,
     }
@@ -153,7 +153,7 @@ export function GlobalProvider({ serverData, ...props }) {
   }
 
   const updateSettings = async newSettingsData => {
-    if (guest) return
+    if (admin) return
 
     console.log('updating settings...', newSettingsData)
     // merge settings and user information together match 'user' mongo doc
@@ -291,8 +291,8 @@ export function GlobalProvider({ serverData, ...props }) {
       // alerts
       addAlert({ type: 'success', msg: `Logged in: ${user.username}` })
     } else {
-      // if we receive no account data then we can presume we are in guest mode with a single project
-      setGuest(true)
+      // if there is no account data then admin is not present, client is guest
+      setAdmin(false)
     }
   }
 
@@ -357,7 +357,6 @@ export function GlobalProvider({ serverData, ...props }) {
     user,
     updateUser,
     projects,
-    // updateProjects,
     removeProject,
     project: currentProject,
     settings,
@@ -375,7 +374,7 @@ export function GlobalProvider({ serverData, ...props }) {
     handleInitialServerData,
     SETTINGS_DEFAULTS,
     HINTS,
-    guest,
+    admin,
     copyToClipboard,
   }
 

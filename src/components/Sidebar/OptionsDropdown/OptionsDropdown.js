@@ -12,7 +12,7 @@ const OptionsDropdown = ({ open }) => {
     toggleModalOpen,
     resetGlobalState,
     project,
-    guest,
+    admin,
     updateProject,
     copyToClipboard,
   } = useGlobalContext()
@@ -52,24 +52,22 @@ const OptionsDropdown = ({ open }) => {
           onMouseLeave={handleMouseLeave}
           className='absolute right-0 z-40 w-48 py-2 text-sm capitalize transition-colors duration-300 ease-in-out border rounded-sm shadow-xl bg-themeBg'
         >
-          {project && !guest && (
+          {project && admin && (
             <Select onClick={handleClick} data-modal='current'>
               <div className='uppercase text-highlight-400'>
                 {project.title}
               </div>
             </Select>
           )}
-          {guest && (
+          {!admin && (
             <div className='flex items-center px-4 py-2 uppercase text-highlight-400'>
               {project.title}
             </div>
           )}
 
-          {!guest && (
-            <Select onClick={handleShareProject}>Share Project</Select>
-          )}
+          {admin && <Select onClick={handleShareProject}>Share Project</Select>}
 
-          {!guest && (
+          {admin && (
             <>
               <Select onClick={handleClick} data-modal='create'>
                 create new
@@ -84,12 +82,12 @@ const OptionsDropdown = ({ open }) => {
             settings
           </Select>
 
-          {!guest && (
+          {admin && (
             <Select onClick={handleClick} data-modal='user'>
               profile
             </Select>
           )}
-          {!guest && (
+          {admin && (
             <Link href='/hello' passHref>
               <a>
                 <Select onClick={handleSignOutClick}>Sign Out</Select>

@@ -1,8 +1,9 @@
-import { createContext, useContext, useState, useEffect, useRef } from 'react'
-import { useGlobalContext } from './globalContext'
-import { useNotificationContext } from './notificationContext'
+import { createContext, useContext, useEffect, useRef, useState } from 'react'
+
 import { useAnounceAction } from '../hooks/useAnounceAction'
 import { useSmartControls } from '../hooks/useSmartControls'
+import { useGlobalContext } from './globalContext'
+import { useNotificationContext } from './notificationContext'
 
 const videoContext = createContext({
   ready: false,
@@ -29,7 +30,7 @@ export function VideoProvider(props) {
     settings,
     toggleSidebar,
     toggleModalOpen,
-    guest,
+    admin,
   } = useGlobalContext()
   const { addAlert } = useNotificationContext()
   const playerRef = useRef(null)
@@ -44,7 +45,7 @@ export function VideoProvider(props) {
   // on initial load alert user if project is available however no src is specified
   // * this could be due to a local video src thus being reset to an empty string when cannot be found
   useEffect(() => {
-    if (project && project.src.length === 0 && !guest) {
+    if (project && project.src.length === 0 && admin) {
       addAlert({
         type: 'warning',
         msg: 'Video source required.',
