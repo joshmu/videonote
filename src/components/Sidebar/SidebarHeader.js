@@ -33,7 +33,7 @@ const SidebarHeader = () => {
           onClick={toggleOpen}
           className={`${
             sidebarOpen ? 'rotate-0' : 'rotate-180 -translate-x-full'
-          } relative text-3xl mr-2 transform text-highlight-700 z-10 bg-transparent transition-all hover:text-highlight-400 duration-500 ease-in-out cursor-pointer`}
+          } relative text-4xl mr-2 transform text-themeAccent2 z-10 bg-transparent transition-all hover:text-themeAccent duration-500 ease-in-out cursor-pointer`}
         >
           <ArrowIcon className='fill-current' />
         </div>
@@ -42,11 +42,11 @@ const SidebarHeader = () => {
       </div>
 
       {/* options dropdown*/}
-      <div className='relative px-2 transition-colors duration-300 ease-in-out cursor-pointer text-highlight-700 hover:text-highlight-400 disable-select'>
+      <div className='relative px-2 transition-colors duration-300 ease-in-out cursor-pointer text-themeAccent2 hover:text-themeAccent disable-select'>
         <motion.div
           whileHover={{ rotate: 90 }}
           className={
-            projects.length === 0 ? 'animate-pulse text-highlight-400' : ''
+            projects.length === 0 ? 'animate-pulse text-themeAccent' : ''
           }
         >
           <SettingsIcon

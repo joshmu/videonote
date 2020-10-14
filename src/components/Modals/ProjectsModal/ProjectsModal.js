@@ -61,7 +61,7 @@ export default function ProjectsModal({ toggle: toggleModal, motionKey }) {
                 onClick={() => {
                   handleRemoveProject(project)
                 }}
-                className='transition-colors duration-300 ease-in-out cursor-pointer hover:text-highlight-400 text-themeText2'
+                className='transition-colors duration-300 ease-in-out cursor-pointer hover:text-themeAccent text-themeText2'
               >
                 <TrashIcon />
               </motion.div>

@@ -25,6 +25,7 @@ export default function ThemeToggle({
 
   return (
     <motion.div
+      whileHover={{ scale: 1.1 }}
       key='themeToggle'
       {...motionStyle}
       onClick={handleClick}

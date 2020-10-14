@@ -109,7 +109,7 @@ export default function CurrentProjectModal({
                     target='_blank'
                     whileHover={{ scale: 0.95 }}
                     onClick={handleShareUrlClick}
-                    className='absolute italic cursor-pointer top-8 text-highlight-400'
+                    className='absolute italic cursor-pointer top-8 text-themeAccent'
                   >
                     videonote.app/vn/{project._id}
                   </motion.a>

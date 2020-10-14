@@ -19,7 +19,7 @@ export default function progressBar({ active }) {
       ></div>
       <div
         style={{ width: perc(progress.loaded) }}
-        className='absolute z-10 h-full transition-all duration-300 ease-linear bg-highlight-800'
+        className='absolute z-10 h-full transition-all duration-300 ease-linear bg-themeAccent2'
       ></div>
     </div>
   )

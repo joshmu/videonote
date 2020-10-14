@@ -38,28 +38,28 @@ export default function Notification() {
 const Alert = ({ type, msg }) => (
   <div className='flex w-full max-w-md mx-auto overflow-hidden border rounded-sm shadow-md bg-themeBg border-themeText2'>
     {type === 'project' && (
-      <div className='flex items-center justify-center w-12 bg-highlight-400'>
-        <ProjectIcon className='w-6 h-6 fill-current text-themeText' />
+      <div className='flex items-center justify-center w-12 bg-themeAccent'>
+        <ProjectIcon className='w-6 h-6 text-white fill-current' />
       </div>
     )}
     {type === 'success' && (
       <div className='flex items-center justify-center w-12 bg-green-400'>
-        <SuccessIcon className='w-6 h-6 fill-current text-themeText' />
+        <SuccessIcon className='w-6 h-6 text-white fill-current' />
       </div>
     )}
     {type === 'info' && (
       <div className='flex items-center justify-center w-12 bg-blue-400'>
-        <InfoIcon className='w-6 h-6 fill-current text-themeText' />
+        <InfoIcon className='w-6 h-6 text-white fill-current' />
       </div>
     )}
     {type === 'warning' && (
       <div className='flex items-center justify-center w-12 bg-yellow-400'>
-        <WarningIcon className='w-6 h-6 fill-current text-themeText' />
+        <WarningIcon className='w-6 h-6 text-white fill-current' />
       </div>
     )}
     {type === 'error' && (
       <div className='flex items-center justify-center w-12 bg-red-400'>
-        <ErrorIcon className='w-6 h-6 fill-current text-themeText' />
+        <ErrorIcon className='w-6 h-6 text-white fill-current' />
       </div>
     )}
 
@@ -67,7 +67,7 @@ const Alert = ({ type, msg }) => (
       <div className='mx-3'>
         {type === 'project' && (
           <>
-            <span className='font-semibold text-highlight-400'>Project</span>
+            <span className='font-semibold text-themeAccent'>Project</span>
             <p className='text-sm text-themeText'>{msg}</p>
           </>
         )}

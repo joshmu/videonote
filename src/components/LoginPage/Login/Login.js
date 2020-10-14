@@ -72,7 +72,7 @@ export default function Login({ toggleLoginView, handleLogin, handleEmail }) {
       <div className='px-6 py-4'>
         <Link href='/hello' passHref>
           <a>
-            <h2 className='text-3xl font-bold text-center text-highlight-400'>
+            <h2 className='text-3xl font-bold text-center text-themeAccent'>
               VideoNote
             </h2>
           </a>
@@ -121,7 +121,7 @@ export default function Login({ toggleLoginView, handleLogin, handleEmail }) {
 
         <button
           onClick={handleSwitchView}
-          className='mx-2 text-sm font-bold transition-colors duration-300 ease-in-out focus:outline-none text-highlight-700 hover:text-highlight-400'
+          className='mx-2 text-sm font-bold transition-colors duration-300 ease-in-out focus:outline-none text-themeAccent2 hover:text-themeAccent'
         >
           Register
         </button>

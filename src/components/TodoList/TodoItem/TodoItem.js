@@ -49,10 +49,9 @@ export default function TodoItem({ todo, close, childVariants }) {
       key={id}
       // * childVariants used so we don't pass 'initial', 'animate' etc
       variants={childVariants}
-      style={{
-        backgroundColor: close ? 'rgba(0, 0, 255, 0.07)' : '',
-      }}
-      className='relative border-b cursor-pointer border-themeText2'
+      className={`${
+        close ? 'bg-themeSelect2' : ''
+      } relative border-b cursor-pointer border-themeText2`}
     >
       <Select padding='p-0'>
         <div className='relative flex items-center justify-start w-full h-full text-base'>

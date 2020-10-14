@@ -9,8 +9,8 @@ const AboutModal = ({ toggle: toggleModal, motionKey }) => {
 
       <ModalInnerContainer>
         <p>
-          <span className='font-semibold text-highlight-400'>VideoNote</span>{' '}
-          aims to provide the fastest possible workflow to review video content.
+          <span className='font-semibold text-themeAccent'>VideoNote</span> aims
+          to provide the fastest possible workflow to review video content.
           Utilising a variety of intuitive keyboard shortcuts, seamless sharing
           of projects with a minimal design to keep you focused on what matters
           most.
@@ -23,7 +23,7 @@ const AboutModal = ({ toggle: toggleModal, motionKey }) => {
         <div className='w-full mt-2 text-right'>
           <a
             href='mailto:hello@videonote.app'
-            className='cursor-pointer text-highlight-400 text-md'
+            className='cursor-pointer text-themeAccent text-md'
           >
             hello@videonote.app
           </a>

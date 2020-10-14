@@ -1,4 +1,3 @@
-const { colors } = require('tailwindcss/defaultTheme')
 const defaultTheme = require('tailwindcss/defaultTheme')
 const plugin = require('tailwindcss/plugin')
 
@@ -16,20 +15,10 @@ module.exports = {
         themeText2: 'var(--text2)',
         themeBg: 'var(--bg)',
         themeBg2: 'var(--bg2)',
-        themeHighlight: `rgba(var(--highlight), var(--bg-opacity))`, // currently not being used, replace with 'highlight-400'
-        themeLight: 'var(--light)',
-        themeDark: 'var(--dark)',
-        highlight: {
-          100: '#ffe8db',
-          200: '#ffd0b7',
-          300: '#ffb994',
-          400: '#ffa170',
-          500: '#ff8a4c',
-          600: '#cc6e3d',
-          700: '#99532e',
-          800: '#66371e',
-          900: '#331c0f',
-        },
+        themeAccent: 'var(--accent)',
+        themeAccent2: 'var(--accent2)',
+        themeSelect: 'var(--select)',
+        themeSelect2: 'var(--select2)',
       },
       opacity: {
         90: '0.90',

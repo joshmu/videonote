@@ -3,36 +3,49 @@
 @tailwind utilities;
 
 :root {
-  --light: theme('colors.white');
-  --light2: theme('colors.gray.600');
-  --dark: #202020;
-  --dark2: theme('colors.gray.400');
   --special: 255, 138, 76;
   --special_rgb: rgba(255, 138, 76, 1);
-  --ripple-color: 255, 138, 76;
 }
 
 .theme-light {
-  --text: var(--dark);
-  --text2: var(--dark2);
-  --bg: var(--light);
-  --bg2: var(--light2);
-  --highlight: var(--special);
+  --text: #202020;
+  --text2: theme('colors.gray.400');
 
-  .neu-theme {
+  --bg: theme('colors.white');
+  --bg2: theme('colors.gray.600');
+
+  // https://www.colorhexa.com/4056a1
+  --accent: #4056a1;
+  --accent2: #c5cbe3;
+
+  --select: theme('colors.gray.700');
+  --select2: rgba(248, 249, 252, 1);
+
+  .neu-bg {
     @apply neu-light;
+  }
+  .neu-accent {
+    @apply neu-light-accent;
   }
 }
 
 .theme-dark {
-  --text: var(--light);
-  --text2: var(--light2);
-  --bg: var(--dark);
-  --bg2: var(--dark2);
-  --highlight: var(--special);
+  --text: theme('colors.white');
+  --text2: theme('colors.gray.600');
+  --bg: #202020;
+  --bg2: theme('colors.gray.400');
 
-  .neu-theme {
+  --accent: #ffa170;
+  --accent2: #99532e;
+
+  --select: rgb(112, 135, 255);
+  --select2: rgba(112, 135, 255, 0.1);
+
+  .neu-bg {
     @apply neu-dark;
+  }
+  .neu-accent {
+    @apply neu-dark-accent;
   }
 }
 
@@ -107,10 +120,16 @@ body {
 }
 
 // https://neumorphism.io/#ffa170
-.neu-highlight {
+.neu-dark-accent {
   @apply rounded-sm;
   background: linear-gradient(225deg, #e69165, #ffac78);
   box-shadow: -20px 20px 60px #d9895f, 20px -20px 60px #ffb981;
+}
+
+.neu-light-accent {
+  @apply rounded-sm;
+  background: linear-gradient(145deg, #3a4d91, #445cac);
+  box-shadow: 20px 20px 60px #364989, -20px -20px 60px #4a63b9;
 }
 
 // https://neumorphism.io/#202020

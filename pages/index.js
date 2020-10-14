@@ -12,7 +12,6 @@ import { VideoProvider } from '@/context/videoContext'
 import Overlay from '@/shared/Modal/Overlay'
 import { fetcher } from '@/utils/clientHelpers'
 
-// todo: stagger anim to dropdown
 // todo: double check alert for local video when it begins to fail
 // todo: alert for empty video src is not working
 // todo: primary modal btn and remove account btn should be the same component
