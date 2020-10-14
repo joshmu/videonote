@@ -12,13 +12,15 @@ const THEME_TYPES = {
 }
 
 export function ThemeProvider(props) {
-  // initial default is light theme
-  const [theme, setTheme] = useState('dark')
+  const [theme, setTheme] = useState(Object.keys(THEME_TYPES)[0])
 
   // initial theme
   useEffect(() => {
     // get locally stored theme
     let savedTheme = window.localStorage.getItem('theme')
+
+    // validation check
+    if (!Object.keys(THEME_TYPES).includes(savedTheme)) savedTheme = null
 
     // if we don't have local stored then lets set it
     if (!savedTheme) {
@@ -40,13 +42,17 @@ export function ThemeProvider(props) {
   }, [theme])
 
   const toggleTheme = () => {
-    const themeList = Object.keys(THEME_TYPES)
-    const themeIndex = themeList.findIndex(themeId => themeId === theme)
+    // get list of themeIds
+    const themeIdList = Object.keys(THEME_TYPES)
+    const themeIndex = themeIdList.findIndex(themeId => themeId === theme)
+    // logic to continuously cycle through array
     const nextThemeIndex =
-      themeIndex === themeList.length - 1 ? 0 : themeIndex + 1
-    let newThemeId = themeList[nextThemeIndex]
+      themeIndex === themeIdList.length - 1 ? 0 : themeIndex + 1
+    let newThemeId = themeIdList[nextThemeIndex]
 
-    if (newThemeId === undefined) newThemeId = 'dark'
+    // validation check & fallback
+    if (!themeIdList.includes(newThemeId)) newThemeId = themeIdList[0]
+
     setTheme(newThemeId)
     window.localStorage.setItem('theme', newThemeId)
   }
