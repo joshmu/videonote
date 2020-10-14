@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion'
 import { AnimatePresence } from 'framer-motion'
-import { BsMoon as MoonIcon } from 'react-icons/bs'
+import { BsMoon as MoonIcon, BsLightningFill as ZapIcon } from 'react-icons/bs'
 import { HiSun as SunIcon } from 'react-icons/hi'
 
 import { useThemeContext } from '../../../context/themeContext'
@@ -11,7 +11,7 @@ export default function ThemeToggle({
   className = '',
   ...props
 }) {
-  const { toggleTheme, theme } = useThemeContext()
+  const { toggleTheme, theme, THEME_TYPES } = useThemeContext()
 
   const handleClick = () => {
     toggleTheme()
@@ -43,13 +43,21 @@ export default function ThemeToggle({
           >
             <MoonIcon className='fill-current' />
           </motion.button>
-        ) : (
+        ) : theme === 'light' ? (
           <motion.button
             key='themeToggle-light'
             {...motionStyle}
             className='relative focus:outline-none'
           >
             <SunIcon className='fill-current' />
+          </motion.button>
+        ) : (
+          <motion.button
+            key='themeToggle-effective'
+            {...motionStyle}
+            className='relative focus:outline-none'
+          >
+            <ZapIcon className='fill-current' />
           </motion.button>
         )}
       </AnimatePresence>

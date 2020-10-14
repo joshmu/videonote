@@ -1,13 +1,14 @@
-import { createContext, useContext, useState, useEffect } from 'react'
+import { createContext, useContext, useEffect, useState } from 'react'
 
 const themeContext = createContext({
   theme: '',
   toggleTheme: () => {},
 })
 
-const TYPES = {
+const THEME_TYPES = {
   dark: 'theme-dark',
   light: 'theme-light',
+  effective: 'theme-effective',
 }
 
 export function ThemeProvider(props) {
@@ -32,21 +33,28 @@ export function ThemeProvider(props) {
 
   // when theme changes then assign to body tag
   useEffect(() => {
-    Object.entries(TYPES).forEach(([, className]) =>
+    Object.entries(THEME_TYPES).forEach(([, className]) =>
       globalThis.document.body.classList.remove(className)
     )
-    globalThis.document.body.classList.add(TYPES[theme])
+    globalThis.document.body.classList.add(THEME_TYPES[theme])
   }, [theme])
 
   const toggleTheme = () => {
-    const newTheme = theme === 'dark' ? 'light' : 'dark'
-    setTheme(newTheme)
-    window.localStorage.setItem('theme', newTheme)
+    const themeList = Object.keys(THEME_TYPES)
+    const themeIndex = themeList.findIndex(themeId => themeId === theme)
+    const nextThemeIndex =
+      themeIndex === themeList.length - 1 ? 0 : themeIndex + 1
+    let newThemeId = themeList[nextThemeIndex]
+
+    if (newThemeId === undefined) newThemeId = 'dark'
+    setTheme(newThemeId)
+    window.localStorage.setItem('theme', newThemeId)
   }
 
   const value = {
     theme,
     toggleTheme,
+    THEME_TYPES,
   }
 
   return <themeContext.Provider value={value} {...props} />
