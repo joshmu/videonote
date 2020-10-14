@@ -12,6 +12,7 @@ import { VideoProvider } from '@/context/videoContext'
 import Overlay from '@/shared/Modal/Overlay'
 import { fetcher } from '@/utils/clientHelpers'
 
+// todo: notification string overflow hidden issue
 // todo: switch to project fires twice on intial project (currentProjectId clash?)
 // todo: clear global state when we delete all of our projects (last project state is left)
 // todo: more user friendly sharing? project title instead? (and when clash then add random suffix?) or half id? unique project title specifically for sharing?

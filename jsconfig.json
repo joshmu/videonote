@@ -11,6 +11,8 @@
       "@/api/*": ["src/pages/api/*"],
       "@/utils/*": ["./utils/*"],
       "@/styles/*": ["./styles/*"]
-    }
+    },
+    "checkJs": true,
+    "jsx": "preserve"
   }
 }

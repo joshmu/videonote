@@ -19,7 +19,6 @@ export default function CurrentProjectModal({
   motionKey,
 }) {
   const { updateProject, project, copyToClipboard } = useGlobalContext()
-  const { addAlert } = useNotificationContext()
   const [state, setState] = useState(null)
 
   useEffect(() => {
@@ -110,7 +109,7 @@ export default function CurrentProjectModal({
                     target='_blank'
                     whileHover={{ scale: 0.95 }}
                     onClick={handleShareUrlClick}
-                    className='absolute italic cursor-pointer -bottom-full text-highlight-400'
+                    className='absolute italic cursor-pointer top-8 text-highlight-400'
                   >
                     videonote.app/vn/{project._id}
                   </motion.a>

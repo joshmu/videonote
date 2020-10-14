@@ -12,7 +12,7 @@ export default function Notification() {
   const { alerts } = useNotificationContext()
 
   return (
-    <div className='absolute top-0 left-0 z-50 w-full max-w-sm'>
+    <div className='absolute top-0 left-0 z-50 w-full max-w-md'>
       <AnimatePresence>
         {alerts.length > 0 &&
           alerts.map(alert => (
@@ -35,7 +35,7 @@ export default function Notification() {
 }
 
 const Alert = ({ type, msg }) => (
-  <div className='flex w-full max-w-sm mx-auto overflow-hidden border rounded-sm shadow-md bg-themeBg border-themeText2'>
+  <div className='flex w-full max-w-md mx-auto overflow-hidden border rounded-sm shadow-md bg-themeBg border-themeText2'>
     {type === 'success' && (
       <div className='flex items-center justify-center w-12 bg-green-500'>
         <SuccessIcon className='w-6 h-6 text-white fill-current' />
