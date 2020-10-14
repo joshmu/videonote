@@ -14,6 +14,7 @@ const SidebarHeader = () => {
     settingsOpen,
     sidebarOpen,
     toggleSidebar,
+    projects,
   } = useGlobalContext()
 
   const toggleOpen = () => {
@@ -42,10 +43,15 @@ const SidebarHeader = () => {
 
       {/* options dropdown*/}
       <div className='relative px-2 transition-colors duration-300 ease-in-out cursor-pointer text-highlight-700 hover:text-highlight-400 disable-select'>
-        <motion.div whileHover={{ rotate: 90 }}>
+        <motion.div
+          whileHover={{ rotate: 90 }}
+          className={
+            projects.length === 0 && 'animate-pulse text-highlight-400'
+          }
+        >
           <SettingsIcon
             onClick={handleSettingsClick}
-            className='text-xl fill-current'
+            className='text-2xl fill-current'
           />
         </motion.div>
 
