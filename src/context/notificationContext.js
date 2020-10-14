@@ -1,5 +1,5 @@
-import React, { createContext, useContext, useState, useRef } from 'react'
 import { nanoid } from 'nanoid'
+import React, { createContext, useContext, useRef, useState } from 'react'
 
 const notificationContext = createContext({
   alerts: [],
@@ -26,6 +26,13 @@ export const NotificationProvider = ({ children }) => {
       type,
       id,
     }
+
+    // don't add if duplicate message
+    if (alertsRef.current.some(alert => alert.msg === newAlert.msg)) {
+      console.log('duplicate alert:', newAlert.msg)
+      return
+    }
+
     setAlerts([...alertsRef.current, newAlert])
 
     // if we won't close manually then use timer

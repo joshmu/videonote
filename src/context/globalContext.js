@@ -55,7 +55,7 @@ export function GlobalProvider({ serverData, ...props }) {
     handleInitialServerData(serverData)
   }, [])
 
-  // recommend creating a project if there are no projects and we have loaded the user
+  // notification recommend creating a project if there are no projects and we have loaded the user
   useEffect(() => {
     if (projects.length === 0 && user)
       addAlert({ type: 'info', msg: 'Create a project to start' })
@@ -77,7 +77,7 @@ export function GlobalProvider({ serverData, ...props }) {
   }, [projects, currentProject, settings])
 
   const updateProject = async projectData => {
-    if (admin) return adminUpdateProject(projectData)
+    if (!admin) return guestUpdaingProject(projectData)
 
     // if no project id is provided then grab it from current project
     // * _id is requird for the api
@@ -97,8 +97,8 @@ export function GlobalProvider({ serverData, ...props }) {
     setCurrentProject(updatedProject)
   }
 
-  const adminUpdateProject = async project => {
-    console.log('admin is updating project', project)
+  const guestUpdaingProject = async project => {
+    console.log('guest is updating project', project)
     const body = {
       project,
     }
@@ -153,7 +153,7 @@ export function GlobalProvider({ serverData, ...props }) {
   }
 
   const updateSettings = async newSettingsData => {
-    if (admin) return
+    if (!admin) return
 
     console.log('updating settings...', newSettingsData)
     // merge settings and user information together match 'user' mongo doc
@@ -217,7 +217,7 @@ export function GlobalProvider({ serverData, ...props }) {
     // todo: when projectOrId is undefined then can we reset global state?
 
     console.log('switch to project', projectOrId)
-    // therefor id has been passed and we need to grab the project
+    // id has been passed and we need to grab the project
     if (typeof projectOrId === 'string')
       projectOrId = projects.find(p => p._id === projectOrId)
 
@@ -235,7 +235,7 @@ export function GlobalProvider({ serverData, ...props }) {
       updateSettings({ currentProjectId: selectedProject._id })
     }
 
-    // notification
+    // notification when we load a project
     addAlert({
       type: 'project',
       msg: `${selectedProject.title.toUpperCase()}`,
