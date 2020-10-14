@@ -13,32 +13,31 @@ import Overlay from '@/shared/Modal/Overlay'
 import { fetcher } from '@/utils/clientHelpers'
 
 // todo: switch to project fires twice on intial project (currentProjectId clash?)
-// todo: clear global state when we delete all of our projects (last project state is left)
-// todo: more user friendly sharing? project title instead? (and when clash then add random suffix?) or half id? unique project title specifically for sharing?
-// todo: theme highlight needs to be dynamic for both light and dark mode (300, 400, 700)
-// todo: think about extending landing page
-// todo: alert for empty video src is not working
 // todo: double check alert for local video when it begins to fail
+// todo: alert for empty video src is not working
+// todo: clear global state when we delete all of our projects (last project state is left)
+
+// todo: theme highlight needs to be dynamic for both light and dark mode (300, 400, 700)
 // todo: if date-fns doesn't serve us for the timer duration then just make our own
 // todo: esc key to close modals
 // todo: unify text with text components
 // todo: staggerChildren integrated for list however potential an animatepresence clash is occurring? or it doesn't animate as the list data is dynamic.
 // todo: icons for each dropdown item
-// todo: load project alert rather than success?
+
+// todo: think about extending landing page
+
 // todo: create docker instance for demo purposes?
 
 // todo: drag progress bar to seek quickly
 // todo: edit timestamp
-// todo: on login, do occuassional clean up of 'removed' data if its older than... 2 weeks?
 
 // todo: mute option
 
 // todo: option to change password
 // todo: forget password option?
 
-// todo: only update settings for user when they are not default values
-
 // todo: speech to text synthesis on actionInput
+// todo: more user friendly sharing? project title instead? (and when clash then add random suffix?) or half id? unique project title specifically for sharing?
 // todo: think about mobile variant
 
 export default function Main({ serverData }) {
