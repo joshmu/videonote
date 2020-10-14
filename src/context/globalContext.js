@@ -41,7 +41,7 @@ export function GlobalProvider({ serverData, ...props }) {
 
   const { addAlert } = useNotificationContext()
 
-  // todo: check if this is still up to date
+  // todo: check if this is still up to date (currently not in use)
   const resetGlobalState = () => {
     setUser(null)
     setProjects([])
@@ -61,7 +61,11 @@ export function GlobalProvider({ serverData, ...props }) {
     if (projects.length === 0 && user) {
       // wipe any existing state if there were previously projects
       setCurrentProject(null)
-      addAlert({ type: 'info', msg: 'Create a project to start' })
+      addAlert({
+        type: 'info',
+        msg: 'Create a project to start',
+        duration: 8000,
+      })
     }
   }, [projects, user])
 
@@ -82,8 +86,6 @@ export function GlobalProvider({ serverData, ...props }) {
         console.log({ recentProject })
         loadProject(recentProject)
       }
-    } else {
-      // todo: reset state here for empty projects after deletion?
     }
   }, [projects, currentProject, settings])
 
@@ -225,8 +227,6 @@ export function GlobalProvider({ serverData, ...props }) {
 
   // typically handle project data or presume id has been passed
   const loadProject = projectOrId => {
-    // todo: when projectOrId is undefined then can we reset global state?
-
     console.log('switch to project', projectOrId)
     // id has been passed and we need to grab the project
     if (typeof projectOrId === 'string')
@@ -250,6 +250,7 @@ export function GlobalProvider({ serverData, ...props }) {
     addAlert({
       type: 'project',
       msg: `${selectedProject.title.toUpperCase()}`,
+      duration: 8000,
     })
   }
 
@@ -299,7 +300,6 @@ export function GlobalProvider({ serverData, ...props }) {
 
       setSettings({ ...SETTINGS_DEFAULTS, ...settings })
 
-      // alerts
       addAlert({ type: 'success', msg: `Logged in: ${user.username}` })
     } else {
       // if there is no account data then admin is not present, client is guest
