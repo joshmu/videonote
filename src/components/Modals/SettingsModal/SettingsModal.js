@@ -71,7 +71,7 @@ export default function SettingsModal({ toggle: toggleModal, motionKey }) {
             />
           </div>
 
-          <ModalPrimaryBtn onClick={handleUpdate}>Update</ModalPrimaryBtn>
+          <ModalPrimaryBtn handleClick={handleUpdate}>Update</ModalPrimaryBtn>
         </ModalForm>
       </ModalInnerContainer>
     </ModalContainer>

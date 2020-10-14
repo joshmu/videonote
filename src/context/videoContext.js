@@ -59,6 +59,8 @@ export function VideoProvider(props) {
     if (project !== null && project.src !== null) {
       console.log('project changed, setting url')
       if (project.src !== url) setUrl(project.src)
+    } else {
+      setUrl(null)
     }
   }, [project])
 

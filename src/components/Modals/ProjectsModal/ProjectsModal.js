@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { ImBin2 as TrashIcon } from 'react-icons/im'
 
 import Select from '@/components/shared/Select/Select'
@@ -9,8 +9,12 @@ import ModalHeader from '@/shared/Modal/ModalHeader'
 import ModalInnerContainer from '@/shared/Modal/ModalInnerContainer'
 
 export default function ProjectsModal({ toggle: toggleModal, motionKey }) {
-  const { projects, loadProject, removeProject } = useGlobalContext()
+  const { projects, loadProject, removeProject, modalOpen } = useGlobalContext()
   const [mousingOver, setMousingOver] = useState(null)
+
+  useEffect(() => {
+    if (projects.length === 0 && modalOpen === 'projects') toggleModal()
+  }, [projects, modalOpen])
 
   const handleSelection = _id => {
     loadProject(_id)

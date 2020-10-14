@@ -84,7 +84,7 @@ export default function CreateProjectModal({ toggle: toggleModal, motionKey }) {
           <LocalVideoForm handleVideoSrc={handleVideoSrc} />
 
           <div></div>
-          <ModalPrimaryBtn onClick={handleCreate}>Create</ModalPrimaryBtn>
+          <ModalPrimaryBtn handleClick={handleCreate}>Create</ModalPrimaryBtn>
         </ModalForm>
       </ModalInnerContainer>
     </ModalContainer>

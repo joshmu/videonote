@@ -1,6 +1,6 @@
 import { extractUser } from '@/utils/apiHelpers'
 import { authenticateToken, generateAccessToken } from '@/utils/jwt'
-import { User } from '@/utils/mongoose'
+import { Project, User } from '@/utils/mongoose'
 
 export default async (req, res) => {
   // Gather the jwt access token from the request header
@@ -29,7 +29,9 @@ export default async (req, res) => {
       await updateUser(userDoc, userData)
     }
     if (action === 'remove') {
-      // todo: test account deletion
+      // remove all projects associated to this user
+      await Project.deleteMany({ _id: { $in: userDoc.projectIds } })
+      // remove user
       await userDoc.remove()
       return res.status(200).json({ msg: `${userDoc.email} removed` })
     }

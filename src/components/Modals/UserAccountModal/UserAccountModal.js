@@ -1,3 +1,4 @@
+import { motion } from 'framer-motion'
 import { useEffect, useState } from 'react'
 
 import { useGlobalContext } from '@/context/globalContext'
@@ -10,8 +11,10 @@ import ModalInput from '@/shared/Modal/ModalInput'
 import ModalPrimaryBtn from '@/shared/Modal/ModalPrimaryBtn'
 import { isValidCredentials } from '@/utils/clientHelpers'
 
+import RemoveAccountBtn from './RemoveAccountBtn/RemoveAccountBtn'
+
 export default function UserAccountModal({ toggle: toggleModal, motionKey }) {
-  const { user, updateUser } = useGlobalContext()
+  const { user, updateUser, removeAccount } = useGlobalContext()
   const { addAlert } = useNotificationContext()
   const [state, setState] = useState({
     username: '',
@@ -39,6 +42,23 @@ export default function UserAccountModal({ toggle: toggleModal, motionKey }) {
     }
     updateUser(updateData)
     toggleModal()
+  }
+
+  const handleRemoveAccount = e => {
+    e.preventDefault()
+
+    if (state.password.length === 0)
+      return addAlert({ type: 'error', msg: 'Password required.' })
+
+    const answer = window.confirm(
+      `Are you sure you want to permanently delete the account and all data associated to ${
+        user.username || user.email
+      }?`
+    )
+    if (answer) {
+      removeAccount(user)
+      toggleModal()
+    }
   }
 
   const handleChange = e => {
@@ -80,11 +100,10 @@ export default function UserAccountModal({ toggle: toggleModal, motionKey }) {
             type='password'
           /> */}
           <div></div>
-          <div></div>
 
-          <ModalPrimaryBtn onClick={handleUpdate} type='submit'>
-            Update
-          </ModalPrimaryBtn>
+          <RemoveAccountBtn handleClick={handleRemoveAccount} />
+
+          <ModalPrimaryBtn handleClick={handleUpdate}>Update</ModalPrimaryBtn>
         </ModalForm>
       </ModalInnerContainer>
     </ModalContainer>

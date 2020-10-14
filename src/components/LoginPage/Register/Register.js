@@ -1,11 +1,11 @@
-import { useEffect, useState } from 'react'
-import Link from 'next/link'
 import { motion } from 'framer-motion'
-import ModalInput from '@/shared/Modal/ModalInput'
-import ModalPrimaryBtn from '@/shared/Modal/ModalPrimaryBtn'
+import Link from 'next/link'
+import { useEffect, useState } from 'react'
+import isEmail from 'validator/lib/isEmail'
 
 import { useNotificationContext } from '@/context/notificationContext'
-import isEmail from 'validator/lib/isEmail'
+import ModalInput from '@/shared/Modal/ModalInput'
+import ModalPrimaryBtn from '@/shared/Modal/ModalPrimaryBtn'
 import { fetcher } from '@/utils/clientHelpers'
 
 export default function Register({ toggleLoginView, handleLogin, email }) {
@@ -95,6 +95,7 @@ export default function Register({ toggleLoginView, handleLogin, email }) {
               aria-label='Email Address'
               value={user.registerEmail}
               onChange={handleChange}
+              autoFocus
             />
           </div>
 
@@ -120,7 +121,9 @@ export default function Register({ toggleLoginView, handleLogin, email }) {
           </div>
 
           <div className='flex items-center justify-end mt-4'>
-            <ModalPrimaryBtn onClick={handleSubmit}>Register</ModalPrimaryBtn>
+            <ModalPrimaryBtn handleClick={handleSubmit}>
+              Register
+            </ModalPrimaryBtn>
           </div>
         </form>
       </div>

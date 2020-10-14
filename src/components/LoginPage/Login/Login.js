@@ -1,12 +1,11 @@
-import { useState, useEffect } from 'react'
-import Link from 'next/link'
 import { motion } from 'framer-motion'
-
-import ModalInput from '@/shared/Modal/ModalInput'
-import ModalPrimaryBtn from '@/shared/Modal/ModalPrimaryBtn'
+import Link from 'next/link'
+import { useEffect, useState } from 'react'
+import isEmail from 'validator/lib/isEmail'
 
 import { useNotificationContext } from '@/context/notificationContext'
-import isEmail from 'validator/lib/isEmail'
+import ModalInput from '@/shared/Modal/ModalInput'
+import ModalPrimaryBtn from '@/shared/Modal/ModalPrimaryBtn'
 import { fetcher } from '@/utils/clientHelpers'
 
 export default function Login({ toggleLoginView, handleLogin, handleEmail }) {
@@ -46,11 +45,11 @@ export default function Login({ toggleLoginView, handleLogin, handleEmail }) {
 
     // 302 = found
     if (res.status === 302) {
-      addAlert({
-        type: 'info',
-        msg: `Signing in: ${data.user.username || data.user.email}`,
-        duration: 1000,
-      })
+      // addAlert({
+      //   type: 'info',
+      //   msg: `Signing in: ${data.user.username || data.user.email}`,
+      //   duration: 1000,
+      // })
       handleLogin(data)
     } else {
       if (data.msg.includes('registration required')) toggleLoginView(false)
@@ -96,6 +95,7 @@ export default function Login({ toggleLoginView, handleLogin, handleEmail }) {
               aria-label='Email Address'
               value={user.loginEmail}
               onChange={handleChange}
+              autoFocus
             />
           </div>
 
@@ -111,7 +111,7 @@ export default function Login({ toggleLoginView, handleLogin, handleEmail }) {
           </div>
 
           <div className='flex items-center justify-end mt-4'>
-            <ModalPrimaryBtn onClick={handleSubmit}>Login</ModalPrimaryBtn>
+            <ModalPrimaryBtn handleClick={handleSubmit}>Login</ModalPrimaryBtn>
           </div>
         </form>
       </div>

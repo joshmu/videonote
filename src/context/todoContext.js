@@ -1,4 +1,5 @@
 import { createContext, useContext, useEffect, useState } from 'react'
+
 import { useGlobalContext } from './globalContext'
 
 const todoContext = createContext({
@@ -13,7 +14,7 @@ const todoContext = createContext({
 })
 
 export function TodoProvider(props) {
-  const { project, updateProject } = useGlobalContext()
+  const { project, projects, updateProject } = useGlobalContext()
   const [todos, setTodos] = useState([])
   const [search, setSearch] = useState('')
 
@@ -21,6 +22,13 @@ export function TodoProvider(props) {
   useEffect(() => {
     if (project !== null) setTodos(project.todos)
   }, [project])
+
+  // when there are no projects present make sure state is reset
+  useEffect(() => {
+    if (projects.length > 0) return
+    setTodos([])
+    setSearch('')
+  }, [projects])
 
   // when todos change, update project
   useEffect(() => {

@@ -1,5 +1,6 @@
 import Router from 'next/router'
 import { createContext, useContext, useEffect, useState } from 'react'
+import Cookie from 'universal-cookie'
 
 import { fetcher } from '../../utils/clientHelpers'
 import { useNotificationContext } from './notificationContext'
@@ -57,9 +58,18 @@ export function GlobalProvider({ serverData, ...props }) {
 
   // notification recommend creating a project if there are no projects and we have loaded the user
   useEffect(() => {
-    if (projects.length === 0 && user)
+    if (projects.length === 0 && user) {
+      // wipe any existing state if there were previously projects
+      setCurrentProject(null)
       addAlert({ type: 'info', msg: 'Create a project to start' })
+    }
   }, [projects, user])
+
+  // reset settings.currentProjectId when projects are empty
+  useEffect(() => {
+    if (projects.length === 0 && settings.currentProjectId)
+      updateSettings({ currentProjectId: null })
+  }, [projects, settings.currentProjectId])
 
   // if we have projects and one isn't assigned then let's do it
   useEffect(() => {
@@ -68,8 +78,9 @@ export function GlobalProvider({ serverData, ...props }) {
         loadProject(settings.currentProjectId)
       } else {
         // otherwise use most recent project
-        const recentProjectId = projects.slice(-1)[0]
-        loadProject(recentProjectId)
+        const recentProject = projects.slice(-1)[0]
+        console.log({ recentProject })
+        loadProject(recentProject)
       }
     } else {
       // todo: reset state here for empty projects after deletion?
@@ -206,10 +217,10 @@ export function GlobalProvider({ serverData, ...props }) {
     // reset user's projects
     setProjects(projects)
     // grab newly created project from the server response and set
-    const insertedProject = projects.find(
-      p => p.src === project.src && p.title === project.title
-    )
-    loadProject(insertedProject)
+    // const insertedProject = projects.find(
+    //   p => p.src === project.src && p.title === project.title
+    // )
+    // loadProject(insertedProject)
   }
 
   // typically handle project data or presume id has been passed
@@ -353,6 +364,33 @@ export function GlobalProvider({ serverData, ...props }) {
     return false
   }
 
+  const removeAccount = async userData => {
+    console.log('removing account', userData.username)
+
+    // request account deletion
+    // api request to create project, assign user id to it
+    const body = {
+      action: 'remove',
+      // use passed data otherwise use current user information in global state
+      user: userData || user,
+    }
+
+    // api sends all available projects back
+    const { res, data } = await fetcher('/api/user', body)
+
+    if (badResponse(res, data.msg)) return
+
+    // presume status 200
+    addAlert({ type: 'success', msg: 'Account removed. Goodbye! 👋' })
+
+    // remove JWT token cookie
+    const cookies = new Cookie()
+    cookies.remove('token')
+
+    // redirect to landing page
+    Router.push('/hello')
+  }
+
   const value = {
     user,
     updateUser,
@@ -376,6 +414,7 @@ export function GlobalProvider({ serverData, ...props }) {
     HINTS,
     admin,
     copyToClipboard,
+    removeAccount,
   }
 
   return <globalContext.Provider value={value} {...props} />

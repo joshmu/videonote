@@ -1,12 +1,14 @@
 import { motion } from 'framer-motion'
 import ReactPlayer from 'react-player'
 
+import { useGlobalContext } from '@/context/globalContext'
 import { useVideoContext } from '@/context/videoContext'
 
 import ActionInput from '../ActionInput/ActionInput'
 import style from './videoPlayer.module.scss'
 
 export default function VideoPlayer() {
+  const { projects } = useGlobalContext()
   const {
     url,
     playing,
@@ -44,28 +46,30 @@ export default function VideoPlayer() {
     >
       {/* resposive wrapper */}
       <div className={`${style.playerWrapper} w-full h-full`}>
-        <ReactPlayer
-          url={url}
-          onError={handlePlayerError}
-          controls={false}
-          playing={playing}
-          volume={volume}
-          progressInterval={500}
-          onReady={handleReady}
-          onProgress={handleProgress}
-          config={{
-            youtube: {
-              playerVars: { showinfo: 0, autoplay: 0 },
-            },
-            vimeo: {},
-          }}
-          className={`${style.reactPlayer} `}
-          width='100%'
-          height='100%'
-        />
+        {url && (
+          <ReactPlayer
+            url={url}
+            onError={handlePlayerError}
+            controls={false}
+            playing={playing}
+            volume={volume}
+            progressInterval={500}
+            onReady={handleReady}
+            onProgress={handleProgress}
+            config={{
+              youtube: {
+                playerVars: { showinfo: 0, autoplay: 0 },
+              },
+              vimeo: {},
+            }}
+            className={`${style.reactPlayer} `}
+            width='100%'
+            height='100%'
+          />
+        )}
       </div>
       {/* input wrapper */}
-      {playerRef.current && (
+      {playerRef.current && projects.length > 0 && (
         <motion.div
           key='action-input'
           initial={{ opacity: 0, y: 10 }}

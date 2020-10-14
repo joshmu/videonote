@@ -66,25 +66,26 @@ const OptionsDropdown = ({ open }) => {
             </div>
           )}
 
-          {admin && <Select onClick={handleShareProject}>Share Project</Select>}
+          {admin && project && (
+            <Select onClick={handleShareProject}>Share Project</Select>
+          )}
 
           {admin && (
-            <>
-              <Select
-                onClick={handleClick}
-                data-modal='create'
-                animate={
-                  projects.length === 0
-                    ? 'animate-pulse text-highlight-400'
-                    : ''
-                }
-              >
-                create new
-              </Select>
-              <Select onClick={handleClick} data-modal='projects'>
-                projects
-              </Select>
-            </>
+            <Select
+              onClick={handleClick}
+              data-modal='create'
+              animate={
+                projects.length === 0 ? 'animate-pulse text-highlight-400' : ''
+              }
+            >
+              create new
+            </Select>
+          )}
+
+          {admin && projects.length > 0 && (
+            <Select onClick={handleClick} data-modal='projects'>
+              projects
+            </Select>
           )}
 
           <Select onClick={handleClick} data-modal='settings'>
@@ -93,7 +94,7 @@ const OptionsDropdown = ({ open }) => {
 
           {admin && (
             <Select onClick={handleClick} data-modal='user'>
-              profile
+              account
             </Select>
           )}
           {admin && (

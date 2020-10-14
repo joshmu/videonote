@@ -12,10 +12,11 @@ import { VideoProvider } from '@/context/videoContext'
 import Overlay from '@/shared/Modal/Overlay'
 import { fetcher } from '@/utils/clientHelpers'
 
-// todo: switch to project fires twice on intial project (currentProjectId clash?)
+// todo: stagger anim to dropdown
 // todo: double check alert for local video when it begins to fail
 // todo: alert for empty video src is not working
 // todo: clear global state when we delete all of our projects (last project state is left)
+// todo: primary modal btn and remove account btn should be the same component
 
 // todo: theme highlight needs to be dynamic for both light and dark mode (300, 400, 700)
 // todo: if date-fns doesn't serve us for the timer duration then just make our own
@@ -78,6 +79,7 @@ Main.getInitialProps = async ctx => {
       Location: `/hello`,
     })
     ctx.res.end()
+    return
   }
 
   // request data with JWT token
@@ -92,6 +94,7 @@ Main.getInitialProps = async ctx => {
       Location: `/login`,
     })
     ctx.res.end()
+    return
   }
 
   return { serverData: data }
