@@ -46,7 +46,7 @@ const SidebarHeader = () => {
         <motion.div
           whileHover={{ rotate: 90 }}
           className={
-            projects.length === 0 && 'animate-pulse text-highlight-400'
+            projects.length === 0 ? 'animate-pulse text-highlight-400' : ''
           }
         >
           <SettingsIcon
