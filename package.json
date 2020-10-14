@@ -1,10 +1,16 @@
 {
   "name": "videonote",
   "version": "0.1.0",
+  "author": {
+    "name": "josh mu",
+    "email": "hello@videonote.app",
+    "url": "https://joshmu.dev"
+  },
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start"
+    "start": "next start",
+    "prod": "next build && next start"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
@@ -26,6 +32,7 @@
     "validator": "^13.1.17"
   },
   "devDependencies": {
+    "babel-plugin-transform-remove-console": "^6.9.4",
     "imagemin-mozjpeg": "^9.0.0",
     "imagemin-optipng": "^8.0.0",
     "imagemin-svgo": "^8.0.0",
@@ -34,5 +41,14 @@
     "postcss-preset-env": "^6.7.0",
     "sass": "^1.26.11",
     "tailwindcss": "^1.8.10"
-  }
+  },
+  "keywords": [
+    "videonote",
+    "josh mu",
+    "todo",
+    "video",
+    "react",
+    "nextjs"
+  ],
+  "license": "MIT"
 }
