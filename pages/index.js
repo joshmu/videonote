@@ -38,6 +38,21 @@ import { fetcher } from '@/utils/clientHelpers'
 // todo: more user friendly sharing? project title instead? (and when clash then add random suffix?) or half id? unique project title specifically for sharing?
 // todo: think about mobile variant
 
+// todo: When signing up, the you have a generic error of “invalid credentials provided”. You should probably describe what has failed (I.e password does not meet requirements, requirements are ...)
+// todo: Error messages needs to be more informative. e.g. I had to guess what your password requirements were. Had to guess email was in cord t.
+// todo: Failure of logging assume I am a new user. Cool concept but from a User experience not good as users could have simply typed in their email incorrectly.
+// todo: Your credential error should not be explicit, I.e don’t say your password is incorrect. Instead should say email or password is incorrect. This reduces accounts being hacked. E.g I know the email has registered, so all I need to do is guess the password.
+// todo: confirmation modal, sometimes requiring password,  providing additional information to user
+// todo: remove trash can for notes when there are no notes
+// todo: provide option for user to cancel notification messages? longer for project listing?
+// todo: changing password in user account modal produces error page
+// todo: understand basic ux rules
+// todo: restrict playback offset to only handle negative numbers
+// todo: email account cannot handle full stops?  (is this normalisation occurring on the backend?)
+// todo: confirmation modal for all 'delete' actions (whenever action is irreversible)
+// todo: undo action for deleted projects and notes?
+// todo: detect new user and bring up welcome modal detailing workflow
+
 export default function Main({ serverData }) {
   return (
     <GlobalProvider serverData={serverData}>
