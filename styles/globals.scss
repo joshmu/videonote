@@ -49,7 +49,7 @@
   }
 }
 
-.theme-effective {
+.theme-superhero {
   --text: theme('colors.gray.100');
   --text2: #5a5560;
   --bg: #46344e;
@@ -62,10 +62,10 @@
   --select2: rgba(112, 135, 255, 0.1);
 
   .neu-bg {
-    @apply neu-effective;
+    @apply neu-superhero;
   }
   .neu-accent {
-    @apply neu-effective-accent;
+    @apply neu-superhero-accent;
   }
 }
 
@@ -152,7 +152,7 @@ body {
   box-shadow: 20px 20px 60px #364989, -20px -20px 60px #4a63b9;
 }
 
-.neu-effective-accent {
+.neu-superhero-accent {
   @apply rounded-sm;
   background: linear-gradient(145deg, #e1d522, #fffe29);
   box-shadow: 20px 20px 60px #d5c920, -20px -20px 60px #ffff2c;
@@ -172,7 +172,7 @@ body {
   box-shadow: -20px 20px 60px #d9d9d9, 20px -20px 60px #ffffff;
 }
 
-.neu-effective {
+.neu-superhero {
   @apply rounded-sm;
   background: linear-gradient(145deg, #3f2f46, #4b3853);
   box-shadow: 20px 20px 60px #3c2c42, -20px -20px 60px #513c5a;

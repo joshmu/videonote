@@ -53,7 +53,7 @@ export default function ThemeToggle({
           </motion.button>
         ) : (
           <motion.button
-            key='themeToggle-effective'
+            key='themeToggle-superhero'
             {...motionStyle}
             className='relative focus:outline-none'
           >

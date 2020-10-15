@@ -8,7 +8,7 @@ const themeContext = createContext({
 const THEME_TYPES = {
   dark: 'theme-dark',
   light: 'theme-light',
-  effective: 'theme-effective',
+  superhero: 'theme-superhero',
 }
 
 export function ThemeProvider(props) {
