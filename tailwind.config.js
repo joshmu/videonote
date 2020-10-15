@@ -30,11 +30,11 @@ module.exports = {
   },
   variants: {},
   plugins: [
-    plugin(function ({ addUtilities, theme }) {
+    plugin(function ({ addUtilities }) {
       const extendLineThrough = {
         '.line-through': {
           textDecoration: 'line-through',
-          textDecorationColor: theme('colors.highlight.400'),
+          textDecorationColor: 'var(--accent)',
         },
       }
 
