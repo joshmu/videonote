@@ -3,9 +3,9 @@ import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import isEmail from 'validator/lib/isEmail'
 
+import ModalPrimaryBtn from '@/components/shared/Modal/ModalBtn'
 import { useNotificationContext } from '@/context/notificationContext'
 import ModalInput from '@/shared/Modal/ModalInput'
-import ModalPrimaryBtn from '@/shared/Modal/ModalPrimaryBtn'
 import { fetcher } from '@/utils/clientHelpers'
 
 export default function Register({ toggleLoginView, handleLogin, email }) {

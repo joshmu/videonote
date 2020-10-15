@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion'
 import { useEffect, useState } from 'react'
 
+import ModalPrimaryBtn from '@/components/shared/Modal/ModalBtn'
 import { ToggleInput } from '@/components/shared/Toggle/Toggle'
 import { useGlobalContext } from '@/context/globalContext'
 import { useNotificationContext } from '@/context/notificationContext'
@@ -9,7 +10,6 @@ import ModalForm from '@/shared/Modal/ModalForm'
 import ModalHeader from '@/shared/Modal/ModalHeader'
 import ModalInnerContainer from '@/shared/Modal/ModalInnerContainer'
 import ModalInput from '@/shared/Modal/ModalInput'
-import ModalPrimaryBtn from '@/shared/Modal/ModalPrimaryBtn'
 
 import LocalVideoForm from '../../shared/LocalVideoForm/LocalVideoForm'
 import ExportNotes from './ExportNotes/ExportNotes'

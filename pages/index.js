@@ -16,7 +16,6 @@ import { fetcher } from '@/utils/clientHelpers'
 // todo: alert for empty video src is not working
 // todo: primary modal btn and remove account btn should be the same component
 
-// todo: theme highlight needs to be dynamic for both light and dark mode (300, 400, 700)
 // todo: if date-fns doesn't serve us for the timer duration then just make our own
 // todo: esc key to close modals
 // todo: unify text with text components

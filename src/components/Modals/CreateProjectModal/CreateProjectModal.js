@@ -1,5 +1,6 @@
 import { useState } from 'react'
 
+import ModalPrimaryBtn from '@/components/shared/Modal/ModalBtn'
 import { useGlobalContext } from '@/context/globalContext'
 import { useNotificationContext } from '@/context/notificationContext'
 import ModalContainer from '@/shared/Modal/ModalContainer'
@@ -7,7 +8,6 @@ import ModalForm from '@/shared/Modal/ModalForm'
 import ModalHeader from '@/shared/Modal/ModalHeader'
 import ModalInnerContainer from '@/shared/Modal/ModalInnerContainer'
 import ModalInput from '@/shared/Modal/ModalInput'
-import ModalPrimaryBtn from '@/shared/Modal/ModalPrimaryBtn'
 
 import LocalVideoForm from '../../shared/LocalVideoForm/LocalVideoForm'
 

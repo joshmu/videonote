@@ -1,6 +1,6 @@
-import { motion } from 'framer-motion'
 import { useEffect, useState } from 'react'
 
+import ModalPrimaryBtn from '@/components/shared/Modal/ModalBtn'
 import { useGlobalContext } from '@/context/globalContext'
 import { useNotificationContext } from '@/context/notificationContext'
 import ModalContainer from '@/shared/Modal/ModalContainer'
@@ -8,10 +8,7 @@ import ModalForm from '@/shared/Modal/ModalForm'
 import ModalHeader from '@/shared/Modal/ModalHeader'
 import ModalInnerContainer from '@/shared/Modal/ModalInnerContainer'
 import ModalInput from '@/shared/Modal/ModalInput'
-import ModalPrimaryBtn from '@/shared/Modal/ModalPrimaryBtn'
 import { isValidCredentials } from '@/utils/clientHelpers'
-
-import RemoveAccountBtn from './RemoveAccountBtn/RemoveAccountBtn'
 
 export default function UserAccountModal({ toggle: toggleModal, motionKey }) {
   const { user, updateUser, removeAccount } = useGlobalContext()
@@ -101,7 +98,16 @@ export default function UserAccountModal({ toggle: toggleModal, motionKey }) {
           /> */}
           <div></div>
 
-          <RemoveAccountBtn handleClick={handleRemoveAccount} />
+          {/* remove account btn */}
+          <div className='flex items-center'>
+            <ModalPrimaryBtn
+              handleClick={handleRemoveAccount}
+              type='button'
+              color='bg-red-400'
+            >
+              <span className='italic'>Remove Account</span>
+            </ModalPrimaryBtn>
+          </div>
 
           <ModalPrimaryBtn handleClick={handleUpdate}>Update</ModalPrimaryBtn>
         </ModalForm>
