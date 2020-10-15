@@ -14,7 +14,6 @@ import { fetcher } from '@/utils/clientHelpers'
 
 // todo: double check alert for local video when it begins to fail
 // todo: alert for empty video src is not working
-// todo: primary modal btn and remove account btn should be the same component
 
 // todo: if date-fns doesn't serve us for the timer duration then just make our own
 // todo: esc key to close modals
@@ -23,6 +22,7 @@ import { fetcher } from '@/utils/clientHelpers'
 // todo: icons for each dropdown item
 
 // todo: think about extending landing page
+// todo: insert an accept cookies msg? or should we avoid cookies so we don't need this?
 
 // todo: create docker instance for demo purposes?
 
