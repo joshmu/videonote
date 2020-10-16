@@ -1,11 +1,11 @@
 import { motion } from 'framer-motion'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
-import isEmail from 'validator/lib/isEmail'
 
 import ModalPrimaryBtn from '@/components/shared/Modal/ModalBtn'
 import { useNotificationContext } from '@/context/notificationContext'
 import ModalInput from '@/shared/Modal/ModalInput'
+import { isValidCredentials } from '@/utils/clientHelpers'
 import { fetcher } from '@/utils/clientHelpers'
 
 export default function Login({ toggleLoginView, handleLogin, handleEmail }) {
@@ -21,16 +21,17 @@ export default function Login({ toggleLoginView, handleLogin, handleEmail }) {
     setUser({ ...user, [e.target.id]: e.target.value })
   }
 
-  const isValidCredentials = () => {
-    const validEmail = isEmail(user.loginEmail)
-    const validPassword = user.loginPassword.length > 4
-    return validEmail && validPassword
-  }
   const handleSubmit = e => {
     e.preventDefault()
 
-    if (!isValidCredentials())
-      return addAlert({ type: 'error', msg: 'Invalid credentials provided' })
+    if (
+      !isValidCredentials({
+        email: user.loginEmail,
+        password: user.loginPassword,
+        addAlert,
+      })
+    )
+      return
 
     requestLogin()
   }
@@ -40,7 +41,7 @@ export default function Login({ toggleLoginView, handleLogin, handleEmail }) {
 
     addAlert({
       type: 'info',
-      msg: `Logging in: ${user.loginEmail}`,
+      msg: `Logging in...`,
       duration: 2000,
     })
 
@@ -53,9 +54,6 @@ export default function Login({ toggleLoginView, handleLogin, handleEmail }) {
     // 302 = found
     if (res.status === 302) {
       handleLogin(data)
-    } else {
-      if (data.msg.includes('registration required')) toggleLoginView(false)
-      addAlert({ type: 'error', msg: data.msg })
     }
   }
 

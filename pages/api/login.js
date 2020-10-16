@@ -12,8 +12,10 @@ export default async (req, res) => {
   const email = normalizeEmail(req.body.email)
 
   // validate
+  const globalResponseMsg = 'Your Email or Password is incorrect.'
   if (email && !isEmail(email)) {
-    res.status(400).json({ msg: 'The email you entered is invalid.' })
+    // res.status(400).json({ msg: 'The email you entered is invalid.' })
+    res.status(400).json({ msg: globalResponseMsg })
     return
   }
   if (!password) {
@@ -21,7 +23,8 @@ export default async (req, res) => {
     return
   }
   if ((await User.countDocuments({ email })) === 0) {
-    res.status(404).json({ msg: 'Email not found, registration required.' })
+    // res.status(404).json({ msg: 'Email not found, registration required.' })
+    res.status(404).json({ msg: globalResponseMsg })
     return
   }
 
@@ -31,7 +34,8 @@ export default async (req, res) => {
   // compare passwords
   const match = await bcrypt.compare(password, user.password)
   if (!match) {
-    return res.status(401).json({ msg: 'Password is incorrect.' })
+    // return res.status(401).json({ msg: 'Password is incorrect.' })
+    return res.status(401).json({ msg: globalResponseMsg })
   }
 
   // token

@@ -1,11 +1,11 @@
 import { motion } from 'framer-motion'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
-import isEmail from 'validator/lib/isEmail'
 
 import ModalPrimaryBtn from '@/components/shared/Modal/ModalBtn'
 import { useNotificationContext } from '@/context/notificationContext'
 import ModalInput from '@/shared/Modal/ModalInput'
+import { isValidCredentials } from '@/utils/clientHelpers'
 import { fetcher } from '@/utils/clientHelpers'
 
 export default function Register({ toggleLoginView, handleLogin, email }) {
@@ -28,10 +28,19 @@ export default function Register({ toggleLoginView, handleLogin, email }) {
   const handleSubmit = async e => {
     e.preventDefault()
 
-    if (!isValidCredentials())
-      return addAlert({ type: 'error', msg: 'Invalid credentials provided' })
+    if (
+      !isValidCredentials({
+        email: user.registerEmail,
+        password: user.registerPassword,
+        password2: user.registerPassword2,
+        addAlert,
+      })
+    )
+      return
+
     await handleRegister()
   }
+
   const handleRegister = async () => {
     console.log('registering new user')
     const body = {
@@ -52,13 +61,7 @@ export default function Register({ toggleLoginView, handleLogin, email }) {
       addAlert({ type: 'error', msg: data.msg })
     }
   }
-  const isValidCredentials = () => {
-    const validEmail = isEmail(user.registerEmail)
-    const validPassword =
-      user.registerPassword.length > 4 &&
-      user.registerPassword === user.registerPassword2
-    return validEmail && validPassword
-  }
+
   const handleSwitchView = () => {
     toggleLoginView(true)
   }

@@ -1,9 +1,10 @@
-import { useVideoContext } from '@/context/videoContext'
-import { useTodoContext } from '@/context/todoContext'
 import { useEffect } from 'react'
 
+import { useTodoContext } from '@/context/todoContext'
+import { useVideoContext } from '@/context/videoContext'
+
 export default function Search() {
-  const { search, updateSearch } = useTodoContext()
+  const { search, updateSearch, todos } = useTodoContext()
   const { toggleSmartControls } = useVideoContext()
 
   useEffect(() => {
@@ -18,12 +19,14 @@ export default function Search() {
   }
 
   return (
-    <input
-      className='w-full transition-colors duration-300 ease-in-out bg-transparent placeholder-themeText2 focus:outline-none fo5us:outline-none text-temeText'
-      type='text'
-      placeholder='Search'
-      value={search}
-      onChange={handleChange}
-    />
+    todos.length > 0 && (
+      <input
+        className='w-full transition-colors duration-300 ease-in-out bg-transparent placeholder-themeText2 focus:outline-none fo5us:outline-none text-temeText'
+        type='text'
+        placeholder='Search'
+        value={search}
+        onChange={handleChange}
+      />
+    )
   )
 }

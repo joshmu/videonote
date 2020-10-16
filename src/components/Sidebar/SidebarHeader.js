@@ -26,17 +26,23 @@ const SidebarHeader = () => {
   }
 
   return (
-    <div className='relative flex items-center justify-between transition-colors duration-300 ease-in-out border-b border-themeText2'>
+    <div
+      className={`${
+        projects.length > 0 ? 'border-b' : ''
+      } relative flex items-center justify-between transition-colors duration-300 ease-in-out border-themeText2`}
+    >
       <div className='flex items-center w-full h-10'>
         {/* arrow slider icon */}
-        <div
-          onClick={toggleOpen}
-          className={`${
-            sidebarOpen ? 'rotate-0' : 'rotate-180 -translate-x-full'
-          } relative text-4xl mr-2 transform text-themeAccent2 z-10 bg-transparent transition-all hover:text-themeAccent duration-500 ease-in-out cursor-pointer`}
-        >
-          <ArrowIcon className='fill-current' />
-        </div>
+        {projects.length > 0 && (
+          <div
+            onClick={toggleOpen}
+            className={`${
+              sidebarOpen ? 'rotate-0' : 'rotate-180 -translate-x-full'
+            } relative text-4xl mr-2 transform text-themeAccent2 z-10 bg-transparent transition-all hover:text-themeAccent duration-500 ease-in-out cursor-pointer`}
+          >
+            <ArrowIcon className='fill-current' />
+          </div>
+        )}
 
         <Search />
       </div>

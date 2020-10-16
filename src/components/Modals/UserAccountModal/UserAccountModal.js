@@ -17,7 +17,6 @@ export default function UserAccountModal({ toggle: toggleModal, motionKey }) {
     username: '',
     email: '',
     password: '',
-    passwordConfirmation: '',
   })
 
   useEffect(() => {
@@ -27,8 +26,15 @@ export default function UserAccountModal({ toggle: toggleModal, motionKey }) {
   const handleUpdate = e => {
     e.preventDefault()
 
-    if (!isValidCredentials({ ...state }))
-      return addAlert({ type: 'error', msg: 'Invalid credentials provided' })
+    if (
+      !isValidCredentials({
+        username: state.username,
+        email: state.email,
+        password: state.password,
+        addAlert,
+      })
+    )
+      return
 
     const name = state.username !== state.email ? state.username : state.email
     addAlert({ type: 'info', msg: `Updating account: ${name}` })
@@ -89,13 +95,7 @@ export default function UserAccountModal({ toggle: toggleModal, motionKey }) {
             id='password'
             type='password'
           />
-          {/* <ModalInput
-            value={state.passwordConfirmation}
-            onChange={handleChange}
-            title='Password Confirmation'
-            id='passwordConfirmation'
-            type='password'
-          /> */}
+
           <div></div>
 
           {/* remove account btn */}

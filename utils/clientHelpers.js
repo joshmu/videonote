@@ -2,18 +2,41 @@ import Cookies from 'universal-cookie'
 import isEmail from 'validator/lib/isEmail'
 
 export const isValidCredentials = ({
-  username = undefined,
   email,
+  username = email,
   password,
-  passwordConfirmation,
+  password2 = password,
+  addAlert,
 }) => {
-  const validUsername = username === undefined || username.length > 2
   const validEmail = isEmail(email)
-  console.log({ password, passwordConfirmation })
-  const validPassword =
-    password.length > 4 &&
-    (passwordConfirmation ? password === passwordConfirmation : true)
-  return validUsername && validEmail && validPassword
+  const validUsername = username.length > 3
+  const validPassword = password.length > 5
+  const validPasswordMatch = password === password2
+
+  if (!validEmail) {
+    addAlert({ type: 'error', msg: 'Email in invalid.' })
+    return false
+  }
+  if (!validUsername) {
+    addAlert({
+      type: 'error',
+      msg: 'Username must be at least 3 characters long',
+    })
+    return false
+  }
+  if (!validPassword) {
+    addAlert({
+      type: 'error',
+      msg: 'Password needs to be at least 5 characters long.',
+    })
+    return false
+  }
+  if (!validPasswordMatch) {
+    addAlert({ type: 'error', msg: 'Passwords do not match.' })
+    return false
+  }
+
+  return validEmail && validPassword && validPasswordMatch
 }
 
 export const handleJwtToken = token => {
