@@ -48,7 +48,7 @@ import { fetcher } from '@/utils/clientHelpers'
 // todo: confirmation modal for all 'delete' actions (whenever action is irreversible)
 // todo: undo action for deleted projects and notes?
 // todo: detect new user and bring up welcome modal detailing workflow
-// todo: remove need for fragments when using logic of showing a component at root level
+// todo: when using localStorage use app namespace prefix? ie. vn:theme
 
 export default function Main({ serverData }) {
   return (

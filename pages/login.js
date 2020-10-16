@@ -14,8 +14,8 @@ export default function Login() {
   const [email, setEmail] = useState('')
 
   const toggleLoginView = (state = undefined) => {
-    const cmd = state === undefined ? !loginView : state
-    setLoginView(cmd)
+    const isLoginViewShowing = state === undefined ? !loginView : state
+    setLoginView(isLoginViewShowing)
   }
 
   const handleLogin = data => {

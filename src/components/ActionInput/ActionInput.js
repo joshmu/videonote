@@ -28,10 +28,10 @@ const ActionInput = () => {
     if (active) setHint(getHint(HINTS, settings.showHints, hint))
   }, [active])
 
-  // disable smart controls when input is not empty
+  // enable smart controls when message field is empty
   useEffect(() => {
-    const cmd = todo.msg.length === 0
-    toggleSmartControls(cmd)
+    const enableSmartControls = todo.msg.length === 0
+    toggleSmartControls(enableSmartControls)
   }, [todo.msg])
 
   // auto focus

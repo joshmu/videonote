@@ -25,16 +25,14 @@ export default function ConfirmModal({ toggle: toggleModal, motionKey }) {
       <ModalInnerContainer>
         <ModalForm>
           {confirmation.passwordRequired ? (
-            <>
-              <ModalInput
-                placeholder='verify password'
-                id='password'
-                type='password'
-                value={password}
-                onChange={handleChange}
-                autoFocus
-              />
-            </>
+            <ModalInput
+              placeholder='verify password'
+              id='password'
+              type='password'
+              value={password}
+              onChange={handleChange}
+              autoFocus
+            />
           ) : (
             <div></div>
           )}

@@ -7,9 +7,10 @@ export default function Search() {
   const { search, updateSearch, todos } = useTodoContext()
   const { toggleSmartControls } = useVideoContext()
 
+  // enable smart controls when search box is empty
   useEffect(() => {
-    const cmd = search.length === 0
-    toggleSmartControls(cmd)
+    const enableSmartControls = search.length === 0
+    toggleSmartControls(enableSmartControls)
   }, [search])
 
   const handleChange = e => {

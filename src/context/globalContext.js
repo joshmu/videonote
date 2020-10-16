@@ -204,8 +204,8 @@ export function GlobalProvider({ serverData, ...props }) {
   }
 
   const toggleSettingsOpen = (state = undefined) => {
-    const cmd = state ? state : !settingsOpen
-    setSettingsOpen(cmd)
+    const isSettingsOpen = state ? state : !settingsOpen
+    setSettingsOpen(isSettingsOpen)
   }
   const toggleSidebar = (state = undefined) => {
     setSidebarOpen(currentState => {

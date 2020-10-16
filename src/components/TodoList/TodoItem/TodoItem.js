@@ -4,20 +4,19 @@ import { useEffect, useState } from 'react'
 import Select from '@/components/shared/Select/Select'
 import { useTodoContext } from '@/context/todoContext'
 import { useVideoContext } from '@/context/videoContext'
-import MotionFadeInOut from '@/shared/ux/MotionFadeInOut'
 
 import TimeDisplay from '../../shared/TimeDisplay/TimeDisplay'
 
 export default function TodoItem({ todo, close, childVariants }) {
   const { id, msg, person: category = null, time, done = false } = todo
   const { seekTo, toggleSmartControls } = useVideoContext()
-  const { updateTodo, removeTodo } = useTodoContext()
+  const { updateTodo } = useTodoContext()
   const [edit, setEdit] = useState(false)
 
   // no smart controls whilst editing
   useEffect(() => {
-    const cmd = !edit
-    toggleSmartControls(cmd)
+    const enableSmartControls = !edit
+    toggleSmartControls(enableSmartControls)
   }, [edit])
 
   const handleTimeClick = () => {
