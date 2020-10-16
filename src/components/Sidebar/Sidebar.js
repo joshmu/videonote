@@ -68,11 +68,13 @@ export default function Sidebar(props) {
       {...props}
     >
       {/* sidebar edge for resizing */}
-      <div
-        className='absolute left-0 z-10 w-6 h-full transform -translate-x-4/5'
-        style={{ cursor: 'ew-resize' }}
-        onMouseDown={handleStartResize}
-      ></div>
+      {sidebarOpen && (
+        <div
+          className='absolute left-0 z-10 w-6 h-full transform -translate-x-4/5'
+          style={{ cursor: 'ew-resize' }}
+          onMouseDown={handleStartResize}
+        ></div>
+      )}
 
       {/* sidebar inner wrapper to maintain width */}
       <div
