@@ -4,6 +4,7 @@ import { useGlobalContext } from '@/context/globalContext'
 import { useVideoContext } from '@/context/videoContext'
 
 import AboutModal from './AboutModal/AboutModal'
+import ConfirmModal from './ConfirmModal/ConfirmModal'
 import CreateProjectModal from './CreateProjectModal/CreateProjectModal'
 import CurrentProjectModal from './CurrentProjectModal/CurrentProjectModal'
 import HelpModal from './HelpModal/HelpModal'
@@ -12,45 +13,55 @@ import SettingsModal from './SettingsModal/SettingsModal'
 import UserAccountModal from './UserAccountModal/UserAccountModal'
 
 export default function Modals() {
-  const { modalOpen, toggleModalOpen } = useGlobalContext()
+  const {
+    modalsOpen,
+    toggleModalOpen,
+    confirmation,
+    confirmationCancel,
+  } = useGlobalContext()
   const { toggleSmartControls } = useVideoContext()
 
   useEffect(() => {
-    const cmd = !modalOpen
-    toggleSmartControls(cmd)
-  }, [modalOpen])
+    const enableSmartControls = !modalsOpen
+    toggleSmartControls(enableSmartControls)
+  }, [modalsOpen])
+
+  const checkModalOpen = modalId => modalsOpen.includes(modalId)
 
   return (
     <>
-      {modalOpen === 'current' && (
+      {checkModalOpen('current') && (
         <CurrentProjectModal
           toggle={toggleModalOpen}
           motionKey='currentProjectModal'
         />
       )}
-      {modalOpen === 'create' && (
+      {checkModalOpen('create') && (
         <CreateProjectModal
           toggle={toggleModalOpen}
           motionKey='createProjectModal'
         />
       )}
-      {modalOpen === 'projects' && (
+      {checkModalOpen('projects') && (
         <ProjectsModal toggle={toggleModalOpen} motionKey='projectsModal' />
       )}
-      {modalOpen === 'settings' && (
+      {checkModalOpen('settings') && (
         <SettingsModal toggle={toggleModalOpen} motionKey='settingsModal' />
       )}
-      {modalOpen === 'user' && (
+      {checkModalOpen('user') && (
         <UserAccountModal
           toggle={toggleModalOpen}
           motionKey='userAccountModal'
         />
       )}
-      {modalOpen === 'help' && (
+      {checkModalOpen('help') && (
         <HelpModal toggle={toggleModalOpen} motionKey='helpModal' />
       )}
-      {modalOpen === 'about' && (
+      {checkModalOpen('about') && (
         <AboutModal toggle={toggleModalOpen} motionKey='aboutModal' />
+      )}
+      {confirmation.open && (
+        <ConfirmModal toggle={confirmationCancel} motionKey='confirmModal' />
       )}
     </>
   )

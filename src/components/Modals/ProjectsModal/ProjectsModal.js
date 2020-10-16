@@ -9,12 +9,17 @@ import ModalHeader from '@/shared/Modal/ModalHeader'
 import ModalInnerContainer from '@/shared/Modal/ModalInnerContainer'
 
 export default function ProjectsModal({ toggle: toggleModal, motionKey }) {
-  const { projects, loadProject, removeProject, modalOpen } = useGlobalContext()
+  const {
+    projects,
+    loadProject,
+    removeProject,
+    modalsOpen,
+  } = useGlobalContext()
   const [mousingOver, setMousingOver] = useState(null)
 
   useEffect(() => {
-    if (projects.length === 0 && modalOpen === 'projects') toggleModal()
-  }, [projects, modalOpen])
+    if (projects.length === 0 && modalsOpen === 'projects') toggleModal()
+  }, [projects, modalsOpen])
 
   const handleSelection = _id => {
     loadProject(_id)

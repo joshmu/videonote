@@ -2,6 +2,8 @@ import Router from 'next/router'
 import { createContext, useContext, useEffect, useState } from 'react'
 import Cookie from 'universal-cookie'
 
+import useConfirmation from '@/hooks/useConfirmation'
+
 import { fetcher } from '../../utils/clientHelpers'
 import { useNotificationContext } from './notificationContext'
 
@@ -35,11 +37,17 @@ export function GlobalProvider({ serverData, ...props }) {
 
   const [sidebarOpen, setSidebarOpen] = useState(true)
   const [settingsOpen, setSettingsOpen] = useState(false)
-  const [modalOpen, setModalOpen] = useState(null)
+  const [modalsOpen, setModalsOpen] = useState([])
 
   const [admin, setAdmin] = useState(true)
 
   const { addAlert } = useNotificationContext()
+  const {
+    confirmation,
+    confirmationPrompt,
+    confirm: confirmationConfirm,
+    reset: confirmationCancel,
+  } = useConfirmation()
 
   // todo: check if this is still up to date (currently not in use)
   const resetGlobalState = () => {
@@ -48,7 +56,7 @@ export function GlobalProvider({ serverData, ...props }) {
     setSettings(SETTINGS_DEFAULTS)
     setCurrentProject(null)
     setSettingsOpen(false)
-    setModalOpen(false)
+    setModalsOpen([])
   }
 
   // initial response from server
@@ -206,11 +214,18 @@ export function GlobalProvider({ serverData, ...props }) {
     })
   }
   const toggleModalOpen = modalName => {
-    if (!modalName) return setModalOpen(null)
-    if (modalName === modalOpen) return setModalOpen(null)
-    setModalOpen(modalName)
-    setModalOpen(modalOpen === modalName ? null : modalName)
+    // if no param then turn off modals
+    if (!modalName) return setModalsOpen([])
+    // if modal name exists then find it and remove from modals open list
+    if (modalsOpen.includes(modalName))
+      return setModalsOpen(currentModals =>
+        currentModals.filter(modal => modal !== modalName)
+      )
+    // otherwise add modal to list of open modals
+    setModalsOpen(currentModals => [...currentModals, modalName])
+    // setModalsOpen(modalsOpen === modalName ? null : modalName)
   }
+
   const createProject = async project => {
     const response = await handleProjectApi('create', user, project)
     if (!response) return console.error('api error')
@@ -401,7 +416,7 @@ export function GlobalProvider({ serverData, ...props }) {
     updateSettings,
     settingsOpen,
     toggleSettingsOpen,
-    modalOpen,
+    modalsOpen,
     toggleModalOpen,
     createProject,
     resetGlobalState,
@@ -415,6 +430,10 @@ export function GlobalProvider({ serverData, ...props }) {
     admin,
     copyToClipboard,
     removeAccount,
+    confirmation,
+    confirmationPrompt,
+    confirmationConfirm,
+    confirmationCancel,
   }
 
   return <globalContext.Provider value={value} {...props} />

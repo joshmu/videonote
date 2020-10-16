@@ -11,7 +11,12 @@ import ModalInput from '@/shared/Modal/ModalInput'
 import { isValidCredentials } from '@/utils/clientHelpers'
 
 export default function UserAccountModal({ toggle: toggleModal, motionKey }) {
-  const { user, updateUser, removeAccount } = useGlobalContext()
+  const {
+    user,
+    updateUser,
+    removeAccount,
+    confirmationPrompt,
+  } = useGlobalContext()
   const { addAlert } = useNotificationContext()
   const [state, setState] = useState({
     username: '',
@@ -35,15 +40,21 @@ export default function UserAccountModal({ toggle: toggleModal, motionKey }) {
     )
       return
 
-    const name = state.username !== state.email ? state.username : state.email
-    addAlert({ type: 'info', msg: `Updating account: ${name}` })
-    console.log('updating account')
-    const updateData = {
-      username: state.username,
-      email: state.email,
-    }
-    updateUser(updateData)
-    toggleModal()
+    confirmationPrompt({
+      msg: 'Are you sure you want to update your account?',
+      action: () => {
+        const name =
+          state.username !== state.email ? state.username : state.email
+        addAlert({ type: 'info', msg: `Updating account: ${name}` })
+        console.log('updating account')
+        const updateData = {
+          username: state.username,
+          email: state.email,
+        }
+        updateUser(updateData)
+        toggleModal()
+      },
+    })
   }
 
   const handleRemoveAccount = e => {

@@ -19,6 +19,7 @@ export default function CurrentProjectModal({
   motionKey,
 }) {
   const { updateProject, project, copyToClipboard } = useGlobalContext()
+  const { addAlert } = useNotificationContext()
   const [state, setState] = useState(null)
 
   useEffect(() => {
@@ -27,11 +28,20 @@ export default function CurrentProjectModal({
 
   const handleUpdate = e => {
     e.preventDefault()
-    if (state.title.length === 0 || state.src.length === 0) return
-    if (state.title === project.title && state.src === project.src) return
+
+    if (state.title.length <= 3)
+      return addAlert({
+        type: 'error',
+        msg: 'Title needs to be atleast 3 characters long.',
+      })
 
     updateProject(state)
+    addAlert({ type: 'info', msg: `Updating project: ${state.title}` })
     toggleModal()
+  }
+
+  const canUpdate = () => {
+    return state.title !== project.title || state.src !== project.src
   }
 
   const handleChange = e => {
@@ -121,9 +131,16 @@ export default function CurrentProjectModal({
               </div>
 
               <div></div>
-              <ModalPrimaryBtn handleClick={handleUpdate}>
-                Update
-              </ModalPrimaryBtn>
+              {canUpdate() ? (
+                <ModalPrimaryBtn handleClick={handleUpdate}>
+                  Update
+                </ModalPrimaryBtn>
+              ) : (
+                <>
+                  <div></div>
+                  <div></div>
+                </>
+              )}
             </ModalForm>
           </ModalInnerContainer>
         </ModalContainer>

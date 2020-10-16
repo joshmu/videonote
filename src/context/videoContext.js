@@ -19,7 +19,7 @@ const videoContext = createContext({
   playerRef: {},
   smartControls: a => {},
   handlePlayerError: a => {},
-  enableSmartControls: true,
+  isSmartControlsEnabled: true,
   toggleSmartControls: (a = undefined) => {},
 })
 
@@ -38,7 +38,7 @@ export function VideoProvider(props) {
   const [playing, setPlaying] = useState(false)
   const [volume, setVolume] = useState(0.75)
   const [progress, setProgress] = useState({})
-  const [enableSmartControls, setEnableSmartControls] = useState(true)
+  const [isSmartControlsEnabled, setIsSmartControlsEnabled] = useState(true)
 
   const [action, setAction] = useAnounceAction('')
 
@@ -122,7 +122,7 @@ export function VideoProvider(props) {
   }
 
   const smartControls = key => {
-    if (!enableSmartControls) return
+    if (!isSmartControlsEnabled) return
 
     if (key === ' ') {
       togglePlay()
@@ -151,7 +151,7 @@ export function VideoProvider(props) {
 
   useSmartControls(smartControls, [
     progress,
-    enableSmartControls,
+    isSmartControlsEnabled,
     settings,
     playerRef,
   ])
@@ -175,12 +175,13 @@ export function VideoProvider(props) {
     addAlert({ type: 'error', msg: 'Player unable to load video.' })
   }
 
-  const toggleSmartControls = cmd => {
-    // don't do anything if no change is required
-    if (cmd === enableSmartControls) return
+  const toggleSmartControls = isEnabled => {
+    // don't do anything if already enabled
+    if (isEnabled === isSmartControlsEnabled) return
 
-    setEnableSmartControls(current => {
-      const updatedState = cmd === undefined ? !current : cmd
+    setIsSmartControlsEnabled(current => {
+      // if isEnable undefined then toggle
+      const updatedState = isEnabled === undefined ? !current : isEnabled
       // console.log('smart controls enabled:', updatedState)
       return updatedState
     })
@@ -221,7 +222,7 @@ export function VideoProvider(props) {
     smartControls,
     handlePlayerError,
     action,
-    enableSmartControls,
+    isSmartControlsEnabled,
     toggleSmartControls,
   }
 
