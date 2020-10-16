@@ -1,5 +1,5 @@
 import { nanoid } from 'nanoid'
-import React, { createContext, useContext, useRef, useState } from 'react'
+import React, { createContext, useContext, useState } from 'react'
 
 const notificationContext = createContext({
   alerts: [],
@@ -9,10 +9,6 @@ const notificationContext = createContext({
 
 export const NotificationProvider = ({ children }) => {
   const [alerts, setAlerts] = useState([])
-  // utilise useRef to avoid the setTimeout closure
-  // @see https://github.com/facebook/react/issues/14010
-  const alertsRef = useRef(alerts)
-  alertsRef.current = alerts
 
   const addAlert = ({
     msg,
@@ -28,17 +24,19 @@ export const NotificationProvider = ({ children }) => {
     }
 
     // don't add if duplicate message
-    if (alertsRef.current.some(alert => alert.msg === newAlert.msg)) {
+    if (alerts.some(alert => alert.msg === newAlert.msg)) {
       console.log('duplicate alert:', newAlert.msg)
       return
     }
 
-    setAlerts([...alertsRef.current, newAlert])
+    setAlerts(currentAlerts => [...currentAlerts, newAlert])
 
     // if we won't close manually then use timer
     if (!persistent) {
       setTimeout(() => {
-        setAlerts(alertsRef.current.filter(alert => alert.id !== newAlert.id))
+        setAlerts(currentAlerts =>
+          currentAlerts.filter(alert => alert.id !== newAlert.id)
+        )
       }, duration)
     }
 

@@ -4,39 +4,43 @@ import isEmail from 'validator/lib/isEmail'
 export const isValidCredentials = ({
   email,
   username = email,
-  password,
+  password = '',
   password2 = password,
+  passwordRequired = true,
   addAlert,
 }) => {
   const validEmail = isEmail(email)
-  const validUsername = username.length > 3
-  const validPassword = password.length > 5
+  const validUsername = username.length >= 3
+  const validPassword = password.length >= 5
   const validPasswordMatch = password === password2
+  let isValid = true
 
   if (!validEmail) {
     addAlert({ type: 'error', msg: 'Email in invalid.' })
-    return false
+    isValid = false
   }
   if (!validUsername) {
     addAlert({
       type: 'error',
       msg: 'Username must be at least 3 characters long',
     })
-    return false
+    isValid = false
   }
-  if (!validPassword) {
-    addAlert({
-      type: 'error',
-      msg: 'Password needs to be at least 5 characters long.',
-    })
-    return false
-  }
-  if (!validPasswordMatch) {
-    addAlert({ type: 'error', msg: 'Passwords do not match.' })
-    return false
+  if (passwordRequired) {
+    if (!validPassword) {
+      addAlert({
+        type: 'error',
+        msg: 'Password needs to be at least 5 characters long.',
+      })
+      isValid = false
+    }
+    if (!validPasswordMatch) {
+      addAlert({ type: 'error', msg: 'Passwords do not match.' })
+      isValid = false
+    }
   }
 
-  return validEmail && validPassword && validPasswordMatch
+  return isValid
 }
 
 export const handleJwtToken = token => {

@@ -12,7 +12,7 @@ export default async (req, res) => {
   const email = normalizeEmail(req.body.email)
 
   // validate
-  const globalResponseMsg = 'Your Email or Password is incorrect.'
+  const globalResponseMsg = 'Your Email and/or Password is incorrect.'
   if (email && !isEmail(email)) {
     // res.status(400).json({ msg: 'The email you entered is invalid.' })
     res.status(400).json({ msg: globalResponseMsg })

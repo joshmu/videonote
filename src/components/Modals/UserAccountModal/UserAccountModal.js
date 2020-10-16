@@ -16,7 +16,6 @@ export default function UserAccountModal({ toggle: toggleModal, motionKey }) {
   const [state, setState] = useState({
     username: '',
     email: '',
-    password: '',
   })
 
   useEffect(() => {
@@ -30,7 +29,7 @@ export default function UserAccountModal({ toggle: toggleModal, motionKey }) {
       !isValidCredentials({
         username: state.username,
         email: state.email,
-        password: state.password,
+        passwordRequired: false,
         addAlert,
       })
     )
@@ -88,14 +87,15 @@ export default function UserAccountModal({ toggle: toggleModal, motionKey }) {
             id='email'
             type='email'
           />
-          <ModalInput
+          {/* <ModalInput
             value={state.password}
             onChange={handleChange}
             title='Confirm Password'
             id='password'
             type='password'
-          />
+          /> */}
 
+          <div></div>
           <div></div>
 
           {/* remove account btn */}
