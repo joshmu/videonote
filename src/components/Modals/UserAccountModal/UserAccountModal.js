@@ -60,18 +60,23 @@ export default function UserAccountModal({ toggle: toggleModal, motionKey }) {
   const handleRemoveAccount = e => {
     e.preventDefault()
 
-    if (state.password.length === 0)
-      return addAlert({ type: 'error', msg: 'Password required.' })
-
-    const answer = window.confirm(
-      `Are you sure you want to permanently delete the account and all data associated to ${
-        user.username || user.email
-      }?`
-    )
-    if (answer) {
-      removeAccount(user)
-      toggleModal()
-    }
+    confirmationPrompt({
+      msg: (
+        <span>
+          Are you sure you want to permanently delete your account and all data
+          associated to{' '}
+          <span className='text-themeAccent'>
+            {user.username || user.email}
+          </span>
+          ?
+        </span>
+      ),
+      passwordRequired: true,
+      action: data => {
+        removeAccount({ ...user, ...data })
+        toggleModal()
+      },
+    })
   }
 
   const handleChange = e => {

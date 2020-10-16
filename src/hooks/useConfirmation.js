@@ -1,36 +1,40 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 
 const CONFIRMATION_DEFAULTS = {
-  open: false,
+  isOpen: false,
   msg: 'Are you sure?',
-  confirm: null,
   action: null,
+  passwordRequired: false,
 }
 
 const useConfirmation = () => {
   const [confirmation, setConfirmation] = useState(CONFIRMATION_DEFAULTS)
 
-  useEffect(() => {
-    // when confirmation is open and and answer is given
-    if (confirmation.open && confirmation.confirm !== null) {
-      // fire provided action if user confirms
-      if (confirmation.confirm && confirmation.action) confirmation.action()
-      // reset confirmation state
-      reset()
-    }
-  }, [confirmation])
-
-  const confirmationPrompt = ({ msg, action }) => {
+  const confirmationPrompt = ({ msg, action, passwordRequired = false }) => {
     // open confirmation modal with custom msg
-    setConfirmation(current => ({ ...current, open: true, msg, action }))
-    // user response (do this in the modal)
-    // return response
+    setConfirmation(current => ({
+      ...current,
+      isOpen: true,
+      msg,
+      passwordRequired,
+      action,
+    }))
   }
 
-  const confirm = () =>
-    setConfirmation(current => ({ ...current, confirm: true }))
+  const confirm = data => {
+    // when user confirms, fire callback action
+    confirmation.action(data)
+    reset()
+  }
 
-  const reset = () => setConfirmation(CONFIRMATION_DEFAULTS)
+  const reset = () => {
+    // close prompt first so we don't see data change
+    setConfirmation(current => ({ ...current, isOpen: false }))
+    // apply slight delay to account for animations
+    setTimeout(() => {
+      setConfirmation(CONFIRMATION_DEFAULTS)
+    }, 300)
+  }
 
   return { confirmation, confirmationPrompt, confirm, reset }
 }

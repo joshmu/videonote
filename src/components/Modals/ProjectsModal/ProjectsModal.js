@@ -14,6 +14,7 @@ export default function ProjectsModal({ toggle: toggleModal, motionKey }) {
     loadProject,
     removeProject,
     modalsOpen,
+    confirmationPrompt,
   } = useGlobalContext()
   const [mousingOver, setMousingOver] = useState(null)
 
@@ -27,11 +28,20 @@ export default function ProjectsModal({ toggle: toggleModal, motionKey }) {
   }
 
   const handleRemoveProject = ({ title, _id }) => {
-    const answer = window.confirm(
-      `Are you sure you want to delete the project: ${title.toUpperCase()}`
-    )
-    if (answer) removeProject(_id)
+    confirmationPrompt({
+      msg: (
+        <span>
+          Are you sure you want to remove the project:{' '}
+          <span className='text-themeAccent'>{title}?</span>
+        </span>
+      ),
+      action: () => {
+        removeProject(_id)
+      },
+    })
   }
+
+  const handleRemoveCompleted = () => {}
 
   const handleMousePosition = (inside, project) => {
     if (inside) setMousingOver(project._id)

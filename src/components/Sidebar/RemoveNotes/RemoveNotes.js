@@ -1,13 +1,28 @@
 import React from 'react'
 import { ImBin2 as TrashIcon } from 'react-icons/im'
 
+import { useGlobalContext } from '@/context/globalContext'
 import { useTodoContext } from '@/context/todoContext'
 
 const RemoveNotes = () => {
+  const { confirmationPrompt, project } = useGlobalContext()
   const { removeCompleted, todos } = useTodoContext()
 
   const handleRemoveCompleted = () => {
-    removeCompleted()
+    const todoCompletedCount = todos.filter(todo => todo.done).length
+    confirmationPrompt({
+      msg: (
+        <span>
+          Are you sure you want to remove your{' '}
+          <span className='text-themeAccent'>{todoCompletedCount}</span>{' '}
+          completed note{todoCompletedCount > 1 && 's'} for project:{' '}
+          <span className='text-themeAccent'>{project.title}</span>?
+        </span>
+      ),
+      action: () => {
+        removeCompleted()
+      },
+    })
   }
 
   return (

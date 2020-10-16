@@ -1,3 +1,5 @@
+import bcrypt from 'bcryptjs'
+
 import { extractUser } from '@/utils/apiHelpers'
 import { authenticateToken, generateAccessToken } from '@/utils/jwt'
 import { Project, User } from '@/utils/mongoose'
@@ -29,6 +31,11 @@ export default async (req, res) => {
       await updateUser(userDoc, userData)
     }
     if (action === 'remove') {
+      // check password
+      const match = await bcrypt.compare(userData.password, userDoc.password)
+      if (!match) {
+        return res.status(401).json({ msg: 'Password is incorrect.' })
+      }
       // remove all projects associated to this user
       await Project.deleteMany({ _id: { $in: userDoc.projectIds } })
       // remove user

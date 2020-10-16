@@ -1,3 +1,4 @@
+import { AnimatePresence } from 'framer-motion'
 import { useEffect } from 'react'
 
 import { useGlobalContext } from '@/context/globalContext'
@@ -29,40 +30,63 @@ export default function Modals() {
   const checkModalOpen = modalId => modalsOpen.includes(modalId)
 
   return (
-    <>
+    <AnimatePresence>
       {checkModalOpen('current') && (
         <CurrentProjectModal
           toggle={toggleModalOpen}
           motionKey='currentProjectModal'
+          key='currentProjectModal'
         />
       )}
       {checkModalOpen('create') && (
         <CreateProjectModal
           toggle={toggleModalOpen}
           motionKey='createProjectModal'
+          key='currentProjectModal'
         />
       )}
       {checkModalOpen('projects') && (
-        <ProjectsModal toggle={toggleModalOpen} motionKey='projectsModal' />
+        <ProjectsModal
+          toggle={toggleModalOpen}
+          motionKey='projectsModal'
+          key='projectsModal'
+        />
       )}
       {checkModalOpen('settings') && (
-        <SettingsModal toggle={toggleModalOpen} motionKey='settingsModal' />
+        <SettingsModal
+          toggle={toggleModalOpen}
+          motionKey='settingsModal'
+          key='settingsModal'
+        />
       )}
       {checkModalOpen('user') && (
         <UserAccountModal
           toggle={toggleModalOpen}
           motionKey='userAccountModal'
+          key='userAccountModal'
         />
       )}
       {checkModalOpen('help') && (
-        <HelpModal toggle={toggleModalOpen} motionKey='helpModal' />
+        <HelpModal
+          toggle={toggleModalOpen}
+          motionKey='helpModal'
+          key='helpModal'
+        />
       )}
       {checkModalOpen('about') && (
-        <AboutModal toggle={toggleModalOpen} motionKey='aboutModal' />
+        <AboutModal
+          toggle={toggleModalOpen}
+          motionKey='aboutModal'
+          key='aboutModal'
+        />
       )}
-      {confirmation.open && (
-        <ConfirmModal toggle={confirmationCancel} motionKey='confirmModal' />
+      {confirmation.isOpen && (
+        <ConfirmModal
+          toggle={confirmationCancel}
+          motionKey='confirmModal'
+          key='confirmModal'
+        />
       )}
-    </>
+    </AnimatePresence>
   )
 }

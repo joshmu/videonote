@@ -1,3 +1,4 @@
+import { AnimatePresence } from 'framer-motion'
 import absoluteUrl from 'next-absolute-url'
 import Cookies from 'universal-cookie'
 
@@ -38,7 +39,6 @@ import { fetcher } from '@/utils/clientHelpers'
 // todo: more user friendly sharing? project title instead? (and when clash then add random suffix?) or half id? unique project title specifically for sharing?
 // todo: think about mobile variant
 
-// todo: confirmation modal, sometimes requiring password,  providing additional information to user
 // todo: remove trash can for notes when there are no notes
 // todo: provide option for user to cancel notification messages? longer for project listing?
 // todo: changing password in user account modal produces error page
@@ -48,6 +48,7 @@ import { fetcher } from '@/utils/clientHelpers'
 // todo: confirmation modal for all 'delete' actions (whenever action is irreversible)
 // todo: undo action for deleted projects and notes?
 // todo: detect new user and bring up welcome modal detailing workflow
+// todo: remove need for fragments when using logic of showing a component at root level
 
 export default function Main({ serverData }) {
   return (

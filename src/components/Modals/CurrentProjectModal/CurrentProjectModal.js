@@ -77,74 +77,72 @@ export default function CurrentProjectModal({
   }
 
   return (
-    <>
-      {state && (
-        <ModalContainer toggle={toggleModal} motionKey={motionKey}>
-          <ModalHeader>{state.title}</ModalHeader>
+    state && (
+      <ModalContainer toggle={toggleModal} motionKey={motionKey}>
+        <ModalHeader>{state.title}</ModalHeader>
 
-          <ModalInnerContainer>
-            <ModalForm>
-              <ModalInput
-                title='Project Title'
-                id='title'
-                type='text'
-                value={state.title}
-                onChange={handleChange}
+        <ModalInnerContainer>
+          <ModalForm>
+            <ModalInput
+              title='Project Title'
+              id='title'
+              type='text'
+              value={state.title}
+              onChange={handleChange}
+            />
+
+            <ModalInput
+              title='Video URL'
+              placeholder='Dropbox, Youtube, Vimeo...'
+              id='src'
+              type='text'
+              value={state.src}
+              onChange={handleChange}
+            />
+
+            <LocalVideoForm handleVideoSrc={handleVideoSrc} />
+
+            <div className='relative mt-2'>
+              <ToggleInput
+                title={
+                  state.isPrivate
+                    ? 'Share this project?'
+                    : 'Sharing this project!'
+                }
+                state={!state.isPrivate}
+                onClick={handleShare}
               />
-
-              <ModalInput
-                title='Video URL'
-                placeholder='Dropbox, Youtube, Vimeo...'
-                id='src'
-                type='text'
-                value={state.src}
-                onChange={handleChange}
-              />
-
-              <LocalVideoForm handleVideoSrc={handleVideoSrc} />
-
-              <div className='relative mt-2'>
-                <ToggleInput
-                  title={
-                    state.isPrivate
-                      ? 'Share this project?'
-                      : 'Sharing this project!'
-                  }
-                  state={!state.isPrivate}
-                  onClick={handleShare}
-                />
-                {!state.isPrivate && (
-                  <motion.a
-                    href={`https://videonote.app/vn/${project._id}`}
-                    target='_blank'
-                    whileHover={{ scale: 0.95 }}
-                    onClick={handleShareUrlClick}
-                    className='absolute italic cursor-pointer top-8 text-themeAccent'
-                  >
-                    videonote.app/vn/{project._id}
-                  </motion.a>
-                )}
-              </div>
-
-              <div className='mt-2'>
-                <ExportNotes />
-              </div>
-
-              <div></div>
-              {canUpdate() ? (
-                <ModalPrimaryBtn handleClick={handleUpdate}>
-                  Update
-                </ModalPrimaryBtn>
-              ) : (
-                <>
-                  <div></div>
-                  <div></div>
-                </>
+              {!state.isPrivate && (
+                <motion.a
+                  href={`https://videonote.app/vn/${project._id}`}
+                  target='_blank'
+                  whileHover={{ scale: 0.95 }}
+                  onClick={handleShareUrlClick}
+                  className='absolute italic cursor-pointer top-8 text-themeAccent'
+                >
+                  videonote.app/vn/{project._id}
+                </motion.a>
               )}
-            </ModalForm>
-          </ModalInnerContainer>
-        </ModalContainer>
-      )}
-    </>
+            </div>
+
+            <div className='mt-2'>
+              <ExportNotes />
+            </div>
+
+            <div></div>
+            {canUpdate() ? (
+              <ModalPrimaryBtn handleClick={handleUpdate}>
+                Update
+              </ModalPrimaryBtn>
+            ) : (
+              <>
+                <div></div>
+                <div></div>
+              </>
+            )}
+          </ModalForm>
+        </ModalInnerContainer>
+      </ModalContainer>
+    )
   )
 }
