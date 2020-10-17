@@ -69,6 +69,9 @@ export function GlobalProvider({ serverData, ...props }) {
     if (projects.length === 0 && user) {
       // wipe any existing state if there were previously projects
       setCurrentProject(null)
+      // presume user could be new (this could also occur if previous projects have been removed)
+
+      toggleModalOpen('welcome')
       addAlert({
         type: 'info',
         msg: 'Create a project to start',

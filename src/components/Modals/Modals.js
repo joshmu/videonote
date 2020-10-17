@@ -12,6 +12,7 @@ import HelpModal from './HelpModal/HelpModal'
 import ProjectsModal from './ProjectsModal/ProjectsModal'
 import SettingsModal from './SettingsModal/SettingsModal'
 import UserAccountModal from './UserAccountModal/UserAccountModal'
+import WelcomeModal from './WelcomeModal/WelcomeModal'
 
 export default function Modals() {
   const {
@@ -75,6 +76,13 @@ export default function Modals() {
       )}
       {checkModalOpen('about') && (
         <AboutModal
+          toggle={toggleModalOpen}
+          motionKey='aboutModal'
+          key='aboutModal'
+        />
+      )}
+      {checkModalOpen('welcome') && (
+        <WelcomeModal
           toggle={toggleModalOpen}
           motionKey='aboutModal'
           key='aboutModal'

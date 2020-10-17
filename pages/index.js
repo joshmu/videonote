@@ -49,6 +49,7 @@ import { fetcher } from '@/utils/clientHelpers'
 // todo: undo action for deleted projects and notes?
 // todo: detect new user and bring up welcome modal detailing workflow
 // todo: when using localStorage use app namespace prefix? ie. vn:theme
+// todo: slide in sidebar on load rather than the content of it?
 
 export default function Main({ serverData }) {
   return (
