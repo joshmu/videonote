@@ -39,7 +39,6 @@ import { fetcher } from '@/utils/clientHelpers'
 // todo: more user friendly sharing? project title instead? (and when clash then add random suffix?) or half id? unique project title specifically for sharing?
 // todo: think about mobile variant
 
-// todo: remove trash can for notes when there are no notes
 // todo: provide option for user to cancel notification messages? longer for project listing?
 // todo: changing password in user account modal produces error page
 // todo: understand basic ux rules
@@ -50,6 +49,9 @@ import { fetcher } from '@/utils/clientHelpers'
 // todo: detect new user and bring up welcome modal detailing workflow
 // todo: when using localStorage use app namespace prefix? ie. vn:theme
 // todo: slide in sidebar on load rather than the content of it?
+// todo: detect new user on signin and defer to register modal
+// todo: add about information to /hello
+// todo: create new project needs correct validation (compare to currentProjectModal)
 
 export default function Main({ serverData }) {
   return (

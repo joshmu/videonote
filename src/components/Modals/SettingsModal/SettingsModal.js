@@ -55,6 +55,7 @@ export default function SettingsModal({ toggle: toggleModal, motionKey }) {
             type='number'
             value={state.playOffset}
             onChange={handleChangeNum}
+            max='0'
           />
           <ModalInput
             title='Seek Jump (Seconds)'
@@ -62,6 +63,7 @@ export default function SettingsModal({ toggle: toggleModal, motionKey }) {
             type='number'
             value={state.seekJump}
             onChange={handleChangeNum}
+            min='1'
           />
           <div>
             <ToggleInput

@@ -29,10 +29,10 @@ export default function CurrentProjectModal({
   const handleUpdate = e => {
     e.preventDefault()
 
-    if (state.title.length <= 3)
+    if (state.title.length === 0)
       return addAlert({
         type: 'error',
-        msg: 'Title needs to be atleast 3 characters long.',
+        msg: 'Title required.',
       })
 
     updateProject(state)

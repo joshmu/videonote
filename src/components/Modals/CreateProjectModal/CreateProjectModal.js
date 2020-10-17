@@ -12,7 +12,7 @@ import ModalInput from '@/shared/Modal/ModalInput'
 import LocalVideoForm from '../../shared/LocalVideoForm/LocalVideoForm'
 
 export default function CreateProjectModal({ toggle: toggleModal, motionKey }) {
-  const { updateSettings, createProject } = useGlobalContext()
+  const { createProject } = useGlobalContext()
   const { addAlert } = useNotificationContext()
 
   const [project, setProject] = useState({
