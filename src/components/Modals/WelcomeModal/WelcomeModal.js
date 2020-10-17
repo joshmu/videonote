@@ -21,7 +21,7 @@ const WelcomeModal = ({ toggle: toggleModal, motionKey }) => {
           <span className='capitalize text-themeAccent'>
             settings <SettingsIcon className='inline-block mb-1 text-xl' />
           </span>{' '}
-          dropdown by clicking cog icon in the right hand corner of the screen.
+          dropdown in the right hand corner of the screen.
         </p>
         <p className='mt-2'>
           Select <span className='capitalize text-themeAccent'>Create New</span>{' '}
