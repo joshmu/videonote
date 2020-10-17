@@ -19,7 +19,6 @@ import { fetcher } from '@/utils/clientHelpers'
 // todo: esc key to close modals
 // todo: unify text with text components
 // todo: staggerChildren integrated for list however potential an animatepresence clash is occurring? or it doesn't animate as the list data is dynamic.
-// todo: icons for each dropdown item
 
 // todo: think about extending landing page
 // todo: insert an accept cookies msg? or should we avoid cookies so we don't need this?
