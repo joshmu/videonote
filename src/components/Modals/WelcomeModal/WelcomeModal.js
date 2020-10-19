@@ -1,7 +1,7 @@
 import ModalContainer from '@/shared/Modal/ModalContainer'
 import ModalHeader from '@/shared/Modal/ModalHeader'
 import ModalInnerContainer from '@/shared/Modal/ModalInnerContainer'
-import { MdSettings as SettingsIcon } from 'react-icons/md'
+import { MdSettings as MenuIcon } from 'react-icons/md'
 
 const WelcomeModal = ({ toggle: toggleModal, motionKey }) => {
   return (
@@ -12,7 +12,7 @@ const WelcomeModal = ({ toggle: toggleModal, motionKey }) => {
         <p className='mt-2'>
           All actions can be accessed from the{' '}
           <span className='capitalize text-themeAccent'>
-            settings <SettingsIcon className='inline-block mb-1 text-xl' />
+            menu <MenuIcon className='inline-block mb-1 text-xl' />
           </span>{' '}
           dropdown in the right hand corner of the screen.
         </p>

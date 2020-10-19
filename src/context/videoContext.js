@@ -31,7 +31,7 @@ export function VideoProvider(props) {
     toggleSidebar,
     toggleModalOpen,
     admin,
-    toggleSettingsOpen,
+    toggleMenuOpen,
   } = useGlobalContext()
   const { addAlert } = useNotificationContext()
   const playerRef = useRef(null)
@@ -58,8 +58,10 @@ export function VideoProvider(props) {
 
   useEffect(() => {
     if (project !== null && project.src !== null) {
-      console.log('project changed, setting url')
-      if (project.src !== url) setUrl(project.src)
+      if (project.src !== url) {
+        console.log('project changed, setting url')
+        setUrl(project.src)
+      }
     } else {
       setUrl(null)
     }
@@ -155,7 +157,7 @@ export function VideoProvider(props) {
     }
 
     if (key === 'Meta') {
-      toggleSettingsOpen()
+      toggleMenuOpen()
     }
   }
 

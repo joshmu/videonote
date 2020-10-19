@@ -1,29 +1,30 @@
 import { AnimatePresence, motion } from 'framer-motion'
 import Link from 'next/link'
-import Cookie from 'universal-cookie'
-import { MdAdd as CreateIcon } from 'react-icons/md'
-import { VscSettings as SettingsIcon } from 'react-icons/vsc'
 import {
-  RiUserSettingsLine as AccountIcon,
-  RiLogoutBoxLine as SignoutIcon,
-  RiLightbulbFlashLine as AboutIcon,
-} from 'react-icons/ri'
-import { IoIosHelpCircleOutline as HelpIcon } from 'react-icons/io'
-
-import {
+  AiOutlineFile as ProjectIcon,
   AiOutlineUnorderedList as ProjectsIcon,
   AiOutlineShareAlt as ShareIcon,
-  AiOutlineFile as ProjectIcon,
 } from 'react-icons/ai'
+import { IoIosHelpCircleOutline as HelpIcon } from 'react-icons/io'
+import { MdAdd as CreateIcon } from 'react-icons/md'
+import {
+  RiLightbulbFlashLine as AboutIcon,
+  RiUserSettingsLine as AccountIcon,
+  RiLogoutBoxLine as SignoutIcon,
+} from 'react-icons/ri'
+import { VscSettings as SettingsIcon } from 'react-icons/vsc'
+import Cookie from 'universal-cookie'
 
 import Select from '@/components/shared/Select/Select'
 import ThemeToggle from '@/components/shared/ThemeToggle/ThemeToggle'
 import { useGlobalContext } from '@/context/globalContext'
 import { useThemeContext } from '@/context/themeContext'
 
-const OptionsDropdown = ({ open }) => {
+import IconMenuItemWrapper from './IconMenuItemWrapper/IconMenuItemWrapper'
+
+const Menu = ({ open }) => {
   const {
-    toggleSettingsOpen,
+    toggleMenuOpen,
     toggleModalOpen,
     project,
     admin,
@@ -36,7 +37,7 @@ const OptionsDropdown = ({ open }) => {
   const handleClick = e => {
     const modalId = e.target.getAttribute('data-modal')
     toggleModalOpen(modalId)
-    toggleSettingsOpen()
+    toggleMenuOpen()
   }
 
   const handleSignOutClick = () => {
@@ -50,7 +51,7 @@ const OptionsDropdown = ({ open }) => {
   }
 
   const handleMouseLeave = () => {
-    toggleSettingsOpen(false)
+    toggleMenuOpen(false)
   }
 
   const handleShareProject = () => {
@@ -90,9 +91,9 @@ const OptionsDropdown = ({ open }) => {
                 data-modal='current'
                 text='text-themeAccent'
               >
-                <IconMenuWrapper>
+                <IconMenuItemWrapper>
                   <ProjectIcon />
-                </IconMenuWrapper>
+                </IconMenuItemWrapper>
                 <span className='uppercase'>{project.title}</span>
               </Select>
             )}
@@ -104,9 +105,9 @@ const OptionsDropdown = ({ open }) => {
 
             {admin && project && (
               <Select onClick={handleShareProject}>
-                <IconMenuWrapper>
+                <IconMenuItemWrapper>
                   <ShareIcon />
-                </IconMenuWrapper>
+                </IconMenuItemWrapper>
                 Share Project
               </Select>
             )}
@@ -119,34 +120,34 @@ const OptionsDropdown = ({ open }) => {
                   projects.length === 0 ? 'animate-pulse text-themeAccent' : ''
                 }
               >
-                <IconMenuWrapper>
+                <IconMenuItemWrapper>
                   <CreateIcon />
-                </IconMenuWrapper>
+                </IconMenuItemWrapper>
                 create new
               </Select>
             )}
 
             {admin && projects.length > 0 && (
               <Select onClick={handleClick} data-modal='projects'>
-                <IconMenuWrapper>
+                <IconMenuItemWrapper>
                   <ProjectsIcon />
-                </IconMenuWrapper>
+                </IconMenuItemWrapper>
                 projects
               </Select>
             )}
 
             <Select onClick={handleClick} data-modal='settings'>
-              <IconMenuWrapper>
+              <IconMenuItemWrapper>
                 <SettingsIcon />
-              </IconMenuWrapper>
+              </IconMenuItemWrapper>
               settings
             </Select>
 
             {admin && (
               <Select onClick={handleClick} data-modal='user'>
-                <IconMenuWrapper>
+                <IconMenuItemWrapper>
                   <AccountIcon />
-                </IconMenuWrapper>
+                </IconMenuItemWrapper>
                 account
               </Select>
             )}
@@ -154,9 +155,9 @@ const OptionsDropdown = ({ open }) => {
               <Link href='/hello' passHref>
                 <a>
                   <Select onClick={handleSignOutClick}>
-                    <IconMenuWrapper>
+                    <IconMenuItemWrapper>
                       <SignoutIcon />
-                    </IconMenuWrapper>
+                    </IconMenuItemWrapper>
                     Sign Out
                   </Select>
                 </a>
@@ -164,23 +165,23 @@ const OptionsDropdown = ({ open }) => {
             )}
 
             <Select onClick={handleThemeToggleClick}>
-              <IconMenuWrapper>
+              <IconMenuItemWrapper>
                 <ThemeToggle />
-              </IconMenuWrapper>
+              </IconMenuItemWrapper>
               Theme
             </Select>
 
             <Select onClick={handleClick} data-modal='help'>
-              <IconMenuWrapper>
+              <IconMenuItemWrapper>
                 <HelpIcon />
-              </IconMenuWrapper>
+              </IconMenuItemWrapper>
               Help
             </Select>
 
             <Select onClick={handleClick} data-modal='about'>
-              <IconMenuWrapper>
+              <IconMenuItemWrapper>
                 <AboutIcon />
-              </IconMenuWrapper>
+              </IconMenuItemWrapper>
               About VideoNote
             </Select>
           </motion.div>
@@ -190,8 +191,4 @@ const OptionsDropdown = ({ open }) => {
   )
 }
 
-const IconMenuWrapper = ({ children }) => (
-  <div className='relative flex items-center w-6 h-full mb-px'>{children}</div>
-)
-
-export default OptionsDropdown
+export default Menu

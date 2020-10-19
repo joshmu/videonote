@@ -10,7 +10,7 @@ import SidebarHeader from './SidebarHeader'
 
 export default function Sidebar(props) {
   const {
-    settingsOpen,
+    menuOpen,
     settings,
     updateSettings,
     sidebarOpen,

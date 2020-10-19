@@ -1,17 +1,17 @@
 import { motion } from 'framer-motion'
 import React from 'react'
 import { GoChevronRight as ArrowIcon } from 'react-icons/go'
-import { MdSettings as SettingsIcon } from 'react-icons/md'
+import { MdSettings as MenuIcon } from 'react-icons/md'
 
 import { useGlobalContext } from '@/context/globalContext'
 
-import OptionsDropdown from './OptionsDropdown/OptionsDropdown'
+import Menu from './Menu/Menu'
 import Search from './Search/Search'
 
 const SidebarHeader = () => {
   const {
-    toggleSettingsOpen,
-    settingsOpen,
+    toggleMenuOpen,
+    menuOpen,
     sidebarOpen,
     toggleSidebar,
     projects,
@@ -22,7 +22,7 @@ const SidebarHeader = () => {
   }
 
   const handleSettingsClick = () => {
-    toggleSettingsOpen()
+    toggleMenuOpen()
   }
 
   return (
@@ -55,13 +55,13 @@ const SidebarHeader = () => {
             projects.length === 0 ? 'animate-pulse text-themeAccent' : ''
           }
         >
-          <SettingsIcon
+          <MenuIcon
             onClick={handleSettingsClick}
             className='text-2xl fill-current'
           />
         </motion.div>
 
-        <OptionsDropdown open={settingsOpen} />
+        <Menu open={menuOpen} />
       </div>
     </div>
   )

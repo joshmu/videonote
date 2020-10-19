@@ -37,7 +37,7 @@ export function GlobalProvider({ serverData, ...props }) {
   const [currentProject, setCurrentProject] = useState(null)
 
   const [sidebarOpen, setSidebarOpen] = useState(true)
-  const [settingsOpen, setSettingsOpen] = useState(false)
+  const [menuOpen, setMenuOpen] = useState(false)
   const [modalsOpen, setModalsOpen] = useState([])
 
   const [admin, setAdmin] = useState(true)
@@ -56,7 +56,7 @@ export function GlobalProvider({ serverData, ...props }) {
     setProjects([])
     setSettings(SETTINGS_DEFAULTS)
     setCurrentProject(null)
-    setSettingsOpen(false)
+    setMenuOpen(false)
     setModalsOpen([])
   }
 
@@ -207,9 +207,9 @@ export function GlobalProvider({ serverData, ...props }) {
     setUser(user)
   }
 
-  const toggleSettingsOpen = (state = undefined) => {
-    const isSettingsOpen = state ? state : !settingsOpen
-    setSettingsOpen(isSettingsOpen)
+  const toggleMenuOpen = (state = undefined) => {
+    const ismenuOpen = state ? state : !menuOpen
+    setMenuOpen(ismenuOpen)
   }
   const toggleSidebar = (state = undefined) => {
     setSidebarOpen(currentState => {
@@ -413,7 +413,7 @@ export function GlobalProvider({ serverData, ...props }) {
   const cancelModals = () => {
     if (modalsOpen.length > 0) setModalsOpen([])
     if (promptState.isOpen) promptCancel()
-    if (settingsOpen) setSettingsOpen(false)
+    if (menuOpen) setMenuOpen(false)
   }
   const handleGlobalEscapeKey = key => {
     if (key === 'Escape') {
@@ -430,8 +430,8 @@ export function GlobalProvider({ serverData, ...props }) {
     project: currentProject,
     settings,
     updateSettings,
-    settingsOpen,
-    toggleSettingsOpen,
+    menuOpen,
+    toggleMenuOpen,
     modalsOpen,
     toggleModalOpen,
     createProject,

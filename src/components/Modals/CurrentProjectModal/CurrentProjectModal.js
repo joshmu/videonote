@@ -100,7 +100,9 @@ export default function CurrentProjectModal({
               onChange={handleChange}
             />
 
-            <LocalVideoForm handleVideoSrc={handleVideoSrc} />
+            {state.src.length === 0 && (
+              <LocalVideoForm handleVideoSrc={handleVideoSrc} />
+            )}
 
             <div className='relative mt-2'>
               <ToggleInput
