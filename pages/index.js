@@ -18,13 +18,10 @@ import { fetcher } from '@/utils/clientHelpers'
 // todo: video file extension warnings... mkv (no audio)
 
 // todo: double check alert for local video when it begins to fail
-// todo: alert for empty video src is not working
 
 // todo: if date-fns doesn't serve us for the timer duration then just make our own
 
 // todo: unify text with text components
-
-// todo: staggerChildren integrated for list however potential an animatepresence clash is occurring? or it doesn't animate as the list data is dynamic.
 
 // todo: think about extending landing page
 // todo: insert an accept cookies msg? or should we avoid cookies so we don't need this?
@@ -49,13 +46,7 @@ import { fetcher } from '@/utils/clientHelpers'
 // todo: handle an audio file instead of a video file?
 // todo: naming scheme which can cover using audio?
 
-// todo: changing password in user account modal produces error page
-// todo: understand basic ux rules
-// todo: email account cannot handle full stops?  (is this normalisation occurring on the backend?)
 // todo: undo action for deleted projects and notes?
-// todo: detect new user and bring up welcome modal detailing workflow
-// todo: when using localStorage use app namespace prefix? ie. vn:theme
-// todo: slide in sidebar on load rather than the content of it?
 // todo: detect new user on signin and defer to register modal
 // todo: add about information to /hello
 // todo: create new project needs correct validation (compare to currentProjectModal)

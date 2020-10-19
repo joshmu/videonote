@@ -60,8 +60,9 @@ export function GlobalProvider({ serverData, ...props }) {
     setModalsOpen([])
   }
 
-  // initial response from server
+  // initial load
   useEffect(() => {
+    // initial response from server
     handleInitialServerData(serverData)
   }, [])
 

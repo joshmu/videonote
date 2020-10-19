@@ -81,7 +81,6 @@ const ActionInput = () => {
     if (isActive) setIsActive(false)
   }
 
-  // * keypress logic: space = play/pause, left-right = seek, up-down = volume
   const handleKeyDown = e => {
     if (todo.msg.length > 0) {
       if (e.key === 'Enter') handleSubmit()

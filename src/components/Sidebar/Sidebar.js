@@ -64,7 +64,7 @@ export default function Sidebar(props) {
       style={{
         width: sidebarOpen ? resizeState.size : 0,
       }}
-      className='relative flex flex-col h-auto transition-all duration-500 ease-in-out'
+      className='relative flex flex-col h-auto transition-all duration-500 ease-in-out bg-themeBg'
       {...props}
     >
       {/* sidebar edge for resizing */}
