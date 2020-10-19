@@ -7,21 +7,26 @@ export default function progressBar({ active }) {
     return (num * 100).toFixed(3) + '%'
   }
 
-  const calcCoord = e => {
+  const handleClick = e => {
+    const { x, width } = getCoords(e)
+    // percentage left
+    const percLeft = x / width
+    // convert to time
+    const secondsPosition = percLeft * duration
+    seekTo(secondsPosition)
+  }
+
+  const getCoords = e => {
     const rect = e.target.getBoundingClientRect()
     // x position within the element.
     const x = e.clientX - rect.left
-    // percentage left
-    const percLeft = x / rect.width
-    // convert to time
-    const secondsPosition = percLeft * duration
-    // console.log({ x, percLeft, timestampPosition })
-    seekTo(secondsPosition)
+    const y = e.clientY - rect.top
+    return { x, y, width: rect.width }
   }
 
   return (
     <div
-      onClick={calcCoord}
+      onClick={handleClick}
       className={`${
         active ? 'opacity-100' : 'opacity-90'
       } relative h-1 overflow-hidden text-xs bg-transparent cursor-pointer`}
