@@ -1,7 +1,7 @@
 import { createContext, useContext, useEffect, useRef, useState } from 'react'
 
 import { useAnounceAction } from '../hooks/useAnounceAction'
-import { useSmartControls } from '../hooks/useSmartControls'
+import useGlobalKeydown from '../hooks/useGlobalKeydown'
 import { useGlobalContext } from './globalContext'
 import { useNotificationContext } from './notificationContext'
 
@@ -147,9 +147,19 @@ export function VideoProvider(props) {
     if (key === 'Shift') {
       toggleSidebar()
     }
+
+    if (key === 'Alt') {
+      console.log('Alt/Option key pressed')
+      // * unused
+    }
+
+    if (key === 'Meta') {
+      console.log('Command key pressed')
+      // todo: open options drowdown
+    }
   }
 
-  useSmartControls(smartControls, [
+  useGlobalKeydown(smartControls, [
     progress,
     isSmartControlsEnabled,
     settings,

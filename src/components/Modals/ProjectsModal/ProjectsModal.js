@@ -14,7 +14,7 @@ export default function ProjectsModal({ toggle: toggleModal, motionKey }) {
     loadProject,
     removeProject,
     modalsOpen,
-    confirmationPrompt,
+    prompt,
   } = useGlobalContext()
   const [mousingOver, setMousingOver] = useState(null)
 
@@ -28,7 +28,7 @@ export default function ProjectsModal({ toggle: toggleModal, motionKey }) {
   }
 
   const handleRemoveProject = ({ title, _id }) => {
-    confirmationPrompt({
+    prompt({
       msg: (
         <span>
           Are you sure you want to remove the project:{' '}

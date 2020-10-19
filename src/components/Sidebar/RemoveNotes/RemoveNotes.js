@@ -5,12 +5,12 @@ import { useGlobalContext } from '@/context/globalContext'
 import { useTodoContext } from '@/context/todoContext'
 
 const RemoveNotes = () => {
-  const { confirmationPrompt, project } = useGlobalContext()
+  const { prompt, project } = useGlobalContext()
   const { removeCompleted, todos } = useTodoContext()
 
   const handleRemoveCompleted = () => {
     const todoCompletedCount = todos.filter(todo => todo.done).length
-    confirmationPrompt({
+    prompt({
       msg: (
         <span>
           Are you sure you want to remove your{' '}

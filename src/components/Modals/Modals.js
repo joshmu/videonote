@@ -18,8 +18,8 @@ export default function Modals() {
   const {
     modalsOpen,
     toggleModalOpen,
-    confirmation,
-    confirmationCancel,
+    promptState,
+    promptCancel,
   } = useGlobalContext()
   const { toggleSmartControls } = useVideoContext()
 
@@ -88,9 +88,9 @@ export default function Modals() {
           key='aboutModal'
         />
       )}
-      {confirmation.isOpen && (
+      {promptState.isOpen && (
         <ConfirmModal
-          toggle={confirmationCancel}
+          toggle={promptCancel}
           motionKey='confirmModal'
           key='confirmModal'
         />

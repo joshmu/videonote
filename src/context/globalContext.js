@@ -2,7 +2,8 @@ import Router from 'next/router'
 import { createContext, useContext, useEffect, useState } from 'react'
 import Cookie from 'universal-cookie'
 
-import useConfirmation from '@/hooks/useConfirmation'
+import useGlobalKeydown from '@/hooks/useGlobalKeydown'
+import usePrompt from '@/hooks/usePrompt'
 
 import { fetcher } from '../../utils/clientHelpers'
 import { useNotificationContext } from './notificationContext'
@@ -43,11 +44,11 @@ export function GlobalProvider({ serverData, ...props }) {
 
   const { addAlert } = useNotificationContext()
   const {
-    confirmation,
-    confirmationPrompt,
-    confirm: confirmationConfirm,
-    reset: confirmationCancel,
-  } = useConfirmation()
+    promptState,
+    prompt,
+    confirm: promptConfirm,
+    reset: promptCancel,
+  } = usePrompt()
 
   // todo: check if this is still up to date (currently not in use)
   const resetGlobalState = () => {
@@ -409,6 +410,18 @@ export function GlobalProvider({ serverData, ...props }) {
     Router.push('/hello')
   }
 
+  const cancelModals = () => {
+    if (modalsOpen.length > 0) setModalsOpen([])
+    if (promptState.isOpen) promptCancel()
+    if (settingsOpen) setSettingsOpen(false)
+  }
+  const handleGlobalEscapeKey = key => {
+    if (key === 'Escape') {
+      cancelModals()
+    }
+  }
+  useGlobalKeydown(handleGlobalEscapeKey, [cancelModals])
+
   const value = {
     user,
     updateUser,
@@ -433,10 +446,11 @@ export function GlobalProvider({ serverData, ...props }) {
     admin,
     copyToClipboard,
     removeAccount,
-    confirmation,
-    confirmationPrompt,
-    confirmationConfirm,
-    confirmationCancel,
+    promptState,
+    prompt,
+    promptConfirm,
+    promptCancel,
+    cancelModals,
   }
 
   return <globalContext.Provider value={value} {...props} />

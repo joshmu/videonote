@@ -8,18 +8,18 @@ export default function Overlay() {
   const {
     modalsOpen,
     toggleModalOpen,
-    confirmation,
-    confirmationCancel,
+    promptState,
+    promptCancel,
   } = useGlobalContext()
 
   useEffect(() => {
-    if (modalsOpen.length > 0 || confirmation.isOpen) setOpen(true)
-    if (modalsOpen.length === 0 && !confirmation.isOpen) setOpen(false)
-  }, [modalsOpen, confirmation])
+    if (modalsOpen.length > 0 || promptState.isOpen) setOpen(true)
+    if (modalsOpen.length === 0 && !promptState.isOpen) setOpen(false)
+  }, [modalsOpen, promptState])
 
   const handleOverlayClick = () => {
     setOpen(false)
-    if (confirmation.isOpen) confirmationCancel()
+    if (promptState.isOpen) promptCancel()
     if (modalsOpen.length > 0) toggleModalOpen()
   }
 
@@ -48,7 +48,7 @@ export default function Overlay() {
           variants={variants}
           onClick={handleOverlayClick}
           className={`${
-            confirmation.isOpen ? 'z-40 bg-opacity-75' : 'z-10 bg-opacity-50'
+            promptState.isOpen ? 'z-40 bg-opacity-75' : 'z-10 bg-opacity-50'
           } absolute top-0 bottom-0 left-0 right-0 bg-black`}
         ></motion.div>
       )}

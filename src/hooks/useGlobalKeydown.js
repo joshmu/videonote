@@ -1,6 +1,6 @@
 import { useEffect } from 'react'
 
-export const useSmartControls = (smartControls, dependencyArray) => {
+const useGlobalKeydown = (smartControls, dependencyArray = []) => {
   useEffect(() => {
     const handleKeys = event => {
       smartControls(event.key)
@@ -11,3 +11,5 @@ export const useSmartControls = (smartControls, dependencyArray) => {
     }
   }, dependencyArray)
 }
+
+export default useGlobalKeydown

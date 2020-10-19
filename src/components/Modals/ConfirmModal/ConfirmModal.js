@@ -8,23 +8,23 @@ import ModalForm from '@/shared/Modal/ModalForm'
 import ModalInnerContainer from '@/shared/Modal/ModalInnerContainer'
 
 export default function ConfirmModal({ toggle: toggleModal, motionKey }) {
-  const { confirmation, confirmationConfirm } = useGlobalContext()
+  const { promptState, promptConfirm } = useGlobalContext()
   const [password, setPassword] = useState('')
 
   const handleChange = e => {
     setPassword(e.target.value)
   }
   const handleConfirm = () => {
-    confirmationConfirm({ password })
+    promptConfirm({ password })
   }
 
   return (
     <ModalContainer toggle={toggleModal} motionKey={motionKey} zIndex='z-50'>
-      <p className='mt-2'>{confirmation.msg}</p>
+      <p className='mt-2'>{promptState.msg}</p>
 
       <ModalInnerContainer>
         <ModalForm>
-          {confirmation.passwordRequired ? (
+          {promptState.passwordRequired ? (
             <ModalInput
               placeholder='verify password'
               id='password'
@@ -34,7 +34,10 @@ export default function ConfirmModal({ toggle: toggleModal, motionKey }) {
               autoFocus
             />
           ) : (
-            <div></div>
+            <>
+              {/* need this due to grid spacing */}
+              <div></div>
+            </>
           )}
 
           <ModalPrimaryBtn handleClick={handleConfirm} type='button'>

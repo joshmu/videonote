@@ -16,14 +16,19 @@ import { fetcher } from '@/utils/clientHelpers'
 // todo: alert for empty video src is not working
 
 // todo: if date-fns doesn't serve us for the timer duration then just make our own
-// todo: esc key to close modals
+
+// todo: provide option for user to cancel notification messages? longer for project listing?
+
 // todo: unify text with text components
+
 // todo: staggerChildren integrated for list however potential an animatepresence clash is occurring? or it doesn't animate as the list data is dynamic.
 
 // todo: think about extending landing page
 // todo: insert an accept cookies msg? or should we avoid cookies so we don't need this?
+
 // todo: offer restrictation on sharing to avoid other users adding their own notes (editable) (DB)
 // todo: offer public url however password protected (DB)
+// todo: more user friendly sharing? project title instead? (and when clash then add random suffix?) or half id? unique project title specifically for sharing?
 
 // todo: create docker instance for demo purposes?
 
@@ -36,17 +41,14 @@ import { fetcher } from '@/utils/clientHelpers'
 // todo: forget password option?
 
 // todo: speech to text synthesis on actionInput
-// todo: more user friendly sharing? project title instead? (and when clash then add random suffix?) or half id? unique project title specifically for sharing?
 // todo: think about mobile variant
 
 // todo: handle an audio file instead of a video file?
 // todo: naming scheme which can cover using audio?
 
-// todo: provide option for user to cancel notification messages? longer for project listing?
 // todo: changing password in user account modal produces error page
 // todo: understand basic ux rules
 // todo: email account cannot handle full stops?  (is this normalisation occurring on the backend?)
-// todo: confirmation modal for all 'delete' actions (whenever action is irreversible)
 // todo: undo action for deleted projects and notes?
 // todo: detect new user and bring up welcome modal detailing workflow
 // todo: when using localStorage use app namespace prefix? ie. vn:theme
