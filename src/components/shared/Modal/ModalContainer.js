@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion'
 
-import CloseModalBtn from './CloseModalBtn'
+import CancelBtn from '../CancelBtn/CancelBtn'
 
 const ModalContainer = ({
   toggle,
@@ -28,7 +28,7 @@ const ModalContainer = ({
       {...props}
     >
       <div className='relative w-full p-6 mx-auto border rounded-sm shadow-md border-themeText bg-themeBg'>
-        <CloseModalBtn toggle={toggle} />
+        <CancelBtn cancel={toggle} />
         {children}
       </div>
     </motion.div>
