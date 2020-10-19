@@ -1,8 +1,6 @@
 # VideoNote
 
-A timestamping todo appication with slick intuitive controls to create notes on the fly whilst observing a video. ✨
-
-Feel free to get in touch or fly me some feedback. ✌️
+A video review app with slick intuitive controls to create timestamped notes on the fly. ✨
 
 ## Tech Stack
 
@@ -11,12 +9,14 @@ Feel free to get in touch or fly me some feedback. ✌️
 - [Framer Motion](https://www.framer.com/motion/)
 - [react-intersection-observer](https://github.com/thebuilder/react-intersection-observer)
 - [react-icons](https://github.com/react-icons/react-icons)
-- [nodemailer](https://github.com/nodemailer/nodemailer)
+- [mongoose](https://mongoosejs.com)
+- [react-player](https://github.com/CookPete/react-player)
+- [nodemailer](https://nodemailer.com)
+- [universal-cookie](https://github.com/reactivestack/cookies/tree/master/packages/universal-cookie)
+- [nanoid](https://github.com/ai/nanoid)
 
 Some additional experimental features are enabled in `tailwind.config.js`: _uniformColorPalette, extendedSpacingScale, extendedFontSizeScale_
 
-### Potentials
+### Run it
 
-- [react-scroll](https://github.com/fisshy/react-scroll)
-- [react-device-detect](https://github.com/duskload/react-device-detect)
-- [react-ga](https://github.com/react-ga/react-ga)
+`npm i && npm run dev`
