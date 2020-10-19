@@ -2,8 +2,10 @@ import { useEffect } from 'react'
 
 import { useTodoContext } from '@/context/todoContext'
 import { useVideoContext } from '@/context/videoContext'
+import { useGlobalContext } from '@/context/globalContext'
 
-export default function Search() {
+const Search = () => {
+  const { project } = useGlobalContext()
   const { search, updateSearch, todos } = useTodoContext()
   const { toggleSmartControls } = useVideoContext()
 
@@ -24,10 +26,12 @@ export default function Search() {
       <input
         className='w-full transition-colors duration-300 ease-in-out bg-transparent placeholder-themeText2 focus:outline-none fo5us:outline-none text-temeText'
         type='text'
-        placeholder='Search'
+        placeholder={`Search - ${project.title}`}
         value={search}
         onChange={handleChange}
       />
     )
   )
 }
+
+export default Search

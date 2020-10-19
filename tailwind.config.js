@@ -15,6 +15,7 @@ module.exports = {
         themeText2: 'var(--text2)',
         themeBg: 'var(--bg)',
         themeBg2: 'var(--bg2)',
+        themeBgOpacity: 'rgba(var(--bgNum), var(--bg-opacity))',
         themeAccent: 'var(--accent)',
         themeAccent2: 'var(--accent2)',
         themeSelect: 'var(--select)',

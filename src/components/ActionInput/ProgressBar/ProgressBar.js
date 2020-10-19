@@ -15,7 +15,7 @@ export default function progressBar({ active }) {
     >
       <div
         style={{ width: perc(progress.played) }}
-        className='absolute z-20 h-full bg-green-500'
+        className='absolute z-20 h-full bg-green-400'
       ></div>
       <div
         style={{ width: perc(progress.loaded) }}

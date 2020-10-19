@@ -21,13 +21,13 @@ const ActionInput = () => {
     msg: '',
     time: null,
   })
-  const [active, setActive] = useState(false)
+  const [isActive, setIsActive] = useState(false)
   const [hint, setHint] = useState(getHint(HINTS, settings.showHints))
 
   useEffect(() => {
     // generate new random hint each time we are focused on the input
-    if (active) setHint(getHint(HINTS, settings.showHints, hint))
-  }, [active])
+    if (isActive) setHint(getHint(HINTS, settings.showHints, hint))
+  }, [isActive])
 
   // enable smart controls when message field is empty
   useEffect(() => {
@@ -75,10 +75,10 @@ const ActionInput = () => {
   }, [todo.msg, todo.time, progress.playedSeconds])
 
   const handleFocus = e => {
-    if (!active) setActive(true)
+    if (!isActive) setIsActive(true)
   }
   const handleBlur = e => {
-    if (active) setActive(false)
+    if (isActive) setIsActive(false)
   }
 
   // * keypress logic: space = play/pause, left-right = seek, up-down = volume
@@ -96,10 +96,10 @@ const ActionInput = () => {
   return (
     <div
       className={`${
-        active ? 'bg-opacity-90' : 'bg-opacity-25'
-      } relative flex items-center w-full h-full bg-white`}
+        isActive ? 'bg-opacity-90' : 'bg-opacity-25'
+      } relative flex items-center w-full h-full bg-themeBgOpacity`}
     >
-      <div className='flex items-center self-center justify-center h-full text-gray-400 transition-all duration-150 ease-in-out bg-transparent rounded-r-none '>
+      <div className='flex items-center self-center justify-center h-full transition-all duration-150 ease-in-out bg-transparent rounded-r-none text-themeText2'>
         <TimeDisplay
           seconds={todo.time ? todo.time : progress.playedSeconds}
           lock={!!todo.time}
@@ -108,12 +108,12 @@ const ActionInput = () => {
 
       <input
         ref={inputRef}
-        className='relative w-full h-full px-2 py-1 text-gray-700 placeholder-gray-400 transition-all duration-150 ease-in-out bg-transparent rounded-sm rounded-b-none rounded-l-none text-md focus:outline-none'
+        className='relative w-full h-full px-2 py-1 transition-all duration-150 ease-in-out bg-transparent rounded-sm rounded-b-none rounded-l-none placeholder-themeText2 text-themeText text-md focus:outline-none'
         autoFocus={true}
         id='actionInput'
         name='addTodo'
         type='text'
-        placeholder={active ? hint : PLACEHOLDER}
+        placeholder={isActive ? hint : PLACEHOLDER}
         value={todo.msg}
         autoComplete='off'
         onChange={handleChange}
@@ -124,9 +124,9 @@ const ActionInput = () => {
 
       <ActionSymbols />
 
-      <TimeMarkers />
+      <TimeMarkers inputActive={isActive} />
       <div className='absolute bottom-0 left-0 w-full transform translate-y-full'>
-        <ProgressBar active={active} />
+        <ProgressBar active={isActive} />
       </div>
     </div>
   )
