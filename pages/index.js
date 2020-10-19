@@ -16,6 +16,8 @@ import { fetcher } from '@/utils/clientHelpers'
 // todo: options dropdown to position against side of viewport so it is visible via shortcut in full screen mode
 // todo: playback speed
 
+// todo: video file extension warnings... mkv (no audio)
+
 // todo: double check alert for local video when it begins to fail
 // todo: alert for empty video src is not working
 

@@ -39,8 +39,9 @@ export default function LocalVideoForm({ handleVideoSrc }) {
               variants={variants}
               className='absolute text-xs'
             >
-              Local videos cannot be shared with other users. For the best
-              experience use web accessible videos.
+              Local videos cannot be shared with other users and need to be
+              re-located per session. For the best experience use web accessible
+              videos.
             </motion.span>
           )}
         </AnimatePresence>

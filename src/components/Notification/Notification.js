@@ -45,7 +45,7 @@ export default function Notification() {
 
 const Alert = ({ type, msg, cancel }) => (
   <div className='relative flex w-full max-w-md mx-auto overflow-hidden border rounded-sm shadow-md bg-themeBg border-themeText2'>
-    <CancelBtn toggle={cancel} />
+    <CancelBtn cancel={cancel} />
     {type === 'project' && (
       <div className='flex items-center justify-center w-12 bg-themeAccent'>
         <ProjectIcon className='w-6 h-6 text-white fill-current' />

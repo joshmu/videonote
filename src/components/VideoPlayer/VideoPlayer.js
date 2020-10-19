@@ -13,6 +13,7 @@ export default function VideoPlayer() {
     url,
     playing,
     volume,
+    playbackRate,
     playerRef,
     handleReady,
     handleProgress,
@@ -53,6 +54,7 @@ export default function VideoPlayer() {
             controls={false}
             playing={playing}
             volume={volume}
+            playbackRate={playbackRate}
             progressInterval={500}
             onReady={handleReady}
             onProgress={handleProgress}

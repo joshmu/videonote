@@ -10,6 +10,8 @@ const videoContext = createContext({
   playing: false,
   volume: 0.75,
   setVolume: a => {},
+  playbackRate: 0.75,
+  setPlaybackRate: a => {},
   progress: { playedSeconds: 0, played: 0, loadedSeconds: 0, loaded: 0 },
   handleReady: a => {},
   url: '',
@@ -39,6 +41,7 @@ export function VideoProvider(props) {
   const [url, setUrl] = useState(null)
   const [playing, setPlaying] = useState(false)
   const [volume, setVolume] = useState(0.75)
+  const [playbackRate, setPlaybackRate] = useState(1)
   const [progress, setProgress] = useState({})
   const [isSmartControlsEnabled, setIsSmartControlsEnabled] = useState(true)
 
@@ -50,12 +53,18 @@ export function VideoProvider(props) {
     if (project && project.src.length === 0 && admin) {
       addAlert({
         type: 'warning',
-        msg: 'Video source required.',
+        msg: (
+          <span>
+            Please provide video source for project:{' '}
+            <span className='text-themeAccent'>{project.title}</span>
+          </span>
+        ),
+        duration: 12000,
       })
 
       toggleModalOpen('current')
     }
-  }, [])
+  }, [project, admin])
 
   useEffect(() => {
     if (project !== null && project.src !== null) {
@@ -171,6 +180,7 @@ export function VideoProvider(props) {
       addAlert({
         type: 'warning',
         msg: 'Please re-locate your video, via project settings.',
+        duration: 12000,
       })
 
       updateProject({ src: '' })
@@ -223,6 +233,8 @@ export function VideoProvider(props) {
     togglePlay,
     volume,
     setVolume,
+    playbackRate,
+    setPlaybackRate,
     changeVolume,
     handleProgress,
     progress,

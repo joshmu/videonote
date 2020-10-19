@@ -10,6 +10,7 @@ import ModalHeader from '@/shared/Modal/ModalHeader'
 import ModalInnerContainer from '@/shared/Modal/ModalInnerContainer'
 import ModalInput from '@/shared/Modal/ModalInput'
 
+import PlaybackRateSlider from './PlaybackRateSlider/PlaybackRateSlider'
 import VolumeSlider from './VolumeSlider/VolumeSlider'
 
 export default function SettingsModal({ toggle: toggleModal, motionKey }) {
@@ -63,14 +64,15 @@ export default function SettingsModal({ toggle: toggleModal, motionKey }) {
             min='1'
           />
           <VolumeSlider />
-          <ModalInput
+          <PlaybackRateSlider />
+          {/* <ModalInput
             title='List Sidebar Width (px)'
             id='sidebarWidth'
             value={state.sidebarWidth}
             onChange={handleChangeNum}
             type='number'
             min='50'
-          />
+          /> */}
           <div>
             <ToggleInput
               title='Show Hints'

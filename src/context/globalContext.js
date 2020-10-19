@@ -218,6 +218,7 @@ export function GlobalProvider({ serverData, ...props }) {
     })
   }
   const toggleModalOpen = modalName => {
+    console.log('opening modal', modalName)
     // if no param then turn off modals
     if (!modalName) return setModalsOpen([])
     // if modal name exists then find it and remove from modals open list
