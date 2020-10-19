@@ -1,17 +1,30 @@
 import { useVideoContext } from '@/context/videoContext'
 
 export default function progressBar({ active }) {
-  const { progress } = useVideoContext()
+  const { progress, duration, seekTo } = useVideoContext()
 
   const perc = num => {
     return (num * 100).toFixed(3) + '%'
   }
 
+  const calcCoord = e => {
+    const rect = e.target.getBoundingClientRect()
+    // x position within the element.
+    const x = e.clientX - rect.left
+    // percentage left
+    const percLeft = x / rect.width
+    // convert to time
+    const secondsPosition = percLeft * duration
+    // console.log({ x, percLeft, timestampPosition })
+    seekTo(secondsPosition)
+  }
+
   return (
     <div
+      onClick={calcCoord}
       className={`${
         active ? 'opacity-100' : 'opacity-90'
-      } relative h-1 overflow-hidden text-xs bg-transparent `}
+      } relative h-1 overflow-hidden text-xs bg-transparent cursor-pointer`}
     >
       <div
         style={{ width: perc(progress.played) }}
