@@ -7,6 +7,7 @@ import { useVideoContext } from '@/context/videoContext'
 import TimeDisplay from '../shared/TimeDisplay/TimeDisplay'
 import ActionSymbols from './ActionSymbols/ActionSymbols'
 import ProgressBar from './ProgressBar/ProgressBar'
+import TimeMarkers from './TimeMarkers/TimeMarkers'
 
 const PLACEHOLDER = 'Add Note...'
 
@@ -98,7 +99,7 @@ const ActionInput = () => {
         active ? 'bg-opacity-90' : 'bg-opacity-25'
       } relative flex items-center w-full h-full bg-white`}
     >
-      <div className='flex items-center self-center justify-center h-full px-2 text-gray-400 transition-all duration-150 ease-in-out bg-transparent rounded-r-none '>
+      <div className='flex items-center self-center justify-center h-full text-gray-400 transition-all duration-150 ease-in-out bg-transparent rounded-r-none '>
         <TimeDisplay
           seconds={todo.time ? todo.time : progress.playedSeconds}
           lock={!!todo.time}
@@ -123,6 +124,7 @@ const ActionInput = () => {
 
       <ActionSymbols />
 
+      <TimeMarkers />
       <div className='absolute bottom-0 left-0 w-full transform translate-y-full'>
         <ProgressBar active={active} />
       </div>

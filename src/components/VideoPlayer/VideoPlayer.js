@@ -18,6 +18,7 @@ export default function VideoPlayer() {
     handleReady,
     handleProgress,
     handlePlayerError,
+    handleDuration,
   } = useVideoContext()
 
   const videoContentVariants = {
@@ -56,6 +57,7 @@ export default function VideoPlayer() {
             volume={volume}
             playbackRate={playbackRate}
             progressInterval={500}
+            onDuration={handleDuration}
             onReady={handleReady}
             onProgress={handleProgress}
             config={{

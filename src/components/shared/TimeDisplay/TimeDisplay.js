@@ -1,6 +1,10 @@
 export default function TimeDisplay({ seconds = 0, lock = false }) {
   return (
-    <div className={`${lock ? 'text-themeAccent2' : ''}`}>
+    <div
+      className={`${
+        lock ? 'text-themeAccent bg-themeBg' : ''
+      } px-2 transition-all duration-200 ease-in-out h-full flex items-center`}
+    >
       {format(seconds)}
     </div>
   )

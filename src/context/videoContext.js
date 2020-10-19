@@ -12,6 +12,9 @@ const videoContext = createContext({
   setVolume: a => {},
   playbackRate: 0.75,
   setPlaybackRate: a => {},
+  duration: null,
+  setDuration: a => {},
+  handleDuration: a => {},
   progress: { playedSeconds: 0, played: 0, loadedSeconds: 0, loaded: 0 },
   handleReady: a => {},
   url: '',
@@ -42,6 +45,7 @@ export function VideoProvider(props) {
   const [playing, setPlaying] = useState(false)
   const [volume, setVolume] = useState(0.75)
   const [playbackRate, setPlaybackRate] = useState(1)
+  const [duration, setDuration] = useState(null)
   const [progress, setProgress] = useState({})
   const [isSmartControlsEnabled, setIsSmartControlsEnabled] = useState(true)
 
@@ -226,6 +230,10 @@ export function VideoProvider(props) {
     input.click()
   }
 
+  const handleDuration = data => {
+    setDuration(data)
+  }
+
   const value = {
     handleReady,
     url,
@@ -235,6 +243,9 @@ export function VideoProvider(props) {
     setVolume,
     playbackRate,
     setPlaybackRate,
+    duration,
+    setDuration,
+    handleDuration,
     changeVolume,
     handleProgress,
     progress,

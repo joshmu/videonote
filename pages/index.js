@@ -14,7 +14,6 @@ import { fetcher } from '@/utils/clientHelpers'
 
 // todo: options dropdown allow to scroll down list with keypress
 // todo: options dropdown to position against side of viewport so it is visible via shortcut in full screen mode
-// todo: playback speed
 
 // todo: video file extension warnings... mkv (no audio)
 
