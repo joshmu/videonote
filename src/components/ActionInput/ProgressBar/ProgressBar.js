@@ -1,23 +1,25 @@
+import { useRef } from 'react'
 import { useVideoContext } from '@/context/videoContext'
 
 export default function progressBar({ active }) {
   const { progress, duration, seekTo } = useVideoContext()
+  const progressRef = useRef(null)
 
   const perc = num => {
     return (num * 100).toFixed(3) + '%'
   }
 
   const handleClick = e => {
-    const { x, width } = getCoords(e)
-    // percentage left
+    const { x, width } = getCoords(e, progressRef)
+    // percentage of width from the left
     const percLeft = x / width
     // convert to time
     const secondsPosition = percLeft * duration
     seekTo(secondsPosition)
   }
 
-  const getCoords = e => {
-    const rect = e.target.getBoundingClientRect()
+  const getCoords = (e, ref) => {
+    const rect = ref.current.getBoundingClientRect()
     // x position within the element.
     const x = e.clientX - rect.left
     const y = e.clientY - rect.top
@@ -27,9 +29,10 @@ export default function progressBar({ active }) {
   return (
     <div
       onClick={handleClick}
+      ref={progressRef}
       className={`${
         active ? 'opacity-100' : 'opacity-90'
-      } relative h-1 overflow-hidden text-xs bg-transparent cursor-pointer`}
+      } relative h-1 overflow-hidden text-xs bg-transparent cursor-pointer w-full`}
     >
       <div
         style={{ width: perc(progress.played) }}
