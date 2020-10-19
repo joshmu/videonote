@@ -1,15 +1,15 @@
 import { useEffect } from 'react'
 
-const useGlobalKeydown = (smartControls, dependencyArray = []) => {
+const useGlobalKeydown = handler => {
   useEffect(() => {
     const handleKeys = event => {
-      smartControls(event.key)
+      handler(event.key)
     }
     globalThis.window.addEventListener('keydown', handleKeys)
     return () => {
       globalThis.window.removeEventListener('keydown', handleKeys)
     }
-  }, dependencyArray)
+  }, [handler])
 }
 
 export default useGlobalKeydown

@@ -31,6 +31,7 @@ export function VideoProvider(props) {
     toggleSidebar,
     toggleModalOpen,
     admin,
+    toggleSettingsOpen,
   } = useGlobalContext()
   const { addAlert } = useNotificationContext()
   const playerRef = useRef(null)
@@ -154,17 +155,11 @@ export function VideoProvider(props) {
     }
 
     if (key === 'Meta') {
-      console.log('Command key pressed')
-      // todo: open options drowdown
+      toggleSettingsOpen()
     }
   }
 
-  useGlobalKeydown(smartControls, [
-    progress,
-    isSmartControlsEnabled,
-    settings,
-    playerRef,
-  ])
+  useGlobalKeydown(smartControls)
 
   const handlePlayerError = error => {
     console.log('vn player error', error)

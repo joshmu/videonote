@@ -420,7 +420,7 @@ export function GlobalProvider({ serverData, ...props }) {
       cancelModals()
     }
   }
-  useGlobalKeydown(handleGlobalEscapeKey, [cancelModals])
+  useGlobalKeydown(handleGlobalEscapeKey)
 
   const value = {
     user,
