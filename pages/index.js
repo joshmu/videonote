@@ -20,8 +20,6 @@ import { fetcher } from '@/utils/clientHelpers'
 
 // todo: if date-fns doesn't serve us for the timer duration then just make our own
 
-// todo: provide option for user to cancel notification messages? longer for project listing?
-
 // todo: unify text with text components
 
 // todo: staggerChildren integrated for list however potential an animatepresence clash is occurring? or it doesn't animate as the list data is dynamic.

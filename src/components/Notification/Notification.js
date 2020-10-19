@@ -8,9 +8,13 @@ import {
 import { VscError as ErrorIcon } from 'react-icons/vsc'
 
 import { useNotificationContext } from '@/context/notificationContext'
+import CloseModalBtn from '../shared/Modal/CloseModalBtn'
 
 export default function Notification() {
-  const { alerts } = useNotificationContext()
+  const { alerts, removeAlert } = useNotificationContext()
+  const closeAlert = id => {
+    removeAlert(id)
+  }
 
   return (
     <div className='absolute top-0 left-0 z-50 w-full max-w-md'>
@@ -27,7 +31,11 @@ export default function Notification() {
               }}
               className='p-2'
             >
-              <Alert type={alert.type} msg={alert.msg} />
+              <Alert
+                type={alert.type}
+                msg={alert.msg}
+                cancel={() => closeAlert(alert.id)}
+              />
             </motion.div>
           ))}
       </AnimatePresence>
@@ -35,8 +43,9 @@ export default function Notification() {
   )
 }
 
-const Alert = ({ type, msg }) => (
-  <div className='flex w-full max-w-md mx-auto overflow-hidden border rounded-sm shadow-md bg-themeBg border-themeText2'>
+const Alert = ({ type, msg, cancel }) => (
+  <div className='relative flex w-full max-w-md mx-auto overflow-hidden border rounded-sm shadow-md bg-themeBg border-themeText2'>
+    <CloseModalBtn toggle={cancel} />
     {type === 'project' && (
       <div className='flex items-center justify-center w-12 bg-themeAccent'>
         <ProjectIcon className='w-6 h-6 text-white fill-current' />
