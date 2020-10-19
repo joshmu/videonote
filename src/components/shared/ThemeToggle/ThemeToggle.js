@@ -2,6 +2,7 @@ import { motion } from 'framer-motion'
 import { AnimatePresence } from 'framer-motion'
 import { BsMoon as MoonIcon, BsLightningFill as ZapIcon } from 'react-icons/bs'
 import { HiSun as SunIcon } from 'react-icons/hi'
+import { GiHeatHaze as HotIcon } from 'react-icons/gi'
 
 import { useThemeContext } from '../../../context/themeContext'
 
@@ -35,7 +36,7 @@ export default function ThemeToggle({
       {...props}
     >
       <AnimatePresence exitBeforeEnter>
-        {theme === 'dark' ? (
+        {theme === 'dark' && (
           <motion.button
             key='themeToggle-dark'
             {...motionStyle}
@@ -43,7 +44,9 @@ export default function ThemeToggle({
           >
             <MoonIcon className='fill-current' />
           </motion.button>
-        ) : theme === 'light' ? (
+        )}
+
+        {theme === 'light' && (
           <motion.button
             key='themeToggle-light'
             {...motionStyle}
@@ -51,13 +54,25 @@ export default function ThemeToggle({
           >
             <SunIcon className='fill-current' />
           </motion.button>
-        ) : (
+        )}
+
+        {theme === 'superhero' && (
           <motion.button
             key='themeToggle-superhero'
             {...motionStyle}
             className='relative focus:outline-none'
           >
             <ZapIcon className='fill-current' />
+          </motion.button>
+        )}
+
+        {theme === 'hot' && (
+          <motion.button
+            key='themeToggle-hot'
+            {...motionStyle}
+            className='relative focus:outline-none'
+          >
+            <HotIcon className='fill-current' />
           </motion.button>
         )}
       </AnimatePresence>

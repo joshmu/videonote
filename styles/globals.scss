@@ -72,6 +72,27 @@
   }
 }
 
+.theme-hot {
+  --text: #97aabd;
+  --text2: #5a5560;
+  --bg: #314455;
+  --bg2: #644e5b;
+  --bgNum: 49, 68, 85;
+
+  --accent: #c96567;
+  --accent2: #9e5a63;
+
+  --select: rgb(112, 135, 255);
+  --select2: rgba(112, 135, 255, 0.1);
+
+  .neu-bg {
+    @apply neu-hot;
+  }
+  .neu-accent {
+    @apply neu-hot-accent;
+  }
+}
+
 body {
   background-color: theme('colors.themeBg');
   color: theme('colors.themeText');
@@ -82,18 +103,14 @@ body {
 .scrollbar {
   &::-webkit-scrollbar {
     @apply w-px cursor-pointer;
-    /*background-color: rgba(229, 231, 235, var(--bg-opacity));*/
   }
 
   &::-webkit-scrollbar-track {
-    // background-color: rgba(229, 231, 235, var(--bg-opacity));
     @apply cursor-pointer;
     /*background: red;*/
   }
 
   &::-webkit-scrollbar-thumb {
-    // background-color: var(--text);
-    // background-color: rgba(255, 138, 76, 0.5);
     @apply rounded-full cursor-pointer bg-themeAccent;
   }
 }
@@ -142,41 +159,49 @@ body {
   -ms-user-select: none; /* Internet Explorer/Edge */
 }
 
+// https://neumorphism.io/#202020
+.neu-dark {
+  border-radius: 0.75rem;
+  background: linear-gradient(225deg, #1d1d1d, #222222);
+  box-shadow: -20px 20px 60px #1b1b1b, 20px -20px 60px #252525;
+}
 // https://neumorphism.io/#ffa170
 .neu-dark-accent {
-  @apply rounded-sm;
+  border-radius: 0.75rem;
   background: linear-gradient(225deg, #e69165, #ffac78);
   box-shadow: -20px 20px 60px #d9895f, 20px -20px 60px #ffb981;
 }
 
+// https://neumorphism.io/#FFFFFF
+.neu-light {
+  border-radius: 0.75rem;
+  background: linear-gradient(225deg, #e6e6e6, #ffffff);
+  box-shadow: -20px 20px 60px #d9d9d9, 20px -20px 60px #ffffff;
+}
 .neu-light-accent {
-  @apply rounded-sm;
+  border-radius: 0.75rem;
   background: linear-gradient(145deg, #3a4d91, #445cac);
   box-shadow: 20px 20px 60px #364989, -20px -20px 60px #4a63b9;
 }
 
+.neu-superhero {
+  border-radius: 0.75rem;
+  background: linear-gradient(145deg, #3f2f46, #4b3853);
+  box-shadow: 20px 20px 60px #3c2c42, -20px -20px 60px #513c5a;
+}
 .neu-superhero-accent {
-  @apply rounded-sm;
+  border-radius: 0.75rem;
   background: linear-gradient(145deg, #e1d522, #fffe29);
   box-shadow: 20px 20px 60px #d5c920, -20px -20px 60px #ffff2c;
 }
 
-// https://neumorphism.io/#202020
-.neu-dark {
-  @apply rounded-sm;
-  background: linear-gradient(225deg, #1d1d1d, #222222);
-  box-shadow: -20px 20px 60px #1b1b1b, 20px -20px 60px #252525;
+.neu-hot {
+  border-radius: 0.75rem;
+  background: linear-gradient(145deg, #2c3d4d, #34495b);
+  box-shadow: 20px 20px 60px #2a3a48, -20px -20px 60px #384e62;
 }
-
-// https://neumorphism.io/#FFFFFF
-.neu-light {
-  @apply rounded-sm;
-  background: linear-gradient(225deg, #e6e6e6, #ffffff);
-  box-shadow: -20px 20px 60px #d9d9d9, 20px -20px 60px #ffffff;
-}
-
-.neu-superhero {
-  @apply rounded-sm;
-  background: linear-gradient(145deg, #3f2f46, #4b3853);
-  box-shadow: 20px 20px 60px #3c2c42, -20px -20px 60px #513c5a;
+.neu-hot-accent {
+  border-radius: 0.75rem;
+  background: linear-gradient(145deg, #b55b5d, #d76c6e);
+  box-shadow: 20px 20px 60px #ab5658, -20px -20px 60px #e77476;
 }

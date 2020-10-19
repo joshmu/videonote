@@ -101,13 +101,16 @@ const ActionInput = () => {
       <div className='flex items-center self-center justify-center h-full transition-all duration-150 ease-in-out bg-transparent rounded-r-none text-themeText2'>
         <TimeDisplay
           seconds={todo.time ? todo.time : progress.playedSeconds}
-          lock={!!todo.time}
+          lock={todo.time !== null}
+          inputActive={isActive}
         />
       </div>
 
       <input
         ref={inputRef}
-        className='relative w-full h-full px-2 py-1 transition-all duration-150 ease-in-out bg-transparent rounded-sm rounded-b-none rounded-l-none placeholder-themeText2 text-themeText text-md focus:outline-none'
+        className={`${
+          isActive ? 'opacity-100' : 'opacity-50'
+        } relative w-full h-full px-2 py-1 transition-all duration-150 ease-in-out bg-transparent rounded-sm rounded-b-none rounded-l-none placeholder-themeText2 text-themeText text-md focus:outline-none`}
         autoFocus={true}
         id='actionInput'
         name='addTodo'

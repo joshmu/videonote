@@ -21,7 +21,7 @@ const TimeMarkers = ({ inputActive }) => {
             className='absolute z-30 h-1 transform -translate-x-1/2 cursor-pointer bg-themeAccent2'
             style={{
               // bottom: '-0.25rem',
-              opacity: inputActive ? 1 : 0.25,
+              opacity: inputActive ? 0.75 : 0.25,
               bottom: '0',
               width: '0.125rem',
               left: handleMarkPos(todo.time, duration),
