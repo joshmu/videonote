@@ -10,16 +10,13 @@ import ModalHeader from '@/shared/Modal/ModalHeader'
 import ModalInnerContainer from '@/shared/Modal/ModalInnerContainer'
 import ModalInput from '@/shared/Modal/ModalInput'
 
+import VolumeSlider from './VolumeSlider/VolumeSlider'
+
 export default function SettingsModal({ toggle: toggleModal, motionKey }) {
-  const { settings, updateSettings } = useGlobalContext()
+  const { settings, updateSettings, SETTINGS_DEFAULTS } = useGlobalContext()
   const { addAlert } = useNotificationContext()
 
-  const [state, setState] = useState({
-    playOffset: '',
-    seekJump: '',
-    showHints: '',
-    isPrivate: '',
-  })
+  const [state, setState] = useState({ ...SETTINGS_DEFAULTS })
 
   useEffect(() => {
     if (settings) setState({ ...state, ...settings })
@@ -50,20 +47,29 @@ export default function SettingsModal({ toggle: toggleModal, motionKey }) {
       <ModalInnerContainer>
         <ModalForm>
           <ModalInput
-            title='Playback Offset (Seconds)'
+            title='Playback Offset (seconds)'
             id='playOffset'
-            type='number'
             value={state.playOffset}
             onChange={handleChangeNum}
+            type='number'
             max='0'
           />
           <ModalInput
-            title='Seek Jump (Seconds)'
+            title='Seek Jump (seconds)'
             id='seekJump'
-            type='number'
             value={state.seekJump}
             onChange={handleChangeNum}
+            type='number'
             min='1'
+          />
+          <VolumeSlider />
+          <ModalInput
+            title='List Sidebar Width (px)'
+            id='sidebarWidth'
+            value={state.sidebarWidth}
+            onChange={handleChangeNum}
+            type='number'
+            min='50'
           />
           <div>
             <ToggleInput
