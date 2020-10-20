@@ -138,11 +138,15 @@ export function VideoProvider(props) {
     setAction('seekForward')
   }
 
-  const smartControls = key => {
+  const smartControls = (key, keysPressed) => {
     if (!isSmartControlsEnabled) return
 
     if (key === ' ') {
-      togglePlay()
+      if (keysPressed.includes('Shift')) {
+        toggleSidebar()
+      } else {
+        togglePlay()
+      }
     }
 
     if (key === 'ArrowLeft') {
@@ -161,17 +165,15 @@ export function VideoProvider(props) {
       changeVolume(-0.1)
     }
 
-    if (key === 'Shift') {
-      console.log('Shift key pressed')
-      // * unused
+    // CMD + SHIFT
+    if (keysPressed.includes('Meta')) {
+      if (key === 'Shift') {
+        toggleSidebar()
+      }
     }
 
     if (key === 'Alt') {
       toggleMenuOpen()
-    }
-
-    if (key === 'Meta') {
-      toggleSidebar()
     }
   }
 
