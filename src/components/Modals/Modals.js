@@ -1,8 +1,8 @@
 import { AnimatePresence } from 'framer-motion'
 import { useEffect } from 'react'
 
+import { useControlsContext } from '@/context/controlsContext'
 import { useGlobalContext } from '@/context/globalContext'
-import { useVideoContext } from '@/context/videoContext'
 
 import AboutModal from './AboutModal/AboutModal'
 import ConfirmModal from './ConfirmModal/ConfirmModal'
@@ -21,7 +21,7 @@ export default function Modals() {
     promptState,
     promptCancel,
   } = useGlobalContext()
-  const { toggleSmartControls } = useVideoContext()
+  const { toggleSmartControls } = useControlsContext()
 
   useEffect(() => {
     const enableSmartControls = !modalsOpen

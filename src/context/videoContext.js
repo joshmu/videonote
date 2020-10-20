@@ -1,7 +1,6 @@
 import { createContext, useContext, useEffect, useRef, useState } from 'react'
 
 import { useAnounceAction } from '../hooks/useAnounceAction'
-import useGlobalKeydown from '../hooks/useGlobalKeydown'
 import { useGlobalContext } from './globalContext'
 import { useNotificationContext } from './notificationContext'
 
@@ -21,12 +20,9 @@ const videoContext = createContext({
   togglePlay: (a = 0) => {},
   changeVolume: a => {},
   handleProgress: () => {},
-  seekTo: a => {},
+  seekTo: (a, b = true) => {},
   playerRef: {},
-  smartControls: a => {},
   handlePlayerError: a => {},
-  isSmartControlsEnabled: true,
-  toggleSmartControls: (a = undefined) => {},
 })
 
 export function VideoProvider(props) {
@@ -47,7 +43,6 @@ export function VideoProvider(props) {
   const [playbackRate, setPlaybackRate] = useState(1)
   const [duration, setDuration] = useState(null)
   const [progress, setProgress] = useState({})
-  const [isSmartControlsEnabled, setIsSmartControlsEnabled] = useState(true)
 
   const [action, setAction] = useAnounceAction('')
 
@@ -114,12 +109,12 @@ export function VideoProvider(props) {
     setProgress(e)
   }
 
-  const seekTo = secs => {
+  const seekTo = (secs, offset = true) => {
     // validate
     if (Number(secs) === NaN || playerRef === null) return
 
     // settings offset
-    const playPosition = secs + settings.playOffset
+    const playPosition = secs + (offset ? settings.playOffset : 0)
 
     playerRef.current.seekTo(playPosition, 'seconds')
   }
@@ -137,47 +132,6 @@ export function VideoProvider(props) {
 
     setAction('seekForward')
   }
-
-  const smartControls = (key, keysPressed) => {
-    if (!isSmartControlsEnabled) return
-
-    if (key === ' ') {
-      if (keysPressed.includes('Shift')) {
-        toggleSidebar()
-      } else {
-        togglePlay()
-      }
-    }
-
-    if (key === 'ArrowLeft') {
-      jumpBack()
-    }
-
-    if (key === 'ArrowRight') {
-      jumpForward()
-    }
-
-    if (key === 'ArrowUp') {
-      changeVolume(0.1)
-    }
-
-    if (key === 'ArrowDown') {
-      changeVolume(-0.1)
-    }
-
-    // CMD + SHIFT
-    if (keysPressed.includes('Meta')) {
-      if (key === 'Shift') {
-        toggleSidebar()
-      }
-    }
-
-    if (key === 'Alt') {
-      toggleMenuOpen()
-    }
-  }
-
-  useGlobalKeydown(smartControls)
 
   const handlePlayerError = error => {
     console.log('vn player error', error)
@@ -197,18 +151,6 @@ export function VideoProvider(props) {
     }
 
     addAlert({ type: 'error', msg: 'Player unable to load video.' })
-  }
-
-  const toggleSmartControls = isEnabled => {
-    // don't do anything if already enabled
-    if (isEnabled === isSmartControlsEnabled) return
-
-    setIsSmartControlsEnabled(current => {
-      // if isEnable undefined then toggle
-      const updatedState = isEnabled === undefined ? !current : isEnabled
-      // console.log('smart controls enabled:', updatedState)
-      return updatedState
-    })
   }
 
   // todo: remove automatic pop up and replace with a button alternative ( or better > auto pop up current project settings modal)
@@ -253,11 +195,10 @@ export function VideoProvider(props) {
     progress,
     seekTo,
     playerRef,
-    smartControls,
     handlePlayerError,
     action,
-    isSmartControlsEnabled,
-    toggleSmartControls,
+    jumpForward,
+    jumpBack,
   }
 
   return <videoContext.Provider value={value} {...props} />

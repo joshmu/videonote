@@ -1,13 +1,13 @@
 import { useEffect } from 'react'
 
 import { useTodoContext } from '@/context/todoContext'
-import { useVideoContext } from '@/context/videoContext'
 import { useGlobalContext } from '@/context/globalContext'
+import { useControlsContext } from '@/context/controlsContext'
 
 const Search = () => {
   const { project } = useGlobalContext()
   const { search, updateSearch, todos } = useTodoContext()
-  const { toggleSmartControls } = useVideoContext()
+  const { toggleSmartControls } = useControlsContext()
 
   // enable smart controls when search box is empty
   useEffect(() => {

@@ -9,13 +9,13 @@ import VideoPlayer from '@/components/VideoPlayer/VideoPlayer'
 import { GlobalProvider } from '@/context/globalContext'
 import { TodoProvider } from '@/context/todoContext'
 import { VideoProvider } from '@/context/videoContext'
+import { ControlsProvider } from '@/context/controlsContext'
 import Overlay from '@/shared/Modal/Overlay'
 import { fetcher } from '@/utils/clientHelpers'
 
 // todo: realtime passing of notes, multi user, data flow back to current project rather than projects listing?
 // todo: jump prev/next notes via command
 // todo: theming is not integrated in to input fields
-// todo: cmd key fix
 
 // todo: options dropdown allow to scroll down list with keypress
 // todo: options dropdown to position against side of viewport so it is visible via shortcut in full screen mode
@@ -83,20 +83,22 @@ export default function Main({ serverData }) {
     <GlobalProvider serverData={serverData}>
       <VideoProvider>
         <TodoProvider>
-          <Layout>
-            <div className='flex flex-col w-full h-screen overflow-hidden'>
-              {/* <div className='text-3xl'>header</div> */}
+          <ControlsProvider>
+            <Layout>
+              <div className='flex flex-col w-full h-screen overflow-hidden'>
+                {/* <div className='text-3xl'>header</div> */}
 
-              <div className='flex flex-1 w-full h-full'>
-                <VideoPlayer />
-                <Sidebar />
+                <div className='flex flex-1 w-full h-full'>
+                  <VideoPlayer />
+                  <Sidebar />
+                </div>
+
+                <Overlay />
+                <Modals />
+                <Notification />
               </div>
-
-              <Overlay />
-              <Modals />
-              <Notification />
-            </div>
-          </Layout>
+            </Layout>
+          </ControlsProvider>
         </TodoProvider>
       </VideoProvider>
     </GlobalProvider>

@@ -8,13 +8,15 @@ import TimeDisplay from '../shared/TimeDisplay/TimeDisplay'
 import ActionSymbols from './ActionSymbols/ActionSymbols'
 import ProgressBar from './ProgressBar/ProgressBar'
 import TimeMarkers from './TimeMarkers/TimeMarkers'
+import { useControlsContext } from '@/context/controlsContext'
 
 const PLACEHOLDER = 'Add Note...'
 
 const ActionInput = () => {
   const inputRef = useRef(null)
   const { settings, sidebarOpen, HINTS } = useGlobalContext()
-  const { progress, toggleSmartControls } = useVideoContext()
+  const { progress } = useVideoContext()
+  const { toggleSmartControls } = useControlsContext()
   const { addTodo } = useTodoContext()
 
   const [todo, setTodo] = useState({

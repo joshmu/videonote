@@ -6,10 +6,12 @@ import { useTodoContext } from '@/context/todoContext'
 import { useVideoContext } from '@/context/videoContext'
 
 import TimeDisplay from '../../shared/TimeDisplay/TimeDisplay'
+import { useControlsContext } from '@/context/controlsContext'
 
 export default function TodoItem({ todo, close, childVariants }) {
   const { id, msg, person: category = null, time, done = false } = todo
-  const { seekTo, toggleSmartControls } = useVideoContext()
+  const { seekTo } = useVideoContext()
+  const { toggleSmartControls } = useControlsContext()
   const { updateTodo } = useTodoContext()
   const [edit, setEdit] = useState(false)
 
