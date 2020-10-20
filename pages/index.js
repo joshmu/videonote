@@ -12,7 +12,10 @@ import { VideoProvider } from '@/context/videoContext'
 import Overlay from '@/shared/Modal/Overlay'
 import { fetcher } from '@/utils/clientHelpers'
 
-// todo: SHIFT
+// todo: realtime passing of notes, multi user, data flow back to current project rather than projects listing?
+// todo: jump prev/next notes via command
+// todo: theming is not integrated in to input fields
+// todo: cmd key fix
 
 // todo: options dropdown allow to scroll down list with keypress
 // todo: options dropdown to position against side of viewport so it is visible via shortcut in full screen mode

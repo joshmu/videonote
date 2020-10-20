@@ -34,8 +34,7 @@ const Menu = ({ open }) => {
   } = useGlobalContext()
   const { toggleTheme } = useThemeContext()
 
-  const handleClick = e => {
-    const modalId = e.target.getAttribute('data-modal')
+  const handleModalOpen = modalId => {
     toggleModalOpen(modalId)
     toggleMenuOpen()
   }
@@ -87,8 +86,7 @@ const Menu = ({ open }) => {
           >
             {project && admin && (
               <Select
-                onClick={handleClick}
-                data-modal='current'
+                onClick={() => handleModalOpen('current')}
                 text='text-themeAccent'
               >
                 <IconMenuItemWrapper>
@@ -114,8 +112,7 @@ const Menu = ({ open }) => {
 
             {admin && (
               <Select
-                onClick={handleClick}
-                data-modal='create'
+                onClick={() => handleModalOpen('create')}
                 animate={
                   projects.length === 0 ? 'animate-pulse text-themeAccent' : ''
                 }
@@ -128,7 +125,7 @@ const Menu = ({ open }) => {
             )}
 
             {admin && projects.length > 0 && (
-              <Select onClick={handleClick} data-modal='projects'>
+              <Select onClick={() => handleModalOpen('projects')}>
                 <IconMenuItemWrapper>
                   <ProjectsIcon />
                 </IconMenuItemWrapper>
@@ -136,7 +133,7 @@ const Menu = ({ open }) => {
               </Select>
             )}
 
-            <Select onClick={handleClick} data-modal='settings'>
+            <Select onClick={() => handleModalOpen('settings')}>
               <IconMenuItemWrapper>
                 <SettingsIcon />
               </IconMenuItemWrapper>
@@ -144,7 +141,7 @@ const Menu = ({ open }) => {
             </Select>
 
             {admin && (
-              <Select onClick={handleClick} data-modal='user'>
+              <Select onClick={() => handleModalOpen('user')}>
                 <IconMenuItemWrapper>
                   <AccountIcon />
                 </IconMenuItemWrapper>
@@ -171,14 +168,14 @@ const Menu = ({ open }) => {
               Theme
             </Select>
 
-            <Select onClick={handleClick} data-modal='help'>
+            <Select onClick={() => handleModalOpen('help')}>
               <IconMenuItemWrapper>
                 <HelpIcon />
               </IconMenuItemWrapper>
               Help
             </Select>
 
-            <Select onClick={handleClick} data-modal='about'>
+            <Select onClick={() => handleModalOpen('about')}>
               <IconMenuItemWrapper>
                 <AboutIcon />
               </IconMenuItemWrapper>
