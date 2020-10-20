@@ -20,7 +20,7 @@ const HINTS = [
   'Spacebar = Play/Pause',
   'Left/Right = Seek',
   'Up/Down = Volume',
-  'Shift Key = show/hide notes',
+  'Cmd Key = show/hide notes',
   'Mark notes done by clicking their time',
   'Click note to jump to time',
   'Double click note = Edit',

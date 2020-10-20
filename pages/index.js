@@ -12,6 +12,8 @@ import { VideoProvider } from '@/context/videoContext'
 import Overlay from '@/shared/Modal/Overlay'
 import { fetcher } from '@/utils/clientHelpers'
 
+// todo: SHIFT
+
 // todo: options dropdown allow to scroll down list with keypress
 // todo: options dropdown to position against side of viewport so it is visible via shortcut in full screen mode
 
@@ -70,6 +72,8 @@ import { fetcher } from '@/utils/clientHelpers'
 // todo: can we use localStorage to save screenshots of video timestamp positions? use this in export feature
 
 // todo: browser cross compatability of video files...
+
+// todo: welcome email when joining videonote
 
 export default function Main({ serverData }) {
   return (

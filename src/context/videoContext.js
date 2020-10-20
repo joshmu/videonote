@@ -162,16 +162,16 @@ export function VideoProvider(props) {
     }
 
     if (key === 'Shift') {
-      toggleSidebar()
-    }
-
-    if (key === 'Alt') {
-      console.log('Alt/Option key pressed')
+      console.log('Shift key pressed')
       // * unused
     }
 
-    if (key === 'Meta') {
+    if (key === 'Alt') {
       toggleMenuOpen()
+    }
+
+    if (key === 'Meta') {
+      toggleSidebar()
     }
   }
 
