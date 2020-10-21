@@ -19,8 +19,8 @@
   --accent: #4056a1;
   --accent2: #c5cbe3;
 
-  --select: theme('colors.gray.700');
-  --select2: rgba(248, 249, 252, 1);
+  --select: rgb(112, 135, 255);
+  --selectNum: 112, 135, 255;
 
   .neu-bg {
     @apply neu-light;
@@ -41,7 +41,7 @@
   --accent2: #99532e;
 
   --select: rgb(112, 135, 255);
-  --select2: rgba(112, 135, 255, 0.1);
+  --selectNum: 112, 135, 255;
 
   .neu-bg {
     @apply neu-dark;
@@ -62,7 +62,7 @@
   --accent2: rgb(250, 184, 38);
 
   --select: rgb(112, 135, 255);
-  --select2: rgba(112, 135, 255, 0.1);
+  --selectNum: 112, 135, 255;
 
   .neu-bg {
     @apply neu-superhero;
@@ -83,7 +83,7 @@
   --accent2: #9e5a63;
 
   --select: rgb(112, 135, 255);
-  --select2: rgba(112, 135, 255, 0.1);
+  --selectNum: 112, 135, 255;
 
   .neu-bg {
     @apply neu-hot;

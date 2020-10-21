@@ -19,7 +19,7 @@ module.exports = {
         themeAccent: 'var(--accent)',
         themeAccent2: 'var(--accent2)',
         themeSelect: 'var(--select)',
-        themeSelect2: 'var(--select2)',
+        themeSelectOpacity: 'rgba(var(--selectNum), var(--bg-opacity))',
       },
       opacity: {
         90: '0.90',
