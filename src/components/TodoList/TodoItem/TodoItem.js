@@ -82,7 +82,7 @@ export default function TodoItem({ todo, closestProximity, childVariants }) {
                 onKeyDown={handleEditKeys}
                 onDoubleClick={() => toggleEdit(false)}
                 onBlur={() => toggleEdit(false)}
-                className='bg-themeBg focus:outline-none'
+                className='placeholder-themeText text-themeText bg-themeBg focus:outline-none '
                 autoFocus
               />
             ) : (
