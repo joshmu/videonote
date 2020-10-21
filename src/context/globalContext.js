@@ -24,8 +24,7 @@ const HINTS = [
   'Click note to jump to time',
   'Mark notes done by clicking their time',
   'Double click note = Edit',
-  'Shift + -> = Next note',
-  'Shift + <- = Prev note',
+  'Shift + Left/Right = Prev/Next note',
   'Drag list edge to resize',
 ]
 
