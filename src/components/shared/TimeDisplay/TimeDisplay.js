@@ -1,12 +1,12 @@
 export default function TimeDisplay({
   seconds = 0,
   lock = false,
-  inputActive,
+  active = false,
 }) {
   return (
     <div
       className={`${lock ? 'text-themeAccent' : ''}
-      ${inputActive ? 'opacity-100' : 'opacity-50'} 
+      ${active ? 'opacity-100' : 'opacity-50'} 
        px-2 transition-all duration-200 ease-in-out h-full flex items-center`}
     >
       {format(seconds)}

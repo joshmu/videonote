@@ -21,7 +21,7 @@ export function ControlsProvider(props) {
     progress,
     seekTo,
   } = useVideoContext()
-  const { todos } = useTodoContext()
+  const { todos, currentNote } = useTodoContext()
 
   const [isSmartControlsEnabled, setIsSmartControlsEnabled] = useState(true)
 
@@ -39,9 +39,9 @@ export function ControlsProvider(props) {
     if (key === 'ArrowLeft') {
       if (keysPressed.includes('Shift')) {
         console.log('todo: jump prev note')
-        const note = seekNote('prev')
+        const note = nextPrevNote('prev')
         console.log({ note })
-        seekTo(note.time)
+        seekTo(note.time, { offset: false })
       } else {
         jumpBack()
       }
@@ -50,9 +50,9 @@ export function ControlsProvider(props) {
     if (key === 'ArrowRight') {
       if (keysPressed.includes('Shift')) {
         console.log('todo: jump next note')
-        const note = seekNote('next')
+        const note = nextPrevNote('next')
         console.log({ note })
-        seekTo(note.time)
+        seekTo(note.time, { offset: false })
       } else {
         jumpForward()
       }
@@ -92,25 +92,21 @@ export function ControlsProvider(props) {
     })
   }
 
-  // todo: seekNote stil not right
-  const seekNote = (direction = 'next') => {
-    if (todos.length === 0) return
-    if (todos.length === 1) return todos[0]
+  const nextPrevNote = (direction = 'next') => {
+    // sort via time
     const notes = todos.sort((a, b) => a.time - b.time)
-    console.log({ notes, progress })
+    const currentIndex = notes.findIndex(note => note.id === currentNote.id)
+    // based on direction grab next/prev note or stop at the limit
+    const idx =
+      direction === 'next'
+        ? currentIndex === notes.length - 1
+          ? currentIndex
+          : currentIndex + 1
+        : currentIndex === 0
+        ? currentIndex
+        : currentIndex - 1
 
-    let nextNote = notes.find(
-      note => note.time + settings.playOffset > progress.playedSeconds
-    )
-    console.log({ nextNote, progress })
-    if (!nextNote) nextNote = notes.slice(-1)[0]
-    if (direction === 'prev') {
-      const nextNoteIdx = notes.findIndex(note => note.id === nextNote.id)
-      const prevNote = notes[nextNoteIdx === 0 ? nextNoteIdx : nextNoteIdx - 1]
-      return prevNote
-    } else {
-      return nextNote
-    }
+    return notes[idx]
   }
 
   const value = {

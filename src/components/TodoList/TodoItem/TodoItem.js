@@ -52,7 +52,7 @@ export default function TodoItem({ todo, closestProximity, childVariants }) {
       variants={childVariants}
       className={`${
         closestProximity ? 'bg-opacity-25' : ' bg-opacity-0'
-      } relative border-b cursor-pointer border-themeText2 bg-themeSelectOpacity`}
+      } relative border-b cursor-pointer border-themeText2 bg-themeSelectOpacity transition-colors duration-200 ease-out`}
     >
       <Select padding='p-0'>
         <div className='relative flex items-center justify-start w-full h-full text-base'>
@@ -63,7 +63,7 @@ export default function TodoItem({ todo, closestProximity, childVariants }) {
             } text-xs transition-colors duration-300 ease-in-out text-themeText2`}
           >
             <div className='px-2'>
-              <TimeDisplay seconds={time} />
+              <TimeDisplay seconds={time} lock={closestProximity} />
             </div>
           </div>
 

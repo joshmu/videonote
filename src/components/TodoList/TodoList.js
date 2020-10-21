@@ -1,16 +1,11 @@
 import { AnimatePresence, motion } from 'framer-motion'
 
 import { useTodoContext } from '@/context/todoContext'
-import { useVideoContext } from '@/context/videoContext'
 
 import TodoItem from './TodoItem/TodoItem'
-import useNoteProximity from '@/hooks/useNoteProximity'
 
 export default function TodoList() {
-  const { todos, sort } = useTodoContext()
-  const { progress } = useVideoContext()
-
-  const { checkProximity } = useNoteProximity({ todos, progress })
+  const { todos, sort, checkProximity } = useTodoContext()
 
   const parentVariants = {
     initial: { opacity: 0 },

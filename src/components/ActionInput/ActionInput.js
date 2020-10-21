@@ -104,7 +104,7 @@ const ActionInput = () => {
         <TimeDisplay
           seconds={todo.time ? todo.time : progress.playedSeconds}
           lock={todo.time !== null}
-          inputActive={isActive}
+          active={isActive}
         />
       </div>
 

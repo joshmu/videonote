@@ -1,6 +1,9 @@
 import { createContext, useContext, useEffect, useState } from 'react'
 
+import useNoteProximity from '@/hooks/useNoteProximity'
+
 import { useGlobalContext } from './globalContext'
+import { useVideoContext } from './videoContext'
 
 const todoContext = createContext({
   todos: [],
@@ -15,8 +18,11 @@ const todoContext = createContext({
 
 export function TodoProvider(props) {
   const { project, projects, updateProject } = useGlobalContext()
+  const { progress } = useVideoContext()
   const [todos, setTodos] = useState([])
   const [search, setSearch] = useState('')
+
+  const { currentNote, checkProximity } = useNoteProximity({ todos, progress })
 
   // when a project is selected pre-fill the todos
   useEffect(() => {
@@ -94,6 +100,8 @@ export function TodoProvider(props) {
     updateSearch,
     sort,
     removeCompleted,
+    checkProximity,
+    currentNote,
   }
 
   return <todoContext.Provider value={value} {...props} />

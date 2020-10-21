@@ -20,7 +20,7 @@ const videoContext = createContext({
   togglePlay: (a = 0) => {},
   changeVolume: a => {},
   handleProgress: () => {},
-  seekTo: (a, b = true) => {},
+  seekTo: (a, { offset = true } = {}) => {},
   playerRef: {},
   handlePlayerError: a => {},
 })
@@ -109,7 +109,7 @@ export function VideoProvider(props) {
     setProgress(e)
   }
 
-  const seekTo = (secs, offset = true) => {
+  const seekTo = (secs, { offset = true } = {}) => {
     // validate
     if (Number(secs) === NaN || playerRef === null) return
 

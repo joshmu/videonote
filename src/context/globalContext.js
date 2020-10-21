@@ -21,9 +21,11 @@ const HINTS = [
   'Left/Right = Seek',
   'Up/Down = Volume',
   'Shift + Spacebar = show/hide notes',
-  'Mark notes done by clicking their time',
   'Click note to jump to time',
+  'Mark notes done by clicking their time',
   'Double click note = Edit',
+  'Shift + -> = Next note',
+  'Shift + <- = Prev note',
   'Drag list edge to resize',
 ]
 

@@ -1,14 +1,14 @@
 import { useEffect, useState } from 'react'
 const useNoteProximity = ({ todos, progress }) => {
-  const [current, setCurrent] = useState(null)
+  const [currentNote, setCurrentNote] = useState(null)
 
   // detect closest todo to current play position
   useEffect(() => {
     // empty list
-    if (todos.length === 0 && current !== null) setCurrent(null)
+    if (todos.length === 0 && currentNote !== null) setCurrentNote(null)
 
     // 1 todo
-    if (todos.length === 1 && current === null) setCurrent(todos[0])
+    if (todos.length === 1 && currentNote === null) setCurrentNote(todos[0])
 
     // otherwise compare
     if (todos.length > 1) {
@@ -18,13 +18,14 @@ const useNoteProximity = ({ todos, progress }) => {
         return distA < distB ? closestTodo : nextTodo
       })
 
-      setCurrent(result)
+      setCurrentNote(result)
     }
   }, [progress.playedSeconds])
 
-  const checkProximity = todo => current !== null && current.id === todo.id
+  const checkProximity = todo =>
+    currentNote !== null && currentNote.id === todo.id
 
-  return { current, checkProximity }
+  return { currentNote, checkProximity }
 }
 
 export default useNoteProximity
