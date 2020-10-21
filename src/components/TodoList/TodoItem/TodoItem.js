@@ -8,7 +8,7 @@ import { useVideoContext } from '@/context/videoContext'
 import TimeDisplay from '../../shared/TimeDisplay/TimeDisplay'
 import { useControlsContext } from '@/context/controlsContext'
 
-export default function TodoItem({ todo, close, childVariants }) {
+export default function TodoItem({ todo, closestProximity, childVariants }) {
   const { id, msg, person: category = null, time, done = false } = todo
   const { seekTo } = useVideoContext()
   const { toggleSmartControls } = useControlsContext()
@@ -51,7 +51,7 @@ export default function TodoItem({ todo, close, childVariants }) {
       // * childVariants used so we don't pass 'initial', 'animate' etc
       variants={childVariants}
       className={`${
-        close ? 'bg-opacity-25' : ' bg-opacity-0'
+        closestProximity ? 'bg-opacity-25' : ' bg-opacity-0'
       } relative border-b cursor-pointer border-themeText2 bg-themeSelectOpacity`}
     >
       <Select padding='p-0'>

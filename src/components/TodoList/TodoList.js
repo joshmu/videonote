@@ -1,37 +1,16 @@
 import { AnimatePresence, motion } from 'framer-motion'
-import { useEffect, useState } from 'react'
 
 import { useTodoContext } from '@/context/todoContext'
 import { useVideoContext } from '@/context/videoContext'
 
 import TodoItem from './TodoItem/TodoItem'
+import useNoteProximity from '@/hooks/useNoteProximity'
 
 export default function TodoList() {
   const { todos, sort } = useTodoContext()
   const { progress } = useVideoContext()
-  const [closest, setClosest] = useState(null)
 
-  // detect closest todo to current play position
-  useEffect(() => {
-    // empty list
-    if (todos.length === 0 && closest !== null) setClosest(null)
-
-    // 1 todo
-    if (todos.length === 1 && closest === null) setClosest(todos[0])
-
-    // otherwise compare
-    if (todos.length > 1) {
-      const result = todos.reduce((closestTodo, nextTodo) => {
-        const distA = Math.abs(closestTodo.time - progress.playedSeconds)
-        const distB = Math.abs(nextTodo.time - progress.playedSeconds)
-        return distA < distB ? closestTodo : nextTodo
-      })
-
-      setClosest(result)
-    }
-  }, [progress.playedSeconds])
-
-  const checkClose = todo => closest !== null && closest.id === todo.id
+  const { checkProximity } = useNoteProximity({ todos, progress })
 
   const parentVariants = {
     initial: { opacity: 0 },
@@ -71,7 +50,7 @@ export default function TodoList() {
             <TodoItem
               todo={todo}
               key={todo.id}
-              close={checkClose(todo)}
+              closestProximity={checkProximity(todo)}
               childVariants={childVariants}
             />
           ))}
