@@ -11,7 +11,7 @@ const Hero = () => {
   }
 
   return (
-    <div className='relative w-full h-screen'>
+    <div className='relative w-full h-screen transition-colors duration-300 ease-in-out bg-gradient-to-b from-themeBg to-themeBg2'>
       <div className='absolute top-0 flex w-full h-screen'>
         {/* left */}
         <div className='relative flex items-center justify-end w-full h-full'>
@@ -37,15 +37,15 @@ const Hero = () => {
             className='relative'
           >
             <Link href='/login'>
-              <button className='absolute z-10 px-3 py-2 -mb-32 tracking-wider text-left uppercase transition-colors duration-300 ease-in-out cursor-pointer focus:outline-none bottom-1/2 hover:text-themeBg text-themeAccent hover:text-themeText hover:bg-themeAccent'>
+              <button className='absolute z-10 px-3 py-2 -mb-32 tracking-wider text-left uppercase transition-colors duration-300 ease-in-out rounded-r-sm cursor-pointer focus:outline-none bottom-1/2 hover:text-themeBg text-themeAccent hover:bg-themeAccent'>
                 Let's Go
               </button>
             </Link>
           </MotionFadeUp>
 
-          {/* orange background slider */}
+          {/* left slider bg */}
           <motion.div
-            key='orangeBg'
+            key='leftSliderBg'
             initial={{ x: '-100%' }}
             animate={{
               x: 0,
@@ -60,7 +60,7 @@ const Hero = () => {
                 duration: 0.8,
               },
             }}
-            className='absolute z-0 w-full h-full bg-themeAccent'
+            className='absolute z-0 w-full transition-colors duration-300 ease-in-out rounded-r-md h-10/12 bg-themeAccent'
           >
             {/* neu video background */}
             <motion.div
@@ -78,7 +78,7 @@ const Hero = () => {
         </div>
 
         {/* right */}
-        <div className='relative flex items-center justify-start flex-shrink w-full h-full transition-colors duration-300 ease-in-out bg-themeBg'>
+        <div className='relative flex items-center justify-start flex-shrink w-full h-full transition-colors duration-300 ease-in-out'>
           <MotionFadeUp
             k='note'
             animate={{ transition: { delay: 0.5 } }}
@@ -87,7 +87,7 @@ const Hero = () => {
           >
             <Heading
               onClick={handleClick}
-              className='cursor-pointer text-themeAccent text-8xl'
+              className='transition-colors duration-300 ease-in-out cursor-pointer text-themeAccent text-8xl'
             >
               Note
             </Heading>
@@ -101,7 +101,7 @@ const Hero = () => {
             exit={{ opacity: 0 }}
             className='absolute z-0 flex items-center justify-center w-full h-full'
           >
-            <div className='flex flex-col justify-between w-3/4 h-1/2'>
+            <div className='flex flex-col justify-between w-3/4 transition-colors duration-300 ease-in-out h-1/2'>
               <div className='h-1/12 neu-bg'></div>
               <div className='h-1/12 neu-bg'></div>
               <div className='h-1/12 neu-bg'></div>
