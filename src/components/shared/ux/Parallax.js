@@ -4,7 +4,7 @@ import {
   useTransform,
   useViewportScroll,
 } from 'framer-motion'
-import { useEffect, useLayoutEffect, useRef, useState } from 'react'
+import { useLayoutEffect, useRef, useState } from 'react'
 
 const calculateMinHeight = (height, range) => {
   return height + height * range
@@ -22,13 +22,15 @@ const Parallax = ({ rate = 0, children, ...props }) => {
   // randomize the rate if we do not specify (0.01-0.4)
   rate = rate === 0 ? rand(1, 40) / 100 : rate
 
-  // useLayoutEffect(() => {
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (!ref.current) return null
     const onResize = () => {
       // also add half window height, so true position is centre of screen
-      setOffsetTop(ref.current.offsetTop - globalThis.window.innerHeight / 2)
-      setMinHeight(calculateMinHeight(ref.current.offsetHeight, rate))
+      const halfWindowY = globalThis.window.innerHeight / 2
+      setOffsetTop(ref.current.offsetTop - halfWindowY)
+      setMinHeight(
+        calculateMinHeight(ref.current.offsetHeight - halfWindowY, rate)
+      )
     }
 
     onResize()
@@ -45,7 +47,7 @@ const Parallax = ({ rate = 0, children, ...props }) => {
 
   // transforming per px thats why we +1
   const y = useSpring(
-    useTransform(scrollY, [offsetTop, offsetTop + 1], [0, rate], {
+    useTransform(scrollY, [offsetTop - 1, offsetTop + 1], [-rate, rate], {
       clamp: false,
     }),
     springConfig
