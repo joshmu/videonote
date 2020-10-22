@@ -54,7 +54,6 @@ export default function Register({ toggleLoginView, handleLogin, email }) {
       addAlert({
         type: 'info',
         msg: 'Account created',
-        duration: 1000,
       })
       handleLogin(data)
     } else {

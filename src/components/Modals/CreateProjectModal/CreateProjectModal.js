@@ -30,13 +30,11 @@ export default function CreateProjectModal({ toggle: toggleModal, motionKey }) {
         addAlert({
           type: 'error',
           msg: 'Project title required.',
-          duration: 1000,
         })
       if (videoSrc.length === 0)
         addAlert({
           type: 'error',
           msg: 'Video source required.',
-          duration: 1000,
         })
       return
     }

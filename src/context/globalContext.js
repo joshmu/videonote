@@ -79,7 +79,6 @@ export function GlobalProvider({ serverData, ...props }) {
       addAlert({
         type: 'info',
         msg: 'Create a project to start',
-        duration: 8000,
       })
     }
   }, [projects, user])
@@ -273,7 +272,6 @@ export function GlobalProvider({ serverData, ...props }) {
     addAlert({
       type: 'project',
       msg: `${selectedProject.title.toUpperCase()}`,
-      duration: 8000,
     })
   }
 

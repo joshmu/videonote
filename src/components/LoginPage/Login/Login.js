@@ -43,7 +43,6 @@ export default function Login({ toggleLoginView, handleLogin, handleEmail }) {
     addAlert({
       type: 'info',
       msg: `Logging in...`,
-      duration: 2000,
     })
 
     const body = {
