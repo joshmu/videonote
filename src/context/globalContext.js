@@ -26,6 +26,7 @@ const HINTS = [
   'Mark notes done by clicking their time',
   'Double click note = Edit',
   'Shift + Left/Right = Prev/Next note',
+  'Click video timeline to jump',
   'Drag list edge to resize',
 ]
 

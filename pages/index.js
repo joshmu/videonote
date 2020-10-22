@@ -36,7 +36,6 @@ import { fetcher } from '@/utils/clientHelpers'
 
 // todo: create docker instance for demo purposes?
 
-// todo: drag progress bar to seek quickly
 // todo: edit timestamp
 
 // todo: mute option
