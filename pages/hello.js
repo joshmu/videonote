@@ -22,8 +22,8 @@ const HelloPage = () => {
 
       <Hero />
 
-      <div className='flex items-center w-full h-screen transition-colors duration-300 ease-in-out bg-themeBg2'>
-        <div className='w-4/5 mx-auto font-sans text-2xl leading-8 tracking-tight sm:w-3/4 md:w-1/2'>
+      <div className='flex items-center w-full min-h-screen pb-20 transition-colors duration-300 ease-in-out bg-themeBg2'>
+        <div className='w-full mx-4 font-sans text-xl leading-8 tracking-tight md:text-2xl md:mx-auto md:w-3/4'>
           <Parallax rate={0.15}>
             <div>
               <p>
@@ -44,7 +44,7 @@ const HelloPage = () => {
               <div className='w-full mt-4 text-right'>
                 <a
                   href='mailto:hello@videonote.app'
-                  className='text-xl cursor-pointer text-themeAccent'
+                  className='text-lg cursor-pointer md:text-xl text-themeAccent'
                 >
                   hello@videonote.app
                 </a>
@@ -52,13 +52,13 @@ const HelloPage = () => {
             </div>
           </Parallax>
 
-          <div className='w-full text-center'>
+          <div className='w-full mt-8 text-center'>
             <Parallax rate={-0.3}>
               <Link href='/login'>
                 <motion.button
                   onClick={handleAboutClick}
                   whileHover={{ scale: 1.1 }}
-                  className='px-4 py-2 text-2xl italic tracking-tight transition-colors duration-300 ease-in-out rounded-sm cursor-pointer focus:outline-none hover:text-themeAccent text-themeText'
+                  className='px-4 py-2 text-xl italic tracking-tight transition-colors duration-300 ease-in-out rounded-sm cursor-pointer md:text-2xl focus:outline-none hover:text-themeAccent text-themeText'
                 >
                   And away we go!
                 </motion.button>

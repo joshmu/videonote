@@ -11,7 +11,7 @@ const Hero = () => {
   }
 
   return (
-    <div className='relative w-full h-screen transition-colors duration-300 ease-in-out bg-gradient-to-b from-themeBg to-themeBg2'>
+    <div className='relative w-full min-h-screen transition-colors duration-300 ease-in-out bg-gradient-to-b from-themeBg to-themeBg2'>
       <div className='absolute top-0 flex w-full h-screen'>
         {/* left */}
         <div className='relative flex items-center justify-end w-full h-full'>
