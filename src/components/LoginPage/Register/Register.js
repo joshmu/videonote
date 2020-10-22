@@ -1,4 +1,5 @@
 import { motion } from 'framer-motion'
+import { StatusCodes } from 'http-status-codes'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 
@@ -49,8 +50,7 @@ export default function Register({ toggleLoginView, handleLogin, email }) {
     }
     const { res, data } = await fetcher('/api/register', body)
 
-    // 201 = created
-    if (res.status === 201) {
+    if (res.status === StatusCodes.CREATED) {
       addAlert({
         type: 'info',
         msg: 'Account created',

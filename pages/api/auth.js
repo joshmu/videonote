@@ -1,3 +1,5 @@
+import { StatusCodes } from 'http-status-codes'
+
 import { extractUser } from '@/utils/apiHelpers'
 import { authenticateToken } from '@/utils/jwt'
 import { Project, User } from '@/utils/mongoose'
@@ -9,7 +11,9 @@ export default async (req, res) => {
   if (token) token = token.replace(/bearer /i, '')
 
   if (!token) {
-    return res.status(401).json({ msg: 'No token. Authorization denied.' })
+    return res
+      .status(StatusCodes.UNAUTHORIZED)
+      .json({ msg: 'No token. Authorization denied.' })
   }
 
   let email
@@ -17,13 +21,14 @@ export default async (req, res) => {
     email = await authenticateToken(token)
   } catch (err) {
     console.error(err.message)
-    return res.status(401).json({ msg: 'Invalid token' })
+    return res.status(StatusCodes.UNAUTHORIZED).json({ msg: 'Invalid token' })
   }
 
   // get user via email
   const user = await User.findOne({ email }).lean()
 
-  if (user === null) return res.status(400).json({ msg: 'No user found.' })
+  if (user === null)
+    return res.status(StatusCodes.BAD_REQUEST).json({ msg: 'No user found.' })
 
   // get projects
   let projects = []
@@ -31,7 +36,7 @@ export default async (req, res) => {
     projects = await Project.find({ _id: user.projectIds }).lean()
   }
 
-  res.status(200).json({
+  res.status(StatusCodes.OK).json({
     user: extractUser(user),
     projects: projects,
   })

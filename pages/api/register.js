@@ -1,4 +1,5 @@
 import bcrypt from 'bcryptjs'
+import { StatusCodes } from 'http-status-codes'
 import isEmail from 'validator/lib/isEmail'
 import normalizeEmail from 'validator/lib/normalizeEmail'
 
@@ -13,15 +14,19 @@ export default async (req, res) => {
 
   // validate
   if (email && !isEmail(email)) {
-    res.status(400).json({ msg: 'The email you entered is invalid.' })
+    res
+      .status(StatusCodes.BAD_REQUEST)
+      .json({ msg: 'The email you entered is invalid.' })
     return
   }
   if (!password) {
-    res.status(400).json({ msg: 'Missing field(s)' })
+    res.status(StatusCodes.BAD_REQUEST).json({ msg: 'Missing field(s)' })
     return
   }
   if ((await User.countDocuments({ email })) > 0) {
-    res.status(403).json({ msg: 'The email has already been used.' })
+    res
+      .status(StatusCodes.FORBIDDEN)
+      .json({ msg: 'The email has already been used.' })
     return
   }
 
@@ -38,14 +43,16 @@ export default async (req, res) => {
   try {
     await userDoc.save()
   } catch (err) {
-    res.status(500).json({ msg: 'Database Error' })
+    res
+      .status(StatusCodes.INTERNAL_SERVER_ERROR)
+      .json({ msg: 'Database Error' })
   }
 
   // token
   const token = generateAccessToken(userDoc.email)
 
   // 201 - created
-  res.status(201).json({
+  res.status(StatusCodes.CREATED).json({
     user: extractUser(await userDoc.toObject()),
     token,
   })

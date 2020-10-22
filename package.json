@@ -17,6 +17,7 @@
     "date-fns": "^2.16.1",
     "file-saver": "^2.0.2",
     "framer-motion": "^2.7.1",
+    "http-status-codes": "^2.1.4",
     "jsonwebtoken": "^8.5.1",
     "mongoose": "^5.10.9",
     "nanoid": "^3.1.12",

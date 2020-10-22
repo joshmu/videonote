@@ -1,4 +1,5 @@
 import bcrypt from 'bcryptjs'
+import { StatusCodes } from 'http-status-codes'
 import isEmail from 'validator/lib/isEmail'
 import normalizeEmail from 'validator/lib/normalizeEmail'
 
@@ -15,16 +16,16 @@ export default async (req, res) => {
   const globalResponseMsg = 'Your Email and/or Password is incorrect.'
   if (email && !isEmail(email)) {
     // res.status(400).json({ msg: 'The email you entered is invalid.' })
-    res.status(400).json({ msg: globalResponseMsg })
+    res.status(StatusCodes.BAD_REQUEST).json({ msg: globalResponseMsg })
     return
   }
   if (!password) {
-    res.status(400).json({ msg: 'Missing field(s)' })
+    res.status(StatusCodes.BAD_REQUEST).json({ msg: 'Missing field(s)' })
     return
   }
   if ((await User.countDocuments({ email })) === 0) {
     // res.status(404).json({ msg: 'Email not found, registration required.' })
-    res.status(404).json({ msg: globalResponseMsg })
+    res.status(StatusCodes.NOT_FOUND).json({ msg: globalResponseMsg })
     return
   }
 
@@ -35,14 +36,14 @@ export default async (req, res) => {
   const match = await bcrypt.compare(password, user.password)
   if (!match) {
     // return res.status(401).json({ msg: 'Password is incorrect.' })
-    return res.status(401).json({ msg: globalResponseMsg })
+    return res.status(StatusCodes.UNAUTHORIZED).json({ msg: globalResponseMsg })
   }
 
   // token
   const token = generateAccessToken(user.email)
 
   // 302 - found
-  return res.status(302).json({
+  return res.status(StatusCodes.MOVED_TEMPORARILY).json({
     user: extractUser(user),
     token,
   })

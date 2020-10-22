@@ -1,4 +1,5 @@
 import bcrypt from 'bcryptjs'
+import { StatusCodes } from 'http-status-codes'
 
 import { extractUser } from '@/utils/apiHelpers'
 import { authenticateToken, generateAccessToken } from '@/utils/jwt'
@@ -10,7 +11,9 @@ export default async (req, res) => {
   // strip 'bearer'
   if (token) token = token.replace(/bearer /i, '')
   if (!token) {
-    return res.status(401).json({ msg: 'No token. Authorization denied.' })
+    return res
+      .status(StatusCodes.UNAUTHORIZED)
+      .json({ msg: 'No token. Authorization denied.' })
   }
 
   const { action, user: userData } = req.body
@@ -20,7 +23,7 @@ export default async (req, res) => {
     email = await authenticateToken(token)
   } catch (err) {
     console.error(err.message)
-    return res.status(401).json({ msg: 'Invalid token' })
+    return res.status(StatusCodes.UNAUTHORIZED).json({ msg: 'Invalid token' })
   }
 
   // get user
@@ -34,16 +37,22 @@ export default async (req, res) => {
       // check password
       const match = await bcrypt.compare(userData.password, userDoc.password)
       if (!match) {
-        return res.status(401).json({ msg: 'Password is incorrect.' })
+        return res
+          .status(StatusCodes.UNAUTHORIZED)
+          .json({ msg: 'Password is incorrect.' })
       }
       // remove all projects associated to this user
       await Project.deleteMany({ _id: { $in: userDoc.projectIds } })
       // remove user
       await userDoc.remove()
-      return res.status(200).json({ msg: `${userDoc.email} removed` })
+      return res
+        .status(StatusCodes.OK)
+        .json({ msg: `${userDoc.email} removed` })
     }
     if (!action) {
-      return res.status(400).json({ msg: 'Action not specified' })
+      return res
+        .status(StatusCodes.BAD_REQUEST)
+        .json({ msg: 'Action not specified' })
     }
   } catch (error) {
     console.error(error)
@@ -55,7 +64,7 @@ export default async (req, res) => {
   // token (keep resetting their session length)
   const newToken = generateAccessToken(updatedUser.email)
 
-  res.status(200).json({
+  res.status(StatusCodes.OK).json({
     user: extractUser(updatedUser),
     token: newToken,
   })

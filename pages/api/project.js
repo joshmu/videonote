@@ -1,3 +1,5 @@
+import { StatusCodes } from 'http-status-codes'
+
 import { extractProject, extractUser } from '@/utils/apiHelpers'
 import { authenticateToken, generateAccessToken } from '@/utils/jwt'
 import { Project, User } from '@/utils/mongoose'
@@ -8,7 +10,9 @@ export default async (req, res) => {
   // strip 'bearer'
   if (token) token = token.replace(/bearer /i, '')
   if (!token) {
-    return res.status(401).json({ msg: 'No token. Authorization denied.' })
+    return res
+      .status(StatusCodes.UNAUTHORIZED)
+      .json({ msg: 'No token. Authorization denied.' })
   }
 
   const { action, project } = req.body
@@ -18,7 +22,7 @@ export default async (req, res) => {
     email = await authenticateToken(token)
   } catch (err) {
     console.error(err.message)
-    return res.status(401).json({ msg: 'Invalid token' })
+    return res.status(StatusCodes.UNAUTHORIZED).json({ msg: 'Invalid token' })
   }
 
   // get user
@@ -48,7 +52,9 @@ export default async (req, res) => {
       await projectDoc.remove()
     }
     if (!action) {
-      return res.status(400).json({ msg: 'Action not specified' })
+      return res
+        .status(StatusCodes.BAD_REQUEST)
+        .json({ msg: 'Action not specified' })
     }
   } catch (error) {
     console.error(error)
@@ -63,7 +69,7 @@ export default async (req, res) => {
   // token (keep resetting their session length)
   const newToken = generateAccessToken(userDoc.email)
 
-  res.status(200).json({
+  res.status(StatusCodes.OK).json({
     user: extractUser(await userDoc.toObject()),
     projects: updatedProjects.map(project => extractProject(project)),
     token: newToken,

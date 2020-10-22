@@ -1,3 +1,4 @@
+import { StatusCodes } from 'http-status-codes'
 import absoluteUrl from 'next-absolute-url'
 import Cookies from 'universal-cookie'
 
@@ -6,10 +7,10 @@ import Modals from '@/components/Modals/Modals'
 import Notification from '@/components/Notification/Notification'
 import Sidebar from '@/components/Sidebar/Sidebar'
 import VideoPlayer from '@/components/VideoPlayer/VideoPlayer'
+import { ControlsProvider } from '@/context/controlsContext'
 import { GlobalProvider } from '@/context/globalContext'
 import { TodoProvider } from '@/context/todoContext'
 import { VideoProvider } from '@/context/videoContext'
-import { ControlsProvider } from '@/context/controlsContext'
 import Overlay from '@/shared/Modal/Overlay'
 import { fetcher } from '@/utils/clientHelpers'
 
@@ -67,6 +68,15 @@ import { fetcher } from '@/utils/clientHelpers'
 // todo: realtime websockets data layer? users in the same project can unify their data, control video in realtime with each other? open video call? see canvas drawings or atleast each others cursor?
 // todo: project last updated in the listing
 
+// todo: after registration the intro blank page could use more UI
+// todo: error on emtpy create (shown in toast) - maybe show error in the dialog/modal form
+// todo: error/success msgs should be displayed min 8 secs
+// todo: teams, sharing notes with team
+// todo: WCAG - install axe for chrome
+// todo: logging of errors?
+// todo: use enums for message status success etc
+// todo: refresh token > use prompt to user > did you want to extend the session? use an interval timer for this
+
 // todo: mobile can still be used and when not sure of a note then select and it plays the video at the position required. (workflow of flicking between)
 // todo: demo video = the videonote workflow... (explain the ease of note taking whilst video is running by having a playback offset, otherwise the simplicity of toggle and note flow)
 
@@ -112,7 +122,7 @@ Main.getInitialProps = async ctx => {
   if (!token) {
     console.log('no token, redirecting...')
     // server
-    ctx.res.writeHead(302, {
+    ctx.res.writeHead(StatusCodes.MOVED_TEMPORARILY, {
       Location: `/hello`,
     })
     ctx.res.end()
@@ -126,8 +136,8 @@ Main.getInitialProps = async ctx => {
   const { res, data } = await fetcher(url, body, token)
 
   // if token is invalid
-  if (res.status !== 200) {
-    ctx.res.writeHead(302, {
+  if (res.status !== StatusCodes.OK) {
+    ctx.res.writeHead(StatusCodes.MOVED_TEMPORARILY, {
       Location: `/login`,
     })
     ctx.res.end()

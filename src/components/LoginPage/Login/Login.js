@@ -1,4 +1,5 @@
 import { motion } from 'framer-motion'
+import { StatusCodes } from 'http-status-codes'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 
@@ -52,7 +53,8 @@ export default function Login({ toggleLoginView, handleLogin, handleEmail }) {
     const { res, data } = await fetcher('/api/login', body)
 
     // if we haven't found the account
-    if (res.status !== 302) return addAlert({ type: 'error', msg: data.msg })
+    if (res.status !== StatusCodes.MOVED_TEMPORARILY)
+      return addAlert({ type: 'error', msg: data.msg })
 
     // continue to app
     handleLogin(data)

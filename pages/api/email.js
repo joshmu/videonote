@@ -1,23 +1,7 @@
-const nodemailer = require('nodemailer')
+import { StatusCodes } from 'http-status-codes'
+import nodemailer from 'nodemailer'
 
-module.exports = async (req, res) => {
-  const {
-    email: from, // sender address
-    name: subject, // Subject line
-    message: text, // plain text body
-  } = req.body
-
-  try {
-    console.log({ from, subject, text })
-    const info = await email({ from, subject, text })
-    res.status(200).send({ msg: 'success', info })
-  } catch (err) {
-    console.error(err)
-    res.status(400).json({ error: err.message })
-  }
-}
-
-async function email({ from, subject, text }) {
+const email = async ({ from, subject, text }) => {
   // create reusable transporter object using the default SMTP transport
   let transporter = nodemailer.createTransport({
     host: 'smtp.dreamhost.com',
@@ -43,3 +27,22 @@ async function email({ from, subject, text }) {
 
   return info
 }
+
+const handler = async (req, res) => {
+  const {
+    email: from, // sender address
+    name: subject, // Subject line
+    message: text, // plain text body
+  } = req.body
+
+  try {
+    console.log({ from, subject, text })
+    const info = await email({ from, subject, text })
+    res.status(StatusCodes.OK).send({ msg: 'success', info })
+  } catch (err) {
+    console.error(err)
+    res.status(StatusCodes.BAD_REQUEST).json({ error: err.message })
+  }
+}
+
+export default handler

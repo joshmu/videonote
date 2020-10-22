@@ -1,3 +1,4 @@
+import { StatusCodes } from 'http-status-codes'
 import Router from 'next/router'
 import { createContext, useContext, useEffect, useState } from 'react'
 import Cookie from 'universal-cookie'
@@ -372,7 +373,7 @@ export function GlobalProvider({ serverData, ...props }) {
   }
 
   const badResponse = (res, msg) => {
-    if (res.status !== 200) {
+    if (res.status !== StatusCodes.OK) {
       if (msg.match(/invalid token/i)) {
         console.log('invalid token, redirecting...')
         const alertMsg = 'Session expired, please re-enter your credentials'
