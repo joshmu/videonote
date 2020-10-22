@@ -4,7 +4,7 @@ import {
   useTransform,
   useViewportScroll,
 } from 'framer-motion'
-import { useLayoutEffect, useRef, useState } from 'react'
+import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 
 const calculateMinHeight = (height, range) => {
   return height + height * range
@@ -22,7 +22,8 @@ const Parallax = ({ rate = 0, children, ...props }) => {
   // randomize the rate if we do not specify (0.01-0.4)
   rate = rate === 0 ? rand(1, 40) / 100 : rate
 
-  useLayoutEffect(() => {
+  // useLayoutEffect(() => {
+  useEffect(() => {
     if (!ref.current) return null
     const onResize = () => {
       // also add half window height, so true position is centre of screen
