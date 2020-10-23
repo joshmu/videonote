@@ -6,7 +6,7 @@ export default function Layout({ children }) {
       <Head>
         <title>VideoNote</title>
       </Head>
-      <div className='relative min-h-full overflow-hidden font-sans antialiased transition-colors duration-300 ease-in-out text-themeText bg-themeBg'>
+      <div className='relative min-h-full overflow-hidden font-sans antialiased transition-colors duration-300 ease-in-out debug-screens'>
         <main>{children}</main>
       </div>
     </>

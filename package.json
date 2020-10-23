@@ -42,7 +42,8 @@
     "next-optimized-images": "^2.6.2",
     "postcss-preset-env": "^6.7.0",
     "sass": "^1.26.11",
-    "tailwindcss": "^1.8.10"
+    "tailwindcss": "^1.8.10",
+    "tailwindcss-debug-screens": "^1.1.0"
   },
   "keywords": [
     "videonote",

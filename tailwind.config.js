@@ -47,6 +47,7 @@ module.exports = {
 
       addUtilities(extendLineThrough)
     }),
+    require('tailwindcss-debug-screens'),
   ],
   future: {
     removeDeprecatedGapUtilities: true,
