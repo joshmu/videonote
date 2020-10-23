@@ -13,7 +13,7 @@ const rand = (min = 0, max = 100) => {
   return Math.floor(Math.random() * (+max - +min)) + +min
 }
 
-const Parallax = ({ rate = 0, children, ...props }) => {
+const Parallax = ({ rate = 0, className = '', children, ...props }) => {
   const ref = useRef(null)
   const { scrollY } = useViewportScroll()
   const [offsetTop, setOffsetTop] = useState(0)
@@ -23,10 +23,12 @@ const Parallax = ({ rate = 0, children, ...props }) => {
   rate = rate === 0 ? rand(1, 40) / 100 : rate
 
   useLayoutEffect(() => {
+    // useEffect(() => {
     if (!ref.current) return null
     const onResize = () => {
-      // also add half window height, so true position is centre of screen
-      const halfWindowY = globalThis.window.innerHeight / 2
+      // also add elem centre of screen by grabbing half screen height and elem height
+      const halfWindowY =
+        globalThis.window.innerHeight / 2 + ref.current.clientHeight / 2
       setOffsetTop(ref.current.offsetTop - halfWindowY)
       setMinHeight(
         calculateMinHeight(ref.current.offsetHeight - halfWindowY, rate)
@@ -54,7 +56,11 @@ const Parallax = ({ rate = 0, children, ...props }) => {
   )
 
   return (
-    <div ref={ref} style={{ minHeight, margin: 'auto', width: '100%' }}>
+    <div
+      ref={ref}
+      style={{ minHeight, margin: 'auto', width: '100%' }}
+      className={className}
+    >
       <motion.div style={{ y }} {...props}>
         {children}
       </motion.div>
