@@ -22,7 +22,7 @@ const HelloPage = () => {
 
       <Hero />
 
-      <div className='flex items-center w-full min-h-screen pb-20 transition-colors duration-300 ease-in-out bg-themeBg2'>
+      <div className='flex items-center w-full pb-20 transition-colors duration-300 ease-in-out min-h-screenVh bg-themeBg'>
         <div className='w-full mx-4 font-sans text-xl leading-8 tracking-tight md:text-2xl md:mx-auto md:w-3/4'>
           <Parallax rate={0.15}>
             <div>

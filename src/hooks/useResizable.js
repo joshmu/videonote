@@ -1,4 +1,5 @@
-import { useState, useEffect } from 'react'
+import { throttle } from 'lodash'
+import { useEffect, useState } from 'react'
 
 export const useResizable = ({ initialSize, defaultSize }) => {
   const [state, setState] = useState({
@@ -17,7 +18,7 @@ export const useResizable = ({ initialSize, defaultSize }) => {
     if (!state.resizing) {
       setState({ ...state, resizing: true })
 
-      document.addEventListener('mousemove', handleResizing)
+      document.addEventListener('mousemove', throttleHandleResize)
       document.addEventListener('mouseup', handleResizeEnd)
       // lock resize cursor
       document.body.style.cursor = 'ew-resize'
@@ -35,12 +36,14 @@ export const useResizable = ({ initialSize, defaultSize }) => {
   const handleResizing = e => {
     setState({ size: window.innerWidth - e.clientX, resizing: true })
   }
+  // throttle resize event to every 20ms
+  const throttleHandleResize = throttle(handleResizing, 20)
 
   const handleResizeEnd = e => {
     const newWidth = window.innerWidth - e.clientX
     setState({ size: newWidth, resizing: false })
 
-    document.removeEventListener('mousemove', handleResizing)
+    document.removeEventListener('mousemove', throttleHandleResize)
     document.removeEventListener('mouseup', handleResizeEnd)
     // remove resize cursor
     document.body.style.cursor = 'default'

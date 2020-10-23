@@ -1,5 +1,7 @@
 import { createContext, useContext, useEffect, useState } from 'react'
 
+import useSetVh from '@/hooks/useSetVh'
+
 const themeContext = createContext({
   theme: '',
   toggleTheme: () => {},
@@ -14,6 +16,9 @@ const THEME_TYPES = {
 }
 
 export function ThemeProvider(props) {
+  // define vh via --vh var to avoid viewport issues on mobile
+  useSetVh()
+
   const [theme, setTheme] = useState(Object.keys(THEME_TYPES)[0])
 
   // initial theme
