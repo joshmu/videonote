@@ -44,10 +44,10 @@ module.exports = {
           textDecorationColor: 'var(--accent)',
         },
       }
-
       addUtilities(extendLineThrough)
     }),
-    require('tailwindcss-debug-screens'),
+    process.env.NODE_ENV !== 'production' &&
+      require('tailwindcss-debug-screens'),
   ],
   future: {
     removeDeprecatedGapUtilities: true,
