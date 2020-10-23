@@ -27,7 +27,6 @@ import { fetcher } from '@/utils/clientHelpers'
 
 // todo: unify text with text components
 
-// todo: think about extending landing page
 // todo: insert an accept cookies msg? or should we avoid cookies so we don't need this?
 
 // todo: offer restrictation on sharing to avoid other users adding their own notes (editable) (DB)
