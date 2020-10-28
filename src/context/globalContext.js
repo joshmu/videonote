@@ -296,7 +296,10 @@ export function GlobalProvider({ serverData, ...props }) {
   //-------------------------------
   const handleInitialServerData = data => {
     console.log('handle initial server data', data)
-    const { user: account, projects, msg } = data
+    const { user, msg } = data
+    const { projects, ...account } = user
+    // const account = data
+    // const { user: account, projects, msg } = data
 
     // if msg presume there is an error
     if (msg) {

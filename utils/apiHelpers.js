@@ -1,7 +1,7 @@
 // take only needed user fields to avoid sensitive ones (such as password)
 export const extractUser = user => {
   if (!user) return null
-  const { password, removed, created, updated, notes, ...data } = user
+  const { password, created, ...data } = user
   return {
     ...data,
   }
@@ -9,7 +9,7 @@ export const extractUser = user => {
 
 export const extractProject = project => {
   if (!project) return null
-  const { removed, created, updated, notes, ...data } = project
+  const { created, updated, ...data } = project
   return {
     ...data,
   }
@@ -17,14 +17,7 @@ export const extractProject = project => {
 
 export const extractPublicProject = project => {
   if (!project) return null
-  const {
-    removed,
-    created,
-    updated,
-    notes,
-    userIds,
-    ...data
-  } = project
+  const { created, updated, userIds, ...data } = project
   return {
     ...data,
   }
