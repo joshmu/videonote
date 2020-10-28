@@ -7,46 +7,51 @@ mongoose.connect(process.env.MONGODB_URI, {
   useCreateIndex: true,
 })
 
-const userSchema = new Schema(
+const UserSchema = new Schema(
   {
     email: { type: String, required: true, unique: true },
     username: { type: String },
-    projectIds: [{ type: Schema.Types.ObjectId, ref: 'Project' }],
-    settings: {
-      playOffset: Number,
-      showHints: Boolean,
-      seekJump: Number,
-      sidebarWidth: Number,
-      currentProjectId: { type: Schema.Types.ObjectId, ref: 'Project' },
-    },
+    projects: [{ type: Schema.Types.ObjectId, ref: 'Project' }],
+    config: { type: Schema.Types.ObjectId, ref: 'Config' },
     role: { type: String, default: 'free' },
-    notes: String,
     password: String,
   },
-  {
-    timestamps: { currentTime: () => Math.floor(Date.now() / 1000) },
-  }
+  { timestamps: true }
 )
 
-const projectSchema = new Schema(
+const ProjectSchema = new Schema(
   {
     title: { type: String, required: true },
     src: String,
-    todos: [
-      {
-        id: { type: String, required: true },
-        msg: { type: String, required: true },
-        time: Number,
-        done: Boolean,
-      },
-    ],
-    notes: String,
+    notes: [{ type: Schema.Types.ObjectId, ref: 'Note' }],
+    user: { type: Schema.Types.ObjectId, ref: 'User', required: true },
+    sharedUsers: [{ type: Schema.Types.ObjectId, ref: 'User' }],
     isPrivate: { type: Boolean, default: true },
-    userIds: [{ type: Schema.Types.ObjectId, ref: 'User' }],
   },
+  { timestamps: true }
+)
+
+const NoteSchema = new Schema(
   {
-    timestamps: { currentTime: () => Math.floor(Date.now() / 1000) },
-  }
+    content: { type: String, required: true },
+    time: { type: Number, default: 0 },
+    done: { type: Boolean, default: false },
+    user: { type: Schema.Types.ObjectId, ref: 'User', required: true },
+    project: { type: Schema.Types.ObjectId, ref: 'Project' },
+  },
+  { timestamps: true }
+)
+
+const ConfigSchema = new Schema(
+  {
+    user: { type: Schema.Types.ObjectId, ref: 'User', required: true },
+    currentProject: { type: Schema.Types.ObjectId, ref: 'Project' },
+    playOffset: Number,
+    showHints: { type: Boolean, default: true },
+    seekJump: Number,
+    sidebarWidth: Number,
+  },
+  { timestamps: true }
 )
 
 // prevent overwrite model error
@@ -54,13 +59,25 @@ let User
 try {
   User = mongoose.model('User')
 } catch (error) {
-  User = mongoose.model('User', userSchema)
+  User = mongoose.model('User', UserSchema)
 }
 let Project
 try {
   Project = mongoose.model('Project')
 } catch (error) {
-  Project = mongoose.model('Project', projectSchema)
+  Project = mongoose.model('Project', ProjectSchema)
+}
+let Note
+try {
+  Note = mongoose.model('Note')
+} catch (error) {
+  Note = mongoose.model('Note', NoteSchema)
+}
+let Config
+try {
+  Config = mongoose.model('Config')
+} catch (error) {
+  Config = mongoose.model('Config', ConfigSchema)
 }
 
-export { User, Project }
+export { User, Project, Note, Config }

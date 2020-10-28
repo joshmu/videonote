@@ -42,6 +42,7 @@ export default async (req, res) => {
           .json({ msg: 'Password is incorrect.' })
       }
       // remove all projects associated to this user
+      // todo: fix for new model
       await Project.deleteMany({ _id: { $in: userDoc.projectIds } })
       // remove user
       await userDoc.remove()
