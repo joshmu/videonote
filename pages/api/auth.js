@@ -2,7 +2,7 @@ import { StatusCodes } from 'http-status-codes'
 
 import { extractUser } from '@/utils/apiHelpers'
 import { authenticateToken } from '@/utils/jwt'
-import { Project, User } from '@/utils/mongoose'
+import { User } from '@/utils/mongoose'
 
 export default async (req, res) => {
   // Gather the jwt access token from the request header
@@ -24,9 +24,10 @@ export default async (req, res) => {
     return res.status(StatusCodes.UNAUTHORIZED).json({ msg: 'Invalid token' })
   }
 
-  // get user via email (including their projects)
+  // get user via email (including their projects & settings)
   const user = await User.findOne({ email })
     .populate({ path: 'projects', model: 'Project' })
+    .populate({ path: 'settings', model: 'Settings' })
     .lean()
 
   if (user === null)

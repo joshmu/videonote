@@ -14,7 +14,7 @@ const SETTINGS_DEFAULTS = {
   showHints: true,
   seekJump: 10,
   sidebarWidth: 400,
-  currentProjectId: null,
+  currentProject: null,
 }
 
 const HINTS = [
@@ -84,17 +84,17 @@ export function GlobalProvider({ serverData, ...props }) {
     }
   }, [projects, user])
 
-  // reset settings.currentProjectId when projects are empty
+  // reset settings.currentProject when projects are empty
   useEffect(() => {
-    if (projects.length === 0 && settings.currentProjectId)
-      updateSettings({ currentProjectId: null })
-  }, [projects, settings.currentProjectId])
+    if (projects.length === 0 && settings.currentProject)
+      updateSettings({ currentProject: null })
+  }, [projects, settings.currentProject])
 
   // if we have projects and one isn't assigned then let's do it
   useEffect(() => {
     if (projects.length > 0 && currentProject === null) {
-      if (settings.currentProjectId) {
-        loadProject(settings.currentProjectId)
+      if (settings.currentProject) {
+        loadProject(settings.currentProject)
       } else {
         // otherwise use most recent project
         const recentProject = projects.slice(-1)[0]
@@ -181,6 +181,11 @@ export function GlobalProvider({ serverData, ...props }) {
   }
 
   const updateSettings = async newSettingsData => {
+    // todo: fix change to new settings collection model
+    // todo: we are up to here, created 'settings' CRUD api which we need to call here and test
+    return console.warn(
+      'todo: change to new settings collection model on database'
+    )
     if (!admin) return
 
     console.log('updating settings...', newSettingsData)
@@ -265,8 +270,8 @@ export function GlobalProvider({ serverData, ...props }) {
     setCurrentProject(selectedProject)
 
     // only update if there is a change
-    if (selectedProject._id !== settings.currentProjectId) {
-      updateSettings({ currentProjectId: selectedProject._id })
+    if (selectedProject._id !== settings.currentProject) {
+      updateSettings({ currentProject: selectedProject._id })
     }
 
     // notification when we load a project
@@ -287,7 +292,7 @@ export function GlobalProvider({ serverData, ...props }) {
     setProjects(projects)
 
     // switch project if we are removing the currently viewed project
-    if (settings.currentProjectId === _id) {
+    if (settings.currentProject === _id) {
       const newCurrentProject = projects.slice(-1)[0]
       loadProject(newCurrentProject)
     }
@@ -296,10 +301,10 @@ export function GlobalProvider({ serverData, ...props }) {
   //-------------------------------
   const handleInitialServerData = data => {
     console.log('handle initial server data', data)
+    // user data and msg for server messages
     const { user, msg } = data
-    const { projects, ...account } = user
-    // const account = data
-    // const { user: account, projects, msg } = data
+    // grab user projects as seperate var and rest is the account
+    const { projects, ...userAccount } = user
 
     // if msg presume there is an error
     if (msg) {
@@ -311,19 +316,19 @@ export function GlobalProvider({ serverData, ...props }) {
     // allocate server data to respective areas
     setProjects(projects)
 
-    if (account) {
-      const { settings, ...user } = account
+    if (userAccount) {
+      const { settings, ...user } = userAccount
       setUser(user)
 
-      // avoid null values from mongo if we have any in settings and assign defaults
-      if (settings) {
-        // if we have any null settings lets use the defaults
+      // avoid null values from mongo
+      // if we have any null values in returned settings then replace with defaults
+      if (settings instanceof Object) {
+        // if we have any null settings lets swap them to their defaults
         Object.entries(settings).forEach(([key, val]) => {
           if (settings[key] === null) settings[key] = SETTINGS_DEFAULTS[key]
         })
+        setSettings({ ...SETTINGS_DEFAULTS, ...settings })
       }
-
-      setSettings({ ...SETTINGS_DEFAULTS, ...settings })
 
       addAlert({ type: 'success', msg: `Logged in: ${user.username}` })
     } else {

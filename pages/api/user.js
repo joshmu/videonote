@@ -72,9 +72,11 @@ export default async (req, res) => {
 }
 
 const updateUser = async (userDoc, userData) => {
-  // if we have nested objects then lets update them and then overwrite currently stored
-  if (userData.settings)
+  // if we have settings data to update and we have previously stored data then merge
+  // todo: this would be refactored to its own settings collection
+  if (userData.settings && userDoc.settings instanceof Object) {
     userData.settings = { ...userDoc.settings, ...userData.settings }
+  }
 
   await userDoc.updateOne({ $set: userData })
   await userDoc.save()

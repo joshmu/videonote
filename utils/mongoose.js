@@ -12,7 +12,7 @@ const UserSchema = new Schema(
     email: { type: String, required: true, unique: true },
     username: { type: String },
     projects: [{ type: Schema.Types.ObjectId, ref: 'Project' }],
-    config: { type: Schema.Types.ObjectId, ref: 'Config' },
+    settings: { type: Schema.Types.ObjectId, ref: 'Settings' },
     role: { type: String, default: 'free' },
     password: String,
   },
@@ -42,7 +42,7 @@ const NoteSchema = new Schema(
   { timestamps: true }
 )
 
-const ConfigSchema = new Schema(
+const SettingsSchema = new Schema(
   {
     user: { type: Schema.Types.ObjectId, ref: 'User', required: true },
     currentProject: { type: Schema.Types.ObjectId, ref: 'Project' },
@@ -73,11 +73,11 @@ try {
 } catch (error) {
   Note = mongoose.model('Note', NoteSchema)
 }
-let Config
+let Settings
 try {
-  Config = mongoose.model('Config')
+  Settings = mongoose.model('Settings')
 } catch (error) {
-  Config = mongoose.model('Config', ConfigSchema)
+  Settings = mongoose.model('Settings', SettingsSchema)
 }
 
-export { User, Project, Note, Config }
+export { User, Project, Note, Settings }
