@@ -29,8 +29,6 @@ export default async (req, res) => {
   // get user
   const userDoc = await User.findOne({ email })
 
-  console.log({ userDoc })
-
   // add user info to note
   note.user = userDoc._id
 
@@ -39,14 +37,18 @@ export default async (req, res) => {
     if (!action) {
       // use _id to search for doc, the rest is data to add
       const { _id, ...data } = note
+
       noteDoc = await Note.findById(_id)
 
       // if note exists
       if (noteDoc) {
-        await noteDoc.updateOne({ $set: data })
-        await noteDoc.save()
+        noteDoc = await Note.findByIdAndUpdate(
+          noteDoc._id,
+          { $set: data },
+          { new: true }
+        )
       } else {
-        // if note doc does not exist then create
+        // if note doc does not exist then create with whole note so we define the _id
         noteDoc = new Note(note)
         await noteDoc.save()
         // add note id to relevant project

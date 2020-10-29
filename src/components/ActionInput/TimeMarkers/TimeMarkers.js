@@ -16,7 +16,7 @@ const TimeMarkers = ({ inputActive }) => {
       <div className='absolute bottom-0 w-full h-1 overflow-hidden'>
         {notes.map(note => (
           <div
-            key={note.id}
+            key={note._id}
             onClick={() => seekTo(note.time)}
             className='absolute z-30 h-1 transform -translate-x-1/2 cursor-pointer bg-themeAccent2'
             style={{

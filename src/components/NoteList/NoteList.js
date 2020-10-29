@@ -4,7 +4,7 @@ import { useNoteContext } from '@/context/noteContext'
 
 import NoteItem from './NoteItem/NoteItem'
 
-export default function TodoList() {
+const NoteList = () => {
   const { notes, sort, checkProximity } = useNoteContext()
 
   const parentVariants = {
@@ -35,7 +35,7 @@ export default function TodoList() {
     <div className='w-full bg-transparent'>
       <AnimatePresence exitBeforeEnter>
         <motion.ul
-          key='todoList'
+          key='noteList'
           initial='initial'
           animate='animate'
           exit='exit'
@@ -43,7 +43,7 @@ export default function TodoList() {
         >
           {sort(notes).map(note => (
             <NoteItem
-              todo={note}
+              note={note}
               key={note._id}
               closestProximity={checkProximity(note)}
               childVariants={childVariants}
@@ -54,3 +54,5 @@ export default function TodoList() {
     </div>
   )
 }
+
+export default NoteList

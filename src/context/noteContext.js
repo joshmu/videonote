@@ -1,3 +1,4 @@
+import mongoose from 'mongoose'
 import { createContext, useContext, useEffect, useState } from 'react'
 
 import useNoteProximity from '@/hooks/useNoteProximity'
@@ -5,10 +6,11 @@ import useNoteProximity from '@/hooks/useNoteProximity'
 import { useGlobalContext } from './globalContext'
 import { useVideoContext } from './videoContext'
 
+const createMongooseId = () => new mongoose.Types.ObjectId().toString()
+
 const noteContext = createContext({
   notes: [],
   addNote: a => {},
-  updateNote: a => {},
   removeNote: a => {},
   updateSearch: a => {},
   sort: a => [],
@@ -17,7 +19,7 @@ const noteContext = createContext({
 })
 
 export function NoteProvider(props) {
-  const { project, projects, updateProject, createNoteApi } = useGlobalContext()
+  const { project, projects, updateProject, noteApi } = useGlobalContext()
   const { progress } = useVideoContext()
   const [notes, setNotes] = useState([])
   const [search, setSearch] = useState('')
@@ -50,30 +52,40 @@ export function NoteProvider(props) {
 
   const addNote = note => {
     const newNote = {
-      id: Date.now(),
+      _id: createMongooseId(),
       content: note.content,
       time: note.time,
       done: false,
       project: project._id,
     }
+    console.log({ newNote })
     setNotes([...notes, newNote])
-    createNoteApi(newNote).then(res => {
-      if (res === 'error') {
+    noteApi(newNote).then(responseNote => {
+      if (responseNote === 'error') {
         // remove newly added note
         setNotes(current => {
-          return current.filter(note => note.id !== newNote.id)
+          return current.filter(note => note._id !== newNote._id)
         })
       }
+      console.log({ responseNote })
     })
   }
 
   const updateNote = note => {
-    const updatedNotes = notes.map(t => (t.id === note.id ? note : t))
-    setNotes(updatedNotes)
+    const oldNote = notes.find(n => n._id === note._id)
+    console.log('update the note', note)
+    return noteApi(note).then(res => {
+      if (res === 'error') {
+        // if we have server error return original note
+        return oldNote
+      }
+      // otherwise the response will be the updated note
+      return res
+    })
   }
 
-  const removeNote = id => {
-    const updatedNotes = notes.filter(note => note.id !== id)
+  const removeNote = _id => {
+    const updatedNotes = notes.filter(note => note._id !== _id)
     setNotes(updatedNotes)
   }
 

@@ -36,8 +36,11 @@ export default async (req, res) => {
     settingsDoc = await Settings.findOne({ _id, user: userDoc._id })
 
     if (settingsDoc) {
-      await settingsDoc.updateOne({ $set: data })
-      await settingsDoc.save()
+      settingsDoc = await Settings.findByIdAndUpdate(
+        settingsDoc._id,
+        { $set: data },
+        { new: true }
+      )
     } else {
       // if settings doc does not exist then create
       settingsDoc = new Settings({ ...settings, user: userDoc._id })

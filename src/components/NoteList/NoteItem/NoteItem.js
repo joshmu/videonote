@@ -8,39 +8,52 @@ import { useVideoContext } from '@/context/videoContext'
 
 import TimeDisplay from '../../shared/TimeDisplay/TimeDisplay'
 
-export default function TodoItem({ todo, closestProximity, childVariants }) {
-  const { id, content, person: category = null, time, done = false } = todo
+const NoteItem = ({ note, closestProximity, childVariants }) => {
+  const { id, content, person: category = null, time, done = false } = note
   const { seekTo } = useVideoContext()
   const { toggleSmartControls } = useControlsContext()
   const { updateNote } = useNoteContext()
-  const [edit, setEdit] = useState(false)
+  const [isEditing, setIsEditing] = useState(false)
+  const [scopedContent, setScopedContent] = useState(content)
 
   // no smart controls whilst editing
   useEffect(() => {
-    const enableSmartControls = !edit
+    const enableSmartControls = !isEditing
     toggleSmartControls(enableSmartControls)
-  }, [edit])
+  }, [isEditing])
+
+  // when we stop editing and we have a change then update note content
+  useEffect(() => {
+    if (!isEditing && scopedContent !== content) {
+      updateNote({ ...note, content: scopedContent }).then(responseNote => {
+        if (responseNote.content === content) {
+          // error must have occurred as we did not receive an updated version
+          // reset scopedContent
+          setScopedContent(content)
+        }
+      })
+    }
+  }, [isEditing, scopedContent])
 
   const handleTimeClick = () => {
-    const updatedTodo = { ...todo, done: !todo.done }
-    updateNote(updatedTodo)
+    const updatedNote = { ...note, done: !note.done }
+    updateNote(updatedNote)
   }
   const handleNoteClick = () => {
     seekTo(time)
   }
   const toggleEdit = (willEdit = undefined) => {
-    setEdit(current => {
+    setIsEditing(current => {
       const newState = willEdit === undefined ? !current : willEdit
       return newState
     })
   }
   const handleEdit = e => {
-    const updatedTodo = { ...todo, content: e.target.value }
-    updateNote(updatedTodo)
+    setScopedContent(e.target.value)
   }
   const handleEditKeys = e => {
     if (e.key === 'Enter') {
-      setEdit(false)
+      setIsEditing(false)
       return
     }
   }
@@ -74,10 +87,10 @@ export default function TodoItem({ todo, closestProximity, childVariants }) {
             {category && (
               <div className='text-sm leading-5 capitalize'>{category}</div>
             )}
-            {edit ? (
+            {isEditing ? (
               <input
                 type='text'
-                value={content}
+                value={scopedContent}
                 onChange={handleEdit}
                 onKeyDown={handleEditKeys}
                 onDoubleClick={() => toggleEdit(false)}
@@ -90,7 +103,7 @@ export default function TodoItem({ todo, closestProximity, childVariants }) {
                 onDoubleClick={() => toggleEdit(true)}
                 className='text-sm leading-5'
               >
-                {content}
+                {scopedContent}
               </div>
             )}
           </div>
@@ -99,3 +112,5 @@ export default function TodoItem({ todo, closestProximity, childVariants }) {
     </motion.div>
   )
 }
+
+export default NoteItem

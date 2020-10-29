@@ -95,7 +95,7 @@ export function ControlsProvider(props) {
   const nextPrevNote = (direction = 'next') => {
     // sort via time
     const notes = notes.sort((a, b) => a.time - b.time)
-    const currentIndex = notes.findIndex(note => note.id === currentNote.id)
+    const currentIndex = notes.findIndex(note => note._id === currentnote._id)
     // based on direction grab next/prev note or stop at the limit
     const idx =
       direction === 'next'

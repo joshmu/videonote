@@ -23,7 +23,7 @@ const useNoteProximity = ({ notes, progress }) => {
   }, [progress.playedSeconds])
 
   const checkProximity = todo =>
-    currentNote !== null && currentNote.id === todo.id
+    currentNote !== null && currentNote._id === todo.id
 
   return { currentNote, checkProximity }
 }

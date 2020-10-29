@@ -95,8 +95,8 @@ export function GlobalProvider({ serverData, ...props }) {
     }
   }, [projects, currentProject, settings])
 
-  const createNoteApi = async noteData => {
-    console.log('create note', noteData)
+  const noteApi = async noteData => {
+    console.log('note api request', noteData)
     // merge note and user information together match 'user' mongo doc
     const body = {
       note: noteData,
@@ -110,7 +110,7 @@ export function GlobalProvider({ serverData, ...props }) {
 
     if (badResponse(res, msg)) return 'error'
 
-    return true
+    return note
   }
 
   const updateProject = async projectData => {
@@ -458,7 +458,7 @@ export function GlobalProvider({ serverData, ...props }) {
     promptConfirm,
     promptCancel,
     cancelModals,
-    createNoteApi,
+    noteApi,
   }
 
   return <globalContext.Provider value={value} {...props} />

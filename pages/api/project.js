@@ -98,9 +98,11 @@ const updateProject = async (projectData, userDoc) => {
   // remove the id and any nested array/object
   const { _id, ...data } = projectData
 
-  const projectDoc = await Project.findById(_id)
-  await projectDoc.updateOne({ $set: data })
-  await projectDoc.save()
+  const projectDoc = await Project.findByIdAndUpdate(
+    _id,
+    { $set: data },
+    { new: true }
+  )
 
   return projectDoc
 }
