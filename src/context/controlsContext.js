@@ -2,7 +2,7 @@ import { createContext, useContext, useState } from 'react'
 
 import useGlobalKeydown from '../hooks/useGlobalKeydown'
 import { useGlobalContext } from './globalContext'
-import { useTodoContext } from './todoContext'
+import { useNoteContext } from './noteContext'
 import { useVideoContext } from './videoContext'
 
 const controlsContext = createContext({
@@ -21,7 +21,7 @@ export function ControlsProvider(props) {
     progress,
     seekTo,
   } = useVideoContext()
-  const { todos, currentNote } = useTodoContext()
+  const { notes, currentNote } = useNoteContext()
 
   const [isSmartControlsEnabled, setIsSmartControlsEnabled] = useState(true)
 
@@ -38,7 +38,7 @@ export function ControlsProvider(props) {
 
     if (key === 'ArrowLeft') {
       if (keysPressed.includes('Shift')) {
-        console.log('todo: jump prev note')
+        console.log('note: jump prev note')
         const note = nextPrevNote('prev')
         console.log({ note })
         seekTo(note.time, { offset: false })
@@ -49,7 +49,7 @@ export function ControlsProvider(props) {
 
     if (key === 'ArrowRight') {
       if (keysPressed.includes('Shift')) {
-        console.log('todo: jump next note')
+        console.log('note: jump next note')
         const note = nextPrevNote('next')
         console.log({ note })
         seekTo(note.time, { offset: false })
@@ -94,7 +94,7 @@ export function ControlsProvider(props) {
 
   const nextPrevNote = (direction = 'next') => {
     // sort via time
-    const notes = todos.sort((a, b) => a.time - b.time)
+    const notes = notes.sort((a, b) => a.time - b.time)
     const currentIndex = notes.findIndex(note => note.id === currentNote.id)
     // based on direction grab next/prev note or stop at the limit
     const idx =

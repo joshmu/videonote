@@ -1,11 +1,11 @@
 import { AnimatePresence, motion } from 'framer-motion'
 
-import { useTodoContext } from '@/context/todoContext'
+import { useNoteContext } from '@/context/noteContext'
 
-import TodoItem from './TodoItem/TodoItem'
+import NoteItem from './NoteItem/NoteItem'
 
 export default function TodoList() {
-  const { todos, sort, checkProximity } = useTodoContext()
+  const { notes, sort, checkProximity } = useNoteContext()
 
   const parentVariants = {
     initial: { opacity: 0 },
@@ -41,11 +41,11 @@ export default function TodoList() {
           exit='exit'
           variants={parentVariants}
         >
-          {sort(todos).map(todo => (
-            <TodoItem
-              todo={todo}
-              key={todo.id}
-              closestProximity={checkProximity(todo)}
+          {sort(notes).map(note => (
+            <NoteItem
+              todo={note}
+              key={note._id}
+              closestProximity={checkProximity(note)}
               childVariants={childVariants}
             />
           ))}

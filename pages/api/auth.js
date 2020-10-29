@@ -24,10 +24,17 @@ export default async (req, res) => {
     return res.status(StatusCodes.UNAUTHORIZED).json({ msg: 'Invalid token' })
   }
 
-  // get user via email (including their projects & settings)
+  // get user via email (including their settings, projects & notes per project)
   const user = await User.findOne({ email })
-    .populate({ path: 'projects', model: 'Project' })
     .populate({ path: 'settings', model: 'Settings' })
+    .populate({
+      path: 'projects',
+      model: 'Project',
+      populate: {
+        path: 'notes',
+        model: 'Note',
+      },
+    })
     .lean()
 
   if (user === null)

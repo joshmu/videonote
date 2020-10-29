@@ -1,9 +1,10 @@
-import React from 'react'
+import { format } from 'date-fns'
 import { saveAs } from 'file-saver'
+import React from 'react'
 import { BsCloudDownload as DownloadIcon } from 'react-icons/bs'
+
 import { useGlobalContext } from '@/context/globalContext'
 import { useNotificationContext } from '@/context/notificationContext'
-import { format } from 'date-fns'
 import { formatDuration } from '@/utils/clientHelpers'
 
 export default function ExportNotes() {
@@ -35,10 +36,12 @@ export default function ExportNotes() {
     txtContent += `Project: ${project.title.toUpperCase()}\n`
     txtContent += `---\n\n`
     // content
-    txtContent += project.todos
+    txtContent += project.notes
       .map(
         msg =>
-          `- [${msg.done ? 'x' : ' '}] ${msg.msg} (${formatDuration(msg.time)})`
+          `- [${msg.done ? 'x' : ' '}] ${msg.content} (${formatDuration(
+            msg.time
+          )})`
       )
       .join('\n')
 

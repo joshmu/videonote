@@ -9,7 +9,7 @@ import Sidebar from '@/components/Sidebar/Sidebar'
 import VideoPlayer from '@/components/VideoPlayer/VideoPlayer'
 import { ControlsProvider } from '@/context/controlsContext'
 import { GlobalProvider } from '@/context/globalContext'
-import { TodoProvider } from '@/context/todoContext'
+import { NoteProvider } from '@/context/noteContext'
 import { VideoProvider } from '@/context/videoContext'
 import Overlay from '@/shared/Modal/Overlay'
 import { fetcher } from '@/utils/clientHelpers'
@@ -89,7 +89,7 @@ export default function Main({ serverData }) {
   return (
     <GlobalProvider serverData={serverData}>
       <VideoProvider>
-        <TodoProvider>
+        <NoteProvider>
           <ControlsProvider>
             <Layout>
               <div className='flex flex-col w-full h-screen overflow-hidden'>
@@ -106,7 +106,7 @@ export default function Main({ serverData }) {
               </div>
             </Layout>
           </ControlsProvider>
-        </TodoProvider>
+        </NoteProvider>
       </VideoProvider>
     </GlobalProvider>
   )

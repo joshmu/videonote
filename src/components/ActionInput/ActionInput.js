@@ -1,14 +1,14 @@
 import { useEffect, useRef, useState } from 'react'
 
+import { useControlsContext } from '@/context/controlsContext'
 import { useGlobalContext } from '@/context/globalContext'
-import { useTodoContext } from '@/context/todoContext'
+import { useNoteContext } from '@/context/noteContext'
 import { useVideoContext } from '@/context/videoContext'
 
 import TimeDisplay from '../shared/TimeDisplay/TimeDisplay'
 import ActionSymbols from './ActionSymbols/ActionSymbols'
 import ProgressBar from './ProgressBar/ProgressBar'
 import TimeMarkers from './TimeMarkers/TimeMarkers'
-import { useControlsContext } from '@/context/controlsContext'
 
 const PLACEHOLDER = 'Add Note...'
 
@@ -17,10 +17,10 @@ const ActionInput = () => {
   const { settings, sidebarOpen, HINTS } = useGlobalContext()
   const { progress } = useVideoContext()
   const { toggleSmartControls } = useControlsContext()
-  const { addTodo } = useTodoContext()
+  const { addNote } = useNoteContext()
 
-  const [todo, setTodo] = useState({
-    msg: '',
+  const [note, setNote] = useState({
+    content: '',
     time: null,
   })
   const [isActive, setIsActive] = useState(false)
@@ -33,9 +33,9 @@ const ActionInput = () => {
 
   // enable smart controls when message field is empty
   useEffect(() => {
-    const enableSmartControls = todo.msg.length === 0
+    const enableSmartControls = note.content.length === 0
     toggleSmartControls(enableSmartControls)
-  }, [todo.msg])
+  }, [note.content])
 
   // auto focus
   useEffect(() => {
@@ -50,31 +50,31 @@ const ActionInput = () => {
     inputRef.current.focus()
   }
 
-  // * add new todo on submit
+  // * add new note on submit
   const handleSubmit = () => {
-    addTodo(todo)
-    // reset todo state
-    setTodo({ msg: '', time: null })
+    addNote(note)
+    // reset note state
+    setNote({ content: '', time: null })
 
     // remove hints after adding note and while still in focus
     setHint(getHint(HINTS, false))
   }
 
-  // * update todo on entry but exclude initial char if it is a space for play/pause logic
+  // * update note on entry but exclude initial char if it is a space for play/pause logic
   const handleChange = e => {
     // if we use an initial space then reset
-    setTodo({ ...todo, msg: e.target.value === ' ' ? '' : e.target.value })
+    setNote({ ...note, content: e.target.value === ' ' ? '' : e.target.value })
   }
 
-  // alter todo timestamp based on whether we have txt data or not
+  // alter note timestamp based on whether we have txt data or not
   useEffect(() => {
     // if we have data then add timestamp
-    if (todo.msg.length > 0 && todo.time === null)
-      setTodo({ ...todo, time: progress.playedSeconds })
+    if (note.content.length > 0 && note.time === null)
+      setNote({ ...note, time: progress.playedSeconds })
     // if we delete data and have a timestamp then reset
-    if (todo.msg.length === 0 && todo.time !== null)
-      setTodo({ ...todo, time: null })
-  }, [todo.msg, todo.time, progress.playedSeconds])
+    if (note.content.length === 0 && note.time !== null)
+      setNote({ ...note, time: null })
+  }, [note.content, note.time, progress.playedSeconds])
 
   const handleFocus = e => {
     if (!isActive) setIsActive(true)
@@ -84,12 +84,12 @@ const ActionInput = () => {
   }
 
   const handleKeyDown = e => {
-    if (todo.msg.length > 0) {
+    if (note.content.length > 0) {
       if (e.key === 'Enter') handleSubmit()
     }
 
-    // keyboard shortcuts on empty todo
-    if (todo.msg === '') {
+    // keyboard shortcuts on empty note
+    if (note.content === '') {
       // smartControls(e.key)
     }
   }
@@ -102,8 +102,8 @@ const ActionInput = () => {
     >
       <div className='flex items-center self-center justify-center h-full transition-all duration-150 ease-in-out bg-transparent rounded-r-none text-themeText2'>
         <TimeDisplay
-          seconds={todo.time ? todo.time : progress.playedSeconds}
-          lock={todo.time !== null}
+          seconds={note.time ? note.time : progress.playedSeconds}
+          lock={note.time !== null}
           active={isActive}
         />
       </div>
@@ -115,10 +115,10 @@ const ActionInput = () => {
         } relative w-full h-full px-2 py-1 transition-all duration-150 ease-in-out bg-transparent rounded-sm rounded-b-none rounded-l-none placeholder-themeText2 text-themeText text-md focus:outline-none`}
         autoFocus={true}
         id='actionInput'
-        name='addTodo'
+        name='addNote'
         type='text'
         placeholder={isActive ? hint : PLACEHOLDER}
-        value={todo.msg}
+        value={note.content}
         autoComplete='off'
         onChange={handleChange}
         onKeyDown={handleKeyDown}

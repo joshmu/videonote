@@ -1,12 +1,12 @@
 import { useEffect } from 'react'
 
-import { useTodoContext } from '@/context/todoContext'
-import { useGlobalContext } from '@/context/globalContext'
 import { useControlsContext } from '@/context/controlsContext'
+import { useGlobalContext } from '@/context/globalContext'
+import { useNoteContext } from '@/context/noteContext'
 
 const Search = () => {
   const { project } = useGlobalContext()
-  const { search, updateSearch, todos } = useTodoContext()
+  const { search, updateSearch, notes } = useNoteContext()
   const { toggleSmartControls } = useControlsContext()
 
   // enable smart controls when search box is empty
@@ -22,7 +22,7 @@ const Search = () => {
   }
 
   return (
-    todos.length > 0 && (
+    notes.length > 0 && (
       <input
         className='w-full transition-colors duration-300 ease-in-out bg-transparent placeholder-themeText2 focus:outline-none fo5us:outline-none text-temeText'
         type='text'

@@ -6,7 +6,7 @@ import Notification from '@/components/Notification/Notification'
 import Sidebar from '@/components/Sidebar/Sidebar'
 import VideoPlayer from '@/components/VideoPlayer/VideoPlayer'
 import { GlobalProvider } from '@/context/globalContext'
-import { TodoProvider } from '@/context/todoContext'
+import { NoteProvider } from '@/context/noteContext'
 import { VideoProvider } from '@/context/videoContext'
 import Overlay from '@/shared/Modal/Overlay'
 
@@ -14,7 +14,7 @@ export default function Main({ serverData }) {
   return (
     <GlobalProvider serverData={serverData}>
       <VideoProvider>
-        <TodoProvider>
+        <NoteProvider>
           <Layout>
             <div className='flex flex-col w-full h-screen overflow-hidden'>
               {/* <div className='text-3xl'>navbar</div> */}
@@ -29,7 +29,7 @@ export default function Main({ serverData }) {
               <Overlay />
             </div>
           </Layout>
-        </TodoProvider>
+        </NoteProvider>
       </VideoProvider>
     </GlobalProvider>
   )

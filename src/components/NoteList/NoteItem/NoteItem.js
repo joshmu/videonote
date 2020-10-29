@@ -2,17 +2,17 @@ import { motion } from 'framer-motion'
 import { useEffect, useState } from 'react'
 
 import Select from '@/components/shared/Select/Select'
-import { useTodoContext } from '@/context/todoContext'
+import { useControlsContext } from '@/context/controlsContext'
+import { useNoteContext } from '@/context/noteContext'
 import { useVideoContext } from '@/context/videoContext'
 
 import TimeDisplay from '../../shared/TimeDisplay/TimeDisplay'
-import { useControlsContext } from '@/context/controlsContext'
 
 export default function TodoItem({ todo, closestProximity, childVariants }) {
-  const { id, msg, person: category = null, time, done = false } = todo
+  const { id, content, person: category = null, time, done = false } = todo
   const { seekTo } = useVideoContext()
   const { toggleSmartControls } = useControlsContext()
-  const { updateTodo } = useTodoContext()
+  const { updateNote } = useNoteContext()
   const [edit, setEdit] = useState(false)
 
   // no smart controls whilst editing
@@ -23,7 +23,7 @@ export default function TodoItem({ todo, closestProximity, childVariants }) {
 
   const handleTimeClick = () => {
     const updatedTodo = { ...todo, done: !todo.done }
-    updateTodo(updatedTodo)
+    updateNote(updatedTodo)
   }
   const handleNoteClick = () => {
     seekTo(time)
@@ -35,8 +35,8 @@ export default function TodoItem({ todo, closestProximity, childVariants }) {
     })
   }
   const handleEdit = e => {
-    const updatedTodo = { ...todo, msg: e.target.value }
-    updateTodo(updatedTodo)
+    const updatedTodo = { ...todo, content: e.target.value }
+    updateNote(updatedTodo)
   }
   const handleEditKeys = e => {
     if (e.key === 'Enter') {
@@ -77,7 +77,7 @@ export default function TodoItem({ todo, closestProximity, childVariants }) {
             {edit ? (
               <input
                 type='text'
-                value={msg}
+                value={content}
                 onChange={handleEdit}
                 onKeyDown={handleEditKeys}
                 onDoubleClick={() => toggleEdit(false)}
@@ -90,7 +90,7 @@ export default function TodoItem({ todo, closestProximity, childVariants }) {
                 onDoubleClick={() => toggleEdit(true)}
                 className='text-sm leading-5'
               >
-                {msg}
+                {content}
               </div>
             )}
           </div>

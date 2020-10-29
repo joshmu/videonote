@@ -1,7 +1,7 @@
 import { motion } from 'framer-motion'
 import { useEffect } from 'react'
 
-import TodoList from '@/components/TodoList/TodoList'
+import NoteList from '@/components/NoteList/NoteList'
 import { useGlobalContext } from '@/context/globalContext'
 import { useResizable } from '@/hooks/useResizable'
 
@@ -86,7 +86,7 @@ export default function Sidebar(props) {
 
         {/* sidebar content */}
         <div className='w-full h-full overflow-auto scrollbar'>
-          <TodoList />
+          <NoteList />
         </div>
 
         <RemoveNotes />

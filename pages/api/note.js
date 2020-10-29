@@ -1,7 +1,7 @@
 import { StatusCodes } from 'http-status-codes'
 
 import { authenticateToken, generateAccessToken } from '@/utils/jwt'
-import { Settings, User } from '@/utils/mongoose'
+import { Note, Project, User } from '@/utils/mongoose'
 
 export default async (req, res) => {
   // Gather the jwt access token from the request header
@@ -14,7 +14,7 @@ export default async (req, res) => {
       .json({ msg: 'No token. Authorization denied.' })
   }
 
-  const { settings } = req.body
+  const { action, note } = req.body
 
   let email
   try {
@@ -29,19 +29,33 @@ export default async (req, res) => {
   // get user
   const userDoc = await User.findOne({ email })
 
-  let settingsDoc
-  try {
-    // use _id to search for doc, the rest is data to add
-    const { _id, ...data } = settings
-    settingsDoc = await Settings.findOne({ _id, user: userDoc._id })
+  console.log({ userDoc })
 
-    if (settingsDoc) {
-      await settingsDoc.updateOne({ $set: data })
-      await settingsDoc.save()
-    } else {
-      // if settings doc does not exist then create
-      settingsDoc = new Settings({ ...settings, user: userDoc._id })
-      await settingsDoc.save()
+  // add user info to note
+  note.user = userDoc._id
+
+  let noteDoc
+  try {
+    if (!action) {
+      // use _id to search for doc, the rest is data to add
+      const { _id, ...data } = note
+      noteDoc = await Note.findById(_id)
+
+      // if note exists
+      if (noteDoc) {
+        await noteDoc.updateOne({ $set: data })
+        await noteDoc.save()
+      } else {
+        // if note doc does not exist then create
+        noteDoc = new Note(note)
+        await noteDoc.save()
+        // add note id to relevant project
+        const projectDoc = await Project.findById(noteDoc.project)
+        projectDoc.notes.push(noteDoc._id)
+        await projectDoc.save()
+      }
+    }
+    if (action === 'delete') {
     }
   } catch (error) {
     console.error(error)
@@ -54,7 +68,7 @@ export default async (req, res) => {
   const newToken = generateAccessToken(userDoc.email)
 
   res.status(StatusCodes.OK).json({
-    settings: settingsDoc.toObject(),
+    note: noteDoc.toObject(),
     token: newToken,
   })
 }

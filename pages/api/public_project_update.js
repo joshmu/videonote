@@ -22,8 +22,8 @@ export default async (req, res) => {
 
   try {
     // update project
-    //* only allow todos to be updated
-    await projectDoc.updateOne({ $set: { todos: project.todos } })
+    //* only allow notes to be updated
+    await projectDoc.updateOne({ $set: { notes: project.notes } })
     await projectDoc.save()
   } catch (error) {
     console.error(error)

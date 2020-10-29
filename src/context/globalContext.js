@@ -5,8 +5,8 @@ import Cookie from 'universal-cookie'
 
 import useGlobalKeydown from '@/hooks/useGlobalKeydown'
 import usePrompt from '@/hooks/usePrompt'
+import { fetcher } from '@/utils/clientHelpers'
 
-import { fetcher } from '../../utils/clientHelpers'
 import { useNotificationContext } from './notificationContext'
 
 const SETTINGS_DEFAULTS = {
@@ -53,16 +53,6 @@ export function GlobalProvider({ serverData, ...props }) {
     reset: promptCancel,
   } = usePrompt()
 
-  // todo: check if this is still up to date (currently not in use)
-  const resetGlobalState = () => {
-    setUser(null)
-    setProjects([])
-    setSettings(SETTINGS_DEFAULTS)
-    setCurrentProject(null)
-    setMenuOpen(false)
-    setModalsOpen([])
-  }
-
   // initial load
   useEffect(() => {
     // initial response from server
@@ -77,6 +67,7 @@ export function GlobalProvider({ serverData, ...props }) {
       // presume user could be new (this could also occur if previous projects have been removed)
 
       toggleModalOpen('welcome')
+
       addAlert({
         type: 'info',
         msg: 'Create a project to start',
@@ -104,13 +95,31 @@ export function GlobalProvider({ serverData, ...props }) {
     }
   }, [projects, currentProject, settings])
 
+  const createNoteApi = async noteData => {
+    console.log('create note', noteData)
+    // merge note and user information together match 'user' mongo doc
+    const body = {
+      note: noteData,
+    }
+    // send updated note to server, token will hold user information required
+    const {
+      res,
+      // @ts-ignore
+      data: { note, msg },
+    } = await fetcher('/api/note', body)
+
+    if (badResponse(res, msg)) return 'error'
+
+    return true
+  }
+
   const updateProject = async projectData => {
     if (!admin) return guestUpdaingProject(projectData)
 
     // if no project id is provided then grab it from current project
     // * _id is requird for the api
     if (!projectData._id) projectData._id = currentProject._id
-    // * todos > currentProject > update this project on server > update projects with server response
+    // * notes > currentProject > update this project on server > update projects with server response
     // @ts-ignore
     const response = await handleProjectApi('update', user, projectData)
     if (!response) return console.error('api error')
@@ -434,7 +443,6 @@ export function GlobalProvider({ serverData, ...props }) {
     modalsOpen,
     toggleModalOpen,
     createProject,
-    resetGlobalState,
     loadProject,
     sidebarOpen,
     toggleSidebar,
@@ -450,6 +458,7 @@ export function GlobalProvider({ serverData, ...props }) {
     promptConfirm,
     promptCancel,
     cancelModals,
+    createNoteApi,
   }
 
   return <globalContext.Provider value={value} {...props} />
