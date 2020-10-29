@@ -181,38 +181,26 @@ export function GlobalProvider({ serverData, ...props }) {
   }
 
   const updateSettings = async newSettingsData => {
-    // todo: fix change to new settings collection model
-    // todo: we are up to here, created 'settings' CRUD api which we need to call here and test
-    return console.warn(
-      'todo: change to new settings collection model on database'
-    )
     if (!admin) return
 
     console.log('updating settings...', newSettingsData)
     // merge settings and user information together match 'user' mongo doc
     const body = {
-      action: 'update',
-      user: { settings: newSettingsData },
+      settings: newSettingsData,
     }
     // send updated settings to server, token will hold user information required
     const {
       res,
       // @ts-ignore
-      data: { user: account, msg },
-    } = await fetcher('/api/user', body)
+      data: { settings, msg },
+    } = await fetcher('/api/settings', body)
 
     if (badResponse(res, msg)) return
 
-    // api returns all projects for the user
-    if (!account) {
-      console.error('user from server is incorrect')
-      return
-    }
+    // any settings which are not present from DB we fill with defaults
+    const fullSettings = { ...SETTINGS_DEFAULTS, ...settings }
 
-    const { settings, ...user } = account
-
-    setSettings(settings)
-    setUser(user)
+    setSettings(fullSettings)
   }
 
   const toggleMenuOpen = (state = undefined) => {

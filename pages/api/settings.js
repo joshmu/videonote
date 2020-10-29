@@ -1,6 +1,5 @@
 import { StatusCodes } from 'http-status-codes'
 
-import { extractProject, extractUser } from '@/utils/apiHelpers'
 import { authenticateToken, generateAccessToken } from '@/utils/jwt'
 import { Settings, User } from '@/utils/mongoose'
 
@@ -15,7 +14,7 @@ export default async (req, res) => {
       .json({ msg: 'No token. Authorization denied.' })
   }
 
-  const { action, project: settings } = req.body
+  const { settings } = req.body
 
   let email
   try {
@@ -30,37 +29,17 @@ export default async (req, res) => {
 
   let settingsDoc
   try {
-    if (action === 'create') {
-      settingsDoc = await createSettings(settings, userDoc)
+    // use _id to search for doc, the rest is data to add
+    const { _id, ...data } = settings
+    settingsDoc = await Settings.findOne({ _id, user: userDoc._id })
 
-      // add settings id to user
-      userDoc.settings = settingsDoc._id
-      await userDoc.save()
-    }
-
-    if (action === 'update') {
-      settingsDoc = await updateSettings(settings, userDoc)
-      if (!settingsDoc)
-        return res
-          .status(StatusCodes.BAD_REQUEST)
-          .json({ msg: 'Settings not found.' })
-    }
-
-    if (action === 'remove') {
-      settingsDoc = await Settings.findById(settings._id)
-
-      // remove user's settings reference
-      delete userDoc.settings
-      await userDoc.save()
-
-      // remove settings doc
-      await settingsDoc.remove()
-    }
-
-    if (!action) {
-      return res
-        .status(StatusCodes.BAD_REQUEST)
-        .json({ msg: 'Action not specified' })
+    if (settingsDoc) {
+      await settingsDoc.updateOne({ $set: data })
+      await settingsDoc.save()
+    } else {
+      // if settings doc does not exist then create
+      settingsDoc = new Settings({ ...settings, user: userDoc._id })
+      await settingsDoc.save()
     }
   } catch (error) {
     console.error(error)
@@ -73,23 +52,4 @@ export default async (req, res) => {
     settings: settingsDoc.toObject(),
     token: newToken,
   })
-}
-
-const createSettings = async (settingsData, userDoc) => {
-  // create settings
-  const settingsDoc = new Settings({ ...settingsData, user: userDoc._id })
-  await settingsDoc.save()
-
-  return settingsDoc
-}
-
-const updateSettings = async (settingsData, userDoc) => {
-  // remove the id and any nested array/object
-  const { _id, ...data } = settingsData
-
-  const settingsDoc = await Settings.findOne({ _id, user: userDoc._id })
-  await settingsDoc.updateOne({ $set: data })
-  await settingsDoc.save()
-
-  return settingsDoc
 }
