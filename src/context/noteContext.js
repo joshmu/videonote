@@ -19,7 +19,13 @@ const noteContext = createContext({
 })
 
 export function NoteProvider(props) {
-  const { project, projects, updateProject, noteApi } = useGlobalContext()
+  const {
+    project,
+    projects,
+    updateProject,
+    noteApi,
+    noteApiRemoveDoneNotes,
+  } = useGlobalContext()
   const { progress } = useVideoContext()
   const [notes, setNotes] = useState([])
   const [search, setSearch] = useState('')
@@ -37,18 +43,6 @@ export function NoteProvider(props) {
     setNotes([])
     setSearch('')
   }, [projects])
-
-  // when notes change, update project
-  // useEffect(() => {
-  //   // we shouldn't need to update notes if there are none.  even remove notes should still be present
-  //   if (notes.length === 0) return
-  //   // if the project.notes matches state notes then this is our initial load from server so don't update
-  //   if (JSON.stringify(project.notes) === JSON.stringify(notes)) return
-
-  //   const updatedProject = project
-  //   updatedproject.notes = notes
-  //   updateProject(updatedProject)
-  // }, [notes])
 
   const addNote = note => {
     const newNote = {
@@ -74,13 +68,22 @@ export function NoteProvider(props) {
   const updateNote = note => {
     const oldNote = notes.find(n => n._id === note._id)
     console.log('update the note', note)
-    return noteApi(note).then(res => {
+    noteApi(note).then(res => {
       if (res === 'error') {
         // if we have server error return original note
-        return oldNote
+        return updateNoteState(oldNote)
+      } else {
+        // otherwise the response will be the updated note
+        updateNoteState(res)
       }
-      // otherwise the response will be the updated note
-      return res
+    })
+  }
+
+  const updateNoteState = updatedNote => {
+    setNotes(current => {
+      return notes.map(note => {
+        return updatedNote._id === note._id ? updatedNote : note
+      })
     })
   }
 
@@ -105,11 +108,10 @@ export function NoteProvider(props) {
     return sorted
   }
 
-  const removeCompleted = () => {
-    setNotes(currentNotes => {
-      const updatedNotes = currentNotes.filter(note => !note.done)
-      return updatedNotes
-    })
+  const removeCompleted = async () => {
+    // * we wait for server response before setting state, this is different to standard single note crud operations
+    const updatedNotes = await noteApiRemoveDoneNotes()
+    setNotes(updatedNotes)
   }
 
   const value = {

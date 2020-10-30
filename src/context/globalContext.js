@@ -113,6 +113,26 @@ export function GlobalProvider({ serverData, ...props }) {
     return note
   }
 
+  const noteApiRemoveDoneNotes = async () => {
+    console.log('remove completed notes')
+    // api request to delete 'done' notes in current project
+    // merge note and user information together match 'user' mongo doc
+    const body = {
+      action: 'remove done notes',
+      projectId: currentProject._id,
+    }
+    // send updated note to server, token will hold user information required
+    const {
+      res,
+      // @ts-ignore
+      data: { notes, msg },
+    } = await fetcher('/api/note', body)
+
+    if (badResponse(res, msg)) return 'error'
+
+    return notes
+  }
+
   const updateProject = async projectData => {
     if (!admin) return guestUpdaingProject(projectData)
 
@@ -459,6 +479,7 @@ export function GlobalProvider({ serverData, ...props }) {
     promptCancel,
     cancelModals,
     noteApi,
+    noteApiRemoveDoneNotes,
   }
 
   return <globalContext.Provider value={value} {...props} />

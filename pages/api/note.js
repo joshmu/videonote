@@ -29,6 +29,11 @@ export default async (req, res) => {
   // get user
   const userDoc = await User.findOne({ email })
 
+  // different route if we choose to delete all complete notes from specified project
+  if (action === 'remove done notes') {
+    return await removeDoneNotes(res, userDoc, req.body.projectId)
+  }
+
   // add user info to note
   note.user = userDoc._id
 
@@ -42,11 +47,10 @@ export default async (req, res) => {
 
       // if note exists
       if (noteDoc) {
-        noteDoc = await Note.findByIdAndUpdate(
-          noteDoc._id,
-          { $set: data },
-          { new: true }
-        )
+        await noteDoc.updateOne({ $set: data })
+        await noteDoc.save()
+        // assign updated version
+        noteDoc = await Note.findById(noteDoc._id)
       } else {
         // if note doc does not exist then create with whole note so we define the _id
         noteDoc = new Note(note)
@@ -71,6 +75,22 @@ export default async (req, res) => {
 
   res.status(StatusCodes.OK).json({
     note: noteDoc.toObject(),
+    token: newToken,
+  })
+}
+
+async function removeDoneNotes(res, userDoc, projectId) {
+  console.log('removing completed notes from project:', projectId)
+  // delete all notes which match projectId and are 'done'
+  await Note.deleteMany({ project: projectId, done: true })
+  // return all notes for project
+  const notes = await Note.find({ project: projectId }).lean()
+
+  // token (keep resetting their session length)
+  const newToken = generateAccessToken(userDoc.email)
+
+  res.status(StatusCodes.OK).json({
+    notes,
     token: newToken,
   })
 }
