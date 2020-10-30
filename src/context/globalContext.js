@@ -161,10 +161,15 @@ export function GlobalProvider({ serverData, ...props }) {
   // to have access to general projects information (like note count) we need to update the projects list
   // we do not alter the current project state with the notes change to avoid a potential update loop
   const updateProjectsStateWithUpdatedNotes = async notes => {
+    console.log('update projects notes state')
     // alter state of projects
     setProjects(current =>
       current.map(p => {
-        return p._id === currentProject._id ? { ...currentProject, notes } : p
+        if (p._id === currentProject._id) {
+          p.notes = notes
+        }
+        return p
+        // return p._id === currentProject._id ? { ...currentProject, notes } : p
       })
     )
   }
@@ -326,14 +331,15 @@ export function GlobalProvider({ serverData, ...props }) {
 
     // if 'project' received then 'delete' is successful
     if (project) {
+      const remainingProjects = projects.filter(p => p._id !== project._id)
       // remove project from state
-      setProjects(current => projects.filter(p => p._id !== project._id))
-    }
+      setProjects(remainingProjects)
 
-    // load another project if we are removing current project
-    if (settings.currentProject === _id) {
-      const newCurrentProject = projects.slice(-1)[0]
-      loadProject(newCurrentProject._id)
+      // load another project if we are removing current project
+      if (settings.currentProject === _id) {
+        const newCurrentProject = remainingProjects.slice(-1)[0]
+        loadProject(newCurrentProject._id)
+      }
     }
   }
 

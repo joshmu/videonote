@@ -1,5 +1,5 @@
 import mongoose from 'mongoose'
-import { createContext, useContext, useEffect, useState } from 'react'
+import { createContext, useContext, useEffect, useRef, useState } from 'react'
 
 import { useIsMount } from '@/hooks/useIsMount'
 import useNoteProximity from '@/hooks/useNoteProximity'
@@ -31,23 +31,34 @@ export function NoteProvider(props) {
   const { progress } = useVideoContext()
   const [notes, setNotes] = useState([])
   const [search, setSearch] = useState('')
+  // use ref to detect when a project is switch and notes are reset to avoid additional call to update state when listening to notes changes
+  const isLoadingNotesRef = useRef(true)
 
   const { currentNote, checkProximity } = useNoteProximity({ notes, progress })
   const isMount = useIsMount()
 
   // when a project is selected pre-fill the notes
   useEffect(() => {
-    if (project !== null) setNotes(project.notes)
+    if (project !== null) {
+      setNotes(project.notes)
+      isLoadingNotesRef.current = true
+    }
   }, [project])
 
   // when notes amount changes then update so we have access to total notes
   // we don't update project state since we will always load from api the data whenever switching
   useEffect(() => {
     if (isMount) return
+    // notes when have an amount of 0 and 'isLoadingNotes' means this is initial update from project and we don't need to update
+    if (notes.length === 0 && isLoadingNotesRef.current) {
+      isLoadingNotesRef.current = false
+      return
+    }
     if (notes.length === project.notes.length) return
-    console.log('update project state')
+    console.log('update project state, notes: ', notes)
+    console.log('project notes', project.notes)
     updateProjectsStateWithUpdatedNotes(notes)
-  }, [isMount, notes])
+  }, [isMount, notes, project])
 
   // when there are no projects present make sure state is reset
   useEffect(() => {
