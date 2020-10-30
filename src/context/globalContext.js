@@ -82,18 +82,20 @@ export function GlobalProvider({ serverData, ...props }) {
   }, [projects, settings.currentProject])
 
   // if we have projects and one isn't assigned then let's do it
-  useEffect(() => {
-    if (projects.length > 0 && currentProject === null) {
-      if (settings.currentProject) {
-        loadProject(settings.currentProject)
-      } else {
-        // otherwise use most recent project
-        const recentProject = projects.slice(-1)[0]
-        console.log({ recentProject })
-        loadProject(recentProject)
-      }
-    }
-  }, [projects, currentProject, settings])
+  // useEffect(() => {
+  //   if (projects.length > 0 && currentProject === null) {
+  //     console.log('assign a project')
+  //     if (settings.currentProject) {
+  //       console.log('load project via settings')
+  //       loadProject(settings.currentProject)
+  //     } else {
+  //       console.log('load project via auto select last')
+  //       // otherwise use most recent project
+  //       const recentProject = projects.slice(-1)[0]
+  //       loadProject(recentProject._id)
+  //     }
+  //   }
+  // }, [projects, currentProject, settings])
 
   const noteApi = async noteData => {
     console.log('note api request', noteData)
@@ -136,23 +138,63 @@ export function GlobalProvider({ serverData, ...props }) {
   const updateProject = async projectData => {
     if (!admin) return guestUpdaingProject(projectData)
 
-    // if no project id is provided then grab it from current project
-    // * _id is requird for the api
-    if (!projectData._id) projectData._id = currentProject._id
-    // * notes > currentProject > update this project on server > update projects with server response
-    // @ts-ignore
+    // add _id for db processing
+    projectData._id = currentProject._id
+
     const response = await projectApi('update', projectData)
     if (!response) return console.error('api error')
-    const { user, projects } = response
 
-    // update projects from server response
-    setProjects(projects)
+    const { project } = response
 
-    // get current project from server response and set
-    const projectId = projectData._id || currentProject._id
-    const updatedProject = projects.find(p => p._id === projectId)
-    setCurrentProject(updatedProject)
+    // update the relevant project
+    // ! avoid updating the 'notes' as this was previously populated by mongoose converting the _id references to data
+    setProjects(current =>
+      current.map(p => {
+        return p._id === project._id ? { ...project, notes: p.notes } : p
+      })
+    )
+    // also update current project state
+    // ! avoid updating the 'notes' as this was previously populated by mongoose converting the _id references to data
+    setCurrentProject(current => ({ ...project, notes: current.notes }))
   }
+
+  // to have access to general projects information (like note count) we need to update the projects list
+  // we do not alter the current project state with the notes change to avoid a potential update loop
+  const updateProjectsStateWithUpdatedNotes = async notes => {
+    // alter state of projects
+    setProjects(current =>
+      current.map(p => {
+        return p._id === currentProject._id ? { ...currentProject, notes } : p
+      })
+    )
+  }
+
+  const loadProject = async projectId => {
+    const projectData = { _id: projectId }
+    const response = await projectApi('get', projectData)
+    if (!response) return console.error('api error')
+
+    const { project } = response
+
+    // update the relevant project
+    setProjects(current =>
+      current.map(p => {
+        return p._id === project._id ? project : p
+      })
+    )
+
+    // also update current project state
+    setCurrentProject(project)
+
+    // update current project settings if it has changed
+    if (project._id !== settings.currentProject) {
+      updateSettings({ currentProject: project._id })
+    }
+
+    alertProjectLoaded(project)
+  }
+
+  const getProject = projectId => {}
 
   const guestUpdaingProject = async project => {
     console.log('guest is updating project', project)
@@ -258,56 +300,40 @@ export function GlobalProvider({ serverData, ...props }) {
 
   const createProject = async projectData => {
     const response = await projectApi('create', projectData)
+    if (!response) return console.error('api error')
 
     // expect project as response from server
     const { project } = response
 
     // add project
     setProjects(current => [...current, project])
-  }
 
-  // typically handle project data or presume id has been passed
-  const loadProject = projectOrId => {
-    console.log('switch to project', projectOrId)
-    // id has been passed and we need to grab the project
-    if (typeof projectOrId === 'string')
-      projectOrId = projects.find(p => p._id === projectOrId)
+    // set current project
+    setCurrentProject(project)
 
-    const selectedProject = projectOrId
+    // update settings
+    updateSettings({ currentProject: project._id })
 
-    if (!selectedProject) {
-      addAlert({ type: 'error', msg: 'Project not found' })
-      return
-    }
-
-    setCurrentProject(selectedProject)
-
-    // only update if there is a change
-    if (selectedProject._id !== settings.currentProject) {
-      updateSettings({ currentProject: selectedProject._id })
-    }
-
-    // notification when we load a project
-    addAlert({
-      type: 'project',
-      msg: `${selectedProject.title.toUpperCase()}`,
-    })
+    alertProjectLoaded(project)
   }
 
   const removeProject = async _id => {
     const projectData = { _id }
-    // @ts-ignore
     const response = await projectApi('remove', projectData)
     if (!response) return console.error('api error')
-    const { user, projects } = response
 
-    // reset user's projects with updated version
-    setProjects(projects)
+    const { project } = response
 
-    // switch project if we are removing the currently viewed project
+    // if 'project' received then 'delete' is successful
+    if (project) {
+      // remove project from state
+      setProjects(current => projects.filter(p => p._id !== project._id))
+    }
+
+    // load another project if we are removing current project
     if (settings.currentProject === _id) {
       const newCurrentProject = projects.slice(-1)[0]
-      loadProject(newCurrentProject)
+      loadProject(newCurrentProject._id)
     }
   }
 
@@ -344,10 +370,34 @@ export function GlobalProvider({ serverData, ...props }) {
       }
 
       addAlert({ type: 'success', msg: `Logged in: ${user.username}` })
+
+      if (projects.length > 0) {
+        let currentProject
+        if (settings.currentProject) {
+          currentProject = projects.find(
+            project => project._id === settings.currentProject
+          )
+        }
+        // if we still don't have anything then just grab last project entry in the list
+        if (!currentProject) {
+          currentProject = projects.slice(-1)[0]
+        }
+        setCurrentProject(currentProject)
+
+        alertProjectLoaded(currentProject)
+      }
     } else {
       // if there is no account data then admin is not present, client is guest
       setAdmin(false)
     }
+  }
+
+  const alertProjectLoaded = project => {
+    // notification when we load a project
+    addAlert({
+      type: 'project',
+      msg: `${project.title.toUpperCase()}`,
+    })
   }
 
   const projectApi = async (action, project) => {
@@ -475,6 +525,7 @@ export function GlobalProvider({ serverData, ...props }) {
     cancelModals,
     noteApi,
     noteApiRemoveDoneNotes,
+    updateProjectsStateWithUpdatedNotes,
   }
 
   return <globalContext.Provider value={value} {...props} />

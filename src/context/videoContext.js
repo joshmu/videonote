@@ -1,5 +1,7 @@
 import { createContext, useContext, useEffect, useRef, useState } from 'react'
 
+import { useIsMount } from '@/hooks/useIsMount'
+
 import { useAnounceAction } from '../hooks/useAnounceAction'
 import { useGlobalContext } from './globalContext'
 import { useNotificationContext } from './notificationContext'
@@ -45,10 +47,13 @@ export function VideoProvider(props) {
   const [progress, setProgress] = useState({})
 
   const [action, setAction] = useAnounceAction('')
+  const isMount = useIsMount()
 
   // on initial load alert user if project is available however no src is specified
   // * this could be due to a local video src thus being reset to an empty string when cannot be found
   useEffect(() => {
+    if (!isMount) return
+    console.log({ project })
     if (project && project.src.length === 0 && admin) {
       addAlert({
         type: 'warning',
@@ -63,7 +68,7 @@ export function VideoProvider(props) {
 
       toggleModalOpen('current')
     }
-  }, [project, admin])
+  }, [project, admin, isMount])
 
   useEffect(() => {
     if (project !== null && project.src !== null) {

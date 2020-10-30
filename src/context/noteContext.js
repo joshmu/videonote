@@ -1,6 +1,7 @@
 import mongoose from 'mongoose'
 import { createContext, useContext, useEffect, useState } from 'react'
 
+import { useIsMount } from '@/hooks/useIsMount'
 import useNoteProximity from '@/hooks/useNoteProximity'
 
 import { useGlobalContext } from './globalContext'
@@ -25,17 +26,28 @@ export function NoteProvider(props) {
     updateProject,
     noteApi,
     noteApiRemoveDoneNotes,
+    updateProjectsStateWithUpdatedNotes,
   } = useGlobalContext()
   const { progress } = useVideoContext()
   const [notes, setNotes] = useState([])
   const [search, setSearch] = useState('')
 
   const { currentNote, checkProximity } = useNoteProximity({ notes, progress })
+  const isMount = useIsMount()
 
   // when a project is selected pre-fill the notes
   useEffect(() => {
     if (project !== null) setNotes(project.notes)
   }, [project])
+
+  // when notes amount changes then update so we have access to total notes
+  // we don't update project state since we will always load from api the data whenever switching
+  useEffect(() => {
+    if (isMount) return
+    if (notes.length === project.notes.length) return
+    console.log('update project state')
+    updateProjectsStateWithUpdatedNotes(notes)
+  }, [isMount, notes])
 
   // when there are no projects present make sure state is reset
   useEffect(() => {

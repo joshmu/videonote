@@ -14,6 +14,9 @@ import { VideoProvider } from '@/context/videoContext'
 import Overlay from '@/shared/Modal/Overlay'
 import { fetcher } from '@/utils/clientHelpers'
 
+// todo: highlight current project in projects modal list
+// todo: total notes for current project on initial load is not showing on projects modal list totals?
+
 // todo: realtime passing of notes, multi user, data flow back to current project rather than projects listing?
 
 // todo: options dropdown allow to scroll down list with keypress

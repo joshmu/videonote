@@ -34,9 +34,6 @@ export default async (req, res) => {
     return await removeDoneNotes(res, userDoc, req.body.projectId)
   }
 
-  // add user info to note
-  note.user = userDoc._id
-
   let noteDoc
   try {
     if (!action) {
@@ -52,7 +49,11 @@ export default async (req, res) => {
         // assign updated version
         noteDoc = await Note.findById(noteDoc._id)
       } else {
-        // if note doc does not exist then create with whole note so we define the _id
+        // if note doc does not exist
+        // add user info to note
+        note.user = userDoc._id
+
+        // create with whole 'note' since we are passing a manually created _id for faster state management client side
         noteDoc = new Note(note)
         await noteDoc.save()
         // add note id to relevant project

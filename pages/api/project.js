@@ -1,7 +1,7 @@
 import { StatusCodes } from 'http-status-codes'
 
 import { authenticateToken, generateAccessToken } from '@/utils/jwt'
-import { Project, User } from '@/utils/mongoose'
+import { Note, Project, User } from '@/utils/mongoose'
 
 export default async (req, res) => {
   // Gather the jwt access token from the request header
@@ -14,8 +14,7 @@ export default async (req, res) => {
       .json({ msg: 'No token. Authorization denied.' })
   }
 
-  const { action, project } = req.body
-
+  // validate
   let email
   try {
     email = await authenticateToken(token)
@@ -27,8 +26,17 @@ export default async (req, res) => {
   // get user
   const userDoc = await User.findOne({ email })
 
+  // data passed
+  const { action, project } = req.body
+
   let projectDoc
   try {
+    if (action === 'get') {
+      projectDoc = await Project.findOne({
+        _id: project._id,
+        user: userDoc._id,
+      }).populate({ path: 'notes', model: 'Note' })
+    }
     if (action === 'create') {
       projectDoc = new Project({
         ...project,
@@ -53,17 +61,31 @@ export default async (req, res) => {
     }
     if (action === 'remove') {
       // get projectDoc via project and user _id
-      const projectDoc = await Project.findOne({
+      projectDoc = await Project.findOne({
         _id: project._id,
         user: userDoc._id,
       })
 
-      // remove user's projectIds reference
+      // remove all notes associated to project
+      await Note.deleteMany({
+        project: projectDoc._id,
+      })
+
+      // remove user's reference to the project
       await userDoc.projects.pull(projectDoc._id)
       await userDoc.save()
 
       // remove project
       await projectDoc.remove()
+
+      // token (keep resetting their session length)
+      const newToken = generateAccessToken(userDoc.email)
+
+      return res.status(StatusCodes.OK).json({
+        // toObject method does not work on removed/deleted mongoose document
+        project: projectDoc,
+        token: newToken,
+      })
     }
     if (!action) {
       return res
