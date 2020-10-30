@@ -44,6 +44,9 @@ export default async (req, res) => {
       // if settings doc does not exist then create
       settingsDoc = new Settings({ ...settings, user: userDoc._id })
       await settingsDoc.save()
+      // assign id to user
+      userDoc.settings = settingsDoc._id
+      await userDoc.save()
     }
   } catch (error) {
     console.error(error)

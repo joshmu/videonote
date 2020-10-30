@@ -141,7 +141,7 @@ export function GlobalProvider({ serverData, ...props }) {
     if (!projectData._id) projectData._id = currentProject._id
     // * notes > currentProject > update this project on server > update projects with server response
     // @ts-ignore
-    const response = await handleProjectApi('update', user, projectData)
+    const response = await projectApi('update', projectData)
     if (!response) return console.error('api error')
     const { user, projects } = response
 
@@ -256,18 +256,14 @@ export function GlobalProvider({ serverData, ...props }) {
     // setModalsOpen(modalsOpen === modalName ? null : modalName)
   }
 
-  const createProject = async project => {
-    const response = await handleProjectApi('create', user, project)
-    if (!response) return console.error('api error')
-    const { user, projects } = response
+  const createProject = async projectData => {
+    const response = await projectApi('create', projectData)
 
-    // reset user's projects
-    setProjects(projects)
-    // grab newly created project from the server response and set
-    // const insertedProject = projects.find(
-    //   p => p.src === project.src && p.title === project.title
-    // )
-    // loadProject(insertedProject)
+    // expect project as response from server
+    const { project } = response
+
+    // add project
+    setProjects(current => [...current, project])
   }
 
   // typically handle project data or presume id has been passed
@@ -301,7 +297,7 @@ export function GlobalProvider({ serverData, ...props }) {
   const removeProject = async _id => {
     const projectData = { _id }
     // @ts-ignore
-    const response = await handleProjectApi('remove', user, projectData)
+    const response = await projectApi('remove', projectData)
     if (!response) return console.error('api error')
     const { user, projects } = response
 
@@ -354,18 +350,17 @@ export function GlobalProvider({ serverData, ...props }) {
     }
   }
 
-  const handleProjectApi = async (action, userData, project) => {
+  const projectApi = async (action, project) => {
     console.log(action, { project })
     // api request to create project, assign user id to it
     const body = {
       action: action,
-      user: userData,
       project,
     }
     // api sends all available projects back
     const {
       res,
-      data: { user, projects, msg },
+      data: { msg, ...data },
     } = await fetcher('/api/project', body)
 
     if (badResponse(res, msg)) return
@@ -376,7 +371,7 @@ export function GlobalProvider({ serverData, ...props }) {
       return
     }
 
-    return { user, projects }
+    return data
   }
 
   const copyToClipboard = (txt, alertMsg = 'Copied to clipboard!') => {

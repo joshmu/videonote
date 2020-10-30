@@ -1,6 +1,5 @@
 import { StatusCodes } from 'http-status-codes'
 
-import { extractProject, extractUser } from '@/utils/apiHelpers'
 import { authenticateToken, generateAccessToken } from '@/utils/jwt'
 import { Project, User } from '@/utils/mongoose'
 
@@ -28,24 +27,39 @@ export default async (req, res) => {
   // get user
   const userDoc = await User.findOne({ email })
 
+  let projectDoc
   try {
     if (action === 'create') {
-      const projectDoc = await createProject(project, userDoc)
+      projectDoc = new Project({
+        ...project,
+        user: userDoc._id,
+      })
+      await projectDoc.save()
 
       // add project id to user's projectId's list
-      userDoc.projectIds.push(projectDoc._id)
+      userDoc.projects.push(projectDoc._id)
       await userDoc.save()
     }
-
     if (action === 'update') {
-      await updateProject(project, userDoc)
+      // remove the id and any nested array/object
+      const { _id, ...data } = project
+
+      // find project by both project and user _id
+      projectDoc = await Project.findOneAndUpdate(
+        { _id, user: userDoc._id },
+        { $set: data },
+        { new: true }
+      )
     }
     if (action === 'remove') {
-      // get projectDoc
-      const projectDoc = await Project.findById(project._id)
+      // get projectDoc via project and user _id
+      const projectDoc = await Project.findOne({
+        _id: project._id,
+        user: userDoc._id,
+      })
 
       // remove user's projectIds reference
-      await userDoc.projectIds.pull(projectDoc._id)
+      await userDoc.projects.pull(projectDoc._id)
       await userDoc.save()
 
       // remove project
@@ -58,57 +72,16 @@ export default async (req, res) => {
     }
   } catch (error) {
     console.error(error)
-  }
-
-  // get all projects with user's id
-  let updatedProjects = []
-  if (userDoc.projectIds.length > 0) {
-    updatedProjects = await Project.find({ _id: userDoc.projectIds }).lean()
+    return res
+      .status(StatusCodes.INTERNAL_SERVER_ERROR)
+      .json({ msg: 'Database error', error })
   }
 
   // token (keep resetting their session length)
   const newToken = generateAccessToken(userDoc.email)
 
-  res.status(StatusCodes.OK).json({
-    user: extractUser(await userDoc.toObject()),
-    projects: updatedProjects.map(project => extractProject(project)),
+  return res.status(StatusCodes.OK).json({
+    project: projectDoc.toObject(),
     token: newToken,
-  })
-}
-
-const createProject = async (projectData, userDoc) => {
-  // create project
-  const projectDoc = new Project({
-    title: projectData.title,
-    src: projectData.src,
-    userIds: [userDoc._id],
-  })
-
-  await projectDoc.save()
-
-  return projectDoc
-}
-
-const updateProject = async (projectData, userDoc) => {
-  if (!(await userOwnsProject(projectData, userDoc))) {
-    console.log('user does not own this project')
-    return
-  }
-
-  // remove the id and any nested array/object
-  const { _id, ...data } = projectData
-
-  const projectDoc = await Project.findByIdAndUpdate(
-    _id,
-    { $set: data },
-    { new: true }
-  )
-
-  return projectDoc
-}
-
-const userOwnsProject = async (project, userDoc) => {
-  return Project.findById(project._id).then(projectDoc => {
-    return projectDoc.userIds.includes(userDoc._id)
   })
 }
