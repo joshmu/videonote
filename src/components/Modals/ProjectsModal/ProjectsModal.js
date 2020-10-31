@@ -11,6 +11,7 @@ import ModalInnerContainer from '@/shared/Modal/ModalInnerContainer'
 export default function ProjectsModal({ toggle: toggleModal, motionKey }) {
   const {
     projects,
+    project: currentProject,
     loadProject,
     removeProject,
     modalsOpen,
@@ -23,6 +24,9 @@ export default function ProjectsModal({ toggle: toggleModal, motionKey }) {
   }, [projects, modalsOpen])
 
   const handleSelection = _id => {
+    // if we are on the current project do nothing
+    if (_id === currentProject._id) return
+
     loadProject(_id)
     toggleModal()
   }
@@ -54,34 +58,47 @@ export default function ProjectsModal({ toggle: toggleModal, motionKey }) {
 
       <ModalInnerContainer>
         {projects.map(project => (
-          <Select
+          <div
             key={project._id}
             onMouseEnter={() => handleMousePosition(true, project)}
             onMouseLeave={() => handleMousePosition(false, project)}
+            className={`${
+              currentProject._id === project._id
+                ? 'bg-opacity-25'
+                : ' bg-opacity-0 cursor-pointer'
+            } relative bg-themeSelectOpacity transition-colors duration-200 ease-out`}
           >
-            <div
-              onClick={() => handleSelection(project._id)}
-              className='flex-1'
+            <Select
+              cursor={
+                currentProject._id === project._id
+                  ? 'cursor-default'
+                  : 'cursor-pointer'
+              }
             >
-              <span className='text-sm capitalize'>{project.title} </span>
-              <span className='ml-2 text-xs text-themeText2'>
-                {project.notes.length} notes
-              </span>
-            </div>
-            {mousingOver === project._id && (
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                onClick={() => {
-                  handleRemoveProject(project)
-                }}
-                className='transition-colors duration-300 ease-in-out cursor-pointer hover:text-themeAccent text-themeText2'
+              <div
+                onClick={() => handleSelection(project._id)}
+                className='flex-1'
               >
-                <TrashIcon />
-              </motion.div>
-            )}
-          </Select>
+                <span className='text-sm capitalize'>{project.title} </span>
+                <span className='ml-2 text-xs text-themeText2'>
+                  {project.notes.length} notes
+                </span>
+              </div>
+              {mousingOver === project._id && (
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  onClick={() => {
+                    handleRemoveProject(project)
+                  }}
+                  className='transition-colors duration-300 ease-in-out cursor-pointer hover:text-themeAccent text-themeText2'
+                >
+                  <TrashIcon />
+                </motion.div>
+              )}
+            </Select>
+          </div>
         ))}
       </ModalInnerContainer>
     </ModalContainer>
