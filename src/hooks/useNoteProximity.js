@@ -12,18 +12,18 @@ const useNoteProximity = ({ notes, progress }) => {
 
     // otherwise compare
     if (notes.length > 1) {
-      const result = notes.reduce((closestTodo, nextTodo) => {
-        const distA = Math.abs(closestTodo.time - progress.playedSeconds)
-        const distB = Math.abs(nextTodo.time - progress.playedSeconds)
-        return distA < distB ? closestTodo : nextTodo
+      const result = notes.reduce((closestNote, nextNote) => {
+        const distA = Math.abs(closestNote.time - progress.playedSeconds)
+        const distB = Math.abs(nextNote.time - progress.playedSeconds)
+        return distA < distB ? closestNote : nextNote
       })
 
       setCurrentNote(result)
     }
   }, [progress.playedSeconds])
 
-  const checkProximity = todo =>
-    currentNote !== null && currentNote._id === todo.id
+  const checkProximity = note =>
+    currentNote !== null && currentNote._id === note._id
 
   return { currentNote, checkProximity }
 }
