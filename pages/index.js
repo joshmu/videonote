@@ -7,10 +7,12 @@ import Modals from '@/components/Modals/Modals'
 import Notification from '@/components/Notification/Notification'
 import Sidebar from '@/components/Sidebar/Sidebar'
 import VideoPlayer from '@/components/VideoPlayer/VideoPlayer'
+import Loader from '@/components/shared/Loader/Loader'
 import { ControlsProvider } from '@/context/controlsContext'
 import { GlobalProvider } from '@/context/globalContext'
 import { NoteProvider } from '@/context/noteContext'
 import { VideoProvider } from '@/context/videoContext'
+import AppContainer from '@/layout/AppContainer/AppContainer'
 import Overlay from '@/shared/Modal/Overlay'
 import { fetcher } from '@/utils/clientHelpers'
 
@@ -95,18 +97,14 @@ export default function Main({ serverData }) {
         <NoteProvider>
           <ControlsProvider>
             <Layout>
-              <div className='flex flex-col w-full h-screen overflow-hidden'>
-                {/* <div className='text-3xl'>header</div> */}
+              <AppContainer>
+                <VideoPlayer />
+                <Sidebar />
+              </AppContainer>
 
-                <div className='flex flex-1 w-full h-full'>
-                  <VideoPlayer />
-                  <Sidebar />
-                </div>
-
-                <Overlay />
-                <Modals />
-                <Notification />
-              </div>
+              <Overlay />
+              <Modals />
+              <Notification />
             </Layout>
           </ControlsProvider>
         </NoteProvider>
