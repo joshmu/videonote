@@ -66,6 +66,10 @@ export function GlobalProvider({ serverData, ...props }) {
       setCurrentProject(null)
       // presume user could be new (this could also occur if previous projects have been removed)
 
+      // if we have a previously open modal, close it
+      if (modalsOpen.length > 0) toggleModalOpen()
+
+      // welcome modal
       toggleModalOpen('welcome')
 
       addAlert({
