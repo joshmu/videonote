@@ -5,7 +5,7 @@ mongoose.connect(process.env.MONGODB_URI, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
   useCreateIndex: true,
-  useFindAndModify: false
+  useFindAndModify: false,
 })
 
 const UserSchema = new Schema(
@@ -13,7 +13,7 @@ const UserSchema = new Schema(
     email: { type: String, required: true, unique: true },
     username: { type: String },
     projects: [{ type: Schema.Types.ObjectId, ref: 'Project' }],
-    settings: { type: Schema.Types.ObjectId, ref: 'Settings' },
+    settings: { type: Schema.Types.ObjectId, ref: 'Settings', unique: true },
     role: { type: String, default: 'free' },
     password: String,
   },
@@ -25,7 +25,12 @@ const ProjectSchema = new Schema(
     title: { type: String, required: true },
     src: String,
     notes: [{ type: Schema.Types.ObjectId, ref: 'Note' }],
-    user: { type: Schema.Types.ObjectId, ref: 'User', required: true },
+    user: {
+      type: Schema.Types.ObjectId,
+      ref: 'User',
+      required: true,
+      unique: true,
+    },
     sharedUsers: [{ type: Schema.Types.ObjectId, ref: 'User' }],
     isPrivate: { type: Boolean, default: true },
   },
@@ -37,7 +42,12 @@ const NoteSchema = new Schema(
     content: { type: String, required: true },
     time: { type: Number, default: 0 },
     done: { type: Boolean, default: false },
-    user: { type: Schema.Types.ObjectId, ref: 'User', required: true },
+    user: {
+      type: Schema.Types.ObjectId,
+      ref: 'User',
+      required: true,
+      unique: true,
+    },
     project: { type: Schema.Types.ObjectId, ref: 'Project' },
   },
   { timestamps: true }
@@ -45,7 +55,12 @@ const NoteSchema = new Schema(
 
 const SettingsSchema = new Schema(
   {
-    user: { type: Schema.Types.ObjectId, ref: 'User', required: true },
+    user: {
+      type: Schema.Types.ObjectId,
+      ref: 'User',
+      required: true,
+      unique: true,
+    },
     currentProject: { type: Schema.Types.ObjectId, ref: 'Project' },
     playOffset: Number,
     showHints: { type: Boolean, default: true },
