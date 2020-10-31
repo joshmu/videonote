@@ -22,6 +22,7 @@ module.exports = {
         themeSelectOpacity: 'rgba(var(--selectNum), var(--bg-opacity))',
       },
       opacity: {
+        10: '0.10',
         90: '0.90',
       },
       maxHeight: {

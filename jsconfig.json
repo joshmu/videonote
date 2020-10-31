@@ -10,7 +10,8 @@
       "@/pages/*": ["src/pages/*"],
       "@/api/*": ["src/pages/api/*"],
       "@/utils/*": ["./utils/*"],
-      "@/styles/*": ["./styles/*"]
+      "@/styles/*": ["./styles/*"],
+      "@/root/*": ["./*"]
     },
     "checkJs": true,
     "jsx": "preserve"

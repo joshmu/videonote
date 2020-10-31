@@ -61,7 +61,7 @@ export default function VideoPlayer() {
       exit='exit'
       variants={videoContentVariants}
       id='videoContent'
-      className='relative w-full h-full transition-all duration-500 ease-in-out bg-themeBg'
+      className='relative w-full h-full transition-all duration-500 ease-in-out'
     >
       {/* resposive video wrapper */}
       <div className={`${style.playerWrapper} w-full h-full`}>
