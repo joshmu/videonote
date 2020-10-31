@@ -90,7 +90,7 @@ export default function VideoPlayer() {
         )}
       </div>
       {/* input wrapper */}
-      {playerRef.current && projects.length > 0 && (
+      {!isLoading && (
         <motion.div
           key='action-input'
           initial={{ opacity: 0, y: 10 }}
