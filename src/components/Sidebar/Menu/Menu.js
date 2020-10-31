@@ -124,7 +124,7 @@ const Menu = ({ open }) => {
               </Select>
             )}
 
-            {admin && projects.length > 0 && (
+            {admin && projects.length > 1 && (
               <Select onClick={() => handleModalOpen('projects')}>
                 <IconMenuItemWrapper>
                   <ProjectsIcon />
