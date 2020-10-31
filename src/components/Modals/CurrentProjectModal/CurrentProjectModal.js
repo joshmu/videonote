@@ -40,10 +40,6 @@ export default function CurrentProjectModal({
     toggleModal()
   }
 
-  const canUpdate = () => {
-    return state.title !== project.title || state.src !== project.src
-  }
-
   const handleChange = e => {
     const updated = { ...state, [e.target.id]: e.target.value }
     setState(updated)
@@ -132,16 +128,7 @@ export default function CurrentProjectModal({
             </div>
 
             <div></div>
-            {canUpdate() ? (
-              <ModalPrimaryBtn handleClick={handleUpdate}>
-                Update
-              </ModalPrimaryBtn>
-            ) : (
-              <>
-                <div></div>
-                <div></div>
-              </>
-            )}
+            <ModalPrimaryBtn handleClick={handleUpdate}>Update</ModalPrimaryBtn>
           </ModalForm>
         </ModalInnerContainer>
       </ModalContainer>

@@ -14,8 +14,6 @@ export default async (req, res) => {
       .json({ msg: 'No token. Authorization denied.' })
   }
 
-  const { settings } = req.body
-
   let email
   try {
     email = await authenticateToken(token)
@@ -29,11 +27,17 @@ export default async (req, res) => {
   // get user
   const userDoc = await User.findOne({ email })
 
+  const { settings } = req.body
+
   let settingsDoc
   try {
     // use _id to search for doc, the rest is data to add
     const { _id, ...data } = settings
-    settingsDoc = await Settings.findOne({ _id, user: userDoc._id })
+    // filter for settings _id otherwise if not avail try and use user settings id
+    settingsDoc = await Settings.findOne({
+      _id: _id ? _id : userDoc.settings,
+      user: userDoc._id,
+    })
 
     if (settingsDoc) {
       await settingsDoc.updateOne({ $set: data })

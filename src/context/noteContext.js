@@ -50,8 +50,8 @@ export function NoteProvider(props) {
   useEffect(() => {
     if (isMount) return
     if (project === null) return
-    // notes when have an amount of 0 and 'isLoadingNotes' means this is initial update from project and we don't need to update
-    if (notes.length === 0 && isLoadingNotesRef.current) {
+    // 'isLoadingNotes' means this is initial update from project.notes and we don't need to update state back to 'projects'
+    if (isLoadingNotesRef.current) {
       isLoadingNotesRef.current = false
       return
     }

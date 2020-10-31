@@ -78,24 +78,8 @@ export function GlobalProvider({ serverData, ...props }) {
   // reset settings.currentProject when projects are empty
   useEffect(() => {
     if (projects.length === 0 && settings.currentProject)
-      updateSettings({ currentProject: null })
+      updateSettings({ currentProject: null, _id: settings._id })
   }, [projects, settings])
-
-  // if we have projects and one isn't assigned then let's do it
-  // useEffect(() => {
-  //   if (projects.length > 0 && currentProject === null) {
-  //     console.log('assign a project')
-  //     if (settings.currentProject) {
-  //       console.log('load project via settings')
-  //       loadProject(settings.currentProject)
-  //     } else {
-  //       console.log('load project via auto select last')
-  //       // otherwise use most recent project
-  //       const recentProject = projects.slice(-1)[0]
-  //       loadProject(recentProject._id)
-  //     }
-  //   }
-  // }, [projects, currentProject, settings])
 
   const noteApi = async noteData => {
     console.log('note api request', noteData)
@@ -193,7 +177,7 @@ export function GlobalProvider({ serverData, ...props }) {
 
     // update current project settings if it has changed
     if (project._id !== settings.currentProject) {
-      updateSettings({ currentProject: project._id })
+      updateSettings({ currentProject: project._id, _id: settings._id })
     }
 
     alertProjectLoaded(project)
@@ -260,14 +244,13 @@ export function GlobalProvider({ serverData, ...props }) {
     if (!admin) return
 
     console.log('updating settings...', newSettingsData)
-    // merge settings and user information together match 'user' mongo doc
+    // always make sure we include settings _id if we have one (this has been passed earlier)
     const body = {
       settings: newSettingsData,
     }
     // send updated settings to server, token will hold user information required
     const {
       res,
-      // @ts-ignore
       data: { settings, msg },
     } = await fetcher('/api/settings', body)
 
@@ -336,7 +319,7 @@ export function GlobalProvider({ serverData, ...props }) {
       setProjects(remainingProjects)
 
       // load another project if we are removing current project
-      if (settings.currentProject === _id) {
+      if (remainingProjects.length > 0 && settings.currentProject === _id) {
         const newCurrentProject = remainingProjects.slice(-1)[0]
         loadProject(newCurrentProject._id)
       }
@@ -366,8 +349,8 @@ export function GlobalProvider({ serverData, ...props }) {
       setUser(user)
 
       // avoid null values from mongo
-      // if we have any null values in returned settings then replace with defaults
-      if (settings instanceof Object) {
+      // if we have any null property values in returned settings then replace with defaults
+      if (typeof settings === 'object' && settings !== null) {
         // if we have any null settings lets swap them to their defaults
         Object.entries(settings).forEach(([key, val]) => {
           if (settings[key] === null) settings[key] = SETTINGS_DEFAULTS[key]
@@ -379,7 +362,7 @@ export function GlobalProvider({ serverData, ...props }) {
 
       if (projects.length > 0) {
         let currentProject
-        if (settings.currentProject) {
+        if (settings && settings.currentProject) {
           currentProject = projects.find(
             project => project._id === settings.currentProject
           )
