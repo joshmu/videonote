@@ -47,7 +47,7 @@ const SidebarHeader = () => {
         <Search />
       </div>
 
-      {/* options dropdown*/}
+      {/* menu dropdown*/}
       <div className='relative px-2 transition-colors duration-300 ease-in-out cursor-pointer text-themeAccent2 hover:text-themeAccent disable-select'>
         <motion.div
           whileHover={{ rotate: 90 }}

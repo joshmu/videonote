@@ -79,7 +79,7 @@ export function GlobalProvider({ serverData, ...props }) {
   useEffect(() => {
     if (projects.length === 0 && settings.currentProject)
       updateSettings({ currentProject: null })
-  }, [projects, settings.currentProject])
+  }, [projects, settings])
 
   // if we have projects and one isn't assigned then let's do it
   // useEffect(() => {
@@ -252,7 +252,7 @@ export function GlobalProvider({ serverData, ...props }) {
     const { settings, ...user } = account
 
     console.log({ settings, user })
-    setSettings(settings)
+    if (settings) setSettings(settings)
     setUser(user)
   }
 

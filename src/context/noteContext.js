@@ -49,6 +49,7 @@ export function NoteProvider(props) {
   // we don't update project state since we will always load from api the data whenever switching
   useEffect(() => {
     if (isMount) return
+    if (project === null) return
     // notes when have an amount of 0 and 'isLoadingNotes' means this is initial update from project and we don't need to update
     if (notes.length === 0 && isLoadingNotesRef.current) {
       isLoadingNotesRef.current = false
