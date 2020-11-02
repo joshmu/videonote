@@ -54,9 +54,9 @@ export default function CurrentProjectModal({
 
   const handleShare = () => {
     // toggle
-    const updated = !state.isPrivate
+    const updated = !state.isShared
     // create new project state
-    const updatedState = { ...state, isPrivate: updated }
+    const updatedState = { ...state, isShared: updated }
     setState(updatedState)
     // as this is important we will send to the server rather than wait for user to update manually
     updateProject(updatedState)
@@ -68,7 +68,7 @@ export default function CurrentProjectModal({
   }
 
   const handleShareUrlClick = () => {
-    if (state.isPrivate) return
+    if (state.isShared) return
     copyToClipboard()
   }
 
@@ -103,14 +103,14 @@ export default function CurrentProjectModal({
             <div className='relative mt-2'>
               <ToggleInput
                 title={
-                  state.isPrivate
+                  state.isShared
                     ? 'Share this project?'
                     : 'Sharing this project!'
                 }
-                state={!state.isPrivate}
+                state={!state.isShared}
                 onClick={handleShare}
               />
-              {!state.isPrivate && (
+              {!state.isShared && (
                 <motion.a
                   href={`https://videonote.app/vn/${project._id}`}
                   target='_blank'

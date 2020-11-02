@@ -54,8 +54,8 @@ const Menu = ({ open }) => {
   }
 
   const handleShareProject = () => {
-    // set sharing by switching off isPrivate
-    updateProject({ isPrivate: false })
+    // set sharing by switching off isShared
+    updateProject({ isShared: false })
     // copy link to clipboard
     copyToClipboard()
   }

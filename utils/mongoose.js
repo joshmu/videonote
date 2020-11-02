@@ -31,7 +31,11 @@ const ProjectSchema = new Schema(
       required: true,
     },
     sharedUsers: [{ type: Schema.Types.ObjectId, ref: 'User' }],
-    isPrivate: { type: Boolean, default: true },
+    isShared: { type: Boolean, default: true },
+    sharedProjectSettings: {
+      type: Schema.Types.ObjectId,
+      ref: 'SharedProjectSettings',
+    },
   },
   { timestamps: true }
 )
@@ -68,6 +72,21 @@ const SettingsSchema = new Schema(
   { timestamps: true }
 )
 
+const SharedProjectSettingsSchema = new Schema(
+  {
+    url: { type: String, required: true, unique: true },
+    user: {
+      type: Schema.Types.ObjectId,
+      ref: 'User',
+      required: true,
+    },
+    project: { type: Schema.Types.ObjectId, ref: 'Project' },
+    password: String,
+    canEdit: { type: Boolean, default: true },
+  },
+  { timestamps: true }
+)
+
 // prevent overwrite model error
 let User
 try {
@@ -93,5 +112,14 @@ try {
 } catch (error) {
   Settings = mongoose.model('Settings', SettingsSchema)
 }
+let SharedProjectSettings
+try {
+  SharedProjectSettings = mongoose.model('SharedProjectSettings')
+} catch (error) {
+  SharedProjectSettings = mongoose.model(
+    'SharedProjectSettings',
+    SharedProjectSettingsSchema
+  )
+}
 
-export { User, Project, Note, Settings }
+export { User, Project, Note, Settings, SharedProjectSettings }

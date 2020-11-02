@@ -20,7 +20,7 @@ export default async (req, res) => {
   }
 
   // project is public
-  if (project.isPrivate)
+  if (project.isShared)
     return res
       .status(StatusCodes.UNAUTHORIZED)
       .json({ msg: 'Project is private.' })
