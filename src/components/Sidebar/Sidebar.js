@@ -16,6 +16,7 @@ export default function Sidebar(props) {
     sidebarOpen,
     toggleSidebar,
     SETTINGS_DEFAULTS,
+    admin,
   } = useGlobalContext()
 
   const { state: resizeState, handleStartResize } = useResizable({
@@ -89,7 +90,7 @@ export default function Sidebar(props) {
           <NoteList />
         </div>
 
-        <RemoveNotes />
+        {admin && <RemoveNotes />}
       </div>
     </motion.div>
   )

@@ -124,7 +124,7 @@ export function GlobalProvider({ serverData, ...props }) {
   }
 
   const updateProject = async projectData => {
-    if (!admin) return guestUpdaingProject(projectData)
+    if (!admin) return
 
     // add _id for db processing
     projectData._id = currentProject._id
@@ -248,8 +248,6 @@ export function GlobalProvider({ serverData, ...props }) {
 
     alertProjectLoaded(project)
   }
-
-  const getProject = projectId => {}
 
   const guestUpdaingProject = async project => {
     console.log('guest is updating project', project)
@@ -410,7 +408,7 @@ export function GlobalProvider({ serverData, ...props }) {
     // allocate server data to respective areas
     setProjects(projects)
 
-    if (userAccount) {
+    if (Object.keys(userAccount).length > 0) {
       const { settings, ...user } = userAccount
       setUser(user)
 
@@ -425,25 +423,26 @@ export function GlobalProvider({ serverData, ...props }) {
       }
 
       addAlert({ type: 'success', msg: `Logged in: ${user.username}` })
-
-      if (projects.length > 0) {
-        let currentProject
-        if (settings && settings.currentProject) {
-          currentProject = projects.find(
-            project => project._id === settings.currentProject
-          )
-        }
-        // if we still don't have anything then just grab last project entry in the list
-        if (!currentProject) {
-          currentProject = projects.slice(-1)[0]
-        }
-        setCurrentProject(currentProject)
-
-        alertProjectLoaded(currentProject)
-      }
     } else {
       // if there is no account data then admin is not present, client is guest
+      console.log('GUEST MODE')
       setAdmin(false)
+    }
+
+    if (projects.length > 0) {
+      let currentProject
+      if (settings && settings.currentProject) {
+        currentProject = projects.find(
+          project => project._id === settings.currentProject
+        )
+      }
+      // if we still don't have anything then just grab last project entry in the list
+      if (!currentProject) {
+        currentProject = projects.slice(-1)[0]
+      }
+      setCurrentProject(currentProject)
+
+      alertProjectLoaded(currentProject)
     }
   }
 
@@ -549,6 +548,10 @@ export function GlobalProvider({ serverData, ...props }) {
   }
   useGlobalKeydown(handleGlobalEscapeKey)
 
+  const checkCanEdit = () => {
+    return admin || currentProject?.share.canEdit
+  }
+
   const value = {
     user,
     updateUser,
@@ -582,6 +585,7 @@ export function GlobalProvider({ serverData, ...props }) {
     updateProjectsStateWithUpdatedNotes,
     shareProject,
     removeShareProject,
+    checkCanEdit,
   }
 
   return <globalContext.Provider value={value} {...props} />

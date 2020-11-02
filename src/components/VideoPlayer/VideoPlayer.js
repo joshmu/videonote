@@ -11,7 +11,7 @@ import Loader from '../shared/Loader/Loader'
 import style from './videoPlayer.module.scss'
 
 export default function VideoPlayer() {
-  const { projects } = useGlobalContext()
+  const { projects, project, admin, checkCanEdit } = useGlobalContext()
   const {
     url,
     playing,
@@ -33,9 +33,9 @@ export default function VideoPlayer() {
     if (typeof url === 'string' && url.length > 0) setIsLoading(true)
   }, [url, isMount])
 
-  const preHandleReady = () => {
+  const preHandleReady = reactPlayer => {
+    handleReady(reactPlayer)
     setIsLoading(false)
-    handleReady()
   }
 
   const videoContentVariants = {
@@ -52,6 +52,7 @@ export default function VideoPlayer() {
       // x: '-100%',
     },
   }
+
   return (
     // wrapper to position input
     <motion.div
@@ -97,7 +98,11 @@ export default function VideoPlayer() {
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -10 }}
         >
-          <div className='absolute bottom-0 z-10 w-2/3 h-12 mb-8 transform -translate-x-1/2 left-1/2'>
+          <div
+            className={`${
+              checkCanEdit() ? 'h-12' : 'h-1'
+            } absolute bottom-0 z-10 w-2/3 mb-8 transform -translate-x-1/2 left-1/2`}
+          >
             <ActionInput />
           </div>
         </motion.div>

@@ -47,7 +47,8 @@ const ShareProjectModal = ({ toggle: toggleModal, motionKey }) => {
 
     const shareData = { ...state }
     // if password hasn't been altered then don't provide it as we currently have a hashed version
-    if (shareData.password === project.share.password) delete shareData.password
+    if (shareData.password === project.share?.password)
+      delete shareData.password
 
     const apiSuccess = await shareProject(state)
     if (apiSuccess) {

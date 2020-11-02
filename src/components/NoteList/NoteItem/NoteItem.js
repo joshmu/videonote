@@ -3,12 +3,14 @@ import { useEffect, useState } from 'react'
 
 import Select from '@/components/shared/Select/Select'
 import { useControlsContext } from '@/context/controlsContext'
+import { useGlobalContext } from '@/context/globalContext'
 import { useNoteContext } from '@/context/noteContext'
 import { useVideoContext } from '@/context/videoContext'
 import { useIsMount } from '@/hooks/useIsMount'
 import TimeDisplay from '@/shared/TimeDisplay/TimeDisplay'
 
 const NoteItem = ({ note, closestProximity, childVariants }) => {
+  const { project, admin } = useGlobalContext()
   const { seekTo } = useVideoContext()
   const { toggleSmartControls } = useControlsContext()
   const { updateNote } = useNoteContext()
@@ -61,6 +63,11 @@ const NoteItem = ({ note, closestProximity, childVariants }) => {
     }
   }
 
+  const handleDoubleClick = e => {
+    if (!admin && !project?.share.canEdit) return
+    toggleEdit(true)
+  }
+
   return (
     <motion.div
       key={state._id}
@@ -105,7 +112,7 @@ const NoteItem = ({ note, closestProximity, childVariants }) => {
               />
             ) : (
               <div
-                onDoubleClick={() => toggleEdit(true)}
+                onDoubleClick={handleDoubleClick}
                 className='text-sm leading-5'
               >
                 {state.content}

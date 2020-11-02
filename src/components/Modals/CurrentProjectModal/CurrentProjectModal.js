@@ -127,7 +127,6 @@ export default function CurrentProjectModal({
               <ExportNotes />
             </div>
 
-            <div></div>
             <ModalPrimaryBtn handleClick={handleUpdate}>Update</ModalPrimaryBtn>
           </ModalForm>
         </ModalInnerContainer>

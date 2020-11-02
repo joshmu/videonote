@@ -1,35 +1,38 @@
 import { StatusCodes } from 'http-status-codes'
 
-import { extractPublicProject } from '@/utils/apiHelpers'
-import { Project } from '@/utils/mongoose'
+import { Project, Share } from '@/utils/mongoose'
 
 // GET 1 PROJECT
 export default async (req, res) => {
   // project share id
-  const { id } = req.body
+  const { shareUrl } = req.body
 
   // get project
-  let project
+  let projectDoc
+  let shareDoc
+  console.log('grab share url project', shareUrl)
   try {
-    project = await Project.findById(id).lean()
+    shareDoc = await Share.findOne({ url: shareUrl })
+    projectDoc = await Project.findById(shareDoc.project)
+      .populate([
+        { path: 'notes', model: 'Note' },
+        { path: 'share', model: 'Share' },
+      ])
+      .lean()
   } catch (error) {
     // no project found
     return res
       .status(StatusCodes.BAD_REQUEST)
-      .json({ msg: 'Project does not exist.' })
+      .json({ msg: 'Share url does not exist.' })
   }
 
-  // project is public
-  if (project.isShared)
-    return res
-      .status(StatusCodes.UNAUTHORIZED)
-      .json({ msg: 'Project is private.' })
-
-  // pass back as a an array to avoid conflicts since vn typically handles 'projects' on server response
-  const projects = [project]
+  // compose output data in the same shape as the entire user object
+  const data = {
+    user: {
+      projects: [projectDoc],
+    },
+  }
 
   // send data
-  res.status(StatusCodes.OK).json({
-    projects: projects.map(p => extractPublicProject(p)),
-  })
+  res.status(StatusCodes.OK).json(data)
 }
