@@ -32,6 +32,7 @@ export function ControlsProvider(props) {
       if (keysPressed.includes('Shift')) {
         toggleSidebar()
       } else {
+        console.log('play/pause')
         togglePlay()
       }
     }

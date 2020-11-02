@@ -14,12 +14,12 @@ const useGlobalKeydown = handler => {
         setKeysPressed(current => current.filter(key => key !== event.key))
     }
 
-    globalThis.window.addEventListener('keydown', handleKeys)
-    globalThis.window.addEventListener('keyup', handleKeyup)
+    window.addEventListener('keydown', handleKeys)
+    window.addEventListener('keyup', handleKeyup)
 
     return () => {
-      globalThis.window.removeEventListener('keydown', handleKeys)
-      globalThis.window.removeEventListener('keyup', handleKeyup)
+      window.removeEventListener('keydown', handleKeys)
+      window.removeEventListener('keyup', handleKeyup)
     }
   }, [handler, keysPressed])
 }

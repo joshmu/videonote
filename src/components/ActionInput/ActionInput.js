@@ -46,7 +46,6 @@ const ActionInput = () => {
   }, [sidebarOpen])
 
   const autoFocus = () => {
-    if (!checkCanEdit) return
     console.log('autoFocus')
     inputRef.current.focus()
   }
@@ -101,37 +100,39 @@ const ActionInput = () => {
         isActive ? 'bg-opacity-90' : 'bg-opacity-25'
       } relative flex items-center w-full h-full bg-themeBgOpacity`}
     >
-      {checkCanEdit() && (
-        <>
-          <div className='flex items-center self-center justify-center h-full transition-all duration-150 ease-in-out bg-transparent rounded-r-none text-themeText2'>
-            <TimeDisplay
-              seconds={note.time ? note.time : progress.playedSeconds}
-              lock={note.time !== null}
-              active={isActive}
-            />
-          </div>
+      <div className='flex items-center self-center justify-center h-full transition-all duration-150 ease-in-out bg-transparent rounded-r-none text-themeText2'>
+        <TimeDisplay
+          seconds={note.time ? note.time : progress.playedSeconds}
+          lock={note.time !== null}
+          active={isActive}
+        />
+      </div>
 
-          <input
-            ref={inputRef}
-            className={`${
-              isActive ? 'opacity-100' : 'opacity-50'
-            } relative w-full h-full px-2 py-1 transition-all duration-150 ease-in-out bg-transparent rounded-sm rounded-b-none rounded-l-none placeholder-themeText2 text-themeText text-md focus:outline-none`}
-            autoFocus={true}
-            id='actionInput'
-            name='addNote'
-            type='text'
-            placeholder={isActive ? hint : PLACEHOLDER}
-            value={note.content}
-            autoComplete='off'
-            onChange={handleChange}
-            onKeyDown={handleKeyDown}
-            onFocus={handleFocus}
-            onBlur={handleBlur}
-          />
+      <input
+        ref={inputRef}
+        className={`${
+          isActive ? 'opacity-100' : 'opacity-50'
+        } relative w-full h-full px-2 py-1 transition-all duration-150 ease-in-out bg-transparent rounded-sm rounded-b-none rounded-l-none placeholder-themeText2 text-themeText text-md focus:outline-none`}
+        autoFocus={true}
+        id='actionInput'
+        name='addNote'
+        type='text'
+        placeholder={
+          isActive
+            ? hint
+            : checkCanEdit()
+            ? PLACEHOLDER
+            : 'Guest mode. Edit disabled.'
+        }
+        value={note.content}
+        autoComplete='off'
+        onChange={handleChange}
+        onKeyDown={handleKeyDown}
+        onFocus={handleFocus}
+        onBlur={handleBlur}
+      />
 
-          <ActionSymbols />
-        </>
-      )}
+      <ActionSymbols />
 
       <TimeMarkers inputActive={isActive} />
       <div className='absolute bottom-0 left-0 w-full transform translate-y-full'>

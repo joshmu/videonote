@@ -11,13 +11,11 @@ import Loader from '../shared/Loader/Loader'
 import style from './videoPlayer.module.scss'
 
 export default function VideoPlayer() {
-  const { projects, project, admin, checkCanEdit } = useGlobalContext()
   const {
     url,
     playing,
     volume,
     playbackRate,
-    playerRef,
     handleReady,
     handleProgress,
     handlePlayerError,
@@ -98,11 +96,7 @@ export default function VideoPlayer() {
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -10 }}
         >
-          <div
-            className={`${
-              checkCanEdit() ? 'h-12' : 'h-1'
-            } absolute bottom-0 z-10 w-2/3 mb-8 transform -translate-x-1/2 left-1/2`}
-          >
+          <div className='absolute bottom-0 z-10 w-2/3 h-12 mb-8 transform -translate-x-1/2 left-1/2'>
             <ActionInput />
           </div>
         </motion.div>

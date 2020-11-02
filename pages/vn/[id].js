@@ -6,6 +6,7 @@ import Modals from '@/components/Modals/Modals'
 import Notification from '@/components/Notification/Notification'
 import Sidebar from '@/components/Sidebar/Sidebar'
 import VideoPlayer from '@/components/VideoPlayer/VideoPlayer'
+import { ControlsProvider } from '@/context/controlsContext'
 import { GlobalProvider } from '@/context/globalContext'
 import { NoteProvider } from '@/context/noteContext'
 import { VideoProvider } from '@/context/videoContext'
@@ -17,20 +18,18 @@ export default function Main({ serverData }) {
     <GlobalProvider serverData={serverData}>
       <VideoProvider>
         <NoteProvider>
-          <Layout>
-            <div className='flex flex-col w-full h-screen overflow-hidden'>
-              {/* <div className='text-3xl'>navbar</div> */}
-
+          <ControlsProvider>
+            <Layout>
               <AppContainer>
                 <VideoPlayer />
                 <Sidebar />
               </AppContainer>
 
+              <Overlay />
               <Modals />
               <Notification />
-              <Overlay />
-            </div>
-          </Layout>
+            </Layout>
+          </ControlsProvider>
         </NoteProvider>
       </VideoProvider>
     </GlobalProvider>

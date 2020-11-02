@@ -27,6 +27,7 @@ export function NoteProvider(props) {
     noteApi,
     noteApiRemoveDoneNotes,
     updateProjectsStateWithUpdatedNotes,
+    checkCanEdit,
   } = useGlobalContext()
   const { progress } = useVideoContext()
   const [notes, setNotes] = useState([])
@@ -69,6 +70,8 @@ export function NoteProvider(props) {
   }, [projects])
 
   const addNote = note => {
+    if (!checkCanEdit()) return
+
     const newNote = {
       _id: createMongooseId(),
       content: note.content,
