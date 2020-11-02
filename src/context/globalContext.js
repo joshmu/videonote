@@ -146,6 +146,68 @@ export function GlobalProvider({ serverData, ...props }) {
     setCurrentProject(current => ({ ...project, notes: current.notes }))
   }
 
+  const shareProject = async shareData => {
+    const body = {
+      action: 'share',
+      project: { _id: currentProject._id },
+      share: shareData,
+    }
+
+    const {
+      res,
+      data: { msg, ...data },
+    } = await fetcher('/api/project', body)
+
+    if (badResponse(res, msg)) return
+
+    if (!data) return console.error('api error')
+
+    console.log('share project api response...')
+    console.log(data)
+    const { project } = data
+
+    // update the relevant project 'share' prop
+    setProjects(current =>
+      current.map(p => {
+        return p._id === project._id ? { ...p, share: project.share } : p
+      })
+    )
+    // also update current project state with new 'share' data
+    setCurrentProject(current => ({ ...current, share: project.share }))
+
+    // return true/false based on returned data matching data sent to server
+    const valuesToCheck = ['canEdit', 'url']
+    return valuesToCheck.every(key => project.share[key] === shareData[key])
+  }
+  const removeShareProject = async () => {
+    const body = {
+      action: 'remove share',
+      project: { _id: currentProject._id },
+      share: { _id: currentProject.share._id },
+    }
+    const {
+      res,
+      data: { msg, ...data },
+    } = await fetcher('/api/project', body)
+
+    if (badResponse(res, msg)) return
+
+    if (!data) return console.error('api error')
+
+    const { project } = data
+
+    // update the relevant project
+    setProjects(current =>
+      current.map(p => {
+        return p._id === project._id ? project : p
+      })
+    )
+    // also update current project state
+    setCurrentProject(project)
+
+    return res.status === 200
+  }
+
   // to have access to general projects information (like note count) we need to update the projects list
   // we do not alter the current project state with the notes change to avoid a potential update loop
   const updateProjectsStateWithUpdatedNotes = async notes => {
@@ -418,8 +480,7 @@ export function GlobalProvider({ serverData, ...props }) {
   }
 
   const copyToClipboard = (txt, alertMsg = 'Copied to clipboard!') => {
-    // if no text is defined presume we are sharing the project url
-    if (!txt) txt = `https://videonote.app/vn/${currentProject._id}`
+    if (!txt) return
 
     // copy to clipboard
     navigator.clipboard.writeText(txt).then(
@@ -519,6 +580,8 @@ export function GlobalProvider({ serverData, ...props }) {
     noteApi,
     noteApiRemoveDoneNotes,
     updateProjectsStateWithUpdatedNotes,
+    shareProject,
+    removeShareProject,
   }
 
   return <globalContext.Provider value={value} {...props} />

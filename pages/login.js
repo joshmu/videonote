@@ -6,12 +6,15 @@ import LoginView from '@/components/LoginPage/Login/Login'
 import RegisterView from '@/components/LoginPage/Register/Register'
 import Notification from '@/components/Notification/Notification'
 import ThemeToggle from '@/components/shared/ThemeToggle/ThemeToggle'
+import useTwConfig from '@/hooks/useTwConfig'
 
 import { handleJwtToken } from '../utils/clientHelpers'
 
 export default function Login() {
   const [loginView, setLoginView] = useState(true)
   const [email, setEmail] = useState('')
+
+  const twConfig = useTwConfig()
 
   const toggleLoginView = (state = undefined) => {
     const isLoginViewShowing = state === undefined ? !loginView : state
@@ -30,7 +33,12 @@ export default function Login() {
       <div className='absolute top-0 right-0 z-50 p-4 text-2xl text-themeAccent'>
         <ThemeToggle />
       </div>
-      <div className='flex items-center justify-center h-screen'>
+      <div
+        className='flex items-center justify-center h-screen bg-opacity-25'
+        style={{
+          backgroundImage: `radial-gradient(circle farthest-corner at center, ${twConfig.theme.colors.themeSelectOpacity} 0%, ${twConfig.theme.colors.themeBg} 100%)`,
+        }}
+      >
         {loginView ? (
           <LoginView
             toggleLoginView={toggleLoginView}

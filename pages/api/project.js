@@ -1,7 +1,8 @@
+import bcrypt from 'bcryptjs'
 import { StatusCodes } from 'http-status-codes'
 
 import { authenticateToken, generateAccessToken } from '@/utils/jwt'
-import { Note, Project, User } from '@/utils/mongoose'
+import { Note, Project, Share, User } from '@/utils/mongoose'
 
 export default async (req, res) => {
   // Gather the jwt access token from the request header
@@ -32,10 +33,10 @@ export default async (req, res) => {
   let projectDoc
   try {
     if (action === 'get') {
-      projectDoc = await Project.findOne({
+      projectDoc = await getEntireProject({
         _id: project._id,
         user: userDoc._id,
-      }).populate({ path: 'notes', model: 'Note' })
+      })
     }
     if (action === 'create') {
       projectDoc = new Project({
@@ -59,6 +60,103 @@ export default async (req, res) => {
         { new: true }
       )
     }
+    if (action === 'share') {
+      console.log('action: share')
+      // current project user is working on
+      projectDoc = await Project.findOne({
+        _id: project._id,
+        user: userDoc._id,
+      })
+
+      // additional data for 'share' action
+      const shareData = req.body.share
+
+      let shareDoc
+      // if the projectDoc contains a 'share' ref _id then we are sharing and we just need to update
+      if (projectDoc.share) {
+        console.log('share project exists')
+        shareDoc = await Share.findById(projectDoc.share)
+        // hash password if we are given one
+        if (shareDoc.password)
+          shareDoc.password = await bcrypt.hash(shareDoc.password, 10)
+        // update share project doc
+        await shareDoc.updateOne({ $set: shareData })
+        await shareDoc.save()
+        // assign updated version
+        shareDoc = await Share.findById(shareDoc._id)
+        // update projectDoc with populated 'share' which will be handed back
+        projectDoc = await Project.findOne({
+          _id: project._id,
+          user: userDoc._id,
+        }).populate({ path: 'share', model: 'Share' })
+      } else {
+        console.log('create share project')
+
+        // hash password if one is provided and overwrite
+        shareData.password =
+          shareData.password === ''
+            ? shareData.password
+            : await bcrypt.hash(shareData.password, 10)
+
+        try {
+          // create share doc
+          shareDoc = await Share.create({
+            ...shareData,
+            project: projectDoc._id,
+            user: userDoc._id,
+          })
+        } catch (error) {
+          console.error(error)
+          return res
+            .status(StatusCodes.INTERNAL_SERVER_ERROR)
+            .json({ msg: 'Specified share project url is taken.', error })
+        }
+        // add reference to project
+        projectDoc.share = shareDoc._id
+        await projectDoc.save()
+        // reassign projectDoc as save() does not return updated version plus populate all avail fields
+        projectDoc = await Project.findById(projectDoc._id)
+          .populate({
+            path: 'notes',
+            model: 'Note',
+          })
+          .populate({
+            path: 'share',
+            model: 'Share',
+          })
+      }
+    }
+    if (action === 'remove share') {
+      // current project user is working on
+      projectDoc = await Project.findOne({
+        _id: project._id,
+        user: userDoc._id,
+      })
+
+      // additional data for 'share' action
+      const shareData = req.body.share
+      await Share.deleteOne({
+        _id: shareData._id,
+        user: userDoc._id,
+        project: projectDoc._id,
+      })
+
+      // remove reference to share in 'project'
+      projectDoc.share = null
+      await projectDoc.save()
+
+      // token (keep resetting their session length)
+      const newToken = generateAccessToken(userDoc.email)
+
+      projectDoc = await getEntireProject({
+        _id: projectDoc._id,
+      })
+
+      return res.status(StatusCodes.OK).json({
+        token: newToken,
+        project: projectDoc.toObject(),
+      })
+    }
     if (action === 'remove') {
       // get projectDoc via project and user _id
       projectDoc = await Project.findOne({
@@ -68,6 +166,11 @@ export default async (req, res) => {
 
       // remove all notes associated to project
       await Note.deleteMany({
+        project: projectDoc._id,
+      })
+
+      // remove all shared documents to the project
+      await Share.deleteMany({
         project: projectDoc._id,
       })
 
@@ -106,4 +209,11 @@ export default async (req, res) => {
     project: projectDoc.toObject(),
     token: newToken,
   })
+}
+
+const getEntireProject = async query => {
+  return Project.findOne(query).populate([
+    { path: 'notes', model: 'Note' },
+    { path: 'share', model: 'Share' },
+  ])
 }

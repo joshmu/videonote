@@ -15,7 +15,7 @@ export default async (req, res) => {
       .json({ msg: 'Project does not exist.' })
 
   // project is public
-  if (projectDoc.isShared)
+  if (projectDoc.share === null)
     return res
       .status(StatusCodes.UNAUTHORIZED)
       .json({ msg: 'Project is private.' })

@@ -30,10 +30,16 @@ export default async (req, res) => {
     .populate({
       path: 'projects',
       model: 'Project',
-      populate: {
-        path: 'notes',
-        model: 'Note',
-      },
+      populate: [
+        {
+          path: 'notes',
+          model: 'Note',
+        },
+        {
+          path: 'share',
+          model: 'Share',
+        },
+      ],
     })
     .lean()
 

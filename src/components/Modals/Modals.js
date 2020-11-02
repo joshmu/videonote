@@ -11,6 +11,7 @@ import CurrentProjectModal from './CurrentProjectModal/CurrentProjectModal'
 import HelpModal from './HelpModal/HelpModal'
 import ProjectsModal from './ProjectsModal/ProjectsModal'
 import SettingsModal from './SettingsModal/SettingsModal'
+import ShareProjectModal from './ShareProjectModal/ShareProjectModal'
 import UserAccountModal from './UserAccountModal/UserAccountModal'
 import WelcomeModal from './WelcomeModal/WelcomeModal'
 
@@ -44,6 +45,13 @@ export default function Modals() {
           toggle={toggleModalOpen}
           motionKey='createProjectModal'
           key='currentProjectModal'
+        />
+      )}
+      {checkModalOpen('share') && (
+        <ShareProjectModal
+          toggle={toggleModalOpen}
+          motionKey='shareProjectModal'
+          key='shareProjectModal'
         />
       )}
       {checkModalOpen('projects') && (

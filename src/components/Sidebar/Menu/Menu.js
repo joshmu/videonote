@@ -53,13 +53,6 @@ const Menu = ({ open }) => {
     toggleMenuOpen(false)
   }
 
-  const handleShareProject = () => {
-    // set sharing by switching off isShared
-    updateProject({ isShared: false })
-    // copy link to clipboard
-    copyToClipboard()
-  }
-
   const variants = {
     initial: { opacity: 0 },
     animate: {
@@ -102,7 +95,7 @@ const Menu = ({ open }) => {
             )}
 
             {admin && project && (
-              <Select onClick={handleShareProject}>
+              <Select onClick={() => handleModalOpen('share')}>
                 <IconMenuItemWrapper>
                   <ShareIcon />
                 </IconMenuItemWrapper>

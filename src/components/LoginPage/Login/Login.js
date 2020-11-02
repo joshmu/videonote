@@ -69,7 +69,7 @@ export default function Login({ toggleLoginView, handleLogin, handleEmail }) {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className='w-full max-w-sm mx-auto overflow-hidden border rounded-sm border-themeText'
+      className='w-full max-w-sm mx-auto overflow-hidden border rounded-sm border-themeText bg-themeBg'
     >
       <div className='px-6 py-4'>
         <Link href='/hello' passHref>

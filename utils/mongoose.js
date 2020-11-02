@@ -31,10 +31,9 @@ const ProjectSchema = new Schema(
       required: true,
     },
     sharedUsers: [{ type: Schema.Types.ObjectId, ref: 'User' }],
-    isShared: { type: Boolean, default: true },
-    sharedProjectSettings: {
+    share: {
       type: Schema.Types.ObjectId,
-      ref: 'SharedProjectSettings',
+      ref: 'Share',
     },
   },
   { timestamps: true }
@@ -72,7 +71,7 @@ const SettingsSchema = new Schema(
   { timestamps: true }
 )
 
-const SharedProjectSettingsSchema = new Schema(
+const ShareProjectSchema = new Schema(
   {
     url: { type: String, required: true, unique: true },
     user: {
@@ -81,7 +80,7 @@ const SharedProjectSettingsSchema = new Schema(
       required: true,
     },
     project: { type: Schema.Types.ObjectId, ref: 'Project' },
-    password: String,
+    password: { type: String, default: '' },
     canEdit: { type: Boolean, default: true },
   },
   { timestamps: true }
@@ -112,14 +111,11 @@ try {
 } catch (error) {
   Settings = mongoose.model('Settings', SettingsSchema)
 }
-let SharedProjectSettings
+let Share
 try {
-  SharedProjectSettings = mongoose.model('SharedProjectSettings')
+  Share = mongoose.model('Share')
 } catch (error) {
-  SharedProjectSettings = mongoose.model(
-    'SharedProjectSettings',
-    SharedProjectSettingsSchema
-  )
+  Share = mongoose.model('Share', ShareProjectSchema)
 }
 
-export { User, Project, Note, Settings, SharedProjectSettings }
+export { User, Project, Note, Settings, Share }

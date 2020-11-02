@@ -3,7 +3,7 @@ import { StatusCodes } from 'http-status-codes'
 
 import { extractUser } from '@/utils/apiHelpers'
 import { authenticateToken, generateAccessToken } from '@/utils/jwt'
-import { Project, Settings, User } from '@/utils/mongoose'
+import { Note, Project, Settings, Share, User } from '@/utils/mongoose'
 
 export default async (req, res) => {
   // Gather the jwt access token from the request header
@@ -41,14 +41,14 @@ export default async (req, res) => {
           .status(StatusCodes.UNAUTHORIZED)
           .json({ msg: 'Password is incorrect.' })
       }
-      // todo: fix for new model
-      // get all projects owned by this user
-      // delete all notes associated to each project
+      // delete share docs by user
+      await Share.deleteMany({ user: userDoc._id })
       // delete projects
       await Project.deleteMany({ _id: { $in: userDoc.projectIds } })
+      // delete all notes by user
+      await Note.deleteMany({ user: userDoc._id })
       // remove user settings doc
-      const settingsDoc = await Settings.findById(userDoc.settings)
-      await settingsDoc.remove()
+      await Settings.deleteOne({ user: userDoc._id })
       // remove user
       await userDoc.remove()
 

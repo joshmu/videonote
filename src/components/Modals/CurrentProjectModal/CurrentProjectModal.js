@@ -5,13 +5,13 @@ import ModalPrimaryBtn from '@/components/shared/Modal/ModalBtn'
 import { ToggleInput } from '@/components/shared/Toggle/Toggle'
 import { useGlobalContext } from '@/context/globalContext'
 import { useNotificationContext } from '@/context/notificationContext'
+import LocalVideoForm from '@/shared/LocalVideoForm/LocalVideoForm'
 import ModalContainer from '@/shared/Modal/ModalContainer'
 import ModalForm from '@/shared/Modal/ModalForm'
 import ModalHeader from '@/shared/Modal/ModalHeader'
 import ModalInnerContainer from '@/shared/Modal/ModalInnerContainer'
 import ModalInput from '@/shared/Modal/ModalInput'
 
-import LocalVideoForm from '../../shared/LocalVideoForm/LocalVideoForm'
 import ExportNotes from './ExportNotes/ExportNotes'
 
 export default function CurrentProjectModal({
@@ -52,25 +52,25 @@ export default function CurrentProjectModal({
     setState(updated)
   }
 
-  const handleShare = () => {
-    // toggle
-    const updated = !state.isShared
-    // create new project state
-    const updatedState = { ...state, isShared: updated }
-    setState(updatedState)
-    // as this is important we will send to the server rather than wait for user to update manually
-    updateProject(updatedState)
-    // if we are sharing
-    if (!updated) {
-      // auto copy to clipboard
-      copyToClipboard()
-    }
-  }
+  // const handleShare = () => {
+  //   // toggle
+  //   const updated = !state.isShared
+  //   // create new project state
+  //   const updatedState = { ...state, isShared: updated }
+  //   setState(updatedState)
+  //   // as this is important we will send to the server rather than wait for user to update manually
+  //   updateProject(updatedState)
+  //   // if we are sharing
+  //   if (!updated) {
+  //     // auto copy to clipboard
+  //     copyToClipboard()
+  //   }
+  // }
 
-  const handleShareUrlClick = () => {
-    if (state.isShared) return
-    copyToClipboard()
-  }
+  // const handleShareUrlClick = () => {
+  //   if (state.isShared) return
+  //   copyToClipboard()
+  // }
 
   return (
     state && (
@@ -100,7 +100,7 @@ export default function CurrentProjectModal({
               <LocalVideoForm handleVideoSrc={handleVideoSrc} />
             )}
 
-            <div className='relative mt-2'>
+            {/* <div className='relative mt-2'>
               <ToggleInput
                 title={
                   state.isShared
@@ -121,7 +121,7 @@ export default function CurrentProjectModal({
                   videonote.app/vn/{project._id}
                 </motion.a>
               )}
-            </div>
+            </div> */}
 
             <div className='mt-2'>
               <ExportNotes />
