@@ -134,8 +134,8 @@ const ActionInput = () => {
 
       <ActionSymbols />
 
-      <TimeMarkers inputActive={isActive} />
-      <div className='absolute bottom-0 left-0 w-full transform translate-y-full'>
+      <div className='absolute bottom-0 left-0 w-full transform translate-y-1/2'>
+        <TimeMarkers inputActive={isActive} />
         <ProgressBar active={isActive} />
       </div>
     </div>
