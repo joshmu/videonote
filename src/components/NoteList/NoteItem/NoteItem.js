@@ -93,7 +93,7 @@ const NoteItem = ({ note, closestProximity, childVariants }) => {
           <div
             onClick={handleNoteClick}
             className={`${
-              state.done && 'text-themeText2'
+              state.done && !closestProximity && 'text-themeText2'
             } w-full h-full py-2 pl-2`}
           >
             {/* {category && (
