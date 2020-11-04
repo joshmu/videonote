@@ -43,10 +43,21 @@ export default async (req, res) => {
       }
       // delete share docs by user
       await Share.deleteMany({ user: userDoc._id })
-      // delete projects
-      await Project.deleteMany({ _id: { $in: userDoc.projectIds } })
-      // delete all notes by user
+      // get all projects owned by user
+      const projectDocs = await Project.find({
+        _id: { $in: userDoc.projects },
+      })
+      for (let projectDoc of projectDocs) {
+        // delete all notes which reference any of these projects
+        await Note.deleteMany({ project: projectDoc._id })
+        // delete the project
+        await projectDoc.remove()
+      }
+      // await Project.deleteMany({ _id: { $in: userDoc.projectIds } })
+
+      // delete all notes by user - which may be associated to projects not owned by the user
       await Note.deleteMany({ user: userDoc._id })
+
       // remove user settings doc
       await Settings.deleteOne({ user: userDoc._id })
       // remove user

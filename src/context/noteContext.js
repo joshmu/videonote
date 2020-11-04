@@ -28,6 +28,8 @@ export function NoteProvider(props) {
     noteApiRemoveDoneNotes,
     updateProjectsStateWithUpdatedNotes,
     checkCanEdit,
+    admin,
+    user,
   } = useGlobalContext()
   const { progress } = useVideoContext()
   const [notes, setNotes] = useState([])
@@ -79,6 +81,9 @@ export function NoteProvider(props) {
       done: false,
       project: project._id,
     }
+    // add user information if we have it
+    if (user?._id) newNote.user = user._id
+
     console.log({ newNote })
     setNotes([...notes, newNote])
     noteApi(newNote).then(responseNote => {
