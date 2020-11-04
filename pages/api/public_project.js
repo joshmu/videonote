@@ -1,3 +1,4 @@
+import bcrypt from 'bcryptjs'
 import { StatusCodes } from 'http-status-codes'
 
 import { Project, Share } from '@/utils/mongoose'
@@ -5,14 +6,32 @@ import { Project, Share } from '@/utils/mongoose'
 // GET 1 PROJECT
 export default async (req, res) => {
   // project share id
-  const { shareUrl } = req.body
+  const { shareUrl, password } = req.body
 
   // get project
   let projectDoc
   let shareDoc
-  console.log('grab share url project', shareUrl)
   try {
     shareDoc = await Share.findOne({ url: shareUrl })
+
+    if (shareDoc.password.length > 0) {
+      // 'shared project password required'
+
+      if (password) {
+        // compare passwords
+        const match = await bcrypt.compare(password, shareDoc.password)
+        console.log({ match })
+        if (!match) {
+          return res.status(StatusCodes.OK).json({ msg: 'password incorrect' })
+        }
+      } else {
+        // else
+        return res
+          .status(StatusCodes.OK)
+          .json({ msg: 'shared project password required' })
+      }
+    }
+
     projectDoc = await Project.findById(shareDoc.project)
       .populate([
         {

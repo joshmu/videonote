@@ -122,7 +122,7 @@ const ActionInput = () => {
             ? hint
             : checkCanEdit()
             ? PLACEHOLDER
-            : 'Guest mode. Edit disabled.'
+            : 'Guest mode. Add/Edit notes disabled.'
         }
         value={note.content}
         autoComplete='off'

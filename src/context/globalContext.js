@@ -50,7 +50,7 @@ export function GlobalProvider({ serverData, ...props }) {
     promptState,
     prompt,
     confirm: promptConfirm,
-    reset: promptCancel,
+    reset: promptReset,
   } = usePrompt()
 
   // initial load
@@ -390,9 +390,98 @@ export function GlobalProvider({ serverData, ...props }) {
     }
   }
 
+  const fetchWithPasswordPublicProject = async password => {
+    // get id
+    const shareUrl = window.location.pathname.split('/').slice(-1)[0]
+
+    // fetch config
+    const origin = window.location.origin
+    const url = `${origin}/api/public_project`
+    const body = {
+      shareUrl,
+      password,
+    }
+
+    // request project
+    const res = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(body),
+    })
+
+    // if an error occurs, redirect to homepage for a guest
+    if (res.status !== StatusCodes.OK) {
+      Router.push('/')
+    }
+
+    // parse
+    const data = await res.json()
+
+    return data
+  }
+
   //-------------------------------
   const handleInitialServerData = data => {
+    // if password is required then lets exit early
+    // fetch data again providing password
+    // re-init 'handleInitialServerData'
+    if (data.msg === 'shared project password required') {
+      prompt({
+        msg: (
+          <div>
+            <h2 className='mb-2 text-xl font-bold text-themeAccent'>
+              <a href='/'>VideoNote</a>
+            </h2>
+            <span className='whitespace-pre'>
+              A <span className='text-themeAccent'>password </span>
+              is required to access this project
+            </span>
+          </div>
+        ),
+        passwordRequired: true,
+        action: async data => {
+          promptReset()
+          const { password } = data
+          setTimeout(async () => {
+            // get password and send again
+            const serverData = await fetchWithPasswordPublicProject(password)
+            handleInitialServerData(serverData)
+          }, 300)
+        },
+      })
+      return
+    } else if (data.msg === 'password incorrect') {
+      prompt({
+        msg: (
+          <div>
+            <h2 className='mb-2 text-xl font-bold text-themeAccent'>
+              <a href='/'>VideoNote</a>
+            </h2>
+            <span className='whitespace-pre'>
+              The <span className='text-themeAccent'>password </span>
+              is incorrect. Do you want to try again?
+            </span>
+          </div>
+        ),
+        passwordRequired: true,
+        action: async data => {
+          promptReset()
+          const { password } = data
+
+          setTimeout(async () => {
+            // get password and send again
+            const serverData = await fetchWithPasswordPublicProject(password)
+            handleInitialServerData(serverData)
+          }, 300)
+        },
+      })
+      return
+    }
+
     console.log('handle initial server data', data)
+
     // user data and msg for server messages
     const { user, msg } = data
     // grab user projects as seperate var and rest is the account
@@ -538,7 +627,7 @@ export function GlobalProvider({ serverData, ...props }) {
 
   const cancelModals = () => {
     if (modalsOpen.length > 0) setModalsOpen([])
-    if (promptState.isOpen) promptCancel()
+    if (promptState.isOpen) promptReset()
     if (menuOpen) setMenuOpen(false)
   }
   const handleGlobalEscapeKey = key => {
@@ -578,7 +667,7 @@ export function GlobalProvider({ serverData, ...props }) {
     promptState,
     prompt,
     promptConfirm,
-    promptCancel,
+    promptCancel: promptReset,
     cancelModals,
     noteApi,
     noteApiRemoveDoneNotes,

@@ -77,8 +77,8 @@ export default async (req, res) => {
         console.log('share project exists')
         shareDoc = await Share.findById(projectDoc.share)
         // hash password if we are given one
-        if (shareDoc.password)
-          shareDoc.password = await bcrypt.hash(shareDoc.password, 10)
+        if (shareData.password.length > 0)
+          shareData.password = await bcrypt.hash(shareData.password, 10)
         // update share project doc
         await shareDoc.updateOne({ $set: shareData })
         await shareDoc.save()
@@ -93,10 +93,8 @@ export default async (req, res) => {
         console.log('create share project')
 
         // hash password if one is provided and overwrite
-        shareData.password =
-          shareData.password === ''
-            ? shareData.password
-            : await bcrypt.hash(shareData.password, 10)
+        if (shareData.password.length > 0)
+          shareData.password = await bcrypt.hash(shareData.password, 10)
 
         try {
           // create share doc
