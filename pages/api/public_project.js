@@ -15,7 +15,15 @@ export default async (req, res) => {
     shareDoc = await Share.findOne({ url: shareUrl })
     projectDoc = await Project.findById(shareDoc.project)
       .populate([
-        { path: 'notes', model: 'Note' },
+        {
+          path: 'notes',
+          model: 'Note',
+          populate: {
+            path: 'user',
+            model: 'User',
+            select: 'username email',
+          },
+        },
         { path: 'share', model: 'Share' },
       ])
       .lean()

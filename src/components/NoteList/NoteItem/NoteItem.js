@@ -8,9 +8,10 @@ import { useNoteContext } from '@/context/noteContext'
 import { useVideoContext } from '@/context/videoContext'
 import { useIsMount } from '@/hooks/useIsMount'
 import TimeDisplay from '@/shared/TimeDisplay/TimeDisplay'
+import DisplayUser from './DisplayUser/DisplayUser'
 
 const NoteItem = ({ note, closestProximity, childVariants }) => {
-  const { project, admin } = useGlobalContext()
+  const { project, admin, user } = useGlobalContext()
   const { seekTo } = useVideoContext()
   const { toggleSmartControls } = useControlsContext()
   const { updateNote } = useNoteContext()
@@ -96,9 +97,7 @@ const NoteItem = ({ note, closestProximity, childVariants }) => {
               state.done && !closestProximity && 'text-themeText2'
             } w-full h-full py-2 pl-2`}
           >
-            {/* {category && (
-              <div className='text-sm leading-5 capitalize'>{category}</div>
-            )} */}
+            <DisplayUser noteUser={note.user} currentUser={user} />
             {isEditing ? (
               <input
                 type='text'
