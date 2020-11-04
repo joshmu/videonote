@@ -55,12 +55,15 @@ export const fetcher = async (url, body, token = false) => {
     token = cookies.get('token')
   }
 
+  const headers = {
+    'Content-Type': 'application/json',
+  }
+  // include 'token' in the header if we have one available
+  if (token) headers.Authorization = `Bearer ${token}`
+
   const res = await fetch(url, {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${token}`,
-    },
+    headers,
     body: JSON.stringify(body),
   })
   const data = await res.json()

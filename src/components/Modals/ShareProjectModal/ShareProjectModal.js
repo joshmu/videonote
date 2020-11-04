@@ -12,7 +12,7 @@ import ModalInnerContainer from '@/shared/Modal/ModalInnerContainer'
 import ModalInput from '@/shared/Modal/ModalInput'
 
 // todo: remove bad characters from url path entry
-const formatUrl = txt => txt.replace(' ', '-')
+const formatUrl = txt => txt.replace(' ', '-').toLowerCase()
 
 const ShareProjectModal = ({ toggle: toggleModal, motionKey }) => {
   const {
@@ -95,7 +95,7 @@ const ShareProjectModal = ({ toggle: toggleModal, motionKey }) => {
       <ModalInnerContainer>
         <ModalForm>
           <ModalInput
-            title={`Unique share url link`}
+            title={`Unique share url title`}
             placeholder='Your-unique-link'
             id='url'
             type='text'
@@ -122,7 +122,7 @@ const ShareProjectModal = ({ toggle: toggleModal, motionKey }) => {
           {project.share && (
             <>
               <div>
-                <p>Your project link is:</p>
+                <p>Your project share link is:</p>
                 <motion.a
                   href={`https://videonote.app/vn/${project.share.url}`}
                   target='_blank'

@@ -34,6 +34,11 @@ export default async (req, res) => {
         {
           path: 'notes',
           model: 'Note',
+          populate: {
+            path: 'user',
+            model: 'User',
+            select: 'username email',
+          },
         },
         {
           path: 'share',

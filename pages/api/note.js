@@ -4,30 +4,41 @@ import { authenticateToken, generateAccessToken } from '@/utils/jwt'
 import { Note, Project, User } from '@/utils/mongoose'
 
 export default async (req, res) => {
+  console.log('note api')
+  // detect user via token
+  // if no user then the 'note' is not assigned a user
+  let isGuestUser = false
+
   // Gather the jwt access token from the request header
   let token = req.headers['authorization']
   // strip 'bearer'
-  if (token) token = token.replace(/bearer /i, '')
-  if (!token) {
-    return res
-      .status(StatusCodes.UNAUTHORIZED)
-      .json({ msg: 'No token. Authorization denied.' })
+  if (token) {
+    token = token.replace(/bearer /i, '')
+  } else {
+    // if there is no token then we could have a guest
+    console.log('Guest user')
+    isGuestUser = true
   }
 
+  // 'note' is inclusive of projectId
   const { action, note } = req.body
 
-  let email
-  try {
-    email = await authenticateToken(token)
-  } catch (error) {
-    console.error(error.message)
-    return res
-      .status(StatusCodes.UNAUTHORIZED)
-      .json({ msg: 'Invalid token', error })
-  }
+  // if the user is not a guest then grab their information
+  let userDoc
+  if (!isGuestUser) {
+    let email
+    try {
+      email = await authenticateToken(token)
+    } catch (error) {
+      console.error(error.message)
+      return res
+        .status(StatusCodes.UNAUTHORIZED)
+        .json({ msg: 'Invalid token', error })
+    }
 
-  // get user
-  const userDoc = await User.findOne({ email })
+    // get user
+    userDoc = await User.findOne({ email })
+  }
 
   // different route if we choose to delete all complete notes from specified project
   if (action === 'remove done notes') {
@@ -44,14 +55,19 @@ export default async (req, res) => {
 
       // if note exists
       if (noteDoc) {
+        // update user if we have one (in case we have a different user modifying a note)
+        // todo: array of users who modify the note when original 'user' is present?
+        if (!isGuestUser) data.user = userDoc._id
+
         await noteDoc.updateOne({ $set: data })
         await noteDoc.save()
         // assign updated version
         noteDoc = await Note.findById(noteDoc._id)
       } else {
-        // if note doc does not exist
+        // create note
+
         // add user info to note
-        note.user = userDoc._id
+        if (!isGuestUser) note.user = userDoc._id
 
         // create with whole 'note' since we are passing a manually created _id for faster state management client side
         noteDoc = new Note(note)
@@ -71,8 +87,13 @@ export default async (req, res) => {
       .json({ msg: 'Database error', error })
   }
 
+  let newToken = null
   // token (keep resetting their session length)
-  const newToken = generateAccessToken(userDoc.email)
+  if (!isGuestUser) newToken = generateAccessToken(userDoc.email)
+
+  // populate the 'user' field if it is a user created note
+  if (noteDoc.user && !noteDoc.populated('user'))
+    await noteDoc.populate('user', 'username email').execPopulate()
 
   res.status(StatusCodes.OK).json({
     note: noteDoc.toObject(),

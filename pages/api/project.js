@@ -213,7 +213,15 @@ export default async (req, res) => {
 
 const getEntireProject = async query => {
   return Project.findOne(query).populate([
-    { path: 'notes', model: 'Note' },
+    {
+      path: 'notes',
+      model: 'Note',
+      populate: {
+        path: 'user',
+        model: 'User',
+        select: 'username email',
+      },
+    },
     { path: 'share', model: 'Share' },
   ])
 }

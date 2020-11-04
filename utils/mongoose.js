@@ -47,7 +47,6 @@ const NoteSchema = new Schema(
     user: {
       type: Schema.Types.ObjectId,
       ref: 'User',
-      required: true,
     },
     project: { type: Schema.Types.ObjectId, ref: 'Project' },
   },
