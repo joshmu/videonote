@@ -2,6 +2,7 @@ const DisplayUser = ({ noteUser, currentUser }) => {
   let displayName = 'guest'
 
   // if we have a noteUser present who is not the admin
+  // todo: use a way to detect the user when adding note to not display
   if (noteUser) {
     // get the note user id
     const noteUserId = typeof noteUser === 'string' ? noteUser : noteUser._id

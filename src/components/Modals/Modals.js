@@ -25,7 +25,8 @@ export default function Modals() {
   const { toggleSmartControls } = useControlsContext()
 
   useEffect(() => {
-    const enableSmartControls = !modalsOpen
+    // disable smart controls when we have modals open
+    const enableSmartControls = modalsOpen.length === 0
     toggleSmartControls(enableSmartControls)
   }, [modalsOpen])
 

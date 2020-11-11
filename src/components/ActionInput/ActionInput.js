@@ -13,8 +13,14 @@ import TimeMarkers from './TimeMarkers/TimeMarkers'
 const PLACEHOLDER = 'Add Note...'
 
 const ActionInput = () => {
-  const inputRef = useRef(null)
-  const { settings, sidebarOpen, HINTS, checkCanEdit } = useGlobalContext()
+  const {
+    settings,
+    sidebarOpen,
+    HINTS,
+    checkCanEdit,
+    actionInputRef,
+    actionInputFocus,
+  } = useGlobalContext()
   const { progress } = useVideoContext()
   const { toggleSmartControls } = useControlsContext()
   const { addNote } = useNoteContext()
@@ -41,14 +47,9 @@ const ActionInput = () => {
   useEffect(() => {
     // focus on full screen
     if (!sidebarOpen) {
-      autoFocus()
+      actionInputFocus()
     }
   }, [sidebarOpen])
-
-  const autoFocus = () => {
-    console.log('autoFocus')
-    inputRef.current.focus()
-  }
 
   // * add new note on submit
   const handleSubmit = () => {
@@ -109,7 +110,7 @@ const ActionInput = () => {
       </div>
 
       <input
-        ref={inputRef}
+        ref={actionInputRef}
         className={`${
           isActive ? 'opacity-100' : 'opacity-50'
         } relative w-full h-full px-2 py-1 transition-all duration-150 ease-in-out bg-transparent rounded-sm rounded-b-none rounded-l-none placeholder-themeText2 text-themeText text-md focus:outline-none`}

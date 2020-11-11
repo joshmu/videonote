@@ -1,6 +1,6 @@
 import { StatusCodes } from 'http-status-codes'
 import Router from 'next/router'
-import { createContext, useContext, useEffect, useState } from 'react'
+import { createContext, useContext, useEffect, useRef, useState } from 'react'
 import Cookie from 'universal-cookie'
 
 import useGlobalKeydown from '@/hooks/useGlobalKeydown'
@@ -42,6 +42,7 @@ export function GlobalProvider({ serverData, ...props }) {
   const [sidebarOpen, setSidebarOpen] = useState(true)
   const [menuOpen, setMenuOpen] = useState(false)
   const [modalsOpen, setModalsOpen] = useState([])
+  const actionInputRef = useRef(null)
 
   const [admin, setAdmin] = useState(true)
 
@@ -641,6 +642,11 @@ export function GlobalProvider({ serverData, ...props }) {
     return admin || currentProject?.share.canEdit
   }
 
+  const actionInputFocus = () => {
+    console.log('autoFocus')
+    actionInputRef.current.focus()
+  }
+
   const value = {
     user,
     updateUser,
@@ -675,6 +681,8 @@ export function GlobalProvider({ serverData, ...props }) {
     shareProject,
     removeShareProject,
     checkCanEdit,
+    actionInputRef,
+    actionInputFocus,
   }
 
   return <globalContext.Provider value={value} {...props} />
