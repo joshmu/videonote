@@ -8,6 +8,7 @@ import { useNoteContext } from '@/context/noteContext'
 import { useVideoContext } from '@/context/videoContext'
 import { useIsMount } from '@/hooks/useIsMount'
 import TimeDisplay from '@/shared/TimeDisplay/TimeDisplay'
+
 import DisplayUser from './DisplayUser/DisplayUser'
 
 const NoteItem = ({ note, closestProximity, childVariants }) => {
@@ -97,7 +98,11 @@ const NoteItem = ({ note, closestProximity, childVariants }) => {
               state.done && !closestProximity && 'text-themeText2'
             } w-full h-full py-2 pl-2`}
           >
-            <DisplayUser noteUser={note.user} currentUser={user} />
+            <DisplayUser
+              noteUser={note.user}
+              currentUser={user}
+              currentSession={note?.currentSession}
+            />
             {isEditing ? (
               <input
                 type='text'

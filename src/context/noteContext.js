@@ -71,6 +71,7 @@ export function NoteProvider(props) {
     setSearch('')
   }, [projects])
 
+  // * addNote data flow updates state and redacts change if server responds with an error updating the db
   const addNote = note => {
     if (!checkCanEdit()) return
 
@@ -83,6 +84,10 @@ export function NoteProvider(props) {
     }
     // add user information if we have it
     if (user?._id) newNote.user = user._id
+
+    // temp flag for current user to detect their own notes if we have no user information
+    // * this is not saved to the db
+    newNote.currentSession = true
 
     console.log({ newNote })
     setNotes([...notes, newNote])
