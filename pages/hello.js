@@ -21,7 +21,7 @@ const HelloPage = () => {
 
       <Hero />
 
-      <div className='flex items-center w-full py-12 transition-colors duration-300 ease-in-out min-h-screenVh bg-themeBg'>
+      {/* <div classname='flex items-center w-full py-12 transition-colors duration-300 ease-in-out min-h-screenvh bg-themebg'>
         <div className='w-full mx-4 font-sans text-xl leading-8 tracking-tight md:text-2xl md:mx-auto md:w-3/4'>
           <div>
             <p>
@@ -60,7 +60,7 @@ const HelloPage = () => {
             </Link>
           </div>
         </div>
-      </div>
+      </div> */}
     </Layout>
   )
 }
