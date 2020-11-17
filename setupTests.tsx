@@ -22,6 +22,20 @@ export const setupTests = (() => {
     .fn()
     .mockImplementation(intersectionObserverMock)
 
+  // REACT-GA
+  /* ** uncomment if required
+  jest.mock('react-ga', () => {
+    const initialize = jest.fn()
+    const set = jest.fn()
+    const pageview = jest.fn()
+    return {
+      initialize,
+      set,
+      pageview,
+    }
+  })
+  */
+
   // FRAMER MOTION MOCK
   jest.mock('framer-motion', () => {
     // helper
@@ -56,10 +70,17 @@ export const setupTests = (() => {
       )),
     }
     const useAnimation = jest.fn(() => ({ start: () => null }))
+    const useTransform = jest.fn(() => null)
+    const useSpring = jest.fn(() => null)
+    const scrollYProgress = jest.fn(() => 0)
+    const useViewportScroll = jest.fn(() => ({ scrollYProgress }))
     return {
       AnimatePresence,
       motion,
+      useTransform,
+      useSpring,
       useAnimation,
+      useViewportScroll,
     }
   })
 

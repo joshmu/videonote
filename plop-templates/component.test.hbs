@@ -1,4 +1,4 @@
-// src/components/{{name}}/{{name}}.test.tsx
+// src/components/{{capitalize name}}/{{capitalize name}}.test.tsx
 
 // setupTests.tsx
 
@@ -6,12 +6,12 @@
 import { render, screen } from '@testing-library/react'
 
 // the component to test
-import { {{name}} } from './{{name}}'
+import { {{capitalize name}} } from './{{capitalize name}}'
 
-test('renders {{name}} component', () => {
+test('renders {{capitalize name}} component', () => {
   //render is from @testing-library/react
-  render(<{{name}} />)
+  render(<{{capitalize name}} />)
   //expect assertion is from Jest
   // todo: replace this assertion...
-  expect(screen.getByText(/{{name}}/)).toBeInTheDocument()
+  expect(screen.getByText(/{{capitalize name}}/)).toBeInTheDocument()
 })

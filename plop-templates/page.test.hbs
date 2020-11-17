@@ -1,0 +1,17 @@
+// src/tests/{{name}}.test.tsx
+
+import { axe, toHaveNoViolations } from 'jest-axe'
+
+import { render } from '@testing-library/react'
+
+import {{capitalize name}}Page from '@/pages/{{name}}'
+
+expect.extend(toHaveNoViolations)
+
+describe('{{capitalize name}} page', () => {
+  test('should have no accessibility violations', async () => {
+    const { container } = render(<{{capitalize name}}Page />)
+    const results = await axe(container)
+    expect(results).toHaveNoViolations()
+  })
+})

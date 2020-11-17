@@ -5,8 +5,8 @@
     "^@/shared/(.*)$": "<rootDir>/src/components/shared/$1",
     "^@/context/(.*)$": "<rootDir>/src/context/$1",
     "^@/hooks/(.*)$": "<rootDir>/src/hooks/$1",
-    "^@/pages/(.*)$": "<rootDir>/src/pages/$1",
-    "^@/api/(.*)$": "<rootDir>/src/pages/api/$1",
+    "^@/pages/(.*)$": "<rootDir>/pages/$1",
+    "^@/api/(.*)$": "<rootDir>/pages/api/$1",
     "^@/services/(.*)$": "<rootDir>/src/services/$1",
     "^@/utils/(.*)$": "<rootDir>/utils/$1",
     "^@/styles/(.*)$": "<rootDir>/styles/$1"
