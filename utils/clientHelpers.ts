@@ -1,6 +1,15 @@
 import Cookies from 'universal-cookie'
 import isEmail from 'validator/lib/isEmail'
 
+type IsValidCredentialsType = {
+  email: string
+  username?: string
+  password?: string
+  password2?: string
+  passwordRequired?: boolean
+  addAlert: (a: object) => {}
+}
+
 export const isValidCredentials = ({
   email,
   username = email,
@@ -8,18 +17,14 @@ export const isValidCredentials = ({
   password2 = password,
   passwordRequired = true,
   addAlert,
-}) => {
-  const validEmail = isEmail(email)
-  const validUsername = username.length >= 3
-  const validPassword = password.length >= 5
-  const validPasswordMatch = password === password2
+}: IsValidCredentialsType): boolean => {
   let isValid = true
 
-  if (!validEmail) {
+  if (!checkEmail(email)) {
     addAlert({ type: 'error', msg: 'Email in invalid.' })
     isValid = false
   }
-  if (!validUsername) {
+  if (!checkUsername(username)) {
     addAlert({
       type: 'error',
       msg: 'Username must be at least 3 characters long',
@@ -27,14 +32,14 @@ export const isValidCredentials = ({
     isValid = false
   }
   if (passwordRequired) {
-    if (!validPassword) {
+    if (!checkPassword(password)) {
       addAlert({
         type: 'error',
         msg: 'Password needs to be at least 5 characters long.',
       })
       isValid = false
     }
-    if (!validPasswordMatch) {
+    if (!checkPasswordMatch(password, password2)) {
       addAlert({ type: 'error', msg: 'Passwords do not match.' })
       isValid = false
     }
@@ -43,19 +48,39 @@ export const isValidCredentials = ({
   return isValid
 }
 
-export const handleJwtToken = token => {
+export const checkEmail = (txt: string): boolean => {
+  return isEmail(txt)
+}
+export const checkUsername = (txt: string): boolean => {
+  return txt.length > 5
+}
+export const checkPassword = (txt: string): boolean => {
+  return txt.length > 5
+}
+export const checkPasswordMatch = (
+  password1: string,
+  password2: string
+): boolean => {
+  return password1 === password2
+}
+
+export const handleJwtToken = (token: string): void => {
   // save token in cookie for subsequent requests
   const cookies = new Cookies()
   cookies.set('token', token, { path: '/' })
 }
 
-export const fetcher = async (url, body, token = false) => {
+export const fetcher = async (
+  url: string,
+  body: object,
+  token: string | boolean = false
+) => {
   if (!token) {
     const cookies = new Cookies()
     token = cookies.get('token')
   }
 
-  const headers = {
+  const headers: { [key: string]: string } = {
     'Content-Type': 'application/json',
   }
   // include 'token' in the header if we have one available
@@ -73,7 +98,7 @@ export const fetcher = async (url, body, token = false) => {
   return { res, data }
 }
 
-export const formatDuration = secStr => {
+export const formatDuration = (secStr: string): string => {
   const totalSecs = +secStr
   const sec = Math.floor(totalSecs % 60)
   const min = Math.floor(totalSecs / 60)
