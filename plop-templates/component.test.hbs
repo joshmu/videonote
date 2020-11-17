@@ -1,0 +1,17 @@
+// src/components/{{name}}/{{name}}.test.tsx
+
+// setupTests.tsx
+
+// import react-testing methods
+import { render, screen } from '@testing-library/react'
+
+// the component to test
+import { {{name}} } from './{{name}}'
+
+test('renders {{name}} component', () => {
+  //render is from @testing-library/react
+  render(<{{name}} />)
+  //expect assertion is from Jest
+  // todo: replace this assertion...
+  expect(screen.getByText(/{{name}}/)).toBeInTheDocument()
+})

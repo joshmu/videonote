@@ -5,8 +5,8 @@ import { MdSettings as MenuIcon } from 'react-icons/md'
 
 import { useGlobalContext } from '@/context/globalContext'
 
-import Menu from './Menu/Menu'
-import Search from './Search/Search'
+import Menu from '../Menu/Menu'
+import Search from '../Search/Search'
 
 const SidebarHeader = () => {
   const {

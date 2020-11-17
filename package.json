@@ -10,7 +10,12 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "prod": "next build && next start"
+    "prod": "next build && next start",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage",
+    "postinstall": "husky install",
+    "plop": "plop"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
@@ -34,16 +39,24 @@
     "validator": "^13.1.17"
   },
   "devDependencies": {
+    "@testing-library/jest-dom": "^5.11.6",
+    "@testing-library/react": "^11.1.2",
+    "@testing-library/user-event": "^12.2.2",
+    "@types/node": "^14.14.7",
+    "@types/react": "^16.9.56",
     "babel-plugin-transform-remove-console": "^6.9.4",
+    "husky": "^4.3.0",
     "imagemin-mozjpeg": "^9.0.0",
     "imagemin-optipng": "^8.0.0",
     "imagemin-svgo": "^8.0.0",
     "next-compose-plugins": "^2.2.0",
     "next-optimized-images": "^2.6.2",
+    "plop": "^2.7.4",
     "postcss-preset-env": "^6.7.0",
     "sass": "^1.26.11",
     "tailwindcss": "^1.8.10",
-    "tailwindcss-debug-screens": "^1.1.0"
+    "tailwindcss-debug-screens": "^1.1.0",
+    "typescript": "^4.0.5"
   },
   "keywords": [
     "videonote",

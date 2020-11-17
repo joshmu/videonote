@@ -6,7 +6,7 @@ import { useGlobalContext } from '@/context/globalContext'
 import { useResizable } from '@/hooks/useResizable'
 
 import RemoveNotes from './RemoveNotes/RemoveNotes'
-import SidebarHeader from './SidebarHeader'
+import SidebarHeader from './SidebarHeader/SidebarHeader'
 
 export default function Sidebar(props) {
   const {

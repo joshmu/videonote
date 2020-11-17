@@ -1,11 +1,13 @@
-import { ThemeProvider } from '../src/context/themeContext'
-import { NotificationProvider } from '@/context/notificationContext'
-
-import { AnimatePresence } from 'framer-motion'
-
 import '@/styles/globals.scss'
 
-function MyApp({ Component, pageProps, router }) {
+import { AnimatePresence } from 'framer-motion'
+import { AppProps } from 'next/app'
+
+import { NotificationProvider } from '@/context/notificationContext'
+
+import { ThemeProvider } from '../src/context/themeContext'
+
+const MyApp = ({ Component, pageProps, router }: AppProps) => {
   return (
     <NotificationProvider>
       <ThemeProvider>

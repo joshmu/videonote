@@ -1,0 +1,15 @@
+{
+  "moduleNameMapper": {
+    "^@/layout/(.*)$": "<rootDir>/src/components/Layout/$1",
+    "^@/components/(.*)$": "<rootDir>/src/components/$1",
+    "^@/shared/(.*)$": "<rootDir>/src/components/shared/$1",
+    "^@/context/(.*)$": "<rootDir>/src/context/$1",
+    "^@/hooks/(.*)$": "<rootDir>/src/hooks/$1",
+    "^@/pages/(.*)$": "<rootDir>/src/pages/$1",
+    "^@/api/(.*)$": "<rootDir>/src/pages/api/$1",
+    "^@/services/(.*)$": "<rootDir>/src/services/$1",
+    "^@/utils/(.*)$": "<rootDir>/utils/$1",
+    "^@/styles/(.*)$": "<rootDir>/styles/$1"
+  },
+  "setupFilesAfterEnv": ["<rootDir>/setupTests.tsx"]
+}

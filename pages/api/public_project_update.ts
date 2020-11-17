@@ -1,8 +1,9 @@
 import { StatusCodes } from 'http-status-codes'
+import { NextApiRequest, NextApiResponse } from 'next'
 
 import { Project } from '@/utils/mongoose'
 
-export default async (req, res) => {
+export default async (req: NextApiRequest, res: NextApiResponse) => {
   // project
   const { project } = req.body
 
