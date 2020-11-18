@@ -48,7 +48,10 @@ export function VideoProvider(props) {
   const [volume, setVolume] = useState<number>(0.75)
   const [playbackRate, setPlaybackRate] = useState<number>(1)
   const [duration, setDuration] = useState<number>(null!)
-  const [progress, setProgress] = useState<ProgressInterface>(null!)
+  // todo: this type cast is incorrect and null conditionals need to be checked in useNoteProximity
+  const [progress, setProgress] = useState<ProgressInterface>(
+    {} as ProgressInterface
+  )
 
   const [action, setAction] = useAnounceAction('')
   const isMount = useIsMount()
