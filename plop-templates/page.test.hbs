@@ -1,4 +1,4 @@
-// src/tests/{{name}}.test.tsx
+// src/__test__/{{name}}.test.tsx
 
 import { axe, toHaveNoViolations } from 'jest-axe'
 
@@ -8,10 +8,15 @@ import {{capitalize name}}Page from '@/pages/{{name}}'
 
 expect.extend(toHaveNoViolations)
 
-describe('{{capitalize name}} page', () => {
+describe('Index page', () => {
   test('should have no accessibility violations', async () => {
     const { container } = render(<{{capitalize name}}Page />)
     const results = await axe(container)
     expect(results).toHaveNoViolations()
+  })
+
+  xtest('matches snapshot', () => {
+    const { asFragment } = render(<{{capitalize name}}Page />)
+    expect(asFragment()).toMatchSnapshot()
   })
 })

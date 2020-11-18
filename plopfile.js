@@ -20,7 +20,7 @@ const createPage = {
 
 const createPageTest = {
   type: 'add',
-  path: 'src/tests/{{name}}.test.tsx',
+  path: 'src/__test__/{{name}}.test.tsx',
   templateFile: 'plop-templates/page.test.hbs',
 }
 

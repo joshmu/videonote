@@ -23,7 +23,7 @@ export const setupTests = (() => {
     .mockImplementation(intersectionObserverMock)
 
   // REACT-GA
-  /* ** uncomment if required
+  /*
   jest.mock('react-ga', () => {
     const initialize = jest.fn()
     const set = jest.fn()

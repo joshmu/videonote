@@ -7,10 +7,10 @@
       "@/shared/*": ["src/components/shared/*"],
       "@/context/*": ["src/context/*"],
       "@/hooks/*": ["src/hooks/*"],
+      "@/styles/*": ["src/styles/*"],
       "@/pages/*": ["pages/*"],
       "@/api/*": ["pages/api/*"],
       "@/utils/*": ["utils/*"],
-      "@/styles/*": ["styles/*"],
       "@/root/*": ["./*"]
     },
     "checkJs": true,

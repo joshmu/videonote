@@ -9,7 +9,7 @@
     "^@/api/(.*)$": "<rootDir>/pages/api/$1",
     "^@/services/(.*)$": "<rootDir>/src/services/$1",
     "^@/utils/(.*)$": "<rootDir>/utils/$1",
-    "^@/styles/(.*)$": "<rootDir>/styles/$1"
+    "^@/styles/(.*)$": "<rootDir>/src/styles/$1"
   },
-  "setupFilesAfterEnv": ["<rootDir>/setupTests.tsx"]
+  "setupFilesAfterEnv": ["<rootDir>/src/__test__/setupTests.tsx"]
 }
