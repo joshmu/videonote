@@ -89,7 +89,7 @@ import { fetcher } from '@/utils/clientHelpers'
 
 // todo: welcome email when joining videonote
 
-export default function Main({ serverData }) {
+const IndexPage = ({ serverData = {} }) => {
   return (
     <GlobalProvider serverData={serverData}>
       <VideoProvider>
@@ -112,7 +112,7 @@ export default function Main({ serverData }) {
   )
 }
 
-Main.getInitialProps = async ctx => {
+IndexPage.getInitialProps = async ctx => {
   const cookies = new Cookies(
     ctx?.req?.headers?.cookie ? ctx.req.headers.cookie : null
   )
@@ -145,3 +145,5 @@ Main.getInitialProps = async ctx => {
 
   return { serverData: data }
 }
+
+export default IndexPage

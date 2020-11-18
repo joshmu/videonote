@@ -2,6 +2,7 @@
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
+      "@/root/*": ["./*"],
       "@/layout/*": ["src/components/Layout/*"],
       "@/components/*": ["src/components/*"],
       "@/shared/*": ["src/components/shared/*"],
@@ -10,8 +11,7 @@
       "@/styles/*": ["src/styles/*"],
       "@/pages/*": ["pages/*"],
       "@/api/*": ["pages/api/*"],
-      "@/utils/*": ["utils/*"],
-      "@/root/*": ["./*"]
+      "@/utils/*": ["utils/*"]
     },
     "checkJs": true,
     "jsx": "preserve"

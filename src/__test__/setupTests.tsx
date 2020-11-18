@@ -84,6 +84,12 @@ export const setupTests = (() => {
     }
   })
 
+  // TW CONFIG
+  jest.mock('@/root/tailwind.config', () => {
+    const config = jest.fn(() => ({}))
+    return config
+  })
+
   // GLOBAL CONTEXT
   jest.mock('@/context/GlobalContext', () => {
     const scrollProgress = 0

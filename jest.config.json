@@ -1,5 +1,6 @@
 {
   "moduleNameMapper": {
+    "^@/root/(.*)$": "<rootDir>/$1",
     "^@/layout/(.*)$": "<rootDir>/src/components/Layout/$1",
     "^@/components/(.*)$": "<rootDir>/src/components/$1",
     "^@/shared/(.*)$": "<rootDir>/src/components/shared/$1",
@@ -9,7 +10,8 @@
     "^@/api/(.*)$": "<rootDir>/pages/api/$1",
     "^@/services/(.*)$": "<rootDir>/src/services/$1",
     "^@/utils/(.*)$": "<rootDir>/utils/$1",
-    "^@/styles/(.*)$": "<rootDir>/src/styles/$1"
+    "^@/styles/(.*)$": "<rootDir>/src/styles/$1",
+    "\\.(scss|sass|css)$": "identity-obj-proxy"
   },
   "setupFilesAfterEnv": ["<rootDir>/src/__test__/setupTests.tsx"]
 }
