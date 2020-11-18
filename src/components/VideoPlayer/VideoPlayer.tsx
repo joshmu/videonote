@@ -1,8 +1,7 @@
-import { motion } from 'framer-motion'
+import { motion, Variants } from 'framer-motion'
 import { useEffect, useState } from 'react'
 import ReactPlayer from 'react-player'
 
-import { useGlobalContext } from '@/context/globalContext'
 import { useVideoContext } from '@/context/videoContext'
 import { useIsMount } from '@/hooks/useIsMount'
 
@@ -10,7 +9,22 @@ import ActionInput from '../ActionInput/ActionInput'
 import Loader from '../shared/Loader/Loader'
 import style from './videoPlayer.module.scss'
 
-export default function VideoPlayer() {
+const videoContentVariants: Variants = {
+  initial: {
+    opacity: 0,
+    // x: '-100%',
+  },
+  animate: {
+    opacity: 1,
+    // x: 0,
+  },
+  exit: {
+    opacity: 0,
+    // x: '-100%',
+  },
+}
+
+export const VideoPlayer = () => {
   const {
     url,
     playing,
@@ -23,7 +37,7 @@ export default function VideoPlayer() {
   } = useVideoContext()
 
   const isMount = useIsMount()
-  const [isLoading, setIsLoading] = useState(false)
+  const [isLoading, setIsLoading] = useState<boolean>(false)
 
   useEffect(() => {
     if (isMount) return
@@ -31,24 +45,9 @@ export default function VideoPlayer() {
     if (typeof url === 'string' && url.length > 0) setIsLoading(true)
   }, [url, isMount])
 
-  const preHandleReady = reactPlayer => {
+  const preHandleReady = (reactPlayer: ReactPlayer) => {
     handleReady(reactPlayer)
     setIsLoading(false)
-  }
-
-  const videoContentVariants = {
-    initial: {
-      opacity: 0,
-      // x: '-100%',
-    },
-    animate: {
-      opacity: 1,
-      // x: 0,
-    },
-    exit: {
-      opacity: 0,
-      // x: '-100%',
-    },
   }
 
   return (

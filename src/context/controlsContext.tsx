@@ -1,17 +1,23 @@
 import { createContext, useContext, useState } from 'react'
 
+import { NoteInterface } from '@/shared/interfaces'
+
 import useGlobalKeydown from '../hooks/useGlobalKeydown'
 import { useGlobalContext } from './globalContext'
 import { useNoteContext } from './noteContext'
 import { useVideoContext } from './videoContext'
 
-const controlsContext = createContext({
-  smartControls: a => {},
-  isSmartControlsEnabled: true,
-  toggleSmartControls: (a = undefined) => {},
-})
+type SmartControlsType = (key: string, keypressed: string[]) => void
+type ToggleSmartControlsType = (a?: boolean) => void
+interface ControlsContextInterface {
+  smartControls: SmartControlsType
+  isSmartControlsEnabled: boolean
+  toggleSmartControls: ToggleSmartControlsType
+}
 
-export function ControlsProvider(props) {
+const controlsContext = createContext<ControlsContextInterface>(null!)
+
+export function ControlsProvider(props: { [key: string]: any }) {
   const { toggleSidebar, toggleMenuOpen, settings } = useGlobalContext()
   const {
     togglePlay,
@@ -25,7 +31,7 @@ export function ControlsProvider(props) {
 
   const [isSmartControlsEnabled, setIsSmartControlsEnabled] = useState(true)
 
-  const smartControls = (key, keysPressed) => {
+  const smartControls: SmartControlsType = (key, keysPressed) => {
     if (!isSmartControlsEnabled) return
 
     if (key === ' ') {
@@ -81,7 +87,7 @@ export function ControlsProvider(props) {
 
   useGlobalKeydown(smartControls)
 
-  const toggleSmartControls = isEnabled => {
+  const toggleSmartControls: ToggleSmartControlsType = isEnabled => {
     // don't do anything if already enabled
     if (isEnabled === isSmartControlsEnabled) return
 
@@ -93,7 +99,7 @@ export function ControlsProvider(props) {
     })
   }
 
-  const nextPrevNote = (direction = 'next') => {
+  const nextPrevNote = (direction: 'next' | 'prev' = 'next'): NoteInterface => {
     // sort via time
     const sortedNotes = notes.sort((a, b) => a.time - b.time)
     const currentIndex = sortedNotes.findIndex(
@@ -112,7 +118,7 @@ export function ControlsProvider(props) {
     return sortedNotes[idx]
   }
 
-  const value = {
+  const value: ControlsContextInterface = {
     smartControls,
     isSmartControlsEnabled,
     toggleSmartControls,
@@ -121,6 +127,6 @@ export function ControlsProvider(props) {
   return <controlsContext.Provider value={value} {...props} />
 }
 
-export function useControlsContext() {
+export const useControlsContext = (): ControlsContextInterface => {
   return useContext(controlsContext)
 }

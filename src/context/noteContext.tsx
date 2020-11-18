@@ -2,24 +2,36 @@ import mongoose from 'mongoose'
 import { createContext, useContext, useEffect, useRef, useState } from 'react'
 
 import { useIsMount } from '@/hooks/useIsMount'
-import useNoteProximity from '@/hooks/useNoteProximity'
+import { useNoteProximity } from '@/hooks/useNoteProximity'
+import { NoteInterface } from '@/shared/interfaces'
 
 import { useGlobalContext } from './globalContext'
 import { useVideoContext } from './videoContext'
 
 const createMongooseId = () => new mongoose.Types.ObjectId().toString()
 
-const noteContext = createContext({
-  notes: [],
-  addNote: a => {},
-  removeNote: a => {},
-  updateSearch: a => {},
-  sort: a => [],
-  search: '',
-  removeCompleted: () => {},
-})
+type AddNoteType = (note: NoteInterface) => void
+type UpdateNoteType = (note: NoteInterface) => void
+type RemoveNoteType = (id: string) => void
+type UpdateSearchType = (txt: string) => void
+type SortType = (notes: NoteInterface[]) => NoteInterface[]
+type RemoveCompletedType = () => void
+interface NoteContextInterface {
+  notes: NoteInterface[]
+  addNote: AddNoteType
+  updateNote: UpdateNoteType
+  removeNote: RemoveNoteType
+  updateSearch: UpdateSearchType
+  sort: SortType
+  search: string
+  removeCompleted: RemoveCompletedType
+  checkProximity: (note: NoteInterface) => boolean
+  currentNote: NoteInterface | null
+}
 
-export function NoteProvider(props) {
+const noteContext = createContext<NoteContextInterface>(null!)
+
+export function NoteProvider(props: { [key: string]: any }) {
   const {
     project,
     projects,
@@ -32,10 +44,10 @@ export function NoteProvider(props) {
     user,
   } = useGlobalContext()
   const { progress } = useVideoContext()
-  const [notes, setNotes] = useState([])
-  const [search, setSearch] = useState('')
+  const [notes, setNotes] = useState<NoteInterface[]>([])
+  const [search, setSearch] = useState<string>('')
   // use ref to detect when a project is switch and notes are reset to avoid additional call to update state when listening to notes changes
-  const isLoadingNotesRef = useRef(true)
+  const isLoadingNotesRef = useRef<boolean>(true)
 
   const { currentNote, checkProximity } = useNoteProximity({ notes, progress })
   const isMount = useIsMount()
@@ -72,10 +84,10 @@ export function NoteProvider(props) {
   }, [projects])
 
   // * addNote data flow updates state and redacts change if server responds with an error updating the db
-  const addNote = note => {
+  const addNote: AddNoteType = note => {
     if (!checkCanEdit()) return
 
-    const newNote = {
+    const newNote: NoteInterface = {
       _id: createMongooseId(),
       content: note.content,
       time: note.time,
@@ -91,7 +103,7 @@ export function NoteProvider(props) {
 
     console.log({ newNote })
     setNotes([...notes, newNote])
-    noteApi(newNote).then(responseNote => {
+    noteApi(newNote).then((responseNote: NoteInterface | 'error') => {
       if (responseNote === 'error') {
         // remove newly added note
         setNotes(current => {
@@ -102,10 +114,10 @@ export function NoteProvider(props) {
     })
   }
 
-  const updateNote = note => {
+  const updateNote: UpdateNoteType = note => {
     const oldNote = notes.find(n => n._id === note._id)
     console.log('update the note', note)
-    noteApi(note).then(res => {
+    noteApi(note).then((res: 'error') => {
       if (res === 'error') {
         // if we have server error return original note
         return updateNoteState(oldNote)
@@ -116,24 +128,24 @@ export function NoteProvider(props) {
     })
   }
 
-  const updateNoteState = updatedNote => {
-    setNotes(current => {
+  const updateNoteState = (updatedNote: NoteInterface): void => {
+    setNotes(() => {
       return notes.map(note => {
         return updatedNote._id === note._id ? updatedNote : note
       })
     })
   }
 
-  const removeNote = _id => {
+  const removeNote = (_id: string): void => {
     const updatedNotes = notes.filter(note => note._id !== _id)
     setNotes(updatedNotes)
   }
 
-  const updateSearch = txt => {
+  const updateSearch: UpdateSearchType = txt => {
     setSearch(txt)
   }
 
-  const sort = notes => {
+  const sort: SortType = notes => {
     // default is to sort chronologically
     let sorted = notes.sort((p, c) => p.time - c.time)
 
@@ -145,13 +157,13 @@ export function NoteProvider(props) {
     return sorted
   }
 
-  const removeCompleted = async () => {
+  const removeCompleted: RemoveCompletedType = async () => {
     // * we wait for server response before setting state, this is different to standard single note crud operations
     const updatedNotes = await noteApiRemoveDoneNotes()
     setNotes(updatedNotes)
   }
 
-  const value = {
+  const value: NoteContextInterface = {
     notes,
     addNote,
     updateNote,

@@ -1,4 +1,4 @@
-import { motion } from 'framer-motion'
+import { motion, Variants } from 'framer-motion'
 import { useEffect } from 'react'
 
 import NoteList from '@/components/NoteList/NoteList'
@@ -8,7 +8,22 @@ import { useResizable } from '@/hooks/useResizable'
 import RemoveNotes from './RemoveNotes/RemoveNotes'
 import SidebarHeader from './SidebarHeader/SidebarHeader'
 
-export default function Sidebar(props) {
+const sidebarVariants: Variants = {
+  initial: {
+    opacity: 0,
+    x: '100%',
+  },
+  animate: {
+    opacity: 1,
+    x: 0,
+  },
+  exit: {
+    opacity: 0,
+    x: '100%',
+  },
+}
+
+export const Sidebar = (props: { [key: string]: any }) => {
   const {
     menuOpen,
     settings,
@@ -38,21 +53,6 @@ export default function Sidebar(props) {
     console.log('fire from sidebar')
     updateSettings({ sidebarWidth: resizeState.size })
   }, [resizeState])
-
-  const sidebarVariants = {
-    initial: {
-      opacity: 0,
-      x: '100%',
-    },
-    animate: {
-      opacity: 1,
-      x: 0,
-    },
-    exit: {
-      opacity: 0,
-      x: '100%',
-    },
-  }
 
   return (
     <motion.div

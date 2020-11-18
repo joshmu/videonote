@@ -1,6 +1,15 @@
 import { useEffect, useState } from 'react'
-const useNoteProximity = ({ notes, progress }) => {
-  const [currentNote, setCurrentNote] = useState(null)
+
+import { NoteInterface } from '@/shared/interfaces'
+
+export const useNoteProximity = ({
+  notes,
+  progress,
+}: {
+  notes: NoteInterface[]
+  progress: { playedSeconds: number }
+}) => {
+  const [currentNote, setCurrentNote] = useState<NoteInterface | null>(null)
 
   // detect closest todo to current play position
   useEffect(() => {
@@ -22,10 +31,8 @@ const useNoteProximity = ({ notes, progress }) => {
     }
   }, [progress.playedSeconds])
 
-  const checkProximity = note =>
+  const checkProximity = (note: NoteInterface): boolean =>
     currentNote !== null && currentNote._id === note._id
 
   return { currentNote, checkProximity }
 }
-
-export default useNoteProximity
