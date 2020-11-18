@@ -10,7 +10,6 @@ import { ReactPlayerProps } from 'react-player'
 
 type SeekToType = (secs: number, settings?: { offset?: boolean }) => void
 interface VideoContextInterface {
-  ready: boolean
   playing: boolean
   volume: number
   setVolume: (vol: number) => void
@@ -27,11 +26,13 @@ interface VideoContextInterface {
   seekTo: SeekToType
   playerRef: ReactPlayerProps
   handlePlayerError: (error: any) => void
+  jumpBack: () => void
+  jumpForward: () => void
 }
 
 const videoContext = createContext<VideoContextInterface>(null!)
 
-export function VideoProvider(props) {
+export const VideoProvider = (props: { [key: string]: any }) => {
   const {
     project,
     updateProject,

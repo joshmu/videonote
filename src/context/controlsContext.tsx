@@ -24,7 +24,6 @@ export function ControlsProvider(props: { [key: string]: any }) {
     jumpBack,
     jumpForward,
     changeVolume,
-    progress,
     seekTo,
   } = useVideoContext()
   const { notes, currentNote } = useNoteContext()
@@ -99,6 +98,7 @@ export function ControlsProvider(props: { [key: string]: any }) {
     })
   }
 
+  // todo: ts enum?
   const nextPrevNote = (direction: 'next' | 'prev' = 'next'): NoteInterface => {
     // sort via time
     const sortedNotes = notes.sort((a, b) => a.time - b.time)

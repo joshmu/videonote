@@ -1,16 +1,27 @@
 import { nanoid } from 'nanoid'
-import React, { createContext, useContext, useState } from 'react'
+import React, { ReactNode, createContext, useContext, useState } from 'react'
 
-const notificationContext = createContext({
-  alerts: [],
-  addAlert: ({}) => {},
-  removeAlert: id => {},
-})
+type AddAlertType = (alert: AlertInterface) => string
+type RemoveAlertType = (id: string) => void
+interface NotificationContextInterface {
+  alerts: AlertInterface[]
+  addAlert: AddAlertType
+  removeAlert: RemoveAlertType
+}
+interface AlertInterface {
+  id?: string
+  msg: string
+  type?: 'info' | 'warning' | 'error' | 'success'
+  duration?: number
+  persistent?: boolean
+}
 
-export const NotificationProvider = ({ children }) => {
-  const [alerts, setAlerts] = useState([])
+const notificationContext = createContext<NotificationContextInterface>(null!)
 
-  const addAlert = ({
+export const NotificationProvider = ({ children }: { children: ReactNode }) => {
+  const [alerts, setAlerts] = useState<AlertInterface[]>([])
+
+  const addAlert: AddAlertType = ({
     msg,
     type = 'info',
     duration = 8000,
@@ -43,12 +54,12 @@ export const NotificationProvider = ({ children }) => {
     return id
   }
 
-  const removeAlert = id => {
+  const removeAlert: RemoveAlertType = id => {
     const updatedAlerts = alerts.filter(alert => alert.id !== id)
     setAlerts(updatedAlerts)
   }
 
-  const value = {
+  const value: NotificationContextInterface = {
     alerts,
     addAlert,
     removeAlert,
@@ -61,4 +72,5 @@ export const NotificationProvider = ({ children }) => {
   )
 }
 
-export const useNotificationContext = () => useContext(notificationContext)
+export const useNotificationContext = (): NotificationContextInterface =>
+  useContext(notificationContext)

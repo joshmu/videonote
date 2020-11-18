@@ -1,13 +1,16 @@
 import { createContext, useContext, useEffect, useState } from 'react'
 
-import useSetVh from '@/hooks/useSetVh'
+import { useSetVh } from '@/hooks/useSetVh'
 
-const themeContext = createContext({
-  theme: '',
-  toggleTheme: () => {},
-})
+interface ThemeContextInterface {
+  theme: string
+  toggleTheme: () => void
+  THEME_TYPES: { [key: string]: string }
+}
 
-const LOCALSTORAGE_KEY = 'vn:theme'
+const themeContext = createContext<ThemeContextInterface>(null!)
+
+const LOCALSTORAGE_KEY: string = 'vn:theme'
 const THEME_TYPES = {
   dark: 'theme-dark',
   light: 'theme-light',
@@ -15,11 +18,11 @@ const THEME_TYPES = {
   hot: 'theme-hot',
 }
 
-export function ThemeProvider(props) {
+export const ThemeProvider = (props: { [key: string]: string }) => {
   // define vh via --vh var to avoid viewport issues on mobile
   useSetVh()
 
-  const [theme, setTheme] = useState(Object.keys(THEME_TYPES)[0])
+  const [theme, setTheme] = useState<string>(Object.keys(THEME_TYPES)[0])
 
   // initial theme
   useEffect(() => {
@@ -60,7 +63,7 @@ export function ThemeProvider(props) {
     window.localStorage.setItem(LOCALSTORAGE_KEY, newThemeId)
   }
 
-  const value = {
+  const value: ThemeContextInterface = {
     theme,
     toggleTheme,
     THEME_TYPES,
