@@ -46,3 +46,10 @@ export interface ShareProjectInterface {
   password?: string
   canEdit?: boolean
 }
+
+export interface ProgressInterface {
+  playedSeconds: number
+  played: number
+  loadedSeconds: number
+  loaded: number
+}
