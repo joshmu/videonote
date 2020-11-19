@@ -35,12 +35,18 @@ const SidebarHeader = () => {
         {/* arrow slider icon */}
         {projects.length > 0 && (
           <div
-            onClick={toggleOpen}
-            className={`${
-              sidebarOpen ? 'rotate-0' : 'rotate-180 -translate-x-full'
-            } relative text-4xl mr-2 transform text-themeAccent2 z-10 bg-transparent transition-all hover:text-themeAccent duration-500 ease-in-out cursor-pointer`}
+            className={`relative text-4xl mr-2 text-themeAccent2 z-10 transition-all hover:text-themeAccent duration-200 ease-in-out cursor-pointer`}
           >
-            <ArrowIcon className='fill-current' />
+            <motion.div
+              onClick={toggleOpen}
+              style={{
+                rotate: sidebarOpen ? 0 : 180,
+                translateX: sidebarOpen ? 0 : '-100%',
+              }}
+              transition={{ duration: 0.5 }}
+            >
+              <ArrowIcon className='fill-current' />
+            </motion.div>
           </div>
         )}
 

@@ -25,11 +25,9 @@ const sidebarVariants: Variants = {
 
 export const Sidebar = (props: { [key: string]: any }) => {
   const {
-    menuOpen,
     settings,
     updateSettings,
     sidebarOpen,
-    toggleSidebar,
     SETTINGS_DEFAULTS,
     admin,
   } = useGlobalContext()

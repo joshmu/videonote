@@ -1,24 +1,33 @@
 import { createContext, useContext, useState } from 'react'
 
-import { NoteInterface } from '@/shared/interfaces'
-
 import useGlobalKeydown from '../hooks/useGlobalKeydown'
 import { useGlobalContext } from './globalContext'
 import { useNoteContext } from './noteContext'
 import { useVideoContext } from './videoContext'
 
-type SmartControlsType = (key: string, keypressed: string[]) => void
+type ControlsType = (key: string, keypressed: string[]) => void
 type ToggleSmartControlsType = (a?: boolean) => void
 interface ControlsContextInterface {
-  smartControls: SmartControlsType
+  smartControls: ControlsType
   isSmartControlsEnabled: boolean
   toggleSmartControls: ToggleSmartControlsType
+}
+enum Key {
+  SPACE = ' ',
+  LEFT = 'ArrowLeft',
+  RIGHT = 'ArrowRight',
+  UP = 'ArrowUp',
+  DOWN = 'ArrowDown',
+  CMD = 'Meta',
+  SHIFT = 'Shift',
+  ALT = 'Alt',
+  ESC = 'Escape',
 }
 
 const controlsContext = createContext<ControlsContextInterface>(null!)
 
 export function ControlsProvider(props: { [key: string]: any }) {
-  const { toggleSidebar, toggleMenuOpen, settings } = useGlobalContext()
+  const { toggleSidebar, toggleMenuOpen, cancelModals } = useGlobalContext()
   const {
     togglePlay,
     jumpBack,
@@ -28,62 +37,51 @@ export function ControlsProvider(props: { [key: string]: any }) {
   } = useVideoContext()
   const { notes, currentNote } = useNoteContext()
 
-  const [isSmartControlsEnabled, setIsSmartControlsEnabled] = useState(true)
+  const [isSmartControlsEnabled, setIsSmartControlsEnabled] = useState<boolean>(
+    true
+  )
 
-  const smartControls: SmartControlsType = (key, keysPressed) => {
-    if (!isSmartControlsEnabled) return
-
-    if (key === ' ') {
-      if (keysPressed.includes('Shift')) {
-        toggleSidebar()
-      } else {
-        console.log('play/pause')
-        togglePlay()
-      }
-    }
-
-    if (key === 'ArrowLeft') {
-      if (keysPressed.includes('Shift')) {
-        console.log('note: jump prev note')
-        const note = nextPrevNote('prev')
-        console.log({ note })
-        seekTo(note.time, { offset: false })
-      } else {
-        jumpBack()
-      }
-    }
-
-    if (key === 'ArrowRight') {
-      if (keysPressed.includes('Shift')) {
-        console.log('note: jump next note')
-        const note = nextPrevNote('next')
-        console.log({ note })
-        seekTo(note.time, { offset: false })
-      } else {
-        jumpForward()
-      }
-    }
-
-    if (key === 'ArrowUp') {
-      changeVolume(0.1)
-    }
-
-    if (key === 'ArrowDown') {
-      changeVolume(-0.1)
-    }
-
-    // CMD + SHIFT
-    if (keysPressed.includes('Meta')) {
-      if (key === 'Shift') {
-        toggleSidebar()
-      }
-    }
-
-    if (key === 'Alt') {
-      toggleMenuOpen()
+  const globalControls: ControlsType = (key, _keysPressed) => {
+    switch (key) {
+      case Key.ESC:
+        cancelModals()
+        break
+      default:
     }
   }
 
+  const smartControls: ControlsType = (key, keysPressed) => {
+    if (!isSmartControlsEnabled) return
+
+    switch (key) {
+      case Key.SPACE:
+        keysPressed.includes(Key.SHIFT) ? toggleSidebar() : togglePlay()
+        break
+      case Key.LEFT:
+        keysPressed.includes(Key.SHIFT) ? nextPrevNote('prev') : jumpBack()
+        break
+      case Key.RIGHT:
+        keysPressed.includes(Key.SHIFT) ? nextPrevNote('next') : jumpForward()
+        break
+      case Key.UP:
+        changeVolume(0.1)
+        break
+      case Key.DOWN:
+        changeVolume(-0.1)
+        break
+      case Key.ALT:
+        toggleMenuOpen()
+        break
+      case Key.ESC:
+        cancelModals()
+        break
+      default:
+      // console.log('unused key', { key })
+    }
+  }
+
+  // add listeners
+  useGlobalKeydown(globalControls)
   useGlobalKeydown(smartControls)
 
   const toggleSmartControls: ToggleSmartControlsType = isEnabled => {
@@ -98,8 +96,7 @@ export function ControlsProvider(props: { [key: string]: any }) {
     })
   }
 
-  // todo: ts enum?
-  const nextPrevNote = (direction: 'next' | 'prev' = 'next'): NoteInterface => {
+  const nextPrevNote = (direction: 'next' | 'prev' = 'next'): void => {
     // sort via time
     const sortedNotes = notes.sort((a, b) => a.time - b.time)
     const currentIndex = sortedNotes.findIndex(
@@ -115,7 +112,11 @@ export function ControlsProvider(props: { [key: string]: any }) {
         ? currentIndex
         : currentIndex - 1
 
-    return sortedNotes[idx]
+    // get the destination note via the index
+    const destinationNote = sortedNotes[idx]
+
+    // go
+    seekTo(destinationNote.time, { offset: false })
   }
 
   const value: ControlsContextInterface = {

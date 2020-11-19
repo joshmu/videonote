@@ -44,6 +44,7 @@ import {
   CheckCanEditType,
   ActionInputFocusType,
 } from './globalContext.types'
+import { Key } from './controlsContext'
 
 const SETTINGS_DEFAULTS: SettingsInterface = {
   playOffset: -4,
@@ -488,7 +489,7 @@ export const GlobalProvider = ({
           </div>
         ),
         passwordRequired: true,
-        action: async ( data: any ) => {
+        action: async (data: any) => {
           cancelPrompt()
           const { password } = data
           setTimeout(async () => {
@@ -513,7 +514,7 @@ export const GlobalProvider = ({
           </div>
         ),
         passwordRequired: true,
-        action: async ( data: any ) => {
+        action: async (data: any) => {
           cancelPrompt()
           const { password } = data
 
@@ -676,17 +677,19 @@ export const GlobalProvider = ({
   }
 
   const cancelModals: CancelModalsType = () => {
+    console.log('cancel modals')
     if (modalsOpen.length > 0) setModalsOpen([])
     if (promptState.isOpen) cancelPrompt()
     if (menuOpen) setMenuOpen(false)
   }
 
-  const handleGlobalEscapeKey: HandleGlobalEscapeKeyType = key => {
-    if (key === 'Escape') {
-      cancelModals()
-    }
-  }
-  useGlobalKeydown(handleGlobalEscapeKey)
+  // todo: move to controls context
+  // const handleGlobalEscapeKey: HandleGlobalEscapeKeyType = key => {
+  //   if (key === Key.ESC) {
+  //     cancelModals()
+  //   }
+  // }
+  // useGlobalKeydown(handleGlobalEscapeKey)
 
   const checkCanEdit: CheckCanEditType = () => {
     return admin || (currentProject?.share as ShareProjectInterface).canEdit
