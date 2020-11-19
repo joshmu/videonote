@@ -11,7 +11,7 @@ import ModalInput from '@/shared/Modal/ModalInput'
 import { isValidCredentials } from '@/utils/clientHelpers'
 
 export default function UserAccountModal({ toggle: toggleModal, motionKey }) {
-  const { user, updateUser, removeAccount, prompt } = useGlobalContext()
+  const { user, updateUser, removeAccount, createPrompt } = useGlobalContext()
   const { addAlert } = useNotificationContext()
   const [state, setState] = useState({
     username: '',
@@ -35,7 +35,7 @@ export default function UserAccountModal({ toggle: toggleModal, motionKey }) {
     )
       return
 
-    prompt({
+    createPrompt({
       msg: 'Are you sure you want to update your account?',
       action: () => {
         const name =
@@ -55,7 +55,7 @@ export default function UserAccountModal({ toggle: toggleModal, motionKey }) {
   const handleRemoveAccount = e => {
     e.preventDefault()
 
-    prompt({
+    createPrompt({
       msg: (
         <span>
           Are you sure you want to permanently delete your account and all data

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 
-import { NoteInterface } from '@/shared/interfaces'
+import { NoteInterface } from '@/root/src/components/shared/types'
 
 export const useNoteProximity = ({
   notes,

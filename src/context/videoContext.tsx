@@ -1,7 +1,7 @@
 import { createContext, useContext, useEffect, useRef, useState } from 'react'
 
 import { useIsMount } from '@/hooks/useIsMount'
-import { ProgressInterface } from '@/shared/interfaces'
+import { ProgressInterface } from '@/root/src/components/shared/types'
 
 import { useAnounceAction } from '../hooks/useAnounceAction'
 import { useGlobalContext } from './globalContext'

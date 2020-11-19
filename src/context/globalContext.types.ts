@@ -1,18 +1,17 @@
 import {
-  NoteInterface,
-  ProjectApiActionsEnum,
-  ProjectInterface,
-  SettingsInterface,
-  ShareProjectInterface,
-  UserInterface,
-} from '@/shared/interfaces'
-
-import {
   CancelPromptType,
   ConfirmPromptType,
   CreatePromptType,
   PromptInterface,
-} from './../hooks/usePrompt'
+} from '@/hooks/usePrompt'
+import {
+  NoteInterface,
+  ProjectApiActions,
+  ProjectInterface,
+  SettingsInterface,
+  ShareProjectInterface,
+  UserInterface,
+} from '@/shared/types'
 
 export interface GlobalContextInterface {
   user: UserInterface
@@ -48,19 +47,21 @@ export interface GlobalContextInterface {
   shareProject: ShareProjectType
   removeShareProject: RemoveShareProjectType
   checkCanEdit: CheckCanEditType
-  actionInputRef: HTMLInputElement
+  actionInputRef: any
   actionInputFocus: ActionInputFocusType
 }
 
-export type NoteApiType = (noteData: {
-  [key: string]: any
-}) => Promise<NoteInterface>
+export type NoteApiType = (
+  noteData:
+    | NoteInterface
+    | {
+        [key: string]: any
+      }
+) => Promise<NoteInterface>
 
 export type NoteApiRemoveDoneNotes = () => Promise<NoteInterface[]>
 
-export type UpdateProjectType = (projectData: {
-  [key: string]: any
-}) => Promise<void>
+export type UpdateProjectType = (projectData: ProjectInterface) => Promise<void>
 
 export type ShareProjectType = (
   shareData: ShareProjectInterface
@@ -103,8 +104,8 @@ export type HandleInitialServerDataType = (data: { [key: string]: any }) => void
 export type AlertProjectLoadedType = (project: ProjectInterface) => void
 
 export type ProjectApiType = (
-  action: ProjectApiActionsEnum,
-  project: ProjectInterface
+  action: ProjectApiActions,
+  project: ProjectInterface | { [key: string]: any }
 ) => Promise<any | void>
 
 export type CopyToClipboardType = (txt: string, alertMsg?: string) => void
@@ -114,8 +115,6 @@ export type BadResponseType = (res: Response, msg: string) => boolean
 export type RemoveAccountType = (userData: UserInterface) => Promise<void>
 
 export type CancelModalsType = () => void
-
-export type HandleGlobalEscapeKeyType = (key: string) => void
 
 export type CheckCanEditType = () => boolean
 

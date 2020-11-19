@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { ImBin2 as TrashIcon } from 'react-icons/im'
 
 import Select from '@/components/shared/Select/Select'
@@ -14,14 +14,9 @@ export default function ProjectsModal({ toggle: toggleModal, motionKey }) {
     project: currentProject,
     loadProject,
     removeProject,
-    modalsOpen,
-    prompt,
+    createPrompt,
   } = useGlobalContext()
   const [mousingOver, setMousingOver] = useState(null)
-
-  useEffect(() => {
-    if (projects.length === 0 && modalsOpen === 'projects') toggleModal()
-  }, [projects, modalsOpen])
 
   const handleSelection = _id => {
     // if we are on the current project do nothing
@@ -32,7 +27,7 @@ export default function ProjectsModal({ toggle: toggleModal, motionKey }) {
   }
 
   const handleRemoveProject = ({ title, _id }) => {
-    prompt({
+    createPrompt({
       msg: (
         <span>
           Are you sure you want to remove the project:{' '}

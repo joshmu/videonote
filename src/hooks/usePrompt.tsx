@@ -11,7 +11,7 @@ export interface PromptInterface {
   isOpen?: boolean
   msg: string | ReactElement
   action: any
-  passwordRequired: boolean
+  passwordRequired?: boolean
 }
 export type CreatePromptType = (promptData: PromptInterface) => void
 export type ConfirmPromptType = (promptData: PromptInterface) => void

@@ -1,16 +1,23 @@
 import { StatusCodes } from 'http-status-codes'
+import { NextApiRequest, NextApiResponse } from 'next'
 
+import {
+  NoteApiAction,
+  NoteDocInterface,
+  NoteInterface,
+  UserDocInterface,
+} from '@/root/src/components/shared/types'
 import { authenticateToken, generateAccessToken } from '@/utils/jwt'
 import { Note, Project, User } from '@/utils/mongoose'
 
-export default async (req, res) => {
+export default async (req: NextApiRequest, res: NextApiResponse) => {
   console.log('note api')
   // detect user via token
   // if no user then the 'note' is not assigned a user
-  let isGuestUser = false
+  let isGuestUser: boolean = false
 
   // Gather the jwt access token from the request header
-  let token = req.headers['authorization']
+  let token: string = req.headers['authorization']
   // strip 'bearer'
   if (token) {
     token = token.replace(/bearer /i, '')
@@ -21,14 +28,17 @@ export default async (req, res) => {
   }
 
   // 'note' is inclusive of projectId
-  const { action, note } = req.body
+  const {
+    action,
+    note,
+  }: { action: NoteApiAction; note: NoteInterface } = req.body
 
   // if the user is not a guest then grab their information
-  let userDoc
+  let userDoc: UserDocInterface
   if (!isGuestUser) {
-    let email
+    let email: string
     try {
-      email = await authenticateToken(token)
+      email = authenticateToken(token)
     } catch (error) {
       console.error(error.message)
       return res
@@ -41,11 +51,11 @@ export default async (req, res) => {
   }
 
   // different route if we choose to delete all complete notes from specified project
-  if (action === 'remove done notes') {
+  if (action === NoteApiAction.REMOVE_DONE_NOTES) {
     return await removeDoneNotes(res, userDoc, req.body.projectId)
   }
 
-  let noteDoc
+  let noteDoc: NoteDocInterface
   try {
     if (!action) {
       // use _id to search for doc, the rest is data to add
@@ -78,7 +88,7 @@ export default async (req, res) => {
         await projectDoc.save()
       }
     }
-    if (action === 'delete') {
+    if (action === NoteApiAction.REMOVE) {
     }
   } catch (error) {
     console.error(error)
@@ -87,7 +97,7 @@ export default async (req, res) => {
       .json({ msg: 'Database error', error })
   }
 
-  let newToken = null
+  let newToken: string = null
   // token (keep resetting their session length)
   if (!isGuestUser) newToken = generateAccessToken(userDoc.email)
 
@@ -101,7 +111,11 @@ export default async (req, res) => {
   })
 }
 
-async function removeDoneNotes(res, userDoc, projectId) {
+const removeDoneNotes = async (
+  res: NextApiResponse,
+  userDoc: UserDocInterface,
+  projectId: string
+): Promise<void> => {
   console.log('removing completed notes from project:', projectId)
   // delete all notes which match projectId and are 'done'
   await Note.deleteMany({ project: projectId, done: true })

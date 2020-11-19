@@ -5,12 +5,12 @@ import { useGlobalContext } from '@/context/globalContext'
 import { useNoteContext } from '@/context/noteContext'
 
 const RemoveNotes = () => {
-  const { prompt, project } = useGlobalContext()
+  const { createPrompt, project } = useGlobalContext()
   const { removeCompleted, notes } = useNoteContext()
 
   const handleRemoveCompleted = () => {
     const noteCompletedCount = notes.filter(note => note.done).length
-    prompt({
+    createPrompt({
       msg: (
         <span>
           Are you sure you want to remove your{' '}

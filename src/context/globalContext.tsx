@@ -1,20 +1,27 @@
 import { StatusCodes } from 'http-status-codes'
 import Router from 'next/router'
-import { createContext, useContext, useEffect, useRef, useState } from 'react'
+import {
+  createContext,
+  MutableRefObject,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from 'react'
 import Cookie from 'universal-cookie'
 
-import useGlobalKeydown from '@/hooks/useGlobalKeydown'
 import { usePrompt } from '@/hooks/usePrompt'
 import { fetcher } from '@/utils/clientHelpers'
 
 import { useNotificationContext } from './notificationContext'
 import {
-  ProjectApiActionsEnum,
+  ProjectApiActions,
   ProjectInterface,
   SettingsInterface,
   ShareProjectInterface,
   UserInterface,
-} from '@/shared/interfaces'
+  NoteApiAction,
+} from '@/root/src/components/shared/types'
 import {
   GlobalContextInterface,
   LoadProjectType,
@@ -40,11 +47,9 @@ import {
   BadResponseType,
   RemoveAccountType,
   CancelModalsType,
-  HandleGlobalEscapeKeyType,
   CheckCanEditType,
   ActionInputFocusType,
 } from './globalContext.types'
-import { Key } from './controlsContext'
 
 const SETTINGS_DEFAULTS: SettingsInterface = {
   playOffset: -4,
@@ -85,7 +90,7 @@ export const GlobalProvider = ({
   const [sidebarOpen, setSidebarOpen] = useState<boolean>(true)
   const [menuOpen, setMenuOpen] = useState<boolean>(false)
   const [modalsOpen, setModalsOpen] = useState<string[]>([])
-  const actionInputRef = useRef<HTMLElement | null>(null!)
+  const actionInputRef = useRef(null)
 
   const [admin, setAdmin] = useState<boolean>(true)
 
@@ -147,7 +152,7 @@ export const GlobalProvider = ({
     // api request to delete 'done' notes in current project
     // merge note and user information together match 'user' mongo doc
     const body = {
-      action: 'remove done notes',
+      action: NoteApiAction.REMOVE_DONE_NOTES,
       projectId: currentProject._id,
     }
     // send updated note to server, token will hold user information required
@@ -168,7 +173,7 @@ export const GlobalProvider = ({
     // add _id for db processing
     projectData._id = currentProject._id
 
-    const response = await projectApi('update', projectData)
+    const response = await projectApi(ProjectApiActions.UPDATE, projectData)
     if (!response) return console.error('api error')
 
     const { project } = response
@@ -272,7 +277,7 @@ export const GlobalProvider = ({
 
   const loadProject: LoadProjectType = async projectId => {
     const projectData = { _id: projectId }
-    const response = await projectApi('get', projectData)
+    const response = await projectApi(ProjectApiActions.GET, projectData)
     if (!response) return console.error('api error')
 
     const { project } = response
@@ -399,7 +404,7 @@ export const GlobalProvider = ({
   }
 
   const createProject: CreateProjectType = async projectData => {
-    const response = await projectApi('create', projectData)
+    const response = await projectApi(ProjectApiActions.CREATE, projectData)
     if (!response) return console.error('api error')
 
     // expect project as response from server
@@ -419,7 +424,7 @@ export const GlobalProvider = ({
 
   const removeProject: RemoveProjectType = async _id => {
     const projectData = { _id }
-    const response = await projectApi('remove', projectData)
+    const response = await projectApi(ProjectApiActions.REMOVE, projectData)
     if (!response) return console.error('api error')
 
     const { project } = response
@@ -724,9 +729,9 @@ export const GlobalProvider = ({
     copyToClipboard,
     removeAccount,
     promptState,
-    prompt: createPrompt,
-    promptConfirm: confirmPrompt,
-    promptCancel: cancelPrompt,
+    createPrompt,
+    confirmPrompt,
+    cancelPrompt,
     cancelModals,
     noteApi,
     noteApiRemoveDoneNotes,

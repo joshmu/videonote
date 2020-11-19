@@ -3,7 +3,7 @@ import { createContext, useContext, useEffect, useRef, useState } from 'react'
 
 import { useIsMount } from '@/hooks/useIsMount'
 import { useNoteProximity } from '@/hooks/useNoteProximity'
-import { NoteInterface } from '@/shared/interfaces'
+import { NoteInterface } from '@/root/src/components/shared/types'
 
 import { useGlobalContext } from './globalContext'
 import { useVideoContext } from './videoContext'

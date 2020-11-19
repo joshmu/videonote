@@ -1,6 +1,3 @@
-import { motion } from 'framer-motion'
-import Link from 'next/link'
-
 import Hero from '@/components/HelloPage/Hero/Hero'
 import Layout from '@/components/Layout/Layout'
 import ThemeToggle from '@/components/shared/ThemeToggle/ThemeToggle'

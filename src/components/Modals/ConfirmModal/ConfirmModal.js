@@ -8,14 +8,14 @@ import ModalForm from '@/shared/Modal/ModalForm'
 import ModalInnerContainer from '@/shared/Modal/ModalInnerContainer'
 
 export default function ConfirmModal({ toggle: toggleModal, motionKey }) {
-  const { promptState, promptConfirm } = useGlobalContext()
+  const { promptState, confirmPrompt } = useGlobalContext()
   const [password, setPassword] = useState('')
 
   const handleChange = e => {
     setPassword(e.target.value)
   }
   const handleConfirm = () => {
-    promptConfirm({ password })
+    confirmPrompt({ password })
   }
 
   return (

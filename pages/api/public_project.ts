@@ -1,16 +1,19 @@
 import bcrypt from 'bcryptjs'
 import { StatusCodes } from 'http-status-codes'
+import { NextApiRequest, NextApiResponse } from 'next'
 
 import { Project, Share } from '@/utils/mongoose'
 
+import { ProjectDocInterface, ShareDocInterface } from './project'
+
 // GET 1 PROJECT
-export default async (req, res) => {
+export default async (req: NextApiRequest, res: NextApiResponse) => {
   // project share id
   const { shareUrl, password } = req.body
 
   // get project
-  let projectDoc
-  let shareDoc
+  let projectDoc: ProjectDocInterface
+  let shareDoc: ShareDocInterface
   try {
     shareDoc = await Share.findOne({ url: shareUrl })
 

@@ -1,3 +1,5 @@
+import { Document } from 'mongoose'
+
 export interface UserInterface {
   _id: string
   email: string
@@ -54,11 +56,33 @@ export interface ProgressInterface {
   loaded: number
 }
 
-export enum ProjectApiActionsEnum {
+export enum ProjectApiActions {
   GET = 'GET',
   CREATE = 'CREATE',
   UPDATE = 'UPDATE',
   REMOVE = 'REMOVE',
   SHARE = 'SHARE',
-  'REMOVE SHARE' = 'REMOVE SHARE',
+  REMOVE_SHARE = 'REMOVE SHARE',
+}
+
+export enum NoteApiAction {
+  REMOVE_DONE_NOTES = 'REMOVE DONE NOTES',
+  REMOVE = 'remove',
+}
+
+export interface ProjectDocInterface extends Document {
+  share?: string | ShareProjectInterface
+}
+
+export interface ShareDocInterface extends Document {
+  password: string
+  project: string | ProjectInterface
+}
+
+export interface UserDocInterface extends Document {
+  email: string
+}
+export interface NoteDocInterface extends Document {
+  user: string | UserInterface
+  project: string | ProjectInterface
 }

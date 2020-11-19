@@ -9,7 +9,7 @@ export default function Overlay() {
     modalsOpen,
     toggleModalOpen,
     promptState,
-    promptCancel,
+    cancelPrompt,
   } = useGlobalContext()
 
   useEffect(() => {
@@ -19,7 +19,7 @@ export default function Overlay() {
 
   const handleOverlayClick = () => {
     setOpen(false)
-    if (promptState.isOpen) promptCancel()
+    if (promptState.isOpen) cancelPrompt()
     if (modalsOpen.length > 0) toggleModalOpen()
   }
 
