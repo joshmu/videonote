@@ -216,6 +216,6 @@ export const VideoProvider = (props: { [key: string]: any }) => {
   return <videoContext.Provider value={value} {...props} />
 }
 
-export function useVideoContext() {
+export const useVideoContext = (): VideoContextInterface => {
   return useContext(videoContext)
 }

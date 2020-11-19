@@ -19,7 +19,7 @@ export interface ProjectInterface {
 }
 
 export interface NoteInterface {
-  _id: string
+  _id?: string
   content: string
   time?: number
   done?: boolean
@@ -29,8 +29,8 @@ export interface NoteInterface {
 }
 
 export interface SettingsInterface {
-  _id: string
-  user: string | UserInterface
+  _id?: string
+  user?: string | UserInterface
   currentProject: string | ProjectInterface
   playOffset?: number
   showHints?: boolean
@@ -39,7 +39,7 @@ export interface SettingsInterface {
 }
 
 export interface ShareProjectInterface {
-  _id: string
+  _id?: string
   url: string
   user: string | UserInterface
   projectd: string | ProjectInterface
@@ -52,4 +52,13 @@ export interface ProgressInterface {
   played: number
   loadedSeconds: number
   loaded: number
+}
+
+export enum ProjectApiActionsEnum {
+  GET = 'GET',
+  CREATE = 'CREATE',
+  UPDATE = 'UPDATE',
+  REMOVE = 'REMOVE',
+  SHARE = 'SHARE',
+  'REMOVE SHARE' = 'REMOVE SHARE',
 }

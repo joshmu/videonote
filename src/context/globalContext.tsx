@@ -4,12 +4,48 @@ import { createContext, useContext, useEffect, useRef, useState } from 'react'
 import Cookie from 'universal-cookie'
 
 import useGlobalKeydown from '@/hooks/useGlobalKeydown'
-import usePrompt from '@/hooks/usePrompt'
+import { usePrompt } from '@/hooks/usePrompt'
 import { fetcher } from '@/utils/clientHelpers'
 
 import { useNotificationContext } from './notificationContext'
+import {
+  ProjectApiActionsEnum,
+  ProjectInterface,
+  SettingsInterface,
+  ShareProjectInterface,
+  UserInterface,
+} from '@/shared/interfaces'
+import {
+  GlobalContextInterface,
+  LoadProjectType,
+  NoteApiRemoveDoneNotes,
+  NoteApiType,
+  RemoveShareProjectType,
+  ShareProjectType,
+  UpdateProjectsStateWithUpdatedNotesType,
+  UpdateProjectType,
+  GuestUpdatingProjectType,
+  UpdateUserType,
+  UpdateSettingsType,
+  ToggleMenuOpenType,
+  ToggleSidebarType,
+  ToggleModalOpenType,
+  CreateProjectType,
+  RemoveProjectType,
+  FetchWithPasswordPublicProjectType,
+  HandleInitialServerDataType,
+  AlertProjectLoadedType,
+  ProjectApiType,
+  CopyToClipboardType,
+  BadResponseType,
+  RemoveAccountType,
+  CancelModalsType,
+  HandleGlobalEscapeKeyType,
+  CheckCanEditType,
+  ActionInputFocusType,
+} from './globalContext.types'
 
-const SETTINGS_DEFAULTS = {
+const SETTINGS_DEFAULTS: SettingsInterface = {
   playOffset: -4,
   showHints: true,
   seekJump: 10,
@@ -17,7 +53,7 @@ const SETTINGS_DEFAULTS = {
   currentProject: null,
 }
 
-const HINTS = [
+const HINTS: string[] = [
   'Spacebar = Play/Pause',
   'Left/Right = Seek',
   'Up/Down = Volume',
@@ -30,29 +66,30 @@ const HINTS = [
   'Drag list edge to resize',
 ]
 
-const globalContext = createContext({})
+const globalContext = createContext<GlobalContextInterface>(null!)
 
-export function GlobalProvider({ serverData, ...props }) {
-  const [user, setUser] = useState(null)
-  const [projects, setProjects] = useState([])
-  const [settings, setSettings] = useState(SETTINGS_DEFAULTS)
+export const GlobalProvider = ({
+  serverData,
+  ...props
+}: {
+  serverData: { [key: string]: any }
+  props: { [key: string]: any }
+}) => {
+  const [user, setUser] = useState<UserInterface>(null!)
+  const [projects, setProjects] = useState<ProjectInterface[]>([])
+  const [settings, setSettings] = useState<SettingsInterface>(SETTINGS_DEFAULTS)
 
-  const [currentProject, setCurrentProject] = useState(null)
+  const [currentProject, setCurrentProject] = useState<ProjectInterface>(null!)
 
-  const [sidebarOpen, setSidebarOpen] = useState(true)
-  const [menuOpen, setMenuOpen] = useState(false)
-  const [modalsOpen, setModalsOpen] = useState([])
-  const actionInputRef = useRef(null)
+  const [sidebarOpen, setSidebarOpen] = useState<boolean>(true)
+  const [menuOpen, setMenuOpen] = useState<boolean>(false)
+  const [modalsOpen, setModalsOpen] = useState<string[]>([])
+  const actionInputRef = useRef<HTMLElement | null>(null!)
 
-  const [admin, setAdmin] = useState(true)
+  const [admin, setAdmin] = useState<boolean>(true)
 
   const { addAlert } = useNotificationContext()
-  const {
-    promptState,
-    prompt,
-    confirm: promptConfirm,
-    reset: promptReset,
-  } = usePrompt()
+  const { promptState, createPrompt, confirmPrompt, cancelPrompt } = usePrompt()
 
   // initial load
   useEffect(() => {
@@ -86,7 +123,7 @@ export function GlobalProvider({ serverData, ...props }) {
       updateSettings({ currentProject: null, _id: settings._id })
   }, [projects, settings])
 
-  const noteApi = async noteData => {
+  const noteApi: NoteApiType = async noteData => {
     console.log('note api request', noteData)
     // merge note and user information together match 'user' mongo doc
     const body = {
@@ -104,7 +141,7 @@ export function GlobalProvider({ serverData, ...props }) {
     return note
   }
 
-  const noteApiRemoveDoneNotes = async () => {
+  const noteApiRemoveDoneNotes: NoteApiRemoveDoneNotes = async () => {
     console.log('remove completed notes')
     // api request to delete 'done' notes in current project
     // merge note and user information together match 'user' mongo doc
@@ -124,7 +161,7 @@ export function GlobalProvider({ serverData, ...props }) {
     return notes
   }
 
-  const updateProject = async projectData => {
+  const updateProject: UpdateProjectType = async projectData => {
     if (!admin) return
 
     // add _id for db processing
@@ -147,7 +184,7 @@ export function GlobalProvider({ serverData, ...props }) {
     setCurrentProject(current => ({ ...project, notes: current.notes }))
   }
 
-  const shareProject = async shareData => {
+  const shareProject: ShareProjectType = async shareData => {
     const body = {
       action: 'share',
       project: { _id: currentProject._id },
@@ -161,7 +198,10 @@ export function GlobalProvider({ serverData, ...props }) {
 
     if (badResponse(res, msg)) return
 
-    if (!data) return console.error('api error')
+    if (!data) {
+      console.error('api error')
+      return false
+    }
 
     console.log('share project api response...')
     console.log(data)
@@ -180,11 +220,12 @@ export function GlobalProvider({ serverData, ...props }) {
     const valuesToCheck = ['canEdit', 'url']
     return valuesToCheck.every(key => project.share[key] === shareData[key])
   }
-  const removeShareProject = async () => {
+
+  const removeShareProject: RemoveShareProjectType = async () => {
     const body = {
       action: 'remove share',
       project: { _id: currentProject._id },
-      share: { _id: currentProject.share._id },
+      share: { _id: (currentProject.share as ShareProjectInterface)._id },
     }
     const {
       res,
@@ -193,7 +234,10 @@ export function GlobalProvider({ serverData, ...props }) {
 
     if (badResponse(res, msg)) return
 
-    if (!data) return console.error('api error')
+    if (!data) {
+      console.error('api error')
+      return false
+    }
 
     const { project } = data
 
@@ -211,7 +255,7 @@ export function GlobalProvider({ serverData, ...props }) {
 
   // to have access to general projects information (like note count) we need to update the projects list
   // we do not alter the current project state with the notes change to avoid a potential update loop
-  const updateProjectsStateWithUpdatedNotes = async notes => {
+  const updateProjectsStateWithUpdatedNotes: UpdateProjectsStateWithUpdatedNotesType = async notes => {
     console.log('update projects notes state')
     // alter state of projects
     setProjects(current =>
@@ -225,7 +269,7 @@ export function GlobalProvider({ serverData, ...props }) {
     )
   }
 
-  const loadProject = async projectId => {
+  const loadProject: LoadProjectType = async projectId => {
     const projectData = { _id: projectId }
     const response = await projectApi('get', projectData)
     if (!response) return console.error('api error')
@@ -250,7 +294,7 @@ export function GlobalProvider({ serverData, ...props }) {
     alertProjectLoaded(project)
   }
 
-  const guestUpdaingProject = async project => {
+  const guestUpdatingProject: GuestUpdatingProjectType = async project => {
     console.log('guest is updating project', project)
     const body = {
       project,
@@ -273,7 +317,7 @@ export function GlobalProvider({ serverData, ...props }) {
     console.log(data.msg)
   }
 
-  const updateUser = async userData => {
+  const updateUser: UpdateUserType = async userData => {
     // respect format of user mongo object on server
     // @ts-ignore
     console.log('updating user...', userData)
@@ -305,7 +349,7 @@ export function GlobalProvider({ serverData, ...props }) {
     setUser(user)
   }
 
-  const updateSettings = async newSettingsData => {
+  const updateSettings: UpdateSettingsType = async newSettingsData => {
     if (!admin) return
 
     console.log('updating settings...', newSettingsData)
@@ -327,17 +371,19 @@ export function GlobalProvider({ serverData, ...props }) {
     setSettings(fullSettings)
   }
 
-  const toggleMenuOpen = (state = undefined) => {
+  const toggleMenuOpen: ToggleMenuOpenType = (state = undefined) => {
     const ismenuOpen = state ? state : !menuOpen
     setMenuOpen(ismenuOpen)
   }
-  const toggleSidebar = (state = undefined) => {
+
+  const toggleSidebar: ToggleSidebarType = (state = undefined) => {
     setSidebarOpen(currentState => {
       const updatedState = state ? state : !currentState
       return updatedState
     })
   }
-  const toggleModalOpen = modalName => {
+
+  const toggleModalOpen: ToggleModalOpenType = (modalName = undefined) => {
     console.log('opening modal', modalName)
     // if no param then turn off modals
     if (!modalName) return setModalsOpen([])
@@ -351,7 +397,7 @@ export function GlobalProvider({ serverData, ...props }) {
     // setModalsOpen(modalsOpen === modalName ? null : modalName)
   }
 
-  const createProject = async projectData => {
+  const createProject: CreateProjectType = async projectData => {
     const response = await projectApi('create', projectData)
     if (!response) return console.error('api error')
 
@@ -370,7 +416,7 @@ export function GlobalProvider({ serverData, ...props }) {
     alertProjectLoaded(project)
   }
 
-  const removeProject = async _id => {
+  const removeProject: RemoveProjectType = async _id => {
     const projectData = { _id }
     const response = await projectApi('remove', projectData)
     if (!response) return console.error('api error')
@@ -391,7 +437,7 @@ export function GlobalProvider({ serverData, ...props }) {
     }
   }
 
-  const fetchWithPasswordPublicProject = async password => {
+  const fetchWithPasswordPublicProject: FetchWithPasswordPublicProjectType = async password => {
     // get id
     const shareUrl = window.location.pathname.split('/').slice(-1)[0]
 
@@ -424,12 +470,12 @@ export function GlobalProvider({ serverData, ...props }) {
   }
 
   //-------------------------------
-  const handleInitialServerData = data => {
+  const handleInitialServerData: HandleInitialServerDataType = data => {
     // if password is required then lets exit early
     // fetch data again providing password
     // re-init 'handleInitialServerData'
     if (data.msg === 'shared project password required') {
-      prompt({
+      createPrompt({
         msg: (
           <div>
             <h2 className='mb-2 text-xl font-bold text-themeAccent'>
@@ -442,8 +488,8 @@ export function GlobalProvider({ serverData, ...props }) {
           </div>
         ),
         passwordRequired: true,
-        action: async data => {
-          promptReset()
+        action: async ( data: any ) => {
+          cancelPrompt()
           const { password } = data
           setTimeout(async () => {
             // get password and send again
@@ -454,7 +500,7 @@ export function GlobalProvider({ serverData, ...props }) {
       })
       return
     } else if (data.msg === 'password incorrect') {
-      prompt({
+      createPrompt({
         msg: (
           <div>
             <h2 className='mb-2 text-xl font-bold text-themeAccent'>
@@ -467,8 +513,8 @@ export function GlobalProvider({ serverData, ...props }) {
           </div>
         ),
         passwordRequired: true,
-        action: async data => {
-          promptReset()
+        action: async ( data: any ) => {
+          cancelPrompt()
           const { password } = data
 
           setTimeout(async () => {
@@ -536,7 +582,7 @@ export function GlobalProvider({ serverData, ...props }) {
     }
   }
 
-  const alertProjectLoaded = project => {
+  const alertProjectLoaded: AlertProjectLoadedType = project => {
     // notification when we load a project
     addAlert({
       type: 'project',
@@ -544,7 +590,7 @@ export function GlobalProvider({ serverData, ...props }) {
     })
   }
 
-  const projectApi = async (action, project) => {
+  const projectApi: ProjectApiType = async (action, project) => {
     console.log(action, { project })
     // api request to create project, assign user id to it
     const body = {
@@ -568,7 +614,10 @@ export function GlobalProvider({ serverData, ...props }) {
     return data
   }
 
-  const copyToClipboard = (txt, alertMsg = 'Copied to clipboard!') => {
+  const copyToClipboard: CopyToClipboardType = (
+    txt,
+    alertMsg = 'Copied to clipboard!'
+  ) => {
     if (!txt) return
 
     // copy to clipboard
@@ -584,7 +633,7 @@ export function GlobalProvider({ serverData, ...props }) {
     )
   }
 
-  const badResponse = (res, msg) => {
+  const badResponse: BadResponseType = (res, msg) => {
     if (res.status !== StatusCodes.OK) {
       if (msg.match(/invalid token/i)) {
         console.log('invalid token, redirecting...')
@@ -599,7 +648,7 @@ export function GlobalProvider({ serverData, ...props }) {
     return false
   }
 
-  const removeAccount = async userData => {
+  const removeAccount: RemoveAccountType = async userData => {
     console.log('removing account', userData.username)
 
     // request account deletion
@@ -626,28 +675,29 @@ export function GlobalProvider({ serverData, ...props }) {
     Router.push('/hello')
   }
 
-  const cancelModals = () => {
+  const cancelModals: CancelModalsType = () => {
     if (modalsOpen.length > 0) setModalsOpen([])
-    if (promptState.isOpen) promptReset()
+    if (promptState.isOpen) cancelPrompt()
     if (menuOpen) setMenuOpen(false)
   }
-  const handleGlobalEscapeKey = key => {
+
+  const handleGlobalEscapeKey: HandleGlobalEscapeKeyType = key => {
     if (key === 'Escape') {
       cancelModals()
     }
   }
   useGlobalKeydown(handleGlobalEscapeKey)
 
-  const checkCanEdit = () => {
-    return admin || currentProject?.share.canEdit
+  const checkCanEdit: CheckCanEditType = () => {
+    return admin || (currentProject?.share as ShareProjectInterface).canEdit
   }
 
-  const actionInputFocus = () => {
+  const actionInputFocus: ActionInputFocusType = () => {
     console.log('autoFocus')
     actionInputRef.current.focus()
   }
 
-  const value = {
+  const value: GlobalContextInterface = {
     user,
     updateUser,
     projects,
@@ -671,9 +721,9 @@ export function GlobalProvider({ serverData, ...props }) {
     copyToClipboard,
     removeAccount,
     promptState,
-    prompt,
-    promptConfirm,
-    promptCancel: promptReset,
+    prompt: createPrompt,
+    promptConfirm: confirmPrompt,
+    promptCancel: cancelPrompt,
     cancelModals,
     noteApi,
     noteApiRemoveDoneNotes,
@@ -688,6 +738,6 @@ export function GlobalProvider({ serverData, ...props }) {
   return <globalContext.Provider value={value} {...props} />
 }
 
-export function useGlobalContext() {
+export const useGlobalContext = (): GlobalContextInterface => {
   return useContext(globalContext)
 }

@@ -11,7 +11,7 @@ interface NotificationContextInterface {
 interface AlertInterface {
   id?: string
   msg: string
-  type?: 'info' | 'warning' | 'error' | 'success'
+  type?: 'info' | 'warning' | 'error' | 'success' | 'project'
   duration?: number
   persistent?: boolean
 }

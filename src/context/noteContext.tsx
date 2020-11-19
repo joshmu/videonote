@@ -179,6 +179,6 @@ export function NoteProvider(props: { [key: string]: any }) {
   return <noteContext.Provider value={value} {...props} />
 }
 
-export function useNoteContext() {
+export const useNoteContext = (): NoteContextInterface => {
   return useContext(noteContext)
 }

@@ -72,6 +72,6 @@ export const ThemeProvider = (props: { [key: string]: string }) => {
   return <themeContext.Provider value={value} {...props} />
 }
 
-export function useThemeContext() {
+export const useThemeContext = (): ThemeContextInterface => {
   return useContext(themeContext)
 }
