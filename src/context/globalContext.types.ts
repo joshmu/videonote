@@ -1,3 +1,5 @@
+import { MutableRefObject } from 'react'
+
 import {
   CancelPromptType,
   ConfirmPromptType,
@@ -47,7 +49,7 @@ export interface GlobalContextInterface {
   shareProject: ShareProjectType
   removeShareProject: RemoveShareProjectType
   checkCanEdit: CheckCanEditType
-  actionInputRef: any
+  actionInputRef: MutableRefObject<HTMLInputElement | null>
   actionInputFocus: ActionInputFocusType
 }
 

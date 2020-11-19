@@ -1,13 +1,6 @@
 import { StatusCodes } from 'http-status-codes'
 import Router from 'next/router'
-import {
-  createContext,
-  MutableRefObject,
-  useContext,
-  useEffect,
-  useRef,
-  useState,
-} from 'react'
+import { createContext, useContext, useEffect, useRef, useState } from 'react'
 import Cookie from 'universal-cookie'
 
 import { usePrompt } from '@/hooks/usePrompt'
@@ -90,7 +83,7 @@ export const GlobalProvider = ({
   const [sidebarOpen, setSidebarOpen] = useState<boolean>(true)
   const [menuOpen, setMenuOpen] = useState<boolean>(false)
   const [modalsOpen, setModalsOpen] = useState<string[]>([])
-  const actionInputRef = useRef(null)
+  const actionInputRef = useRef<HTMLInputElement | null>(null)
 
   const [admin, setAdmin] = useState<boolean>(true)
 
