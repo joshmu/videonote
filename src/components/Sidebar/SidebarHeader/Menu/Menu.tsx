@@ -6,7 +6,7 @@
  *
  * @author Josh Mu <hello@joshmu.dev>
  * @created Tuesday, 6th October 2020
- * @modified Sunday, 22nd November 2020 3:32:49 pm
+ * @modified Sunday, 22nd November 2020 4:29:15 pm
  * @copyright © 2020 - 2020 MU
  */
 
@@ -27,6 +27,7 @@ import {
 import { VscSettings as SettingsIcon } from 'react-icons/vsc'
 import Cookie from 'universal-cookie'
 
+import { ModalType } from '@/components/Modals/Modals'
 import { useGlobalContext } from '@/context/globalContext'
 import { useThemeContext } from '@/context/themeContext'
 import { Select } from '@/shared/Select/Select'
@@ -55,7 +56,7 @@ export const Menu = ({ open }: { open: boolean }) => {
   } = useGlobalContext()
   const { toggleTheme } = useThemeContext()
 
-  const handleModalOpen = (modalId: string): void => {
+  const handleModalOpen = (modalId: ModalType): void => {
     toggleModalOpen(modalId)
     toggleMenuOpen()
   }
@@ -89,7 +90,7 @@ export const Menu = ({ open }: { open: boolean }) => {
           >
             {project && admin && (
               <Select
-                onClick={() => handleModalOpen('current')}
+                onClick={() => handleModalOpen(ModalType.CURRENT_PROJECT)}
                 text='text-themeAccent'
               >
                 <IconMenuItemWrapper>
@@ -105,7 +106,7 @@ export const Menu = ({ open }: { open: boolean }) => {
             )}
 
             {admin && project && (
-              <Select onClick={() => handleModalOpen('share')}>
+              <Select onClick={() => handleModalOpen(ModalType.SHARE_PROJECT)}>
                 <IconMenuItemWrapper>
                   <ShareIcon />
                 </IconMenuItemWrapper>
@@ -115,7 +116,7 @@ export const Menu = ({ open }: { open: boolean }) => {
 
             {admin && (
               <Select
-                onClick={() => handleModalOpen('create')}
+                onClick={() => handleModalOpen(ModalType.CREATE_PROJECT)}
                 animate={
                   projects.length === 0 ? 'animate-pulse text-themeAccent' : ''
                 }
@@ -128,7 +129,7 @@ export const Menu = ({ open }: { open: boolean }) => {
             )}
 
             {admin && projects.length > 0 && (
-              <Select onClick={() => handleModalOpen('projects')}>
+              <Select onClick={() => handleModalOpen(ModalType.PROJECTS)}>
                 <IconMenuItemWrapper>
                   <ProjectsIcon />
                 </IconMenuItemWrapper>
@@ -136,7 +137,7 @@ export const Menu = ({ open }: { open: boolean }) => {
               </Select>
             )}
 
-            <Select onClick={() => handleModalOpen('settings')}>
+            <Select onClick={() => handleModalOpen(ModalType.SETTINGS)}>
               <IconMenuItemWrapper>
                 <SettingsIcon />
               </IconMenuItemWrapper>
@@ -144,7 +145,7 @@ export const Menu = ({ open }: { open: boolean }) => {
             </Select>
 
             {admin && (
-              <Select onClick={() => handleModalOpen('user')}>
+              <Select onClick={() => handleModalOpen(ModalType.USER_ACCOUNT)}>
                 <IconMenuItemWrapper>
                   <AccountIcon />
                 </IconMenuItemWrapper>
@@ -171,14 +172,14 @@ export const Menu = ({ open }: { open: boolean }) => {
               Theme
             </Select>
 
-            <Select onClick={() => handleModalOpen('help')}>
+            <Select onClick={() => handleModalOpen(ModalType.HELP)}>
               <IconMenuItemWrapper>
                 <HelpIcon />
               </IconMenuItemWrapper>
               Help
             </Select>
 
-            <Select onClick={() => handleModalOpen('about')}>
+            <Select onClick={() => handleModalOpen(ModalType.ABOUT)}>
               <IconMenuItemWrapper>
                 <AboutIcon />
               </IconMenuItemWrapper>

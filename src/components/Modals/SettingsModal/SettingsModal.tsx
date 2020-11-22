@@ -1,39 +1,60 @@
-import { useEffect, useState } from 'react'
+/**
+ * @path /src/components/Modals/SettingsModal/SettingsModal.tsx
+ *
+ * @project videonote
+ * @file SettingsModal.tsx
+ *
+ * @author Josh Mu <hello@joshmu.dev>
+ * @created Thursday, 24th September 2020
+ * @modified Sunday, 22nd November 2020 5:40:05 pm
+ * @copyright © 2020 - 2020 MU
+ */
 
-import ModalPrimaryBtn from '@/components/shared/Modal/ModalBtn'
+import { ChangeEvent, useEffect, useState } from 'react'
+
+import { ModalPrimaryBtn } from '@/components/shared/Modal/ModalBtn'
 import { ToggleInput } from '@/components/shared/Toggle/Toggle'
 import { useGlobalContext } from '@/context/globalContext'
 import { useNotificationContext } from '@/context/notificationContext'
-import ModalContainer from '@/shared/Modal/ModalContainer'
-import ModalForm from '@/shared/Modal/ModalForm'
-import ModalHeader from '@/shared/Modal/ModalHeader'
-import ModalInnerContainer from '@/shared/Modal/ModalInnerContainer'
-import ModalInput from '@/shared/Modal/ModalInput'
+import { ModalContainer } from '@/shared/Modal/ModalContainer'
+import { ModalForm } from '@/shared/Modal/ModalForm'
+import { ModalHeader } from '@/shared/Modal/ModalHeader'
+import { ModalInnerContainer } from '@/shared/Modal/ModalInnerContainer'
+import { ModalInput } from '@/shared/Modal/ModalInput'
+import { SettingsInterface } from '@/shared/types'
 
-import PlaybackRateSlider from './PlaybackRateSlider/PlaybackRateSlider'
-import VolumeSlider from './VolumeSlider/VolumeSlider'
+import { PlaybackRateSlider } from './PlaybackRateSlider/PlaybackRateSlider'
+import { VolumeSlider } from './VolumeSlider/VolumeSlider'
 
-export default function SettingsModal({ toggle: toggleModal, motionKey }) {
+export const SettingsModal = ({
+  toggle: toggleModal,
+  motionKey,
+}: {
+  toggle: () => void
+  motionKey: string
+}) => {
   const { settings, updateSettings, SETTINGS_DEFAULTS } = useGlobalContext()
   const { addAlert } = useNotificationContext()
 
-  const [state, setState] = useState({ ...SETTINGS_DEFAULTS })
+  const [state, setState] = useState<SettingsInterface>({
+    ...SETTINGS_DEFAULTS,
+  })
 
   useEffect(() => {
     if (settings) setState({ ...state, ...settings })
   }, [settings])
 
-  const handleChangeNum = e => {
-    setState({ ...state, [e.target.id]: Number(e.target.value) })
+  const handleChangeNum = (event: ChangeEvent<HTMLInputElement>): void => {
+    setState({ ...state, [event.target.id]: Number(event.target.value) })
   }
 
-  const handleToggle = id => {
-    console.log('toggle', id)
-    setState({ ...state, [id]: !settings[id] })
+  const handleToggle = (settingsKey: string) => {
+    console.log('toggle', settingsKey)
+    setState({ ...state, [settingsKey]: !settings[settingsKey] })
   }
 
-  const handleUpdate = e => {
-    e.preventDefault()
+  const handleUpdate = (event: ChangeEvent<HTMLInputElement>): void => {
+    event.preventDefault()
 
     addAlert({ type: 'info', msg: `Updating settings` })
     console.log('updating account')
@@ -65,14 +86,6 @@ export default function SettingsModal({ toggle: toggleModal, motionKey }) {
           />
           <VolumeSlider />
           <PlaybackRateSlider />
-          {/* <ModalInput
-            title='List Sidebar Width (px)'
-            id='sidebarWidth'
-            value={state.sidebarWidth}
-            onChange={handleChangeNum}
-            type='number'
-            min='50'
-          /> */}
           <div>
             <ToggleInput
               title='Show Hints'

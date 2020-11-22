@@ -6,12 +6,13 @@
  *
  * @author Josh Mu <hello@joshmu.dev>
  * @created Thursday, 19th November 2020
- * @modified Sunday, 22nd November 2020 2:44:04 pm
+ * @modified Sunday, 22nd November 2020 6:07:18 pm
  * @copyright © 2020 - 2020 MU
  */
 
 import { MutableRefObject } from 'react'
 
+import { ModalType } from '@/components/Modals/Modals'
 import {
   CancelPromptType,
   ConfirmPromptType,
@@ -37,7 +38,7 @@ export interface GlobalContextInterface {
   updateSettings: UpdateSettingsType
   menuOpen: boolean
   toggleMenuOpen: ToggleMenuOpenType
-  modalsOpen: string[]
+  modalsOpen: ModalType[]
   toggleModalOpen: ToggleModalOpenType
   createProject: CreateProjectType
   loadProject: LoadProjectType
@@ -95,7 +96,7 @@ export type GuestUpdatingProjectType = (
   project: ProjectInterface
 ) => Promise<void>
 
-export type UpdateUserType = (userData: UserInterface) => Promise<void>
+export type UpdateUserType = (userData: UserInterface | {username: string, email: string}) => Promise<void>
 
 export type UpdateSettingsType = (newSettingsData: {
   [key: string]: any
@@ -105,9 +106,9 @@ export type ToggleMenuOpenType = (state?: boolean) => void
 
 export type ToggleSidebarType = (state?: boolean) => void
 
-export type ToggleModalOpenType = (modalName?: string) => void
+export type ToggleModalOpenType = (modalName?: ModalType) => void
 
-export type CreateProjectType = (projectData: ProjectInterface) => Promise<void>
+export type CreateProjectType = (projectData: ProjectInterface | {title: string, src: string}) => Promise<void>
 
 export type RemoveProjectType = (_id: string) => Promise<void>
 

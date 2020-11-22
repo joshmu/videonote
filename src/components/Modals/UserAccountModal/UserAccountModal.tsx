@@ -1,34 +1,60 @@
-import { useEffect, useState } from 'react'
+/**
+ * @path /src/components/Modals/UserAccountModal/UserAccountModal.tsx
+ *
+ * @project videonote
+ * @file UserAccountModal.tsx
+ *
+ * @author Josh Mu <hello@joshmu.dev>
+ * @created Tuesday, 6th October 2020
+ * @modified Sunday, 22nd November 2020 6:23:23 pm
+ * @copyright © 2020 - 2020 MU
+ */
 
-import ModalPrimaryBtn from '@/components/shared/Modal/ModalBtn'
+import { ChangeEvent, MouseEvent, useEffect, useState } from 'react'
+
+import { ModalPrimaryBtn } from '@/components/shared/Modal/ModalBtn'
 import { useGlobalContext } from '@/context/globalContext'
 import { useNotificationContext } from '@/context/notificationContext'
-import ModalContainer from '@/shared/Modal/ModalContainer'
-import ModalForm from '@/shared/Modal/ModalForm'
-import ModalHeader from '@/shared/Modal/ModalHeader'
-import ModalInnerContainer from '@/shared/Modal/ModalInnerContainer'
-import ModalInput from '@/shared/Modal/ModalInput'
+import { ModalContainer } from '@/shared/Modal/ModalContainer'
+import { ModalForm } from '@/shared/Modal/ModalForm'
+import { ModalHeader } from '@/shared/Modal/ModalHeader'
+import { ModalInnerContainer } from '@/shared/Modal/ModalInnerContainer'
+import { ModalInput } from '@/shared/Modal/ModalInput'
+import { UserInterface } from '@/shared/types'
 import { isValidCredentials } from '@/utils/clientHelpers'
 
-export default function UserAccountModal({ toggle: toggleModal, motionKey }) {
+export const UserAccountModal = ({
+  toggle: toggleModal,
+  motionKey,
+}: {
+  toggle: () => void
+  motionKey: string
+}) => {
   const { user, updateUser, removeAccount, createPrompt } = useGlobalContext()
   const { addAlert } = useNotificationContext()
-  const [state, setState] = useState({
+  const [userAccountState, setUserAccountState] = useState<
+    UserInterface | { username: string; email: string }
+  >({
     username: '',
     email: '',
   })
 
   useEffect(() => {
-    if (user) setState({ ...state, username: user.username, email: user.email })
+    if (user)
+      setUserAccountState({
+        ...userAccountState,
+        username: user.username,
+        email: user.email,
+      })
   }, [user])
 
-  const handleUpdate = e => {
-    e.preventDefault()
+  const handleUpdate = (event: MouseEvent<HTMLElement>): void => {
+    event.preventDefault()
 
     if (
       !isValidCredentials({
-        username: state.username,
-        email: state.email,
+        username: userAccountState.username,
+        email: userAccountState.email,
         passwordRequired: false,
         addAlert,
       })
@@ -39,12 +65,14 @@ export default function UserAccountModal({ toggle: toggleModal, motionKey }) {
       msg: 'Are you sure you want to update your account?',
       action: () => {
         const name =
-          state.username !== state.email ? state.username : state.email
+          userAccountState.username !== userAccountState.email
+            ? userAccountState.username
+            : userAccountState.email
         addAlert({ type: 'info', msg: `Updating account: ${name}` })
         console.log('updating account')
         const updateData = {
-          username: state.username,
-          email: state.email,
+          username: userAccountState.username,
+          email: userAccountState.email,
         }
         updateUser(updateData)
         toggleModal()
@@ -52,8 +80,8 @@ export default function UserAccountModal({ toggle: toggleModal, motionKey }) {
     })
   }
 
-  const handleRemoveAccount = e => {
-    e.preventDefault()
+  const handleRemoveAccount = (event: MouseEvent<HTMLElement>): void => {
+    event.preventDefault()
 
     createPrompt({
       msg: (
@@ -67,15 +95,18 @@ export default function UserAccountModal({ toggle: toggleModal, motionKey }) {
         </span>
       ),
       passwordRequired: true,
-      action: data => {
-        removeAccount({ ...user, ...data })
+      action: ({ password }: { password: string }) => {
+        removeAccount({ ...user, password })
         toggleModal()
       },
     })
   }
 
-  const handleChange = e => {
-    setState({ ...state, [e.target.id]: e.target.value })
+  const handleChange = (event: ChangeEvent<HTMLInputElement>): void => {
+    setUserAccountState({
+      ...userAccountState,
+      [event.target.id]: event.target.value,
+    })
   }
 
   return (
@@ -85,26 +116,19 @@ export default function UserAccountModal({ toggle: toggleModal, motionKey }) {
       <ModalInnerContainer>
         <ModalForm>
           <ModalInput
-            value={state.username}
+            value={userAccountState.username}
             onChange={handleChange}
             title='Username'
             id='username'
             type='text'
           />
           <ModalInput
-            value={state.email}
+            value={userAccountState.email}
             onChange={handleChange}
             title='Email'
             id='email'
             type='email'
           />
-          {/* <ModalInput
-            value={state.password}
-            onChange={handleChange}
-            title='Confirm Password'
-            id='password'
-            type='password'
-          /> */}
 
           <div></div>
           <div></div>

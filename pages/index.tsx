@@ -6,7 +6,7 @@
  *
  * @author Josh Mu <hello@joshmu.dev>
  * @created Tuesday, 6th October 2020
- * @modified Sunday, 22nd November 2020 2:24:23 pm
+ * @modified Sunday, 22nd November 2020 4:09:07 pm
  * @copyright © 2020 - 2020 MU
  */
 
@@ -16,7 +16,7 @@ import absoluteUrl from 'next-absolute-url'
 import Cookies from 'universal-cookie'
 
 import { Layout } from '@/components/Layout/Layout'
-import Modals from '@/components/Modals/Modals'
+import { Modals } from '@/components/Modals/Modals'
 import Notification from '@/components/Notification/Notification'
 import { Sidebar } from '@/components/Sidebar/Sidebar'
 import { VideoPlayer } from '@/components/VideoPlayer/VideoPlayer'
@@ -25,7 +25,7 @@ import { GlobalProvider } from '@/context/globalContext'
 import { NoteProvider } from '@/context/noteContext'
 import { VideoProvider } from '@/context/videoContext'
 import { AppContainer } from '@/layout/AppContainer/AppContainer'
-import Overlay from '@/shared/Modal/Overlay'
+import { Overlay } from '@/shared/Modal/Overlay'
 import { fetcher } from '@/utils/clientHelpers'
 
 // todo: highlight current project in projects modal list

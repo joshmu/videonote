@@ -1,42 +1,49 @@
 /**
- * @path /src/components/Modals/CreateProjectModal/CreateProjectModal.js
- * 
+ * @path /src/components/Modals/CreateProjectModal/CreateProjectModal.tsx
+ *
  * @project videonote
- * @file CreateProjectModal.js
- * 
+ * @file CreateProjectModal.tsx
+ *
  * @author Josh Mu <hello@joshmu.dev>
  * @created Sunday, 20th September 2020
- * @modified Sunday, 22nd November 2020 3:26:33 pm
+ * @modified Sunday, 22nd November 2020 5:10:15 pm
  * @copyright © 2020 - 2020 MU
  */
 
-import { useState } from 'react'
+import { ChangeEvent, useState } from 'react'
 
-import ModalPrimaryBtn from '@/components/shared/Modal/ModalBtn'
+import { ModalPrimaryBtn } from '@/components/shared/Modal/ModalBtn'
 import { useGlobalContext } from '@/context/globalContext'
 import { useNotificationContext } from '@/context/notificationContext'
-import ModalContainer from '@/shared/Modal/ModalContainer'
-import ModalForm from '@/shared/Modal/ModalForm'
-import ModalHeader from '@/shared/Modal/ModalHeader'
-import ModalInnerContainer from '@/shared/Modal/ModalInnerContainer'
-import ModalInput from '@/shared/Modal/ModalInput'
+import { LocalVideoForm } from '@/shared/LocalVideoForm/LocalVideoForm'
+import { ModalContainer } from '@/shared/Modal/ModalContainer'
+import { ModalForm } from '@/shared/Modal/ModalForm'
+import { ModalHeader } from '@/shared/Modal/ModalHeader'
+import { ModalInnerContainer } from '@/shared/Modal/ModalInnerContainer'
+import { ModalInput } from '@/shared/Modal/ModalInput'
 
-import { LocalVideoForm } from '../../shared/LocalVideoForm/LocalVideoForm'
-
-export default function CreateProjectModal({ toggle: toggleModal, motionKey }) {
+export const CreateProjectModal = ({
+  toggle: toggleModal,
+  motionKey,
+}: {
+  toggle: () => void
+  motionKey: string
+}) => {
   const { createProject } = useGlobalContext()
   const { addAlert } = useNotificationContext()
 
-  const [project, setProject] = useState({
+  const [project, setProject] = useState<{ title: string; src: string }>({
     title: '',
     src: '',
   })
 
-  const handleCreate = async e => {
+  const handleCreate = async (
+    event: ChangeEvent<HTMLInputElement>
+  ): Promise<void> => {
     const title = project.title.trim()
     const videoSrc = project.src.trim()
 
-    e.preventDefault()
+    event.preventDefault()
     if (title.length === 0 || videoSrc.length === 0) {
       if (title.length === 0)
         addAlert({
@@ -56,13 +63,13 @@ export default function CreateProjectModal({ toggle: toggleModal, motionKey }) {
     toggleModal()
   }
 
-  const handleChange = e => {
-    setProject({ ...project, [e.target.id]: e.target.value })
+  const handleChange = (event: ChangeEvent<HTMLInputElement>): void => {
+    setProject({ ...project, [event.target.id]: event.target.value })
   }
 
-  const handleVideoSrc = url => {
+  const handleVideoSrc = (url: string): void => {
     console.log(url)
-    if (typeof url !== 'string' || url.length === 0) return
+    if (url.length === 0) return
     setProject({ ...project, src: url })
   }
 

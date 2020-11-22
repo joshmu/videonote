@@ -1,3 +1,15 @@
+/**
+ * @path /src/hooks/usePrompt.tsx
+ *
+ * @project videonote
+ * @file usePrompt.tsx
+ *
+ * @author Josh Mu <hello@joshmu.dev>
+ * @created Friday, 16th October 2020
+ * @modified Sunday, 22nd November 2020 6:18:24 pm
+ * @copyright © 2020 - 2020 MU
+ */
+
 import { ReactElement, useState } from 'react'
 
 const DEFAULTS = {
@@ -10,11 +22,13 @@ const DEFAULTS = {
 export interface PromptInterface {
   isOpen?: boolean
   msg: string | ReactElement
-  action: any
+  action: (callbackData: { [key: string]: string | number }) => void
   passwordRequired?: boolean
 }
 export type CreatePromptType = (promptData: PromptInterface) => void
-export type ConfirmPromptType = (promptData: PromptInterface) => void
+export type ConfirmPromptType = (confirmPromptData: {
+  password?: string
+}) => void
 export type CancelPromptType = () => void
 
 export const usePrompt = (): {
@@ -40,9 +54,9 @@ export const usePrompt = (): {
     }))
   }
 
-  const confirmPrompt: ConfirmPromptType = data => {
+  const confirmPrompt: ConfirmPromptType = callbackData => {
     // when user confirms, fire callback action
-    state.action(data)
+    state.action(callbackData)
     cancelPrompt()
   }
 

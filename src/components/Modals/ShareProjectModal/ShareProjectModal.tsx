@@ -1,22 +1,40 @@
-import { motion } from 'framer-motion'
-import { useEffect, useState } from 'react'
+/**
+ * @path /src/components/Modals/ShareProjectModal/ShareProjectModal.tsx
+ *
+ * @project videonote
+ * @file ShareProjectModal.tsx
+ *
+ * @author Josh Mu <hello@joshmu.dev>
+ * @created Monday, 2nd November 2020
+ * @modified Sunday, 22nd November 2020 6:02:18 pm
+ * @copyright © 2020 - 2020 MU
+ */
 
-import ModalPrimaryBtn from '@/components/shared/Modal/ModalBtn'
+import { motion } from 'framer-motion'
+import { ChangeEvent, FormEvent, MouseEvent, useEffect, useState } from 'react'
+
+import { ModalPrimaryBtn } from '@/components/shared/Modal/ModalBtn'
 import { ToggleInput } from '@/components/shared/Toggle/Toggle'
 import { useGlobalContext } from '@/context/globalContext'
 import { useNotificationContext } from '@/context/notificationContext'
-import ModalContainer from '@/shared/Modal/ModalContainer'
-import ModalForm from '@/shared/Modal/ModalForm'
-import ModalHeader from '@/shared/Modal/ModalHeader'
-import ModalInnerContainer from '@/shared/Modal/ModalInnerContainer'
-import ModalInput from '@/shared/Modal/ModalInput'
+import { ModalContainer } from '@/shared/Modal/ModalContainer'
+import { ModalForm } from '@/shared/Modal/ModalForm'
+import { ModalHeader } from '@/shared/Modal/ModalHeader'
+import { ModalInnerContainer } from '@/shared/Modal/ModalInnerContainer'
+import { ModalInput } from '@/shared/Modal/ModalInput'
+import { ShareProjectInterface } from '@/shared/types'
 
 // todo: remove bad characters from url path entry
-const formatUrl = txt => txt.replace(' ', '-').toLowerCase()
+const formatUrl = (txt: string): string => txt.replace(' ', '-').toLowerCase()
 
-const ShareProjectModal = ({ toggle: toggleModal, motionKey }) => {
+export const ShareProjectModal = ({
+  toggle: toggleModal,
+  motionKey,
+}: {
+  toggle: () => void
+  motionKey: string
+}) => {
   const {
-    updateProject,
     project,
     copyToClipboard,
     shareProject,
@@ -28,26 +46,35 @@ const ShareProjectModal = ({ toggle: toggleModal, motionKey }) => {
     password: '',
     canEdit: true,
   }
-  const initialState = project.share ? { ...project.share } : defaults
-  const [state, setState] = useState(initialState)
+  const initialState: ShareProjectInterface = project.share
+    ? { ...(project.share as ShareProjectInterface) }
+    : defaults
+
+  const [state, setState] = useState<ShareProjectInterface>(initialState)
 
   // update state if project.share state is updated
   useEffect(() => {
-    if (project.share) setState({ ...project.share })
+    if (project.share) setState({ ...(project.share as ShareProjectInterface) })
   }, [project])
 
-  const handleSubmit = async e => {
-    e.preventDefault()
+  const handleSubmit = async (
+    event: FormEvent<HTMLButtonElement>
+  ): Promise<void> => {
+    event.preventDefault()
 
-    if (state.url.length === 0)
-      return addAlert({
+    if (state.url.length === 0) {
+      addAlert({
         type: 'error',
         msg: 'Unique Share Url required.',
       })
+      return
+    }
 
     const shareData = { ...state }
     // if password hasn't been altered then don't provide it as we currently have a hashed version
-    if (shareData.password === project.share?.password)
+    if (
+      shareData.password === (project.share as ShareProjectInterface)?.password
+    )
       delete shareData.password
 
     const apiSuccess = await shareProject(state)
@@ -58,8 +85,10 @@ const ShareProjectModal = ({ toggle: toggleModal, motionKey }) => {
       addAlert({ type: 'error', msg: 'An error occurred...' })
     }
   }
-  const handleRemoveShare = async e => {
-    e.preventDefault()
+  const handleRemoveShare = async (
+    event: MouseEvent<HTMLElement>
+  ): Promise<void> => {
+    event.preventDefault()
     const apiSuccess = await removeShareProject()
 
     if (apiSuccess) {
@@ -70,20 +99,28 @@ const ShareProjectModal = ({ toggle: toggleModal, motionKey }) => {
     }
   }
 
-  const handleChange = e => {
-    let data = {}
-    if (e.target.id === 'url') {
-      data.url = formatUrl(e.target.value)
+  const handleChange = (event: ChangeEvent<HTMLInputElement>): void => {
+    const id: string = event.target.id
+    let data = { url: '' }
+
+    // if 'id' is 'url' then format before adding
+    if (id === 'url') {
+      data.url = formatUrl(event.target.value)
     } else {
-      data[e.target.id] = e.target.value
+      //  otherwise all other entries currently need no additional formatting
+      data[event.target.id] = event.target.value
     }
 
     const updatedState = { ...state, ...data }
     setState(updatedState)
   }
-  const handleCanEditToggle = () => {
+
+  const handleCanEditToggle = (): void => {
     setState(current => {
-      const updatedState = { ...current, canEdit: !state.canEdit }
+      const updatedState: ShareProjectInterface = {
+        ...current,
+        canEdit: !state.canEdit,
+      }
       return updatedState
     })
   }
@@ -124,17 +161,22 @@ const ShareProjectModal = ({ toggle: toggleModal, motionKey }) => {
               <div>
                 <p>Your project share link is:</p>
                 <motion.a
-                  href={`https://videonote.app/vn/${project.share.url}`}
+                  href={`https://videonote.app/vn/${
+                    (project.share as ShareProjectInterface).url
+                  }`}
                   target='_blank'
                   whileHover={{ scale: 0.95 }}
                   onClick={() =>
                     copyToClipboard(
-                      `https://videonote.app/vn/${project.share.url}`
+                      `https://videonote.app/vn/${
+                        (project.share as ShareProjectInterface).url
+                      }`
                     )
                   }
                   className='italic cursor-pointer top-8 text-themeAccent'
                 >
-                  videonote.app/vn/{project.share.url}
+                  videonote.app/vn/
+                  {(project.share as ShareProjectInterface).url}
                 </motion.a>
               </div>
             </>
@@ -160,5 +202,3 @@ const ShareProjectModal = ({ toggle: toggleModal, motionKey }) => {
     </ModalContainer>
   )
 }
-
-export default ShareProjectModal

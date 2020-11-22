@@ -1,8 +1,26 @@
-import ModalContainer from '@/shared/Modal/ModalContainer'
-import ModalHeader from '@/shared/Modal/ModalHeader'
-import ModalInnerContainer from '@/shared/Modal/ModalInnerContainer'
+/**
+ * @path /src/components/Modals/AboutModal/AboutModal.tsx
+ *
+ * @project videonote
+ * @file AboutModal.tsx
+ *
+ * @author Josh Mu <hello@joshmu.dev>
+ * @created Monday, 12th October 2020
+ * @modified Sunday, 22nd November 2020 4:44:11 pm
+ * @copyright © 2020 - 2020 MU
+ */
 
-const AboutModal = ({ toggle: toggleModal, motionKey }) => {
+import { ModalContainer } from '@/shared/Modal/ModalContainer'
+import { ModalHeader } from '@/shared/Modal/ModalHeader'
+import { ModalInnerContainer } from '@/shared/Modal/ModalInnerContainer'
+
+export const AboutModal = ({
+  toggle: toggleModal,
+  motionKey,
+}: {
+  toggle: () => void
+  motionKey: string
+}) => {
   return (
     <ModalContainer toggle={toggleModal} motionKey={motionKey}>
       <ModalHeader>About VideoNote</ModalHeader>
@@ -32,4 +50,3 @@ const AboutModal = ({ toggle: toggleModal, motionKey }) => {
     </ModalContainer>
   )
 }
-export default AboutModal

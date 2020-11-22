@@ -1,12 +1,12 @@
 /**
- * @path /src/components/Modals/ProjectsModal/ProjectsModal.js
+ * @path /src/components/Modals/ProjectsModal/ProjectsModal.tsx
  *
  * @project videonote
- * @file ProjectsModal.js
+ * @file ProjectsModal.tsx
  *
  * @author Josh Mu <hello@joshmu.dev>
  * @created Tuesday, 6th October 2020
- * @modified Sunday, 22nd November 2020 3:31:33 pm
+ * @modified Sunday, 22nd November 2020 5:28:32 pm
  * @copyright © 2020 - 2020 MU
  */
 
@@ -16,11 +16,19 @@ import { ImBin2 as TrashIcon } from 'react-icons/im'
 
 import { Select } from '@/components/shared/Select/Select'
 import { useGlobalContext } from '@/context/globalContext'
-import ModalContainer from '@/shared/Modal/ModalContainer'
-import ModalHeader from '@/shared/Modal/ModalHeader'
-import ModalInnerContainer from '@/shared/Modal/ModalInnerContainer'
+import { ModalContainer } from '@/shared/Modal/ModalContainer'
+import { ModalHeader } from '@/shared/Modal/ModalHeader'
+import { ModalInnerContainer } from '@/shared/Modal/ModalInnerContainer'
 
-export default function ProjectsModal({ toggle: toggleModal, motionKey }) {
+import { ProjectInterface } from '../../shared/types'
+
+export const ProjectsModal = ({
+  toggle: toggleModal,
+  motionKey,
+}: {
+  toggle: () => void
+  motionKey: string
+}) => {
   const {
     projects,
     project: currentProject,
@@ -28,9 +36,11 @@ export default function ProjectsModal({ toggle: toggleModal, motionKey }) {
     removeProject,
     createPrompt,
   } = useGlobalContext()
-  const [mousingOver, setMousingOver] = useState(null)
+  const [mousingOverProjectItem, setMousingOverProjectItem] = useState<string>(
+    null
+  )
 
-  const handleSelection = _id => {
+  const handleSelection = (_id: string): void => {
     // if we are on the current project do nothing
     if (_id === currentProject._id) return
 
@@ -38,7 +48,7 @@ export default function ProjectsModal({ toggle: toggleModal, motionKey }) {
     toggleModal()
   }
 
-  const handleRemoveProject = ({ title, _id }) => {
+  const handleRemoveProject = ({ title, _id }: ProjectInterface): void => {
     createPrompt({
       msg: (
         <span>
@@ -52,11 +62,12 @@ export default function ProjectsModal({ toggle: toggleModal, motionKey }) {
     })
   }
 
-  const handleRemoveCompleted = () => {}
-
-  const handleMousePosition = (inside, project) => {
-    if (inside) setMousingOver(project._id)
-    if (!inside) setMousingOver(null)
+  const handleMousePosition = (
+    inside: boolean,
+    project: ProjectInterface
+  ): void => {
+    if (inside) setMousingOverProjectItem(project._id)
+    if (!inside) setMousingOverProjectItem(null)
   }
 
   return (
@@ -91,7 +102,7 @@ export default function ProjectsModal({ toggle: toggleModal, motionKey }) {
                   {project.notes.length} notes
                 </span>
               </div>
-              {mousingOver === project._id && (
+              {mousingOverProjectItem === project._id && (
                 <motion.div
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}

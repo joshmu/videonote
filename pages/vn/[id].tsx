@@ -1,19 +1,36 @@
+/**
+ * @path /pages/vn/[id].tsx
+ *
+ * @project videonote
+ * @file [id].tsx
+ *
+ * @author Josh Mu <hello@joshmu.dev>
+ * @created Thursday, 8th October 2020
+ * @modified Sunday, 22nd November 2020 4:08:47 pm
+ * @copyright © 2020 - 2020 MU
+ */
+
 import { StatusCodes } from 'http-status-codes'
+import { NextPage } from 'next'
 import absoluteUrl from 'next-absolute-url'
 
-import Layout from '@/components/Layout/Layout'
+import { Layout } from '@/components/Layout/Layout'
 import Modals from '@/components/Modals/Modals'
 import Notification from '@/components/Notification/Notification'
-import Sidebar from '@/components/Sidebar/Sidebar'
-import VideoPlayer from '@/components/VideoPlayer/VideoPlayer'
+import { Sidebar } from '@/components/Sidebar/Sidebar'
+import { VideoPlayer } from '@/components/VideoPlayer/VideoPlayer'
 import { ControlsProvider } from '@/context/controlsContext'
 import { GlobalProvider } from '@/context/globalContext'
 import { NoteProvider } from '@/context/noteContext'
 import { VideoProvider } from '@/context/videoContext'
-import AppContainer from '@/layout/AppContainer/AppContainer'
-import Overlay from '@/shared/Modal/Overlay'
+import { AppContainer } from '@/layout/AppContainer/AppContainer'
+import { Overlay } from '@/shared/Modal/Overlay'
 
-export default function Main({ serverData }) {
+interface Props {
+  serverData?: {}
+}
+
+const ShareProjectPage: NextPage<Props> = ({ serverData = {} }) => {
   return (
     <GlobalProvider serverData={serverData}>
       <VideoProvider>
@@ -36,7 +53,7 @@ export default function Main({ serverData }) {
   )
 }
 
-Main.getInitialProps = async ctx => {
+ShareProjectPage.getInitialProps = async ctx => {
   // get id
   const shareUrl = ctx.query.id
 
@@ -71,3 +88,5 @@ Main.getInitialProps = async ctx => {
   // pass to react
   return { serverData: data }
 }
+
+export default ShareProjectPage

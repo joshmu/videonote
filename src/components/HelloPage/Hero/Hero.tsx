@@ -1,12 +1,12 @@
 /**
  * @path /src/components/HelloPage/Hero/Hero.tsx
- * 
+ *
  * @project videonote
  * @file Hero.tsx
- * 
+ *
  * @author Josh Mu <hello@joshmu.dev>
  * @created Thursday, 22nd October 2020
- * @modified Sunday, 22nd November 2020 2:34:59 pm
+ * @modified Sunday, 22nd November 2020 6:32:58 pm
  * @copyright © 2020 - 2020 MU
  */
 
@@ -23,8 +23,8 @@ export const Hero = () => {
   }
 
   return (
-    <div className='relative w-full transition-colors duration-300 ease-in-out min-h-screenVh bg-themeBg'>
-      <div className='absolute top-0 flex w-full h-screenVh'>
+    <div className='relative w-full min-h-screen transition-colors duration-300 ease-in-out bg-themeBg'>
+      <div className='absolute top-0 flex w-full h-screen'>
         {/* left */}
         <div className='relative flex items-center justify-end w-full h-full'>
           <motion.div

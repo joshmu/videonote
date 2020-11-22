@@ -1,11 +1,31 @@
-import { motion } from 'framer-motion'
+/**
+ * @path /src/components/shared/Modal/ModalBtn.tsx
+ *
+ * @project videonote
+ * @file ModalBtn.tsx
+ *
+ * @author Josh Mu <hello@joshmu.dev>
+ * @created Monday, 12th October 2020
+ * @modified Sunday, 22nd November 2020 5:12:38 pm
+ * @copyright © 2020 - 2020 MU
+ */
 
-const ModalPrimaryBtn = ({
+import { motion } from 'framer-motion'
+import { ReactNode } from 'react'
+
+interface ModalPrimaryBtnInterface {
+  handleClick: (event: any) => any
+  type?: string
+  color?: string
+  children: ReactNode
+}
+
+export const ModalPrimaryBtn = ({
   handleClick,
   type = 'submit',
   color = '',
   children,
-}) => (
+}: ModalPrimaryBtnInterface) => (
   <div className='flex justify-end mt-4'>
     <motion.button
       whileHover={{ scale: 0.9, transition: { duration: 0.1 } }}
@@ -20,5 +40,3 @@ const ModalPrimaryBtn = ({
     </motion.button>
   </div>
 )
-
-export default ModalPrimaryBtn

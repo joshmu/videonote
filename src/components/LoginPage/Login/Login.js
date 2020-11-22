@@ -1,11 +1,23 @@
+/**
+ * @path /src/components/LoginPage/Login/Login.js
+ * 
+ * @project videonote
+ * @file Login.js
+ * 
+ * @author Josh Mu <hello@joshmu.dev>
+ * @created Tuesday, 6th October 2020
+ * @modified Sunday, 22nd November 2020 6:26:06 pm
+ * @copyright © 2020 - 2020 MU
+ */
+
 import { motion } from 'framer-motion'
 import { StatusCodes } from 'http-status-codes'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 
-import ModalPrimaryBtn from '@/components/shared/Modal/ModalBtn'
+import { ModalPrimaryBtn } from '@/components/shared/Modal/ModalBtn'
 import { useNotificationContext } from '@/context/notificationContext'
-import ModalInput from '@/shared/Modal/ModalInput'
+import { ModalInput } from '@/shared/Modal/ModalInput'
 import { isValidCredentials } from '@/utils/clientHelpers'
 import { fetcher } from '@/utils/clientHelpers'
 

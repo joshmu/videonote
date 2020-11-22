@@ -1,9 +1,28 @@
-import ModalContainer from '@/shared/Modal/ModalContainer'
-import ModalHeader from '@/shared/Modal/ModalHeader'
-import ModalInnerContainer from '@/shared/Modal/ModalInnerContainer'
+/**
+ * @path /src/components/Modals/WelcomeModal/WelcomeModal.tsx
+ *
+ * @project videonote
+ * @file WelcomeModal.tsx
+ *
+ * @author Josh Mu <hello@joshmu.dev>
+ * @created Saturday, 17th October 2020
+ * @modified Sunday, 22nd November 2020 6:24:24 pm
+ * @copyright © 2020 - 2020 MU
+ */
+
 import { MdSettings as MenuIcon } from 'react-icons/md'
 
-const WelcomeModal = ({ toggle: toggleModal, motionKey }) => {
+import { ModalContainer } from '@/shared/Modal/ModalContainer'
+import { ModalHeader } from '@/shared/Modal/ModalHeader'
+import { ModalInnerContainer } from '@/shared/Modal/ModalInnerContainer'
+
+export const WelcomeModal = ({
+  toggle: toggleModal,
+  motionKey,
+}: {
+  toggle: () => void
+  motionKey: string
+}) => {
   return (
     <ModalContainer toggle={toggleModal} motionKey={motionKey}>
       <ModalHeader>Welcome!</ModalHeader>
@@ -51,5 +70,3 @@ const WelcomeModal = ({ toggle: toggleModal, motionKey }) => {
     </ModalContainer>
   )
 }
-
-export default WelcomeModal

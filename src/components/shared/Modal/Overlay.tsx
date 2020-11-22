@@ -1,10 +1,36 @@
-import { AnimatePresence, motion } from 'framer-motion'
+/**
+ * @path /src/components/shared/Modal/Overlay.tsx
+ *
+ * @project videonote
+ * @file Overlay.tsx
+ *
+ * @author Josh Mu <hello@joshmu.dev>
+ * @created Sunday, 27th September 2020
+ * @modified Sunday, 22nd November 2020 4:08:36 pm
+ * @copyright © 2020 - 2020 MU
+ */
+
+import { AnimatePresence, Variants, motion } from 'framer-motion'
 import { useEffect, useState } from 'react'
 
 import { useGlobalContext } from '@/context/globalContext'
 
-export default function Overlay() {
-  const [open, setOpen] = useState(false)
+const variants: Variants = {
+  initial: {
+    opacity: 0,
+  },
+  animate: {
+    opacity: 1,
+    transition: { duration: 0.2 },
+  },
+  exit: {
+    opacity: 0,
+    transition: { duration: 0.2 },
+  },
+}
+
+export const Overlay = () => {
+  const [open, setOpen] = useState<boolean>(false)
   const {
     modalsOpen,
     toggleModalOpen,
@@ -17,24 +43,10 @@ export default function Overlay() {
     if (modalsOpen.length === 0 && !promptState.isOpen) setOpen(false)
   }, [modalsOpen, promptState])
 
-  const handleOverlayClick = () => {
+  const handleOverlayClick = (): void => {
     setOpen(false)
     if (promptState.isOpen) cancelPrompt()
     if (modalsOpen.length > 0) toggleModalOpen()
-  }
-
-  const variants = {
-    initial: {
-      opacity: 0,
-    },
-    animate: {
-      opacity: 1,
-      transition: { duration: 0.2 },
-    },
-    exit: {
-      opacity: 0,
-      transition: { duration: 0.2 },
-    },
   }
 
   return (

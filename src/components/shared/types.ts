@@ -1,3 +1,15 @@
+/**
+ * @path /src/components/shared/types.ts
+ *
+ * @project videonote
+ * @file types.ts
+ *
+ * @author Josh Mu <hello@joshmu.dev>
+ * @created Wednesday, 18th November 2020
+ * @modified Sunday, 22nd November 2020 5:59:52 pm
+ * @copyright © 2020 - 2020 MU
+ */
+
 import { Document } from 'mongoose'
 
 export interface UserInterface {
@@ -43,8 +55,8 @@ export interface SettingsInterface {
 export interface ShareProjectInterface {
   _id?: string
   url: string
-  user: string | UserInterface
-  projectd: string | ProjectInterface
+  user?: string | UserInterface
+  project?: string | ProjectInterface
   password?: string
   canEdit?: boolean
 }

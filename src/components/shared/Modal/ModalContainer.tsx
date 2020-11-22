@@ -1,26 +1,35 @@
 /**
- * @path /src/components/shared/Modal/ModalContainer.js
+ * @path /src/components/shared/Modal/ModalContainer.tsx
  *
  * @project videonote
- * @file ModalContainer.js
+ * @file ModalContainer.tsx
  *
  * @author Josh Mu <hello@joshmu.dev>
  * @created Sunday, 27th September 2020
- * @modified Sunday, 22nd November 2020 3:19:42 pm
+ * @modified Sunday, 22nd November 2020 4:51:33 pm
  * @copyright © 2020 - 2020 MU
  */
 
-import { motion } from 'framer-motion'
+import { HTMLMotionProps, motion } from 'framer-motion'
+import { ReactNode } from 'react'
 
 import { CancelBtn } from '@/shared/CancelBtn/CancelBtn'
 
-const ModalContainer = ({
+interface ModalContainerInterface extends HTMLMotionProps<'div'> {
+  toggle: () => void
+  children: ReactNode
+  motionKey?: string
+  zIndex?: string
+  props?: { [key: string]: any }
+}
+
+export const ModalContainer = ({
   toggle,
   children,
   motionKey = 'modal',
   zIndex = null,
   ...props
-}) => {
+}: ModalContainerInterface) => {
   const variants = {
     initial: { opacity: 0, y: '-40%', x: '-50%' },
     animate: { opacity: 1, y: '-50%', transition: { duration: 0.2 } },
@@ -46,5 +55,3 @@ const ModalContainer = ({
     </motion.div>
   )
 }
-
-export default ModalContainer

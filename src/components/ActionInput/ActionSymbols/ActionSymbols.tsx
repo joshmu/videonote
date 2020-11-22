@@ -6,7 +6,7 @@
  *
  * @author Josh Mu <hello@joshmu.dev>
  * @created Monday, 28th September 2020
- * @modified Sunday, 22nd November 2020 3:04:43 pm
+ * @modified Sunday, 22nd November 2020 6:34:36 pm
  * @copyright © 2020 - 2020 MU
  */
 
@@ -62,7 +62,7 @@ export default function ActionSymbols() {
             <VolumeUpIcon />
           </MotionFadeInOut>
         )}
-        {action === PlayerAction.VOLUME_UP && (
+        {action === PlayerAction.VOLUME_DOWN && (
           <MotionFadeInOut motionKey={action} duration={0.5}>
             <VolumeDownIcon />
           </MotionFadeInOut>

@@ -6,20 +6,20 @@
  *
  * @author Josh Mu <hello@joshmu.dev>
  * @created Sunday, 27th September 2020
- * @modified Sunday, 22nd November 2020 3:29:31 pm
+ * @modified Sunday, 22nd November 2020 4:26:43 pm
  * @copyright © 2020 - 2020 MU
  */
 
-import { ReactNode } from 'react'
+import React, { ReactNode } from 'react'
 
-type SelectProps = {
+interface SelectProps extends React.HTMLAttributes<HTMLDivElement> {
   children: ReactNode
   modalId?: string
   padding?: string
   animate?: string
   text?: string
   cursor?: string
-  props?: {}
+  props?: { [key: string]: any }
 }
 
 export const Select = ({

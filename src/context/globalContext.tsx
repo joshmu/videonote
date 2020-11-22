@@ -6,7 +6,7 @@
  *
  * @author Josh Mu <hello@joshmu.dev>
  * @created Tuesday, 6th October 2020
- * @modified Sunday, 22nd November 2020 2:08:34 pm
+ * @modified Sunday, 22nd November 2020 6:19:03 pm
  * @copyright © 2020 - 2020 MU
  */
 
@@ -26,6 +26,7 @@ import {
 } from '@/root/src/components/shared/types'
 import { fetcher } from '@/utils/clientHelpers'
 
+import { ModalType } from '../components/Modals/Modals'
 import {
   ActionInputFocusType,
   AlertProjectLoadedType,
@@ -96,7 +97,7 @@ export const GlobalProvider = ({
 
   const [sidebarOpen, setSidebarOpen] = useState<boolean>(true)
   const [menuOpen, setMenuOpen] = useState<boolean>(false)
-  const [modalsOpen, setModalsOpen] = useState<string[]>([])
+  const [modalsOpen, setModalsOpen] = useState<ModalType[]>([])
   const actionInputRef = useRef<HTMLInputElement | null>(null)
 
   const [admin, setAdmin] = useState<boolean>(true)
@@ -121,7 +122,7 @@ export const GlobalProvider = ({
       if (modalsOpen.length > 0) toggleModalOpen()
 
       // welcome modal
-      toggleModalOpen('welcome')
+      toggleModalOpen(ModalType.WELCOME)
 
       addAlert({
         type: 'info',
