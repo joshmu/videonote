@@ -14,7 +14,6 @@
     "test": "jest",
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
-    "postinstall": "husky install",
     "plop": "plop"
   },
   "dependencies": {
@@ -51,7 +50,6 @@
     "@types/react": "^16.9.56",
     "@types/validator": "^13.1.0",
     "babel-plugin-transform-remove-console": "^6.9.4",
-    "husky": "^4.3.0",
     "identity-obj-proxy": "^3.0.0",
     "imagemin-mozjpeg": "^9.0.0",
     "imagemin-optipng": "^8.0.0",
