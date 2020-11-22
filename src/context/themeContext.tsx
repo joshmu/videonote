@@ -1,3 +1,15 @@
+/**
+ * @path /src/context/themeContext.tsx
+ * 
+ * @project videonote
+ * @file themeContext.tsx
+ * 
+ * @author Josh Mu <hello@joshmu.dev>
+ * @created Monday, 14th September 2020
+ * @modified Sunday, 22nd November 2020 11:18:13 am
+ * @copyright © 2020 - 2020 MU
+ */
+
 import { createContext, useContext, useEffect, useState } from 'react'
 
 import { useSetVh } from '@/hooks/useSetVh'

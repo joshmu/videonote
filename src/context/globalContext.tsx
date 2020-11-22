@@ -1,48 +1,60 @@
+/**
+ * @path /src/context/globalContext.tsx
+ *
+ * @project videonote
+ * @file globalContext.tsx
+ *
+ * @author Josh Mu <hello@joshmu.dev>
+ * @created Tuesday, 6th October 2020
+ * @modified Sunday, 22nd November 2020 9:30:58 am
+ * @copyright © 2020 - 2020 MU
+ */
+
 import { StatusCodes } from 'http-status-codes'
 import Router from 'next/router'
 import { createContext, useContext, useEffect, useRef, useState } from 'react'
 import Cookie from 'universal-cookie'
 
 import { usePrompt } from '@/hooks/usePrompt'
-import { fetcher } from '@/utils/clientHelpers'
-
-import { useNotificationContext } from './notificationContext'
 import {
+  NoteApiAction,
   ProjectApiActions,
   ProjectInterface,
   SettingsInterface,
   ShareProjectInterface,
   UserInterface,
-  NoteApiAction,
 } from '@/root/src/components/shared/types'
+import { fetcher } from '@/utils/clientHelpers'
+
 import {
+  ActionInputFocusType,
+  AlertProjectLoadedType,
+  BadResponseType,
+  CancelModalsType,
+  CheckCanEditType,
+  CopyToClipboardType,
+  CreateProjectType,
+  FetchWithPasswordPublicProjectType,
   GlobalContextInterface,
+  GuestUpdatingProjectType,
+  HandleInitialServerDataType,
   LoadProjectType,
   NoteApiRemoveDoneNotes,
   NoteApiType,
+  ProjectApiType,
+  RemoveAccountType,
+  RemoveProjectType,
   RemoveShareProjectType,
   ShareProjectType,
-  UpdateProjectsStateWithUpdatedNotesType,
-  UpdateProjectType,
-  GuestUpdatingProjectType,
-  UpdateUserType,
-  UpdateSettingsType,
   ToggleMenuOpenType,
-  ToggleSidebarType,
   ToggleModalOpenType,
-  CreateProjectType,
-  RemoveProjectType,
-  FetchWithPasswordPublicProjectType,
-  HandleInitialServerDataType,
-  AlertProjectLoadedType,
-  ProjectApiType,
-  CopyToClipboardType,
-  BadResponseType,
-  RemoveAccountType,
-  CancelModalsType,
-  CheckCanEditType,
-  ActionInputFocusType,
+  ToggleSidebarType,
+  UpdateProjectType,
+  UpdateProjectsStateWithUpdatedNotesType,
+  UpdateSettingsType,
+  UpdateUserType,
 } from './globalContext.types'
+import { useNotificationContext } from './notificationContext'
 
 const SETTINGS_DEFAULTS: SettingsInterface = {
   playOffset: -4,
@@ -71,8 +83,8 @@ export const GlobalProvider = ({
   serverData,
   ...props
 }: {
-  serverData: { [key: string]: any }
-  props: { [key: string]: any }
+  serverData: {}
+  props: {}
 }) => {
   const [user, setUser] = useState<UserInterface>(null!)
   const [projects, setProjects] = useState<ProjectInterface[]>([])
