@@ -6,11 +6,17 @@
  *
  * @author Josh Mu <hello@joshmu.dev>
  * @created Monday, 14th September 2020
- * @modified Sunday, 22nd November 2020 12:09:11 pm
+ * @modified Sunday, 22nd November 2020 6:58:19 pm
  * @copyright © 2020 - 2020 MU
  */
 
-import { createContext, useContext, useEffect, useState } from 'react'
+import {
+  ReactNode,
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+} from 'react'
 
 // import { useSetVh } from '@/hooks/useSetVh'
 
@@ -30,7 +36,7 @@ export enum ThemeType {
   HOT = 'theme-hot',
 }
 
-export const ThemeProvider = (props: { [key: string]: string }) => {
+export const ThemeProvider = ({ children }: { children: ReactNode }) => {
   // define vh via --vh var to avoid viewport issues on mobile
   // useSetVh()
 
@@ -83,7 +89,7 @@ export const ThemeProvider = (props: { [key: string]: string }) => {
     toggleTheme,
   }
 
-  return <themeContext.Provider value={value} {...props} />
+  return <themeContext.Provider value={value}>{children}</themeContext.Provider>
 }
 
 export const useThemeContext = (): ThemeContextInterface => {
