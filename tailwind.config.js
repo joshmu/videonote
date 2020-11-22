@@ -1,10 +1,36 @@
+/**
+ * @path /tailwind.config.js
+ *
+ * @project videonote
+ * @file tailwind.config.js
+ *
+ * @author Josh Mu <hello@joshmu.dev>
+ * @created Monday, 14th September 2020
+ * @modified Sunday, 22nd November 2020 7:36:06 pm
+ * @copyright © 2020 - 2020 MU
+ */
+
 const defaultTheme = require('tailwindcss/defaultTheme')
 const plugin = require('tailwindcss/plugin')
 
+const plugins = [
+  plugin(function ({ addUtilities }) {
+    const extendLineThrough = {
+      '.line-through': {
+        textDecoration: 'line-through',
+        textDecorationColor: 'var(--accent)',
+      },
+    }
+    addUtilities(extendLineThrough)
+  }),
+]
+const devOnlyPlugins = [require('tailwindcss-debug-screens')]
+
 module.exports = {
-  purge: {
-    content: ['./pages/**/*.js', './src/components/**/*.js'],
-  },
+  purge: [
+    './pages/**/*.{ts,tsx, js,jsx}',
+    './src/components/**/*.{ts,tsx,js,jsx}',
+  ],
   theme: {
     extend: {
       fontFamily: {
@@ -37,19 +63,10 @@ module.exports = {
     },
   },
   variants: {},
-  plugins: [
-    plugin(function ({ addUtilities }) {
-      const extendLineThrough = {
-        '.line-through': {
-          textDecoration: 'line-through',
-          textDecorationColor: 'var(--accent)',
-        },
-      }
-      addUtilities(extendLineThrough)
-    }),
-    process.env.NODE_ENV !== 'production' &&
-      require('tailwindcss-debug-screens'),
-  ],
+  plugins:
+    process.env.NODE_ENV === 'production'
+      ? plugins
+      : [...plugins, ...devOnlyPlugins],
   future: {
     removeDeprecatedGapUtilities: true,
     purgeLayersByDefault: true,
