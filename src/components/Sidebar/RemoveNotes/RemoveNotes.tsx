@@ -6,7 +6,7 @@
  *
  * @author Josh Mu <hello@joshmu.dev>
  * @created Monday, 12th October 2020
- * @modified Sunday, 22nd November 2020 12:47:24 pm
+ * @modified Sunday, 22nd November 2020 12:48:39 pm
  * @copyright © 2020 - 2020 MU
  */
 
@@ -17,7 +17,7 @@ import { ImBin2 as TrashIcon } from 'react-icons/im'
 import { useGlobalContext } from '@/context/globalContext'
 import { useNoteContext } from '@/context/noteContext'
 
-const RemoveNotes = () => {
+export const RemoveNotes = () => {
   const { createPrompt, project } = useGlobalContext()
   const { removeCompleted, notes } = useNoteContext()
 
@@ -58,5 +58,3 @@ const RemoveNotes = () => {
     </AnimatePresence>
   )
 }
-
-export default RemoveNotes

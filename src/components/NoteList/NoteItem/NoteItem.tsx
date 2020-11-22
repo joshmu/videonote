@@ -1,17 +1,17 @@
 /**
- * @path /src/components/NoteList/NoteItem/NoteItem.js
+ * @path /src/components/NoteList/NoteItem/NoteItem.tsx
  *
  * @project videonote
- * @file NoteItem.js
+ * @file NoteItem.tsx
  *
  * @author Josh Mu <hello@joshmu.dev>
  * @created Monday, 14th September 2020
- * @modified Sunday, 22nd November 2020 12:13:18 pm
+ * @modified Sunday, 22nd November 2020 1:44:59 pm
  * @copyright © 2020 - 2020 MU
  */
 
-import { motion } from 'framer-motion'
-import { useEffect, useState } from 'react'
+import { Variants, motion } from 'framer-motion'
+import { ChangeEvent, KeyboardEvent, useEffect, useState } from 'react'
 
 import Select from '@/components/shared/Select/Select'
 import { useControlsContext } from '@/context/controlsContext'
@@ -20,17 +20,28 @@ import { useNoteContext } from '@/context/noteContext'
 import { useVideoContext } from '@/context/videoContext'
 import { useIsMount } from '@/hooks/useIsMount'
 import TimeDisplay from '@/shared/TimeDisplay/TimeDisplay'
+import { NoteInterface, ShareProjectInterface } from '@/shared/types'
 
 import DisplayUser from './DisplayUser/DisplayUser'
 
-const NoteItem = ({ note, closestProximity, childVariants }) => {
+interface NoteItemInterface {
+  note: NoteInterface
+  closestProximity: boolean
+  childVariants: Variants
+}
+
+export const NoteItem = ({
+  note,
+  closestProximity,
+  childVariants,
+}: NoteItemInterface) => {
   const { project, admin, user } = useGlobalContext()
   const { seekTo } = useVideoContext()
   const { toggleSmartControls } = useControlsContext()
   const { updateNote } = useNoteContext()
 
-  const [isEditing, setIsEditing] = useState(false)
-  const [state, setState] = useState(note)
+  const [isEditing, setIsEditing] = useState<boolean>(false)
+  const [state, setState] = useState<NoteInterface>(note)
 
   const isMount = useIsMount()
 
@@ -52,33 +63,36 @@ const NoteItem = ({ note, closestProximity, childVariants }) => {
     updateNote(state)
   }, [isEditing, state, isMount])
 
-  const handleTimeClick = () => {
+  const handleTimeClick = (): void => {
     const updatedNote = { ...state, done: !state.done }
     setState(updatedNote)
   }
 
-  const handleNoteClick = () => {
+  const handleNoteClick = (): void => {
     seekTo(state.time)
   }
-  const toggleEdit = (willEdit = undefined) => {
+  const toggleEdit = (willEdit: boolean = undefined): void => {
     setIsEditing(current => {
       const newState = willEdit === undefined ? !current : willEdit
       return newState
     })
   }
-  const handleEdit = e => {
-    const updatedState = { ...state, content: e.target.value }
+  const handleEdit = (event: ChangeEvent): void => {
+    const updatedState = {
+      ...state,
+      content: (event.target as HTMLInputElement).value,
+    }
     setState(updatedState)
   }
-  const handleEditKeys = e => {
-    if (e.key === 'Enter') {
+  const handleEditKeys = (event: KeyboardEvent) => {
+    if (event.key === 'Enter') {
       setIsEditing(false)
       return
     }
   }
 
-  const handleDoubleClick = e => {
-    if (!admin && !project?.share.canEdit) return
+  const handleDoubleClick = (): void => {
+    if (!admin && !(project?.share as ShareProjectInterface).canEdit) return
     toggleEdit(true)
   }
 
@@ -88,7 +102,7 @@ const NoteItem = ({ note, closestProximity, childVariants }) => {
       // * childVariants used so we don't pass 'initial', 'animate' etc
       variants={childVariants}
       className={`${
-        closestProximity ? 'bg-opacity-25' : ' bg-opacity-0'
+        closestProximity ? 'bg-opacity-25' : 'bg-opacity-0'
       } relative border-b cursor-pointer border-themeText2 bg-themeSelectOpacity transition-colors duration-200 ease-out`}
     >
       <Select padding='p-0'>
@@ -140,5 +154,3 @@ const NoteItem = ({ note, closestProximity, childVariants }) => {
     </motion.div>
   )
 }
-
-export default NoteItem

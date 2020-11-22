@@ -1,8 +1,20 @@
+/**
+ * @path /src/components/NoteList/NoteList.js
+ * 
+ * @project videonote
+ * @file NoteList.js
+ * 
+ * @author Josh Mu <hello@joshmu.dev>
+ * @created Monday, 14th September 2020
+ * @modified Sunday, 22nd November 2020 12:56:07 pm
+ * @copyright © 2020 - 2020 MU
+ */
+
 import { AnimatePresence, motion } from 'framer-motion'
 
 import { useNoteContext } from '@/context/noteContext'
 
-import NoteItem from './NoteItem/NoteItem'
+import { NoteItem } from './NoteItem/NoteItem'
 
 const NoteList = () => {
   const { notes, sort, checkProximity } = useNoteContext()
