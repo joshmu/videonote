@@ -1,3 +1,15 @@
+/**
+ * @path /src/components/NoteList/NoteItem/NoteItem.js
+ *
+ * @project videonote
+ * @file NoteItem.js
+ *
+ * @author Josh Mu <hello@joshmu.dev>
+ * @created Monday, 14th September 2020
+ * @modified Sunday, 22nd November 2020 12:13:18 pm
+ * @copyright © 2020 - 2020 MU
+ */
+
 import { motion } from 'framer-motion'
 import { useEffect, useState } from 'react'
 

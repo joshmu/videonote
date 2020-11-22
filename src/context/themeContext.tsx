@@ -6,13 +6,13 @@
  *
  * @author Josh Mu <hello@joshmu.dev>
  * @created Monday, 14th September 2020
- * @modified Sunday, 22nd November 2020 11:37:54 am
+ * @modified Sunday, 22nd November 2020 12:09:11 pm
  * @copyright © 2020 - 2020 MU
  */
 
 import { createContext, useContext, useEffect, useState } from 'react'
 
-import { useSetVh } from '@/hooks/useSetVh'
+// import { useSetVh } from '@/hooks/useSetVh'
 
 interface ThemeContextInterface {
   theme: string
@@ -32,7 +32,7 @@ export enum ThemeType {
 
 export const ThemeProvider = (props: { [key: string]: string }) => {
   // define vh via --vh var to avoid viewport issues on mobile
-  useSetVh()
+  // useSetVh()
 
   // initialize theme with first enum entry
   const [theme, setTheme] = useState<ThemeType>(

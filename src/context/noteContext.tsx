@@ -1,3 +1,15 @@
+/**
+ * @path /src/context/noteContext.tsx
+ *
+ * @project videonote
+ * @file noteContext.tsx
+ *
+ * @author Josh Mu <hello@joshmu.dev>
+ * @created Tuesday, 6th October 2020
+ * @modified Sunday, 22nd November 2020 12:40:41 pm
+ * @copyright © 2020 - 2020 MU
+ */
+
 import mongoose from 'mongoose'
 import { createContext, useContext, useEffect, useRef, useState } from 'react'
 
@@ -35,12 +47,10 @@ export function NoteProvider(props: { [key: string]: any }) {
   const {
     project,
     projects,
-    updateProject,
     noteApi,
     noteApiRemoveDoneNotes,
     updateProjectsStateWithUpdatedNotes,
     checkCanEdit,
-    admin,
     user,
   } = useGlobalContext()
   const { progress } = useVideoContext()
@@ -55,7 +65,7 @@ export function NoteProvider(props: { [key: string]: any }) {
   // when a project is selected pre-fill the notes
   useEffect(() => {
     if (project !== null) {
-      setNotes(project.notes)
+      setNotes(project.notes as NoteInterface[])
       isLoadingNotesRef.current = true
     }
   }, [project])

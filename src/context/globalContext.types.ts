@@ -1,3 +1,15 @@
+/**
+ * @path /src/context/globalContext.types.ts
+ * 
+ * @project videonote
+ * @file globalContext.types.ts
+ * 
+ * @author Josh Mu <hello@joshmu.dev>
+ * @created Thursday, 19th November 2020
+ * @modified Sunday, 22nd November 2020 12:39:54 pm
+ * @copyright © 2020 - 2020 MU
+ */
+
 import { MutableRefObject } from 'react'
 
 import {
@@ -59,7 +71,7 @@ export type NoteApiType = (
     | {
         [key: string]: any
       }
-) => Promise<NoteInterface>
+) => Promise<NoteInterface | 'error'>
 
 export type NoteApiRemoveDoneNotes = () => Promise<NoteInterface[]>
 

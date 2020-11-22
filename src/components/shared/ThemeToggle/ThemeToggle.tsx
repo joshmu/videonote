@@ -1,16 +1,16 @@
 /**
- * @path /src/components/shared/ThemeToggle/ThemeToggle.js
+ * @path /src/components/shared/ThemeToggle/ThemeToggle.tsx
  *
  * @project videonote
- * @file ThemeToggle.js
+ * @file ThemeToggle.tsx
  *
  * @author Josh Mu <hello@joshmu.dev>
  * @created Tuesday, 15th September 2020
- * @modified Sunday, 22nd November 2020 11:41:02 am
+ * @modified Sunday, 22nd November 2020 12:08:20 pm
  * @copyright © 2020 - 2020 MU
  */
 
-import { motion } from 'framer-motion'
+import { Variants, motion } from 'framer-motion'
 import { AnimatePresence } from 'framer-motion'
 import { BsMoon as MoonIcon, BsLightningFill as ZapIcon } from 'react-icons/bs'
 import { GiHeatHaze as HotIcon } from 'react-icons/gi'
@@ -18,19 +18,26 @@ import { HiSun as SunIcon } from 'react-icons/hi'
 
 import { ThemeType, useThemeContext } from '@/context/themeContext'
 
+interface ThemeToggleInterface {
+  lightColor?: string
+  darkColor?: string
+  className?: string
+  props: object
+}
+
 export default function ThemeToggle({
   lightColor = '',
   darkColor = '',
   className = '',
   ...props
-}) {
+}: ThemeToggleInterface) {
   const { toggleTheme, theme } = useThemeContext()
 
-  const handleClick = () => {
+  const handleClick = (): void => {
     toggleTheme()
   }
 
-  const motionStyle = {
+  const motionStyle: Variants = {
     initial: { opacity: 0, rotate: -180, scale: 0 },
     animate: { opacity: 1, rotate: 0, scale: 1 },
     exit: { opacity: 0, rotate: 180, scale: 0 },
