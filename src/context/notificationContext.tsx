@@ -1,3 +1,15 @@
+/**
+ * @path /src/context/notificationContext.tsx
+ * 
+ * @project videonote
+ * @file notificationContext.tsx
+ * 
+ * @author Josh Mu <hello@joshmu.dev>
+ * @created Friday, 25th September 2020
+ * @modified Sunday, 22nd November 2020 7:11:50 pm
+ * @copyright © 2020 - 2020 MU
+ */
+
 import { nanoid } from 'nanoid'
 import React, { ReactNode, createContext, useContext, useState } from 'react'
 
@@ -10,7 +22,7 @@ interface NotificationContextInterface {
 }
 interface AlertInterface {
   id?: string
-  msg: string
+  msg: string | ReactNode
   type?: 'info' | 'warning' | 'error' | 'success' | 'project'
   duration?: number
   persistent?: boolean

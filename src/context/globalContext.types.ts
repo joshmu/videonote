@@ -6,7 +6,7 @@
  *
  * @author Josh Mu <hello@joshmu.dev>
  * @created Thursday, 19th November 2020
- * @modified Sunday, 22nd November 2020 6:07:18 pm
+ * @modified Sunday, 22nd November 2020 7:18:30 pm
  * @copyright © 2020 - 2020 MU
  */
 
@@ -77,7 +77,7 @@ export type NoteApiType = (
 export type NoteApiRemoveDoneNotes = () => Promise<NoteInterface[]>
 
 export type UpdateProjectType = (
-  projectData: ProjectInterface | {}
+  projectData: ProjectInterface | { _id?: string; src: string }
 ) => Promise<void>
 
 export type ShareProjectType = (
@@ -96,7 +96,9 @@ export type GuestUpdatingProjectType = (
   project: ProjectInterface
 ) => Promise<void>
 
-export type UpdateUserType = (userData: UserInterface | {username: string, email: string}) => Promise<void>
+export type UpdateUserType = (
+  userData: UserInterface | { username: string; email: string }
+) => Promise<void>
 
 export type UpdateSettingsType = (newSettingsData: {
   [key: string]: any
@@ -108,7 +110,9 @@ export type ToggleSidebarType = (state?: boolean) => void
 
 export type ToggleModalOpenType = (modalName?: ModalType) => void
 
-export type CreateProjectType = (projectData: ProjectInterface | {title: string, src: string}) => Promise<void>
+export type CreateProjectType = (
+  projectData: ProjectInterface | { title: string; src: string }
+) => Promise<void>
 
 export type RemoveProjectType = (_id: string) => Promise<void>
 

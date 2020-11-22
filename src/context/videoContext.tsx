@@ -6,7 +6,7 @@
  *
  * @author Josh Mu <hello@joshmu.dev>
  * @created Tuesday, 6th October 2020
- * @modified Sunday, 22nd November 2020 2:56:58 pm
+ * @modified Sunday, 22nd November 2020 7:08:45 pm
  * @copyright © 2020 - 2020 MU
  */
 
@@ -16,6 +16,7 @@ import { ReactPlayerProps } from 'react-player'
 import { useIsMount } from '@/hooks/useIsMount'
 import { ProgressInterface } from '@/root/src/components/shared/types'
 
+import { ModalType } from '../components/Modals/Modals'
 import { useAnounceAction } from '../hooks/useAnounceAction'
 import { useGlobalContext } from './globalContext'
 import { useNotificationContext } from './notificationContext'
@@ -93,7 +94,7 @@ export const VideoProvider = (props: { [key: string]: any }) => {
         duration: 12000,
       })
 
-      toggleModalOpen('current')
+      toggleModalOpen(ModalType.CURRENT_PROJECT)
     }
   }, [project, admin, isMount])
 
@@ -176,7 +177,7 @@ export const VideoProvider = (props: { [key: string]: any }) => {
       })
 
       updateProject({ src: '' })
-      toggleModalOpen('current')
+      toggleModalOpen(ModalType.CURRENT_PROJECT)
       // requestLocalVideo()
 
       return

@@ -1,3 +1,15 @@
+/**
+ * @path /utils/clientHelpers.ts
+ * 
+ * @project videonote
+ * @file clientHelpers.ts
+ * 
+ * @author Josh Mu <hello@joshmu.dev>
+ * @created Tuesday, 6th October 2020
+ * @modified Sunday, 22nd November 2020 7:25:48 pm
+ * @copyright © 2020 - 2020 MU
+ */
+
 import Cookies from 'universal-cookie'
 import isEmail from 'validator/lib/isEmail'
 
@@ -98,8 +110,8 @@ export const fetcher = async (
   return { res, data }
 }
 
-export const formatDuration = (secStr: string): string => {
-  const totalSecs = +secStr
+export const formatDuration = (secs: number): string => {
+  const totalSecs = +secs
   const sec = Math.floor(totalSecs % 60)
   const min = Math.floor(totalSecs / 60)
   return `${min}:${sec < 10 ? '0' + sec : sec}`

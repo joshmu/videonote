@@ -1,3 +1,15 @@
+/**
+ * @path /src/components/Modals/CurrentProjectModal/ExportNotes/ExportNotes.js
+ *
+ * @project videonote
+ * @file ExportNotes.js
+ *
+ * @author Josh Mu <hello@joshmu.dev>
+ * @created Friday, 9th October 2020
+ * @modified Sunday, 22nd November 2020 7:21:16 pm
+ * @copyright © 2020 - 2020 MU
+ */
+
 import { format } from 'date-fns'
 import { saveAs } from 'file-saver'
 import React from 'react'
@@ -31,6 +43,8 @@ export default function ExportNotes() {
   }
 
   function createTxtFile() {
+    if (project?.notes.length === 0) return
+
     let txtContent = `VIDEONOTE\n\n`
     txtContent += `${printDate()}\n`
     txtContent += `Project: ${project.title.toUpperCase()}\n`

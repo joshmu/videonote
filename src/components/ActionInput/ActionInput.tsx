@@ -6,7 +6,7 @@
  *
  * @author Josh Mu <hello@joshmu.dev>
  * @created Thursday, 17th September 2020
- * @modified Sunday, 22nd November 2020 2:34:09 pm
+ * @modified Sunday, 22nd November 2020 7:14:31 pm
  * @copyright © 2020 - 2020 MU
  */
 
@@ -18,6 +18,7 @@ import { useNoteContext } from '@/context/noteContext'
 import { useVideoContext } from '@/context/videoContext'
 
 import TimeDisplay from '../shared/TimeDisplay/TimeDisplay'
+import { NoteInterface } from '../shared/types'
 import ActionSymbols from './ActionSymbols/ActionSymbols'
 import ProgressBar from './ProgressBar/ProgressBar'
 import TimeMarkers from './TimeMarkers/TimeMarkers'
@@ -37,7 +38,9 @@ export const ActionInput = () => {
   const { toggleSmartControls } = useControlsContext()
   const { addNote } = useNoteContext()
 
-  const [note, setNote] = useState<{ content: string; time: number }>({
+  const [note, setNote] = useState<
+    NoteInterface | { content: string; time: number }
+  >({
     content: '',
     time: null,
   })

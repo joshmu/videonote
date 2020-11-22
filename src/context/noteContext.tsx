@@ -6,7 +6,7 @@
  *
  * @author Josh Mu <hello@joshmu.dev>
  * @created Tuesday, 6th October 2020
- * @modified Sunday, 22nd November 2020 2:30:56 pm
+ * @modified Sunday, 22nd November 2020 7:15:48 pm
  * @copyright © 2020 - 2020 MU
  */
 
@@ -22,7 +22,9 @@ import { useVideoContext } from './videoContext'
 
 const createMongooseId = () => new mongoose.Types.ObjectId().toString()
 
-type AddNoteType = (note: NoteInterface | {}) => void
+type AddNoteType = (
+  note: NoteInterface | { content: string; time: number }
+) => void
 type UpdateNoteType = (note: NoteInterface) => void
 type RemoveNoteType = (id: string) => void
 type UpdateSearchType = (txt: string) => void

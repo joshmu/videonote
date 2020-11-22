@@ -1,3 +1,15 @@
+/**
+ * @path /src/components/shared/ux/Compressor.js
+ * 
+ * @project videonote
+ * @file Compressor.js
+ * 
+ * @author Josh Mu <hello@joshmu.dev>
+ * @created Tuesday, 15th September 2020
+ * @modified Sunday, 22nd November 2020 7:16:29 pm
+ * @copyright © 2020 - 2020 MU
+ */
+
 import { motion, useAnimation } from 'framer-motion'
 import { useViewportScroll } from 'framer-motion'
 import React, { useEffect, useState } from 'react'
@@ -38,10 +50,10 @@ export default function Compressor({ text, hide, ...props }) {
     show: {
       width: 'auto',
       opacity: 1,
-    },
-    transition: {
-      duration: 1,
-      ease: [0.6, 0.05, -0.01, 0.9],
+      transition: {
+        duration: 1,
+        ease: [0.6, 0.05, -0.01, 0.9],
+      },
     },
   }
 

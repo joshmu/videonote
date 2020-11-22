@@ -1,3 +1,15 @@
+/**
+ * @path /pages/api/project.ts
+ * 
+ * @project videonote
+ * @file project.ts
+ * 
+ * @author Josh Mu <hello@joshmu.dev>
+ * @created Tuesday, 6th October 2020
+ * @modified Sunday, 22nd November 2020 7:01:59 pm
+ * @copyright © 2020 - 2020 MU
+ */
+
 import bcrypt from 'bcryptjs'
 import { StatusCodes } from 'http-status-codes'
 import { NextApiRequest, NextApiResponse } from 'next'
@@ -6,7 +18,7 @@ import {
   ProjectApiActions,
   ProjectDocInterface,
   ShareDocInterface,
-} from '@/root/src/components/shared/types'
+} from '@/shared/types'
 import { authenticateToken, generateAccessToken } from '@/utils/jwt'
 import { Note, Project, Share, User } from '@/utils/mongoose'
 

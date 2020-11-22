@@ -1,10 +1,21 @@
+/**
+ * @path /pages/api/public_project.ts
+ *
+ * @project videonote
+ * @file public_project.ts
+ *
+ * @author Josh Mu <hello@joshmu.dev>
+ * @created Thursday, 8th October 2020
+ * @modified Sunday, 22nd November 2020 7:02:38 pm
+ * @copyright © 2020 - 2020 MU
+ */
+
 import bcrypt from 'bcryptjs'
 import { StatusCodes } from 'http-status-codes'
 import { NextApiRequest, NextApiResponse } from 'next'
 
+import { ProjectDocInterface, ShareDocInterface } from '@/shared/types'
 import { Project, Share } from '@/utils/mongoose'
-
-import { ProjectDocInterface, ShareDocInterface } from './project'
 
 // GET 1 PROJECT
 export default async (req: NextApiRequest, res: NextApiResponse) => {

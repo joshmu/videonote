@@ -6,14 +6,14 @@
  *
  * @author Josh Mu <hello@joshmu.dev>
  * @created Wednesday, 18th November 2020
- * @modified Sunday, 22nd November 2020 5:59:52 pm
+ * @modified Sunday, 22nd November 2020 7:24:38 pm
  * @copyright © 2020 - 2020 MU
  */
 
 import { Document } from 'mongoose'
 
 export interface UserInterface {
-  _id: string
+  _id?: string
   email: string
   username: string
   projects: string[] | ProjectInterface[]
@@ -23,10 +23,10 @@ export interface UserInterface {
 }
 
 export interface ProjectInterface {
-  _id: string
+  _id?: string
   title: string
   src?: string
-  notes: string[] | NoteInterface[]
+  notes: NoteInterface[]
   user: string | UserInterface
   sharedUsers?: string[] | UserInterface[]
   share?: string | ShareProjectInterface
