@@ -1,8 +1,20 @@
+/**
+ * @path /src/components/Modals/ProjectsModal/ProjectsModal.js
+ *
+ * @project videonote
+ * @file ProjectsModal.js
+ *
+ * @author Josh Mu <hello@joshmu.dev>
+ * @created Tuesday, 6th October 2020
+ * @modified Sunday, 22nd November 2020 3:31:33 pm
+ * @copyright © 2020 - 2020 MU
+ */
+
 import { motion } from 'framer-motion'
 import { useState } from 'react'
 import { ImBin2 as TrashIcon } from 'react-icons/im'
 
-import Select from '@/components/shared/Select/Select'
+import { Select } from '@/components/shared/Select/Select'
 import { useGlobalContext } from '@/context/globalContext'
 import ModalContainer from '@/shared/Modal/ModalContainer'
 import ModalHeader from '@/shared/Modal/ModalHeader'

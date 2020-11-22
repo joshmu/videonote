@@ -1,6 +1,18 @@
+/**
+ * @path /src/components/shared/Modal/ModalContainer.js
+ *
+ * @project videonote
+ * @file ModalContainer.js
+ *
+ * @author Josh Mu <hello@joshmu.dev>
+ * @created Sunday, 27th September 2020
+ * @modified Sunday, 22nd November 2020 3:19:42 pm
+ * @copyright © 2020 - 2020 MU
+ */
+
 import { motion } from 'framer-motion'
 
-import CancelBtn from '../CancelBtn/CancelBtn'
+import { CancelBtn } from '@/shared/CancelBtn/CancelBtn'
 
 const ModalContainer = ({
   toggle,

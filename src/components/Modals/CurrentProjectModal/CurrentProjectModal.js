@@ -1,11 +1,21 @@
-import { motion } from 'framer-motion'
+/**
+ * @path /src/components/Modals/CurrentProjectModal/CurrentProjectModal.js
+ *
+ * @project videonote
+ * @file CurrentProjectModal.js
+ *
+ * @author Josh Mu <hello@joshmu.dev>
+ * @created Wednesday, 30th September 2020
+ * @modified Sunday, 22nd November 2020 3:26:55 pm
+ * @copyright © 2020 - 2020 MU
+ */
+
 import { useEffect, useState } from 'react'
 
 import ModalPrimaryBtn from '@/components/shared/Modal/ModalBtn'
-import { ToggleInput } from '@/components/shared/Toggle/Toggle'
 import { useGlobalContext } from '@/context/globalContext'
 import { useNotificationContext } from '@/context/notificationContext'
-import LocalVideoForm from '@/shared/LocalVideoForm/LocalVideoForm'
+import { LocalVideoForm } from '@/shared/LocalVideoForm/LocalVideoForm'
 import ModalContainer from '@/shared/Modal/ModalContainer'
 import ModalForm from '@/shared/Modal/ModalForm'
 import ModalHeader from '@/shared/Modal/ModalHeader'

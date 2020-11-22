@@ -1,12 +1,12 @@
 /**
- * @path /src/components/Sidebar/Menu/Menu.tsx
+ * @path /src/components/Sidebar/SidebarHeader/Menu/Menu.tsx
  *
  * @project videonote
  * @file Menu.tsx
  *
  * @author Josh Mu <hello@joshmu.dev>
  * @created Tuesday, 6th October 2020
- * @modified Sunday, 22nd November 2020 2:28:47 pm
+ * @modified Sunday, 22nd November 2020 3:32:49 pm
  * @copyright © 2020 - 2020 MU
  */
 
@@ -27,10 +27,10 @@ import {
 import { VscSettings as SettingsIcon } from 'react-icons/vsc'
 import Cookie from 'universal-cookie'
 
-import Select from '@/components/shared/Select/Select'
-import ThemeToggle from '@/components/shared/ThemeToggle/ThemeToggle'
 import { useGlobalContext } from '@/context/globalContext'
 import { useThemeContext } from '@/context/themeContext'
+import { Select } from '@/shared/Select/Select'
+import ThemeToggle from '@/shared/ThemeToggle/ThemeToggle'
 
 import { IconMenuItemWrapper } from './IconMenuItemWrapper/IconMenuItemWrapper'
 

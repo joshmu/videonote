@@ -1,3 +1,15 @@
+/**
+ * @path /src/components/Modals/CreateProjectModal/CreateProjectModal.js
+ * 
+ * @project videonote
+ * @file CreateProjectModal.js
+ * 
+ * @author Josh Mu <hello@joshmu.dev>
+ * @created Sunday, 20th September 2020
+ * @modified Sunday, 22nd November 2020 3:26:33 pm
+ * @copyright © 2020 - 2020 MU
+ */
+
 import { useState } from 'react'
 
 import ModalPrimaryBtn from '@/components/shared/Modal/ModalBtn'
@@ -9,7 +21,7 @@ import ModalHeader from '@/shared/Modal/ModalHeader'
 import ModalInnerContainer from '@/shared/Modal/ModalInnerContainer'
 import ModalInput from '@/shared/Modal/ModalInput'
 
-import LocalVideoForm from '../../shared/LocalVideoForm/LocalVideoForm'
+import { LocalVideoForm } from '../../shared/LocalVideoForm/LocalVideoForm'
 
 export default function CreateProjectModal({ toggle: toggleModal, motionKey }) {
   const { createProject } = useGlobalContext()

@@ -6,19 +6,19 @@
  *
  * @author Josh Mu <hello@joshmu.dev>
  * @created Monday, 14th September 2020
- * @modified Sunday, 22nd November 2020 2:23:28 pm
+ * @modified Sunday, 22nd November 2020 3:32:30 pm
  * @copyright © 2020 - 2020 MU
  */
 
 import { Variants, motion } from 'framer-motion'
 import { ChangeEvent, KeyboardEvent, useEffect, useState } from 'react'
 
-import Select from '@/components/shared/Select/Select'
 import { useControlsContext } from '@/context/controlsContext'
 import { useGlobalContext } from '@/context/globalContext'
 import { useNoteContext } from '@/context/noteContext'
 import { useVideoContext } from '@/context/videoContext'
 import { useIsMount } from '@/hooks/useIsMount'
+import { Select } from '@/shared/Select/Select'
 import TimeDisplay from '@/shared/TimeDisplay/TimeDisplay'
 import { NoteInterface, ShareProjectInterface } from '@/shared/types'
 

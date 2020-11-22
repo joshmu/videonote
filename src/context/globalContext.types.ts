@@ -1,12 +1,12 @@
 /**
  * @path /src/context/globalContext.types.ts
- * 
+ *
  * @project videonote
  * @file globalContext.types.ts
- * 
+ *
  * @author Josh Mu <hello@joshmu.dev>
  * @created Thursday, 19th November 2020
- * @modified Sunday, 22nd November 2020 12:39:54 pm
+ * @modified Sunday, 22nd November 2020 2:44:04 pm
  * @copyright © 2020 - 2020 MU
  */
 
@@ -75,7 +75,9 @@ export type NoteApiType = (
 
 export type NoteApiRemoveDoneNotes = () => Promise<NoteInterface[]>
 
-export type UpdateProjectType = (projectData: ProjectInterface) => Promise<void>
+export type UpdateProjectType = (
+  projectData: ProjectInterface | {}
+) => Promise<void>
 
 export type ShareProjectType = (
   shareData: ShareProjectInterface

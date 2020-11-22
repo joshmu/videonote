@@ -1,4 +1,17 @@
+/**
+ * @path /src/context/videoContext.tsx
+ *
+ * @project videonote
+ * @file videoContext.tsx
+ *
+ * @author Josh Mu <hello@joshmu.dev>
+ * @created Tuesday, 6th October 2020
+ * @modified Sunday, 22nd November 2020 2:56:58 pm
+ * @copyright © 2020 - 2020 MU
+ */
+
 import { createContext, useContext, useEffect, useRef, useState } from 'react'
+import { ReactPlayerProps } from 'react-player'
 
 import { useIsMount } from '@/hooks/useIsMount'
 import { ProgressInterface } from '@/root/src/components/shared/types'
@@ -6,8 +19,15 @@ import { ProgressInterface } from '@/root/src/components/shared/types'
 import { useAnounceAction } from '../hooks/useAnounceAction'
 import { useGlobalContext } from './globalContext'
 import { useNotificationContext } from './notificationContext'
-import { ReactPlayerProps } from 'react-player'
 
+export enum PlayerAction {
+  PLAY = 'play',
+  PAUSE = 'pause',
+  VOLUME_UP = 'volumeUp',
+  VOLUME_DOWN = 'volumeDown',
+  SEEK_FORWARD = 'seekForward',
+  SEEK_BACK = 'seekBack',
+}
 type SeekToType = (secs: number, settings?: { offset?: boolean }) => void
 interface VideoContextInterface {
   playing: boolean
@@ -28,6 +48,7 @@ interface VideoContextInterface {
   handlePlayerError: (error: any) => void
   jumpBack: () => void
   jumpForward: () => void
+  action: string
 }
 
 const videoContext = createContext<VideoContextInterface>(null!)
@@ -37,10 +58,8 @@ export const VideoProvider = (props: { [key: string]: any }) => {
     project,
     updateProject,
     settings,
-    toggleSidebar,
     toggleModalOpen,
     admin,
-    toggleMenuOpen,
   } = useGlobalContext()
   const { addAlert } = useNotificationContext()
   const playerRef = useRef<ReactPlayerProps>(null!)
@@ -98,7 +117,7 @@ export const VideoProvider = (props: { [key: string]: any }) => {
     setPlaying(playing => {
       const updatedPlayState = !playing
       // console.log({ playing, newState })
-      setAction(updatedPlayState ? 'play' : 'pause')
+      setAction(updatedPlayState ? PlayerAction.PLAY : PlayerAction.PAUSE)
       return updatedPlayState
     })
   }
@@ -113,7 +132,7 @@ export const VideoProvider = (props: { [key: string]: any }) => {
     newVolume = newVolume < 0 ? 0 : newVolume > 1 ? 1 : newVolume
     setVolume(newVolume)
 
-    setAction(increment > 0 ? 'volumeUp' : 'volumeDown')
+    setAction(increment > 0 ? PlayerAction.VOLUME_UP : PlayerAction.VOLUME_DOWN)
   }
 
   const handleProgress = (progressObj: ProgressInterface): void => {
@@ -136,14 +155,14 @@ export const VideoProvider = (props: { [key: string]: any }) => {
     const destination = progress.playedSeconds - settings.seekJump
     seekTo(destination > 0 ? destination : 0)
 
-    setAction('seekBack')
+    setAction(PlayerAction.SEEK_BACK)
   }
 
   const jumpForward = (): void => {
     const destination = progress.playedSeconds + settings.seekJump
     seekTo(destination)
 
-    setAction('seekForward')
+    setAction(PlayerAction.SEEK_FORWARD)
   }
 
   const handlePlayerError = (error: any): void => {
@@ -208,9 +227,9 @@ export const VideoProvider = (props: { [key: string]: any }) => {
     seekTo,
     playerRef,
     handlePlayerError,
-    action,
     jumpForward,
     jumpBack,
+    action,
   }
 
   return <videoContext.Provider value={value} {...props} />

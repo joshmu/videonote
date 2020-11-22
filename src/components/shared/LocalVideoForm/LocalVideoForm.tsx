@@ -1,24 +1,37 @@
+/**
+ * @path /src/components/shared/LocalVideoForm/LocalVideoForm.tsx
+ *
+ * @project videonote
+ * @file LocalVideoForm.tsx
+ *
+ * @author Josh Mu <hello@joshmu.dev>
+ * @created Thursday, 8th October 2020
+ * @modified Sunday, 22nd November 2020 3:27:07 pm
+ * @copyright © 2020 - 2020 MU
+ */
+
+import { AnimatePresence, Variants, motion } from 'framer-motion'
 import { useState } from 'react'
-import LocalVideoLoader from './LocalVideoLoader'
-import { AnimatePresence, motion } from 'framer-motion'
 
-export default function LocalVideoForm({ handleVideoSrc }) {
-  const [hover, setHover] = useState(false)
+import { LocalVideoLoader } from './LocalVideoLoader'
 
-  const variants = {
-    initial: {
-      opacity: 0,
+const variants: Variants = {
+  initial: {
+    opacity: 0,
+  },
+  animate: {
+    opacity: 1,
+    transition: {
+      duration: 0.4,
     },
-    animate: {
-      opacity: 1,
-      transition: {
-        duration: 0.4,
-      },
-    },
-    exit: {
-      opacity: 0,
-    },
-  }
+  },
+  exit: {
+    opacity: 0,
+  },
+}
+
+export const LocalVideoForm = ({ handleVideoSrc }) => {
+  const [hover, setHover] = useState<boolean>(false)
 
   return (
     <>

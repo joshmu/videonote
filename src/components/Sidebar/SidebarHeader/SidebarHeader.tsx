@@ -6,7 +6,7 @@
  *
  * @author Josh Mu <hello@joshmu.dev>
  * @created Monday, 12th October 2020
- * @modified Sunday, 22nd November 2020 2:02:55 pm
+ * @modified Sunday, 22nd November 2020 3:08:02 pm
  * @copyright © 2020 - 2020 MU
  */
 
@@ -17,8 +17,8 @@ import { MdSettings as MenuIcon } from 'react-icons/md'
 
 import { useGlobalContext } from '@/context/globalContext'
 
-import Menu from '../Menu/Menu'
-import Search from '../Search/Search'
+import { Menu } from './Menu/Menu'
+import { Search } from './Search/Search'
 
 export const SidebarHeader = () => {
   const {

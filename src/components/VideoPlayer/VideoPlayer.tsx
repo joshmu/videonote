@@ -1,12 +1,24 @@
-import { motion, Variants } from 'framer-motion'
+/**
+ * @path /src/components/VideoPlayer/VideoPlayer.tsx
+ *
+ * @project videonote
+ * @file VideoPlayer.tsx
+ *
+ * @author Josh Mu <hello@joshmu.dev>
+ * @created Thursday, 17th September 2020
+ * @modified Sunday, 22nd November 2020 3:26:20 pm
+ * @copyright © 2020 - 2020 MU
+ */
+
+import { Variants, motion } from 'framer-motion'
 import { useEffect, useState } from 'react'
 import ReactPlayer from 'react-player'
 
 import { useVideoContext } from '@/context/videoContext'
 import { useIsMount } from '@/hooks/useIsMount'
 
-import ActionInput from '../ActionInput/ActionInput'
-import Loader from '../shared/Loader/Loader'
+import { ActionInput } from '../ActionInput/ActionInput'
+import { Loader } from '../shared/Loader/Loader'
 import style from './videoPlayer.module.scss'
 
 const videoContentVariants: Variants = {

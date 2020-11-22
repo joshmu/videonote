@@ -1,3 +1,15 @@
+/**
+ * @path /src/components/ActionInput/ActionSymbols/ActionSymbols.tsx
+ *
+ * @project videonote
+ * @file ActionSymbols.tsx
+ *
+ * @author Josh Mu <hello@joshmu.dev>
+ * @created Monday, 28th September 2020
+ * @modified Sunday, 22nd November 2020 3:04:43 pm
+ * @copyright © 2020 - 2020 MU
+ */
+
 import { AnimatePresence } from 'framer-motion'
 import { useEffect, useState } from 'react'
 import {
@@ -11,14 +23,15 @@ import {
   TiMediaFastForward as SeekForwardIcon,
 } from 'react-icons/ti'
 
-import { useVideoContext } from '@/context/videoContext'
+import { PlayerAction, useVideoContext } from '@/context/videoContext'
 import MotionFadeInOut from '@/shared/ux/MotionFadeInOut'
 
 export default function ActionSymbols() {
   const { action: playerAction } = useVideoContext()
   const [action, setAction] = useState('')
-  let timer
+  let timer: ReturnType<typeof setTimeout>
 
+  // when we receive a player action we allow the state to exist temporarily
   useEffect(() => {
     if (playerAction === '') return
     // clear timeout if there is one
@@ -34,32 +47,32 @@ export default function ActionSymbols() {
   return (
     <div className='mr-2 text-2xl text-themeAccent'>
       <AnimatePresence exitBeforeEnter>
-        {action === 'play' && (
+        {action === PlayerAction.PLAY && (
           <MotionFadeInOut motionKey={action} duration={0.5}>
             <PlayIcon />
           </MotionFadeInOut>
         )}
-        {action === 'pause' && (
+        {action === PlayerAction.PAUSE && (
           <MotionFadeInOut motionKey={action} duration={0.5}>
             <PauseIcon />
           </MotionFadeInOut>
         )}
-        {action === 'volumeUp' && (
+        {action === PlayerAction.VOLUME_UP && (
           <MotionFadeInOut motionKey={action} duration={0.5}>
             <VolumeUpIcon />
           </MotionFadeInOut>
         )}
-        {action === 'volumeDown' && (
+        {action === PlayerAction.VOLUME_UP && (
           <MotionFadeInOut motionKey={action} duration={0.5}>
             <VolumeDownIcon />
           </MotionFadeInOut>
         )}
-        {action === 'seekBack' && (
+        {action === PlayerAction.SEEK_BACK && (
           <MotionFadeInOut motionKey={action} duration={0.5}>
             <SeekBackIcon />
           </MotionFadeInOut>
         )}
-        {action === 'seekForward' && (
+        {action === PlayerAction.SEEK_FORWARD && (
           <MotionFadeInOut motionKey={action} duration={0.5}>
             <SeekForwardIcon />
           </MotionFadeInOut>

@@ -1,3 +1,15 @@
+/**
+ * @path /src/components/Notification/Notification.js
+ *
+ * @project videonote
+ * @file Notification.js
+ *
+ * @author Josh Mu <hello@joshmu.dev>
+ * @created Friday, 25th September 2020
+ * @modified Sunday, 22nd November 2020 3:23:52 pm
+ * @copyright © 2020 - 2020 MU
+ */
+
 import { AnimatePresence, motion } from 'framer-motion'
 import {
   AiOutlineInfoCircle as InfoIcon,
@@ -8,7 +20,7 @@ import {
 import { VscError as ErrorIcon } from 'react-icons/vsc'
 
 import { useNotificationContext } from '@/context/notificationContext'
-import CancelBtn from '../shared/CancelBtn/CancelBtn'
+import { CancelBtn } from '@/shared/CancelBtn/CancelBtn'
 
 export default function Notification() {
   const { alerts, removeAlert } = useNotificationContext()
