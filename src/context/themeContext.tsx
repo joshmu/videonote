@@ -1,12 +1,12 @@
 /**
  * @path /src/context/themeContext.tsx
- * 
+ *
  * @project videonote
  * @file themeContext.tsx
- * 
+ *
  * @author Josh Mu <hello@joshmu.dev>
  * @created Monday, 14th September 2020
- * @modified Sunday, 22nd November 2020 11:18:13 am
+ * @modified Sunday, 22nd November 2020 11:37:54 am
  * @copyright © 2020 - 2020 MU
  */
 
@@ -17,32 +17,35 @@ import { useSetVh } from '@/hooks/useSetVh'
 interface ThemeContextInterface {
   theme: string
   toggleTheme: () => void
-  THEME_TYPES: { [key: string]: string }
 }
 
 const themeContext = createContext<ThemeContextInterface>(null!)
 
 const LOCALSTORAGE_KEY: string = 'vn:theme'
-const THEME_TYPES = {
-  dark: 'theme-dark',
-  light: 'theme-light',
-  superhero: 'theme-superhero',
-  hot: 'theme-hot',
+
+export enum ThemeType {
+  DARK = 'theme-dark',
+  LIGHT = 'theme-light',
+  SUPERHERO = 'theme-superhero',
+  HOT = 'theme-hot',
 }
 
 export const ThemeProvider = (props: { [key: string]: string }) => {
   // define vh via --vh var to avoid viewport issues on mobile
   useSetVh()
 
-  const [theme, setTheme] = useState<string>(Object.keys(THEME_TYPES)[0])
+  // initialize theme with first enum entry
+  const [theme, setTheme] = useState<ThemeType>(
+    Object.keys(ThemeType)[0] as ThemeType
+  )
 
   // initial theme
   useEffect(() => {
     // get locally stored theme
-    let savedTheme = window.localStorage.getItem(LOCALSTORAGE_KEY)
+    let savedTheme = window.localStorage.getItem(LOCALSTORAGE_KEY) as ThemeType
 
     // validation check
-    if (!Object.keys(THEME_TYPES).includes(savedTheme)) savedTheme = null
+    if (!Object.values(ThemeType).includes(savedTheme)) savedTheme = null
 
     // if we have a saved theme then set it
     // otherwise update localStorage with default initial theme
@@ -53,32 +56,31 @@ export const ThemeProvider = (props: { [key: string]: string }) => {
 
   // when theme changes then assign to body tag
   useEffect(() => {
-    Object.entries(THEME_TYPES).forEach(([, className]) =>
+    Object.values(ThemeType).forEach(className =>
       globalThis.document.body.classList.remove(className)
     )
-    globalThis.document.body.classList.add(THEME_TYPES[theme])
+    globalThis.document.body.classList.add(theme)
   }, [theme])
 
   const toggleTheme = () => {
     // get list of themeIds
-    const themeIdList = Object.keys(THEME_TYPES)
-    const themeIndex = themeIdList.findIndex(themeId => themeId === theme)
+    const themeList = Object.values(ThemeType)
+    const themeIndex = themeList.findIndex(classname => classname === theme)
     // logic to continuously cycle through array
     const nextThemeIndex =
-      themeIndex === themeIdList.length - 1 ? 0 : themeIndex + 1
-    let newThemeId = themeIdList[nextThemeIndex]
+      themeIndex === themeList.length - 1 ? 0 : themeIndex + 1
+    let newTheme = themeList[nextThemeIndex]
 
     // validation check & fallback
-    if (!themeIdList.includes(newThemeId)) newThemeId = themeIdList[0]
+    if (!themeList.includes(newTheme)) newTheme = themeList[0]
 
-    setTheme(newThemeId)
-    window.localStorage.setItem(LOCALSTORAGE_KEY, newThemeId)
+    setTheme(newTheme)
+    window.localStorage.setItem(LOCALSTORAGE_KEY, newTheme)
   }
 
   const value: ThemeContextInterface = {
     theme,
     toggleTheme,
-    THEME_TYPES,
   }
 
   return <themeContext.Provider value={value} {...props} />
