@@ -1,9 +1,23 @@
-import Hero from '@/components/HelloPage/Hero/Hero'
-import Layout from '@/components/Layout/Layout'
+/**
+ * @path /pages/hello.tsx
+ *
+ * @project videonote
+ * @file hello.tsx
+ *
+ * @author Josh Mu <hello@joshmu.dev>
+ * @created Monday, 14th September 2020
+ * @modified Sunday, 22nd November 2020 2:35:14 pm
+ * @copyright © 2020 - 2020 MU
+ */
+
+import { NextPage } from 'next'
+
+import { Hero } from '@/components/HelloPage/Hero/Hero'
+import { Layout } from '@/components/Layout/Layout'
 import ThemeToggle from '@/components/shared/ThemeToggle/ThemeToggle'
 
-const HelloPage = () => {
-  const handleAboutClick = e => {
+const HelloPage: NextPage = () => {
+  const handleAboutClick = (): void => {
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 

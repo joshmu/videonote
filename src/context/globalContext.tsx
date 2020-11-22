@@ -6,7 +6,7 @@
  *
  * @author Josh Mu <hello@joshmu.dev>
  * @created Tuesday, 6th October 2020
- * @modified Sunday, 22nd November 2020 12:37:28 pm
+ * @modified Sunday, 22nd November 2020 2:08:34 pm
  * @copyright © 2020 - 2020 MU
  */
 
@@ -80,11 +80,13 @@ const HINTS: string[] = [
 const globalContext = createContext<GlobalContextInterface>(null!)
 
 export const GlobalProvider = ({
+  children,
   serverData,
   ...props
 }: {
+  children: React.ReactElement
   serverData: {}
-  props: {}
+  props?: {}
 }) => {
   const [user, setUser] = useState<UserInterface>(null!)
   const [projects, setProjects] = useState<ProjectInterface[]>([])
@@ -748,7 +750,11 @@ export const GlobalProvider = ({
     actionInputFocus,
   }
 
-  return <globalContext.Provider value={value} {...props} />
+  return (
+    <globalContext.Provider value={value} {...props}>
+      {children}
+    </globalContext.Provider>
+  )
 }
 
 export const useGlobalContext = (): GlobalContextInterface => {

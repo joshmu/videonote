@@ -1,3 +1,15 @@
+/**
+ * @path /src/components/HelloPage/Hero/Hero.tsx
+ * 
+ * @project videonote
+ * @file Hero.tsx
+ * 
+ * @author Josh Mu <hello@joshmu.dev>
+ * @created Thursday, 22nd October 2020
+ * @modified Sunday, 22nd November 2020 2:34:59 pm
+ * @copyright © 2020 - 2020 MU
+ */
+
 import { motion } from 'framer-motion'
 import Link from 'next/link'
 import Router from 'next/router'
@@ -5,8 +17,8 @@ import Router from 'next/router'
 import { Heading } from '@/components/shared/Text/Text'
 import MotionFadeUp from '@/components/shared/ux/MotionFadeUp'
 
-const Hero = () => {
-  const handleClick = () => {
+export const Hero = () => {
+  const handleClick = (): void => {
     Router.push('/login')
   }
 
@@ -117,5 +129,3 @@ const Hero = () => {
     </div>
   )
 }
-
-export default Hero

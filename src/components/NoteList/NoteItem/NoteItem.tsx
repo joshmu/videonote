@@ -6,7 +6,7 @@
  *
  * @author Josh Mu <hello@joshmu.dev>
  * @created Monday, 14th September 2020
- * @modified Sunday, 22nd November 2020 1:44:59 pm
+ * @modified Sunday, 22nd November 2020 2:23:28 pm
  * @copyright © 2020 - 2020 MU
  */
 
@@ -77,10 +77,10 @@ export const NoteItem = ({
       return newState
     })
   }
-  const handleEdit = (event: ChangeEvent): void => {
+  const handleEdit = (event: ChangeEvent<HTMLInputElement>): void => {
     const updatedState = {
       ...state,
-      content: (event.target as HTMLInputElement).value,
+      content: event.target.value,
     }
     setState(updatedState)
   }

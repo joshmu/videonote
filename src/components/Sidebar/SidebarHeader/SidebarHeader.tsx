@@ -1,3 +1,15 @@
+/**
+ * @path /src/components/Sidebar/SidebarHeader/SidebarHeader.tsx
+ *
+ * @project videonote
+ * @file SidebarHeader.tsx
+ *
+ * @author Josh Mu <hello@joshmu.dev>
+ * @created Monday, 12th October 2020
+ * @modified Sunday, 22nd November 2020 2:02:55 pm
+ * @copyright © 2020 - 2020 MU
+ */
+
 import { motion } from 'framer-motion'
 import React from 'react'
 import { GoChevronRight as ArrowIcon } from 'react-icons/go'
@@ -8,7 +20,7 @@ import { useGlobalContext } from '@/context/globalContext'
 import Menu from '../Menu/Menu'
 import Search from '../Search/Search'
 
-const SidebarHeader = () => {
+export const SidebarHeader = () => {
   const {
     toggleMenuOpen,
     menuOpen,
@@ -17,11 +29,11 @@ const SidebarHeader = () => {
     projects,
   } = useGlobalContext()
 
-  const toggleOpen = () => {
+  const toggleOpen = (): void => {
     toggleSidebar()
   }
 
-  const handleSettingsClick = () => {
+  const handleSettingsClick = (): void => {
     toggleMenuOpen()
   }
 
@@ -72,5 +84,3 @@ const SidebarHeader = () => {
     </div>
   )
 }
-
-export default SidebarHeader

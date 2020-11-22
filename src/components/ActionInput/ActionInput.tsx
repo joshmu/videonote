@@ -1,4 +1,16 @@
-import { useEffect, useRef, useState } from 'react'
+/**
+ * @path /src/components/ActionInput/ActionInput.tsx
+ *
+ * @project videonote
+ * @file ActionInput.tsx
+ *
+ * @author Josh Mu <hello@joshmu.dev>
+ * @created Thursday, 17th September 2020
+ * @modified Sunday, 22nd November 2020 2:34:09 pm
+ * @copyright © 2020 - 2020 MU
+ */
+
+import { ChangeEvent, KeyboardEvent, useEffect, useState } from 'react'
 
 import { useControlsContext } from '@/context/controlsContext'
 import { useGlobalContext } from '@/context/globalContext'
@@ -12,7 +24,7 @@ import TimeMarkers from './TimeMarkers/TimeMarkers'
 
 const PLACEHOLDER = 'Add Note...'
 
-const ActionInput = () => {
+export const ActionInput = () => {
   const {
     settings,
     sidebarOpen,
@@ -25,12 +37,12 @@ const ActionInput = () => {
   const { toggleSmartControls } = useControlsContext()
   const { addNote } = useNoteContext()
 
-  const [note, setNote] = useState({
+  const [note, setNote] = useState<{ content: string; time: number }>({
     content: '',
     time: null,
   })
-  const [isActive, setIsActive] = useState(false)
-  const [hint, setHint] = useState(getHint(HINTS, settings.showHints))
+  const [isActive, setIsActive] = useState<boolean>(false)
+  const [hint, setHint] = useState<string>(getHint(HINTS, settings.showHints))
 
   useEffect(() => {
     // generate new random hint each time we are focused on the input
@@ -62,9 +74,12 @@ const ActionInput = () => {
   }
 
   // * update note on entry but exclude initial char if it is a space for play/pause logic
-  const handleChange = e => {
+  const handleChange = (event: ChangeEvent<HTMLInputElement>): void => {
     // if we use an initial space then reset
-    setNote({ ...note, content: e.target.value === ' ' ? '' : e.target.value })
+    setNote({
+      ...note,
+      content: event.target.value === ' ' ? '' : event.target.value,
+    })
   }
 
   // alter note timestamp based on whether we have txt data or not
@@ -77,21 +92,17 @@ const ActionInput = () => {
       setNote({ ...note, time: null })
   }, [note.content, note.time, progress.playedSeconds])
 
-  const handleFocus = e => {
+  const handleFocus = (): void => {
     if (!isActive) setIsActive(true)
   }
-  const handleBlur = e => {
+  const handleBlur = (): void => {
     if (isActive) setIsActive(false)
   }
 
-  const handleKeyDown = e => {
+  const handleKeyDown = (event: KeyboardEvent<HTMLInputElement>): void => {
+    // actions possible if text has been place within input
     if (note.content.length > 0) {
-      if (e.key === 'Enter') handleSubmit()
-    }
-
-    // keyboard shortcuts on empty note
-    if (note.content === '') {
-      // smartControls(e.key)
+      if (event.key === 'Enter') handleSubmit()
     }
   }
 
@@ -143,9 +154,11 @@ const ActionInput = () => {
   )
 }
 
-export default ActionInput
-
-const getHint = (HINTS, show, prevHint = null) => {
+const getHint = (
+  HINTS: string[],
+  show: boolean,
+  prevHint: string = null
+): string => {
   if (!show) return PLACEHOLDER
 
   if (prevHint === null) {

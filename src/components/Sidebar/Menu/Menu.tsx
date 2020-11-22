@@ -1,4 +1,16 @@
-import { AnimatePresence, motion } from 'framer-motion'
+/**
+ * @path /src/components/Sidebar/Menu/Menu.tsx
+ *
+ * @project videonote
+ * @file Menu.tsx
+ *
+ * @author Josh Mu <hello@joshmu.dev>
+ * @created Tuesday, 6th October 2020
+ * @modified Sunday, 22nd November 2020 2:28:47 pm
+ * @copyright © 2020 - 2020 MU
+ */
+
+import { AnimatePresence, Variants, motion } from 'framer-motion'
 import Link from 'next/link'
 import {
   AiOutlineFile as ProjectIcon,
@@ -20,48 +32,46 @@ import ThemeToggle from '@/components/shared/ThemeToggle/ThemeToggle'
 import { useGlobalContext } from '@/context/globalContext'
 import { useThemeContext } from '@/context/themeContext'
 
-import IconMenuItemWrapper from './IconMenuItemWrapper/IconMenuItemWrapper'
+import { IconMenuItemWrapper } from './IconMenuItemWrapper/IconMenuItemWrapper'
 
-const Menu = ({ open }) => {
+const variants: Variants = {
+  initial: { opacity: 0 },
+  animate: {
+    opacity: 1,
+    transition: {
+      duration: 0.2,
+    },
+  },
+  exit: { opacity: 0, transition: { duration: 0.2 } },
+}
+
+export const Menu = ({ open }: { open: boolean }) => {
   const {
     toggleMenuOpen,
     toggleModalOpen,
     project,
     admin,
-    updateProject,
-    copyToClipboard,
     projects,
   } = useGlobalContext()
   const { toggleTheme } = useThemeContext()
 
-  const handleModalOpen = modalId => {
+  const handleModalOpen = (modalId: string): void => {
     toggleModalOpen(modalId)
     toggleMenuOpen()
   }
 
-  const handleSignOutClick = () => {
+  const handleSignOutClick = (): void => {
     // remove JWT token cookie
     const cookies = new Cookie()
     cookies.remove('token')
   }
 
-  const handleThemeToggleClick = () => {
+  const handleThemeToggleClick = (): void => {
     toggleTheme()
   }
 
-  const handleMouseLeave = () => {
+  const handleMouseLeave = (): void => {
     toggleMenuOpen(false)
-  }
-
-  const variants = {
-    initial: { opacity: 0 },
-    animate: {
-      opacity: 1,
-      transition: {
-        duration: 0.2,
-      },
-    },
-    exit: { opacity: 0, transition: { duration: 0.2 } },
   }
 
   return (
@@ -180,5 +190,3 @@ const Menu = ({ open }) => {
     </div>
   )
 }
-
-export default Menu

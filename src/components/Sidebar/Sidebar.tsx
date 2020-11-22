@@ -1,24 +1,24 @@
 /**
  * @path /src/components/Sidebar/Sidebar.tsx
- * 
+ *
  * @project videonote
  * @file Sidebar.tsx
- * 
+ *
  * @author Josh Mu <hello@joshmu.dev>
  * @created Sunday, 20th September 2020
- * @modified Sunday, 22nd November 2020 12:48:49 pm
+ * @modified Sunday, 22nd November 2020 2:25:36 pm
  * @copyright © 2020 - 2020 MU
  */
 
 import { Variants, motion } from 'framer-motion'
 import { useEffect } from 'react'
 
-import NoteList from '@/components/NoteList/NoteList'
+import { NoteList } from '@/components/NoteList/NoteList'
 import { useGlobalContext } from '@/context/globalContext'
 import { useResizable } from '@/hooks/useResizable'
 
 import { RemoveNotes } from './RemoveNotes/RemoveNotes'
-import SidebarHeader from './SidebarHeader/SidebarHeader'
+import { SidebarHeader } from './SidebarHeader/SidebarHeader'
 
 const sidebarVariants: Variants = {
   initial: {

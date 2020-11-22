@@ -6,7 +6,7 @@
  *
  * @author Josh Mu <hello@joshmu.dev>
  * @created Tuesday, 15th September 2020
- * @modified Sunday, 22nd November 2020 12:08:20 pm
+ * @modified Sunday, 22nd November 2020 2:13:53 pm
  * @copyright © 2020 - 2020 MU
  */
 
@@ -22,7 +22,7 @@ interface ThemeToggleInterface {
   lightColor?: string
   darkColor?: string
   className?: string
-  props: object
+  props?: object
 }
 
 export default function ThemeToggle({

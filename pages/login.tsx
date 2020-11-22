@@ -1,7 +1,20 @@
+/**
+ * @path /pages/login.tsx
+ *
+ * @project videonote
+ * @file login.tsx
+ *
+ * @author Josh Mu <hello@joshmu.dev>
+ * @created Tuesday, 6th October 2020
+ * @modified Sunday, 22nd November 2020 2:27:35 pm
+ * @copyright © 2020 - 2020 MU
+ */
+
+import { NextPage } from 'next'
 import Router from 'next/router'
 import { useState } from 'react'
 
-import Layout from '@/components/Layout/Layout'
+import { Layout } from '@/components/Layout/Layout'
 import LoginView from '@/components/LoginPage/Login/Login'
 import RegisterView from '@/components/LoginPage/Register/Register'
 import Notification from '@/components/Notification/Notification'
@@ -10,23 +23,23 @@ import useTwConfig from '@/hooks/useTwConfig'
 
 import { handleJwtToken } from '../utils/clientHelpers'
 
-export default function Login() {
-  const [loginView, setLoginView] = useState(true)
-  const [email, setEmail] = useState('')
+const Login: NextPage = () => {
+  const [loginView, setLoginView] = useState<boolean>(true)
+  const [email, setEmail] = useState<string>('')
 
   const twConfig = useTwConfig()
 
-  const toggleLoginView = (state = undefined) => {
+  const toggleLoginView = (state: boolean = undefined): void => {
     const isLoginViewShowing = state === undefined ? !loginView : state
     setLoginView(isLoginViewShowing)
   }
 
-  const handleLogin = data => {
+  const handleLogin = (data: { token: string }): void => {
     handleJwtToken(data.token)
     Router.push('/')
   }
 
-  const handleEmail = email => setEmail(email)
+  const handleEmail = (email: string): void => setEmail(email)
 
   return (
     <Layout>
@@ -58,3 +71,5 @@ export default function Login() {
     </Layout>
   )
 }
+
+export default Login
