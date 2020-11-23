@@ -1,3 +1,15 @@
+/**
+ * @path /utils/mongoose.ts
+ *
+ * @project videonote
+ * @file mongoose.ts
+ *
+ * @author Josh Mu <hello@joshmu.dev>
+ * @created Tuesday, 13th October 2020
+ * @modified Monday, 23rd November 2020 4:58:55 pm
+ * @copyright © 2020 - 2020 MU
+ */
+
 import mongoose from 'mongoose'
 const { Schema } = mongoose
 

@@ -1,6 +1,19 @@
+/**
+ * @path /src/context/controlsContext.tsx
+ *
+ * @project videonote
+ * @file controlsContext.tsx
+ *
+ * @author Josh Mu <hello@joshmu.dev>
+ * @created Tuesday, 20th October 2020
+ * @modified Monday, 23rd November 2020 4:05:18 pm
+ * @copyright © 2020 - 2020 MU
+ */
+
 import { createContext, useContext, useState } from 'react'
 
-import useGlobalKeydown from '../hooks/useGlobalKeydown'
+import { useGlobalKeydown } from '@/hooks/useGlobalKeydown'
+
 import { useGlobalContext } from './globalContext'
 import { useNoteContext } from './noteContext'
 import { useVideoContext } from './videoContext'
@@ -12,7 +25,7 @@ interface ControlsContextInterface {
   isSmartControlsEnabled: boolean
   toggleSmartControls: ToggleSmartControlsType
 }
-enum Key {
+export enum Keymap {
   SPACE = ' ',
   LEFT = 'ArrowLeft',
   RIGHT = 'ArrowRight',
@@ -43,7 +56,7 @@ export function ControlsProvider(props: { [key: string]: any }) {
 
   const globalControls: ControlsType = (key, _keysPressed) => {
     switch (key) {
-      case Key.ESC:
+      case Keymap.ESC:
         cancelModals()
         break
       default:
@@ -54,25 +67,27 @@ export function ControlsProvider(props: { [key: string]: any }) {
     if (!isSmartControlsEnabled) return
 
     switch (key) {
-      case Key.SPACE:
-        keysPressed.includes(Key.SHIFT) ? toggleSidebar() : togglePlay()
+      case Keymap.SPACE:
+        keysPressed.includes(Keymap.SHIFT) ? toggleSidebar() : togglePlay()
         break
-      case Key.LEFT:
-        keysPressed.includes(Key.SHIFT) ? nextPrevNote('prev') : jumpBack()
+      case Keymap.LEFT:
+        keysPressed.includes(Keymap.SHIFT) ? nextPrevNote('prev') : jumpBack()
         break
-      case Key.RIGHT:
-        keysPressed.includes(Key.SHIFT) ? nextPrevNote('next') : jumpForward()
+      case Keymap.RIGHT:
+        keysPressed.includes(Keymap.SHIFT)
+          ? nextPrevNote('next')
+          : jumpForward()
         break
-      case Key.UP:
+      case Keymap.UP:
         changeVolume(0.1)
         break
-      case Key.DOWN:
+      case Keymap.DOWN:
         changeVolume(-0.1)
         break
-      case Key.ALT:
+      case Keymap.ALT:
         toggleMenuOpen()
         break
-      case Key.ESC:
+      case Keymap.ESC:
         cancelModals()
         break
       default:
