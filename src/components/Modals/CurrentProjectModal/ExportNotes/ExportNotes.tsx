@@ -1,12 +1,12 @@
 /**
- * @path /src/components/Modals/CurrentProjectModal/ExportNotes/ExportNotes.js
+ * @path /src/components/Modals/CurrentProjectModal/ExportNotes/ExportNotes.tsx
  *
  * @project videonote
- * @file ExportNotes.js
+ * @file ExportNotes.tsx
  *
  * @author Josh Mu <hello@joshmu.dev>
  * @created Friday, 9th October 2020
- * @modified Sunday, 22nd November 2020 7:21:16 pm
+ * @modified Monday, 23rd November 2020 11:35:45 am
  * @copyright © 2020 - 2020 MU
  */
 
@@ -19,7 +19,7 @@ import { useGlobalContext } from '@/context/globalContext'
 import { useNotificationContext } from '@/context/notificationContext'
 import { formatDuration } from '@/utils/clientHelpers'
 
-export default function ExportNotes() {
+export const ExportNotes = () => {
   const { project } = useGlobalContext()
   const { addAlert } = useNotificationContext()
 
@@ -30,7 +30,25 @@ export default function ExportNotes() {
     return <div></div>
   }
 
-  function handleClick() {
+  const createTxtFile = (): string => {
+    if (project?.notes.length === 0) return
+
+    let txtContent = `VIDEONOTE\n\n`
+    txtContent += `${printDate()}\n`
+    txtContent += `Project: ${project.title.toUpperCase()}\n`
+    txtContent += `---\n\n`
+    // content
+    txtContent += project.notes
+      .map(
+        msg =>
+          `${msg.done ? 'x' : '-'} [${formatDuration(msg.time)}] ${msg.content}`
+      )
+      .join('\n')
+
+    return txtContent
+  }
+
+  const handleClick = (): void => {
     addAlert({ type: 'info', msg: `Exporting Notes` })
     console.log('export notes')
     const txtFile = createTxtFile()
@@ -42,25 +60,6 @@ export default function ExportNotes() {
     saveAs(blob, `VIDEONOTE - ${project.title}.txt`)
   }
 
-  function createTxtFile() {
-    if (project?.notes.length === 0) return
-
-    let txtContent = `VIDEONOTE\n\n`
-    txtContent += `${printDate()}\n`
-    txtContent += `Project: ${project.title.toUpperCase()}\n`
-    txtContent += `---\n\n`
-    // content
-    txtContent += project.notes
-      .map(
-        msg =>
-          `- [${msg.done ? 'x' : ' '}] ${msg.content} (${formatDuration(
-            msg.time
-          )})`
-      )
-      .join('\n')
-
-    return txtContent
-  }
   return (
     <div
       onClick={handleClick}
@@ -72,7 +71,7 @@ export default function ExportNotes() {
   )
 }
 
-const printDate = date => {
+const printDate = (date: Date = null): string => {
   if (!date) date = new Date()
   return format(date, 'do MM y')
 }

@@ -6,7 +6,7 @@
  *
  * @author Josh Mu <hello@joshmu.dev>
  * @created Wednesday, 30th September 2020
- * @modified Sunday, 22nd November 2020 5:22:37 pm
+ * @modified Monday, 23rd November 2020 11:32:13 am
  * @copyright © 2020 - 2020 MU
  */
 
@@ -23,7 +23,7 @@ import { ModalInnerContainer } from '@/shared/Modal/ModalInnerContainer'
 import { ModalInput } from '@/shared/Modal/ModalInput'
 import { ProjectInterface } from '@/shared/types'
 
-import ExportNotes from './ExportNotes/ExportNotes'
+import { ExportNotes } from './ExportNotes/ExportNotes'
 
 export const CurrentProjectModal = ({
   toggle: toggleModal,
