@@ -6,7 +6,7 @@
  *
  * @author Josh Mu <hello@joshmu.dev>
  * @created Tuesday, 6th October 2020
- * @modified Sunday, 22nd November 2020 2:27:35 pm
+ * @modified Monday, 23rd November 2020 11:39:30 am
  * @copyright © 2020 - 2020 MU
  */
 
@@ -17,7 +17,7 @@ import { useState } from 'react'
 import { Layout } from '@/components/Layout/Layout'
 import LoginView from '@/components/LoginPage/Login/Login'
 import RegisterView from '@/components/LoginPage/Register/Register'
-import Notification from '@/components/Notification/Notification'
+import { Notification } from '@/components/Notification/Notification'
 import ThemeToggle from '@/components/shared/ThemeToggle/ThemeToggle'
 import useTwConfig from '@/hooks/useTwConfig'
 

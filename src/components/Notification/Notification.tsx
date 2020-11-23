@@ -1,12 +1,12 @@
 /**
- * @path /src/components/Notification/Notification.js
+ * @path /src/components/Notification/Notification.tsx
  *
  * @project videonote
- * @file Notification.js
+ * @file Notification.tsx
  *
  * @author Josh Mu <hello@joshmu.dev>
  * @created Friday, 25th September 2020
- * @modified Sunday, 22nd November 2020 3:23:52 pm
+ * @modified Monday, 23rd November 2020 11:45:15 am
  * @copyright © 2020 - 2020 MU
  */
 
@@ -19,12 +19,16 @@ import {
 } from 'react-icons/ai'
 import { VscError as ErrorIcon } from 'react-icons/vsc'
 
-import { useNotificationContext } from '@/context/notificationContext'
+import {
+  AlertInterface,
+  useNotificationContext,
+} from '@/context/notificationContext'
 import { CancelBtn } from '@/shared/CancelBtn/CancelBtn'
 
-export default function Notification() {
+export const Notification = () => {
   const { alerts, removeAlert } = useNotificationContext()
-  const closeAlert = id => {
+
+  const closeAlert = (id: string): void => {
     removeAlert(id)
   }
 
@@ -55,7 +59,11 @@ export default function Notification() {
   )
 }
 
-const Alert = ({ type, msg, cancel }) => (
+interface AlertProps extends AlertInterface {
+  cancel: () => void
+}
+
+const Alert = ({ type, msg, cancel }: AlertProps) => (
   <div className='relative flex w-full max-w-md mx-auto overflow-hidden border rounded-sm shadow-md bg-themeBg border-themeText2'>
     <CancelBtn cancel={cancel} />
     {type === 'project' && (

@@ -6,7 +6,7 @@
  *
  * @author Josh Mu <hello@joshmu.dev>
  * @created Tuesday, 6th October 2020
- * @modified Sunday, 22nd November 2020 6:54:53 pm
+ * @modified Monday, 23rd November 2020 11:39:51 am
  * @copyright © 2020 - 2020 MU
  */
 
@@ -17,7 +17,7 @@ import Cookies from 'universal-cookie'
 
 import { Layout } from '@/components/Layout/Layout'
 import { Modals } from '@/components/Modals/Modals'
-import Notification from '@/components/Notification/Notification'
+import { Notification } from '@/components/Notification/Notification'
 import { Sidebar } from '@/components/Sidebar/Sidebar'
 import { VideoPlayer } from '@/components/VideoPlayer/VideoPlayer'
 import { ControlsProvider } from '@/context/controlsContext'

@@ -1,12 +1,12 @@
 /**
  * @path /src/context/notificationContext.tsx
- * 
+ *
  * @project videonote
  * @file notificationContext.tsx
- * 
+ *
  * @author Josh Mu <hello@joshmu.dev>
  * @created Friday, 25th September 2020
- * @modified Sunday, 22nd November 2020 7:11:50 pm
+ * @modified Monday, 23rd November 2020 11:42:11 am
  * @copyright © 2020 - 2020 MU
  */
 
@@ -20,7 +20,7 @@ interface NotificationContextInterface {
   addAlert: AddAlertType
   removeAlert: RemoveAlertType
 }
-interface AlertInterface {
+export interface AlertInterface {
   id?: string
   msg: string | ReactNode
   type?: 'info' | 'warning' | 'error' | 'success' | 'project'

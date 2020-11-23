@@ -6,7 +6,7 @@
  *
  * @author Josh Mu <hello@joshmu.dev>
  * @created Thursday, 8th October 2020
- * @modified Sunday, 22nd November 2020 7:03:45 pm
+ * @modified Monday, 23rd November 2020 11:39:41 am
  * @copyright © 2020 - 2020 MU
  */
 
@@ -16,7 +16,7 @@ import absoluteUrl from 'next-absolute-url'
 
 import { Layout } from '@/components/Layout/Layout'
 import { Modals } from '@/components/Modals/Modals'
-import Notification from '@/components/Notification/Notification'
+import { Notification } from '@/components/Notification/Notification'
 import { Sidebar } from '@/components/Sidebar/Sidebar'
 import { VideoPlayer } from '@/components/VideoPlayer/VideoPlayer'
 import { ControlsProvider } from '@/context/controlsContext'
