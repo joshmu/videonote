@@ -6,7 +6,7 @@
  *
  * @author Josh Mu <hello@joshmu.dev>
  * @created Thursday, 17th September 2020
- * @modified Sunday, 22nd November 2020 7:14:31 pm
+ * @modified Monday, 23rd November 2020 2:44:52 pm
  * @copyright © 2020 - 2020 MU
  */
 
@@ -20,8 +20,8 @@ import { useVideoContext } from '@/context/videoContext'
 import TimeDisplay from '../shared/TimeDisplay/TimeDisplay'
 import { NoteInterface } from '../shared/types'
 import ActionSymbols from './ActionSymbols/ActionSymbols'
-import ProgressBar from './ProgressBar/ProgressBar'
-import TimeMarkers from './TimeMarkers/TimeMarkers'
+import { ProgressBar } from './ProgressBar/ProgressBar'
+import { TimeMarkers } from './TimeMarkers/TimeMarkers'
 
 const PLACEHOLDER = 'Add Note...'
 
@@ -150,7 +150,7 @@ export const ActionInput = () => {
       <ActionSymbols />
 
       <div className='absolute bottom-0 left-0 w-full transform translate-y-1/2'>
-        <TimeMarkers inputActive={isActive} />
+        <TimeMarkers actionInputIsActive={isActive} />
         <ProgressBar active={isActive} />
       </div>
     </div>

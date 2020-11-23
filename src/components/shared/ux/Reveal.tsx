@@ -1,13 +1,32 @@
-import { useEffect } from 'react'
-import { motion, useAnimation, AnimatePresence } from 'framer-motion'
+/**
+ * @path /src/components/shared/ux/Reveal.tsx
+ *
+ * @project videonote
+ * @file Reveal.tsx
+ *
+ * @author Josh Mu <hello@joshmu.dev>
+ * @created Monday, 14th September 2020
+ * @modified Monday, 23rd November 2020 3:36:56 pm
+ * @copyright © 2020 - 2020 MU
+ */
+
+import { Variants, motion, useAnimation } from 'framer-motion'
+import { ReactNode, useEffect } from 'react'
 import { useInView } from 'react-intersection-observer'
 
-export default function Reveal({
+interface RevealProps {
+  children: ReactNode
+  variants?: Variants
+  transition?: { [key: string]: any }
+  props?: { [key: string]: any }
+}
+
+export const Reveal = ({
   children,
   variants = null,
   transition = null,
   ...props
-}) {
+}: RevealProps) => {
   const controls = useAnimation()
   const [ref, inView] = useInView()
 

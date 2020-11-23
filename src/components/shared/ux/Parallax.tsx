@@ -1,23 +1,40 @@
+/**
+ * @path /src/components/shared/ux/Parallax.tsx
+ *
+ * @project videonote
+ * @file Parallax.tsx
+ *
+ * @author Josh Mu <hello@joshmu.dev>
+ * @created Thursday, 22nd October 2020
+ * @modified Monday, 23rd November 2020 3:35:20 pm
+ * @copyright © 2020 - 2020 MU
+ */
+
 import {
   motion,
   useSpring,
   useTransform,
   useViewportScroll,
 } from 'framer-motion'
-import { useLayoutEffect, useRef, useState } from 'react'
+import { ReactNode, useLayoutEffect, useRef, useState } from 'react'
 
-const calculateMinHeight = (height, range) => {
-  return height + height * range
-}
-const rand = (min = 0, max = 100) => {
-  return Math.floor(Math.random() * (+max - +min)) + +min
+interface ParallaxProps {
+  rate?: number
+  className?: string
+  children: ReactNode
+  props?: { [key: string]: any }
 }
 
-const Parallax = ({ rate = 0, className = '', children, ...props }) => {
-  const ref = useRef(null)
+export const Parallax = ({
+  rate = 0,
+  className = '',
+  children,
+  ...props
+}: ParallaxProps) => {
+  const ref = useRef<HTMLDivElement>(null)
   const { scrollY } = useViewportScroll()
-  const [offsetTop, setOffsetTop] = useState(0)
-  const [minHeight, setMinHeight] = useState('auto')
+  const [offsetTop, setOffsetTop] = useState<number>(0)
+  const [minHeight, setMinHeight] = useState<number | 'auto'>('auto')
 
   // randomize the rate if we do not specify (0.01-0.4)
   rate = rate === 0 ? rand(1, 40) / 100 : rate
@@ -41,6 +58,7 @@ const Parallax = ({ rate = 0, className = '', children, ...props }) => {
     return () => window.removeEventListener('resize', onResize)
   }, [ref])
 
+  // todo: typescript spring config?
   const springConfig = {
     damping: 100,
     stiffness: 500,
@@ -68,4 +86,9 @@ const Parallax = ({ rate = 0, className = '', children, ...props }) => {
   )
 }
 
-export default Parallax
+const calculateMinHeight = (height: number, range: number): number => {
+  return height + height * range
+}
+const rand = (min: number = 0, max: number = 100): number => {
+  return Math.floor(Math.random() * (+max - +min)) + +min
+}

@@ -6,7 +6,7 @@
  *
  * @author Josh Mu <hello@joshmu.dev>
  * @created Thursday, 22nd October 2020
- * @modified Sunday, 22nd November 2020 6:32:58 pm
+ * @modified Monday, 23rd November 2020 3:26:14 pm
  * @copyright © 2020 - 2020 MU
  */
 
@@ -15,7 +15,7 @@ import Link from 'next/link'
 import Router from 'next/router'
 
 import { Heading } from '@/components/shared/Text/Text'
-import MotionFadeUp from '@/components/shared/ux/MotionFadeUp'
+import { MotionFadeUp } from '@/components/shared/ux/MotionFadeUp'
 
 export const Hero = () => {
   const handleClick = (): void => {

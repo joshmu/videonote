@@ -1,29 +1,56 @@
 /**
- * @path /src/components/shared/ux/Compressor.js
- * 
+ * @path /src/components/shared/ux/Compressor.tsx
+ *
  * @project videonote
- * @file Compressor.js
- * 
+ * @file Compressor.tsx
+ *
  * @author Josh Mu <hello@joshmu.dev>
  * @created Tuesday, 15th September 2020
- * @modified Sunday, 22nd November 2020 7:16:29 pm
+ * @modified Monday, 23rd November 2020 3:20:14 pm
  * @copyright © 2020 - 2020 MU
  */
 
-import { motion, useAnimation } from 'framer-motion'
+import { Variants, motion, useAnimation } from 'framer-motion'
 import { useViewportScroll } from 'framer-motion'
 import React, { useEffect, useState } from 'react'
 
-export default function Compressor({ text, hide, ...props }) {
-  const [output, setOutput] = useState(['', '', ''])
-  const [toggle, setToggle] = useState(false)
+const animationVariants: Variants = {
+  hide: {
+    width: 0,
+    opacity: 0,
+  },
+  show: {
+    width: 'auto',
+    opacity: 1,
+    transition: {
+      duration: 1,
+      ease: [0.6, 0.05, -0.01, 0.9],
+    },
+  },
+}
+
+export const Compressor = ({
+  text,
+  hide,
+  ...props
+}: {
+  text: string
+  hide: string
+  props: { [key: string]: any }
+}) => {
+  const [output, setOutput] = useState<[string, string, string]>(['', '', ''])
+  const [toggle, setToggle] = useState<boolean>(false)
 
   const { scrollYProgress } = useViewportScroll()
   const controls = useAnimation()
 
   useEffect(() => {
     // split text in to 3 parts
-    const textArray = Array(3)
+    const textArray: [string, string, string] = Array(3) as [
+      string,
+      string,
+      string
+    ]
     textArray[0] = text.slice(0, text.indexOf(hide))
     textArray[1] = hide
     textArray[2] = text.slice(text.indexOf(hide) + hide.length)
@@ -41,21 +68,6 @@ export default function Compressor({ text, hide, ...props }) {
       setToggle(false)
     }
   }, [scrollYProgress])
-
-  const animationVariants = {
-    hide: {
-      width: 0,
-      opacity: 0,
-    },
-    show: {
-      width: 'auto',
-      opacity: 1,
-      transition: {
-        duration: 1,
-        ease: [0.6, 0.05, -0.01, 0.9],
-      },
-    },
-  }
 
   return (
     <p className='flex items-center justify-center whitespace-pre' {...props}>

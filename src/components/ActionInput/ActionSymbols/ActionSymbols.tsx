@@ -6,7 +6,7 @@
  *
  * @author Josh Mu <hello@joshmu.dev>
  * @created Monday, 28th September 2020
- * @modified Sunday, 22nd November 2020 6:34:36 pm
+ * @modified Monday, 23rd November 2020 3:22:52 pm
  * @copyright © 2020 - 2020 MU
  */
 
@@ -24,7 +24,7 @@ import {
 } from 'react-icons/ti'
 
 import { PlayerAction, useVideoContext } from '@/context/videoContext'
-import MotionFadeInOut from '@/shared/ux/MotionFadeInOut'
+import { MotionFadeInOut } from '@/shared/ux/MotionFadeInOut'
 
 export default function ActionSymbols() {
   const { action: playerAction } = useVideoContext()

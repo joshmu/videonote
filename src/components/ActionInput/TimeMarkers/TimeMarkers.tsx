@@ -1,13 +1,29 @@
+/**
+ * @path /src/components/ActionInput/TimeMarkers/TimeMarkers.tsx
+ *
+ * @project videonote
+ * @file TimeMarkers.tsx
+ *
+ * @author Josh Mu <hello@joshmu.dev>
+ * @created Monday, 19th October 2020
+ * @modified Monday, 23rd November 2020 2:41:56 pm
+ * @copyright © 2020 - 2020 MU
+ */
+
 import { useNoteContext } from '@/context/noteContext'
 import { useVideoContext } from '@/context/videoContext'
 
-const TimeMarkers = ({ inputActive }) => {
+export const TimeMarkers = ({
+  actionInputIsActive,
+}: {
+  actionInputIsActive: boolean
+}) => {
   const { notes } = useNoteContext()
   const { duration, progress, seekTo } = useVideoContext()
 
-  const handleMarkPos = (time, duration) => {
+  const handleMarkPos = (time: number, duration: number): number => {
     const left = +((time / duration) * 100).toFixed(3)
-    return left + '%'
+    return left
   }
 
   return (
@@ -24,7 +40,7 @@ const TimeMarkers = ({ inputActive }) => {
               // opacity: inputActive ? 0.75 : 0.25,
               bottom: '0',
               // width: '0.125rem',
-              left: handleMarkPos(note.time, duration),
+              left: handleMarkPos(note.time, duration) + '%',
             }}
           ></div>
         ))}
@@ -32,5 +48,3 @@ const TimeMarkers = ({ inputActive }) => {
     )
   )
 }
-
-export default TimeMarkers

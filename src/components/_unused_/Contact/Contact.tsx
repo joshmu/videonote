@@ -1,9 +1,29 @@
-import { useState } from 'react'
+/**
+ * @path /src/components/_unused_/Contact/Contact.tsx
+ *
+ * @project videonote
+ * @file Contact.tsx
+ *
+ * @author Josh Mu <hello@joshmu.dev>
+ * @created Thursday, 1st October 2020
+ * @modified Monday, 23rd November 2020 3:23:53 pm
+ * @copyright © 2020 - 2020 MU
+ */
 
-import MotionFadeInOut from '@/shared/ux/MotionFadeInOut'
+import { ChangeEvent, useState } from 'react'
 
-export default function Contact(props) {
-  const [state, setState] = useState({
+import { MotionFadeInOut } from '@/shared/ux/MotionFadeInOut'
+
+interface ContactState {
+  name: string
+  email: string
+  message: string
+  sent: boolean
+  error: string | null
+}
+
+export const Contact = (props: { [key: string]: any }) => {
+  const [state, setState] = useState<ContactState>({
     name: '',
     email: '',
     message: '',
@@ -11,19 +31,21 @@ export default function Contact(props) {
     error: null,
   })
 
-  const handleChange = e => {
+  const handleChange = (
+    event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ): void => {
     // match the state props with the placeholder names
-    const id = e.target.placeholder.toLowerCase()
-    setState({ ...state, [id]: e.target.value })
+    const id = event.target.placeholder.toLowerCase()
+    setState({ ...state, [id]: event.target.value })
   }
 
-  const handleSubmit = async () => {
+  const handleSubmit = async (): Promise<void> => {
     if (state.sent || state.email.length === 0 || state.message.length === 0)
       return
 
     const url = '/api/email'
 
-    const settings = {
+    const settings: RequestInit = {
       method: 'POST',
       headers: {
         Accept: 'application/json',
