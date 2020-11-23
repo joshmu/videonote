@@ -6,9 +6,11 @@
  *
  * @author Josh Mu <hello@joshmu.dev>
  * @created Tuesday, 6th October 2020
- * @modified Sunday, 22nd November 2020 6:19:03 pm
+ * @modified Monday, 23rd November 2020 5:40:52 pm
  * @copyright © 2020 - 2020 MU
  */
+
+import { Settings } from 'http2'
 
 import { StatusCodes } from 'http-status-codes'
 import Router from 'next/router'
@@ -301,7 +303,9 @@ export const GlobalProvider = ({
     setCurrentProject(project)
 
     // update current project settings if it has changed
+    console.log('updateProject', project._id, settings.currentProject)
     if (project._id !== settings.currentProject) {
+      console.log('updating settings')
       updateSettings({ currentProject: project._id, _id: settings._id })
     }
 
@@ -543,11 +547,14 @@ export const GlobalProvider = ({
 
     console.log('handle initial server data', data)
 
+    // PARSE SERVER DATA
     // user data and msg for server messages
-    const { user, msg } = data
+    const { user: serverData, msg } = data
     // grab user projects as seperate var and rest is the account
-    const { projects, ...userAccount } = user
+    const { projects, ...userAccount } = serverData
+    const { settings, ...user }: { settings: SettingsInterface } = userAccount
 
+    // ERROR
     // if msg presume there is an error
     if (msg) {
       Router.push('/login')
@@ -555,24 +562,27 @@ export const GlobalProvider = ({
       return
     }
 
+    // HANDLE DATA
     // allocate server data to respective areas
     setProjects(projects)
 
     if (Object.keys(userAccount).length > 0) {
-      const { settings, ...user } = userAccount
-      setUser(user)
+      setUser(user as UserInterface)
 
       // avoid null values from mongo
       // if we have any null property values in returned settings then replace with defaults
       if (typeof settings === 'object' && settings !== null) {
         // if we have any null settings lets swap them to their defaults
-        Object.entries(settings).forEach(([key, val]) => {
+        Object.keys(settings).forEach(key => {
           if (settings[key] === null) settings[key] = SETTINGS_DEFAULTS[key]
         })
         setSettings({ ...SETTINGS_DEFAULTS, ...settings })
       }
 
-      addAlert({ type: 'success', msg: `Logged in: ${user.username}` })
+      addAlert({
+        type: 'success',
+        msg: `Logged in: ${(user as UserInterface).username}`,
+      })
     } else {
       // if there is no account data then admin is not present, client is guest
       console.log('GUEST MODE')
@@ -580,9 +590,12 @@ export const GlobalProvider = ({
     }
 
     if (projects.length > 0) {
-      let currentProject
+      let currentProject: ProjectInterface
+
+      // if settings data is passed back and we have a currentProject Id
+      // stored then lets find the project and assign
       if (settings && settings.currentProject) {
-        currentProject = projects.find(
+        currentProject = (projects as ProjectInterface[]).find(
           project => project._id === settings.currentProject
         )
       }

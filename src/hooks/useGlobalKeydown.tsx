@@ -6,7 +6,7 @@
  *
  * @author Josh Mu <hello@joshmu.dev>
  * @created Wednesday, 30th September 2020
- * @modified Monday, 23rd November 2020 4:36:24 pm
+ * @modified Monday, 23rd November 2020 5:06:50 pm
  * @copyright © 2020 - 2020 MU
  */
 
@@ -20,7 +20,6 @@ export const useGlobalKeydown = (handler: HandlerType): void => {
   const [keysPressed, setKeysPressed] = useState<Keymap[]>([])
 
   useEffect(() => {
-    console.log(keysPressed)
     const handleKeyDown = (event: KeyboardEvent): void => {
       // do nothing if it is not part of our desired keymap
       if (!Object.values(Keymap).includes(event.key as Keymap)) return

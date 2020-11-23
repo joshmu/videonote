@@ -6,7 +6,7 @@
  *
  * @author Josh Mu <hello@joshmu.dev>
  * @created Wednesday, 18th November 2020
- * @modified Sunday, 22nd November 2020 7:24:38 pm
+ * @modified Monday, 23rd November 2020 5:16:19 pm
  * @copyright © 2020 - 2020 MU
  */
 
@@ -45,7 +45,7 @@ export interface NoteInterface {
 export interface SettingsInterface {
   _id?: string
   user?: string | UserInterface
-  currentProject: string | ProjectInterface
+  currentProject: string
   playOffset?: number
   showHints?: boolean
   seekJump?: number
