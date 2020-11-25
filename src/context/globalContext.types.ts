@@ -6,7 +6,7 @@
  *
  * @author Josh Mu <hello@joshmu.dev>
  * @created Thursday, 19th November 2020
- * @modified Sunday, 22nd November 2020 7:18:30 pm
+ * @modified Wednesday, 25th November 2020 12:48:00 pm
  * @copyright © 2020 - 2020 MU
  */
 
@@ -64,6 +64,7 @@ export interface GlobalContextInterface {
   checkCanEdit: CheckCanEditType
   actionInputRef: MutableRefObject<HTMLInputElement | null>
   actionInputFocus: ActionInputFocusType
+  warnLocalVideo: WarnLocalVideoType
 }
 
 export type NoteApiType = (
@@ -140,3 +141,5 @@ export type CancelModalsType = () => void
 export type CheckCanEditType = () => boolean
 
 export type ActionInputFocusType = () => void
+
+export type WarnLocalVideoType = (project: ProjectInterface) => void

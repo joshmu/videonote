@@ -6,18 +6,16 @@
  *
  * @author Josh Mu <hello@joshmu.dev>
  * @created Tuesday, 6th October 2020
- * @modified Sunday, 22nd November 2020 7:08:45 pm
+ * @modified Wednesday, 25th November 2020 12:48:50 pm
  * @copyright © 2020 - 2020 MU
  */
 
 import { createContext, useContext, useEffect, useRef, useState } from 'react'
 import { ReactPlayerProps } from 'react-player'
 
-import { useIsMount } from '@/hooks/useIsMount'
-import { ProgressInterface } from '@/root/src/components/shared/types'
+import { ProgressInterface } from '@/components/shared/types'
+import { useAnounceAction } from '@/hooks/useAnounceAction'
 
-import { ModalType } from '../components/Modals/Modals'
-import { useAnounceAction } from '../hooks/useAnounceAction'
 import { useGlobalContext } from './globalContext'
 import { useNotificationContext } from './notificationContext'
 
@@ -59,8 +57,7 @@ export const VideoProvider = (props: { [key: string]: any }) => {
     project,
     updateProject,
     settings,
-    toggleModalOpen,
-    admin,
+    warnLocalVideo,
   } = useGlobalContext()
   const { addAlert } = useNotificationContext()
   const playerRef = useRef<ReactPlayerProps>(null!)
@@ -75,28 +72,6 @@ export const VideoProvider = (props: { [key: string]: any }) => {
   )
 
   const [action, setAction] = useAnounceAction('')
-  const isMount = useIsMount()
-
-  // on initial load alert user if project is available however no src is specified
-  // * this could be due to a local video src thus being reset to an empty string when cannot be found
-  useEffect(() => {
-    if (!isMount) return
-    console.log({ project })
-    if (project && project.src.length === 0 && admin) {
-      addAlert({
-        type: 'warning',
-        msg: (
-          <span>
-            Please provide video source for project:{' '}
-            <span className='text-themeAccent'>{project.title}</span>
-          </span>
-        ),
-        duration: 12000,
-      })
-
-      toggleModalOpen(ModalType.CURRENT_PROJECT)
-    }
-  }, [project, admin, isMount])
 
   useEffect(() => {
     if (project !== null && project.src !== null) {
@@ -170,14 +145,9 @@ export const VideoProvider = (props: { [key: string]: any }) => {
     console.log('vn player error', error)
 
     if (error.target && error.target.error.message.includes('Format error')) {
-      addAlert({
-        type: 'warning',
-        msg: 'Please re-locate your video, via project settings.',
-        duration: 12000,
-      })
-
       updateProject({ src: '' })
-      toggleModalOpen(ModalType.CURRENT_PROJECT)
+
+      warnLocalVideo(project)
       // requestLocalVideo()
 
       return

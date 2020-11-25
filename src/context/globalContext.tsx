@@ -6,11 +6,9 @@
  *
  * @author Josh Mu <hello@joshmu.dev>
  * @created Tuesday, 6th October 2020
- * @modified Monday, 23rd November 2020 5:40:52 pm
+ * @modified Wednesday, 25th November 2020 12:48:21 pm
  * @copyright © 2020 - 2020 MU
  */
-
-import { Settings } from 'http2'
 
 import { StatusCodes } from 'http-status-codes'
 import Router from 'next/router'
@@ -56,6 +54,7 @@ import {
   UpdateProjectsStateWithUpdatedNotesType,
   UpdateSettingsType,
   UpdateUserType,
+  WarnLocalVideoType,
 } from './globalContext.types'
 import { useNotificationContext } from './notificationContext'
 
@@ -310,6 +309,7 @@ export const GlobalProvider = ({
     }
 
     alertProjectLoaded(project)
+    if (project.src.length === 0) warnLocalVideo(project)
   }
 
   const guestUpdatingProject: GuestUpdatingProjectType = async project => {
@@ -603,9 +603,10 @@ export const GlobalProvider = ({
       if (!currentProject) {
         currentProject = projects.slice(-1)[0]
       }
-      setCurrentProject(currentProject)
 
-      alertProjectLoaded(currentProject)
+      loadProject(currentProject._id)
+      // setCurrentProject(currentProject)
+      // alertProjectLoaded(currentProject)
     }
   }
 
@@ -726,6 +727,22 @@ export const GlobalProvider = ({
     actionInputRef.current.focus()
   }
 
+  const warnLocalVideo: WarnLocalVideoType = project => {
+    addAlert({
+      type: 'warning',
+      msg: (
+        <span>
+          Please provide video source for project:{' '}
+          {project?.title && (
+            <span className='text-themeAccent'>{project.title}</span>
+          )}
+        </span>
+      ),
+      duration: 12000,
+    })
+    toggleModalOpen(ModalType.CURRENT_PROJECT)
+  }
+
   const value: GlobalContextInterface = {
     user,
     updateUser,
@@ -762,6 +779,7 @@ export const GlobalProvider = ({
     checkCanEdit,
     actionInputRef,
     actionInputFocus,
+    warnLocalVideo,
   }
 
   return (
