@@ -6,7 +6,7 @@
  * 
  * @author Josh Mu <hello@joshmu.dev>
  * @created Monday, 14th September 2020
- * @modified Sunday, 22nd November 2020 7:45:59 pm
+ * @modified Wednesday, 25th November 2020 9:05:45 pm
  * @copyright © 2020 - 2020 MU
  */
 
@@ -111,7 +111,9 @@ body {
 
 .scrollbar {
   &::-webkit-scrollbar {
-    @apply w-px cursor-pointer;
+    // 1px width does not seem to work
+    width: 2px;
+    @apply cursor-pointer;
   }
 
   &::-webkit-scrollbar-track {

@@ -6,7 +6,7 @@
  *
  * @author Josh Mu <hello@joshmu.dev>
  * @created Sunday, 20th September 2020
- * @modified Wednesday, 25th November 2020 8:48:32 pm
+ * @modified Wednesday, 25th November 2020 8:56:56 pm
  * @copyright © 2020 - 2020 MU
  */
 
@@ -89,12 +89,12 @@ export const Sidebar = (props: { [key: string]: any }) => {
       {/* sidebar inner wrapper to maintain width */}
       <div
         style={{ width: resizeState.size + 'px' }}
-        className='relative h-full'
+        className='relative flex flex-col h-full'
       >
         <SidebarHeader />
 
         {/* sidebar content */}
-        <div className='w-full h-full overflow-auto scrollbar'>
+        <div className='flex-1 w-full h-full overflow-auto scrollbar'>
           <NoteList />
         </div>
 
