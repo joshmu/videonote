@@ -1,12 +1,12 @@
 /**
- * @path /src/components/Sidebar/RemoveNotes/RemoveNotes.js
+ * @path /src/components/Sidebar/RemoveNotes/RemoveNotes.tsx
  *
  * @project videonote
- * @file RemoveNotes.js
+ * @file RemoveNotes.tsx
  *
  * @author Josh Mu <hello@joshmu.dev>
  * @created Monday, 12th October 2020
- * @modified Sunday, 22nd November 2020 12:48:39 pm
+ * @modified Wednesday, 25th November 2020 1:23:04 pm
  * @copyright © 2020 - 2020 MU
  */
 

@@ -6,7 +6,7 @@
  *
  * @author Josh Mu <hello@joshmu.dev>
  * @created Sunday, 20th September 2020
- * @modified Sunday, 22nd November 2020 2:25:36 pm
+ * @modified Wednesday, 25th November 2020 1:24:02 pm
  * @copyright © 2020 - 2020 MU
  */
 
@@ -17,6 +17,7 @@ import { NoteList } from '@/components/NoteList/NoteList'
 import { useGlobalContext } from '@/context/globalContext'
 import { useResizable } from '@/hooks/useResizable'
 
+import { ExportNotes } from '../Modals/CurrentProjectModal/ExportNotes/ExportNotes'
 import { RemoveNotes } from './RemoveNotes/RemoveNotes'
 import { SidebarHeader } from './SidebarHeader/SidebarHeader'
 
@@ -100,7 +101,11 @@ export const Sidebar = (props: { [key: string]: any }) => {
           <NoteList />
         </div>
 
-        {admin && <RemoveNotes />}
+        {/* sidebar footer */}
+        <div className='absolute bottom-0 w-full h-8'>
+          <ExportNotes className='pl-4' />
+          {admin && <RemoveNotes />}
+        </div>
       </div>
     </motion.div>
   )

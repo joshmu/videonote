@@ -6,7 +6,7 @@
  *
  * @author Josh Mu <hello@joshmu.dev>
  * @created Wednesday, 30th September 2020
- * @modified Monday, 23rd November 2020 11:32:13 am
+ * @modified Wednesday, 25th November 2020 1:05:35 pm
  * @copyright © 2020 - 2020 MU
  */
 
@@ -97,7 +97,7 @@ export const CurrentProjectModal = ({
             )}
 
             <div className='mt-2'>
-              <ExportNotes />
+              <ExportNotes dynamicLabel={false} />
             </div>
 
             <ModalPrimaryBtn handleClick={handleUpdate}>Update</ModalPrimaryBtn>
