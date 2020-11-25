@@ -6,7 +6,7 @@
  *
  * @author Josh Mu <hello@joshmu.dev>
  * @created Friday, 9th October 2020
- * @modified Wednesday, 25th November 2020 8:53:40 pm
+ * @modified Wednesday, 25th November 2020 9:14:27 pm
  * @copyright © 2020 - 2020 MU
  */
 
@@ -72,7 +72,7 @@ export const ExportNotes = ({
       onClick={handleExport}
       onMouseEnter={handleEnter}
       onMouseLeave={handleExit}
-      className='flex items-center justify-start h-4 text-sm duration-300 ease-in-out cursor-pointer text-themeText2 hover:text-themeAccent transtion-colors'
+      className='flex items-center justify-start h-4 text-sm duration-200 ease-in-out cursor-pointer text-themeText2 hover:text-themeAccent transtion-colors'
     >
       <DownloadIcon className='w-4 h-4 stroke-current' />
       <AnimatePresence>
