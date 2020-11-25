@@ -1,12 +1,12 @@
 /**
- * @path /src/components/Sidebar/RemoveNotes/RemoveNotes.tsx
+ * @path /src/components/Sidebar/SidebarFooter/RemoveNotes/RemoveNotes.tsx
  *
  * @project videonote
  * @file RemoveNotes.tsx
  *
  * @author Josh Mu <hello@joshmu.dev>
  * @created Monday, 12th October 2020
- * @modified Wednesday, 25th November 2020 1:23:04 pm
+ * @modified Wednesday, 25th November 2020 8:44:59 pm
  * @copyright © 2020 - 2020 MU
  */
 
@@ -43,7 +43,7 @@ export const RemoveNotes = () => {
       {notes.filter(note => note.done).length > 0 && (
         <div
           onClick={handleRemoveCompleted}
-          className='absolute bottom-0 right-0 p-4 duration-300 ease-in-out cursor-pointer text-themeText2 hover:text-themeAccent transtion-colors'
+          className='duration-300 ease-in-out cursor-pointer text-themeText2 hover:text-themeAccent transtion-colors'
         >
           <motion.div
             key='removeNotesIcon'
@@ -51,7 +51,7 @@ export const RemoveNotes = () => {
             animate={{ scale: 1 }}
             exit={{ scale: 0 }}
           >
-            <TrashIcon className='fill-current' />
+            <TrashIcon className='stroke-current' />
           </motion.div>
         </div>
       )}

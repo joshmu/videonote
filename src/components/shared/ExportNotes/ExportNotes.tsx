@@ -1,12 +1,12 @@
 /**
- * @path /src/components/Modals/CurrentProjectModal/ExportNotes/ExportNotes.tsx
+ * @path /src/components/shared/ExportNotes/ExportNotes.tsx
  *
  * @project videonote
  * @file ExportNotes.tsx
  *
  * @author Josh Mu <hello@joshmu.dev>
  * @created Friday, 9th October 2020
- * @modified Wednesday, 25th November 2020 1:29:12 pm
+ * @modified Wednesday, 25th November 2020 8:53:40 pm
  * @copyright © 2020 - 2020 MU
  */
 
@@ -23,10 +23,8 @@ import { formatDuration } from '@/utils/clientHelpers'
 
 export const ExportNotes = ({
   dynamicLabel = true,
-  className = '',
 }: {
   dynamicLabel?: boolean
-  className?: string
 }) => {
   const { project } = useGlobalContext()
   const { addAlert } = useNotificationContext()
@@ -74,16 +72,16 @@ export const ExportNotes = ({
       onClick={handleExport}
       onMouseEnter={handleEnter}
       onMouseLeave={handleExit}
-      className={`flex items-center justify-start cursor-pointer text-sm ${className}`}
+      className='flex items-center justify-start h-4 text-sm duration-300 ease-in-out cursor-pointer text-themeText2 hover:text-themeAccent transtion-colors'
     >
-      <DownloadIcon className='w-4 h-4 opacity-50' />
+      <DownloadIcon className='w-4 h-4 stroke-current' />
       <AnimatePresence>
         {(!dynamicLabel || showLabel) && (
           <motion.span
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className='ml-2'
+            className='ml-2 text-md'
           >
             Export Notes
           </motion.span>
@@ -93,18 +91,21 @@ export const ExportNotes = ({
   ) : null
 }
 
-const createTxtFile = (project: ProjectInterface): string => {
+const createTxtFile = (
+  project: ProjectInterface,
+  includeDate: boolean = false
+): string => {
   if (project?.notes.length === 0) return
 
   let txtContent = `VIDEONOTE\n\n`
   txtContent += `${project.title.toUpperCase()}\n`
-  txtContent += `${printDate()}\n`
+  if (includeDate) txtContent += `${printDate()}\n`
   txtContent += `---\n\n`
   // content
   txtContent += project.notes
     .map(
       msg =>
-        `${msg.done ? 'x' : '-'} ${formatDuration(msg.time)} ${msg.content}`
+        `${msg.done ? '✓' : ' '} ${formatDuration(msg.time)} ${msg.content}`
     )
     .join('\n')
 

@@ -6,7 +6,7 @@
  *
  * @author Josh Mu <hello@joshmu.dev>
  * @created Sunday, 20th September 2020
- * @modified Wednesday, 25th November 2020 1:24:02 pm
+ * @modified Wednesday, 25th November 2020 8:48:32 pm
  * @copyright © 2020 - 2020 MU
  */
 
@@ -17,8 +17,7 @@ import { NoteList } from '@/components/NoteList/NoteList'
 import { useGlobalContext } from '@/context/globalContext'
 import { useResizable } from '@/hooks/useResizable'
 
-import { ExportNotes } from '../Modals/CurrentProjectModal/ExportNotes/ExportNotes'
-import { RemoveNotes } from './RemoveNotes/RemoveNotes'
+import { SidebarFooter } from './SidebarFooter/SidebarFooter'
 import { SidebarHeader } from './SidebarHeader/SidebarHeader'
 
 const sidebarVariants: Variants = {
@@ -42,7 +41,6 @@ export const Sidebar = (props: { [key: string]: any }) => {
     updateSettings,
     sidebarOpen,
     SETTINGS_DEFAULTS,
-    admin,
   } = useGlobalContext()
 
   const { state: resizeState, handleStartResize } = useResizable({
@@ -76,7 +74,7 @@ export const Sidebar = (props: { [key: string]: any }) => {
       style={{
         width: sidebarOpen ? resizeState.size : 0,
       }}
-      className='relative flex flex-col h-auto transition-all duration-500 ease-in-out'
+      className='relative flex flex-col h-auto transition-all duration-500 ease-in-out border-l border-themeText2'
       {...props}
     >
       {/* sidebar edge for resizing */}
@@ -93,7 +91,6 @@ export const Sidebar = (props: { [key: string]: any }) => {
         style={{ width: resizeState.size + 'px' }}
         className='relative h-full'
       >
-        {/* sidebar header */}
         <SidebarHeader />
 
         {/* sidebar content */}
@@ -101,11 +98,7 @@ export const Sidebar = (props: { [key: string]: any }) => {
           <NoteList />
         </div>
 
-        {/* sidebar footer */}
-        <div className='absolute bottom-0 w-full h-8'>
-          <ExportNotes className='pl-4' />
-          {admin && <RemoveNotes />}
-        </div>
+        <SidebarFooter />
       </div>
     </motion.div>
   )

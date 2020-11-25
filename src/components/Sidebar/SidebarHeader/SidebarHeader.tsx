@@ -6,7 +6,7 @@
  *
  * @author Josh Mu <hello@joshmu.dev>
  * @created Monday, 12th October 2020
- * @modified Sunday, 22nd November 2020 3:08:02 pm
+ * @modified Wednesday, 25th November 2020 8:47:45 pm
  * @copyright © 2020 - 2020 MU
  */
 
@@ -41,7 +41,7 @@ export const SidebarHeader = () => {
     <div
       className={`${
         projects.length > 0 ? 'border-b' : ''
-      } relative flex items-center justify-between transition-colors duration-300 ease-in-out border-themeText2`}
+      } bg-themeBg relative flex items-center justify-between transition-colors duration-300 ease-in-out border-themeText2`}
     >
       <div className='flex items-center w-full h-10'>
         {/* arrow slider icon */}

@@ -6,7 +6,7 @@
  *
  * @author Josh Mu <hello@joshmu.dev>
  * @created Wednesday, 30th September 2020
- * @modified Wednesday, 25th November 2020 1:05:35 pm
+ * @modified Wednesday, 25th November 2020 8:41:00 pm
  * @copyright © 2020 - 2020 MU
  */
 
@@ -23,7 +23,7 @@ import { ModalInnerContainer } from '@/shared/Modal/ModalInnerContainer'
 import { ModalInput } from '@/shared/Modal/ModalInput'
 import { ProjectInterface } from '@/shared/types'
 
-import { ExportNotes } from './ExportNotes/ExportNotes'
+// import { ExportNotes } from './ExportNotes/ExportNotes'
 
 export const CurrentProjectModal = ({
   toggle: toggleModal,
@@ -97,7 +97,7 @@ export const CurrentProjectModal = ({
             )}
 
             <div className='mt-2'>
-              <ExportNotes dynamicLabel={false} />
+              {/* <ExportNotes dynamicLabel={false} /> */}
             </div>
 
             <ModalPrimaryBtn handleClick={handleUpdate}>Update</ModalPrimaryBtn>
