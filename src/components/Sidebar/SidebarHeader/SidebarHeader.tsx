@@ -6,7 +6,7 @@
  *
  * @author Josh Mu <hello@joshmu.dev>
  * @created Monday, 12th October 2020
- * @modified Wednesday, 25th November 2020 8:47:45 pm
+ * @modified Monday, 30th November 2020 5:33:47 pm
  * @copyright © 2020 - 2020 MU
  */
 
@@ -37,18 +37,18 @@ export const SidebarHeader = () => {
     toggleMenuOpen()
   }
 
+  const projectsExist = () => projects.length > 0
+
   return (
     <div
       className={`${
-        projects.length > 0 ? 'border-b' : ''
+        projectsExist() ? 'border-b' : ''
       } bg-themeBg relative flex items-center justify-between transition-colors duration-300 ease-in-out border-themeText2`}
     >
       <div className='flex items-center w-full h-10'>
         {/* arrow slider icon */}
-        {projects.length > 0 && (
-          <div
-            className={`relative text-4xl mr-2 text-themeAccent2 z-10 transition-all hover:text-themeAccent duration-200 ease-in-out cursor-pointer`}
-          >
+        {projectsExist() && (
+          <div className='relative z-10 mr-2 text-4xl transition-all duration-200 ease-in-out cursor-pointer text-themeAccent2 hover:text-themeAccent'>
             <motion.div
               onClick={toggleOpen}
               style={{

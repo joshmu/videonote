@@ -6,7 +6,7 @@
  *
  * @author Josh Mu <hello@joshmu.dev>
  * @created Tuesday, 6th October 2020
- * @modified Sunday, 22nd November 2020 4:29:15 pm
+ * @modified Monday, 30th November 2020 5:30:47 pm
  * @copyright © 2020 - 2020 MU
  */
 
@@ -36,11 +36,13 @@ import ThemeToggle from '@/shared/ThemeToggle/ThemeToggle'
 import { IconMenuItemWrapper } from './IconMenuItemWrapper/IconMenuItemWrapper'
 
 const variants: Variants = {
-  initial: { opacity: 0 },
+  initial: {
+    opacity: 0,
+  },
   animate: {
     opacity: 1,
     transition: {
-      duration: 0.2,
+      duration: 0.1,
     },
   },
   exit: { opacity: 0, transition: { duration: 0.2 } },
@@ -81,12 +83,12 @@ export const Menu = ({ open }: { open: boolean }) => {
         {open && (
           <motion.div
             key='optionsDropdown'
-            initial='inital'
+            initial='initial'
             animate='animate'
             exit='exit'
             variants={variants}
             onMouseLeave={handleMouseLeave}
-            className='absolute right-0 z-40 w-48 py-2 text-sm capitalize transition-colors duration-300 ease-in-out border rounded-sm shadow-xl bg-themeBg'
+            className='absolute z-40 w-48 py-2 text-sm capitalize transition-colors duration-300 ease-in-out border rounded-sm shadow-xl right-2 top-7 bg-themeBg'
           >
             {project && admin && (
               <Select
