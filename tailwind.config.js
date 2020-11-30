@@ -6,7 +6,7 @@
  *
  * @author Josh Mu <hello@joshmu.dev>
  * @created Monday, 14th September 2020
- * @modified Sunday, 22nd November 2020 7:36:06 pm
+ * @modified Monday, 30th November 2020 7:48:34 pm
  * @copyright © 2020 - 2020 MU
  */
 
@@ -41,11 +41,11 @@ module.exports = {
         themeText2: 'var(--text2)',
         themeBg: 'var(--bg)',
         themeBg2: 'var(--bg2)',
-        themeBgOpacity: 'rgba(var(--bgNum), var(--bg-opacity))',
+        themeBgOpacity: 'rgba(var(--bgNum), var(--tw-bg-opacity))',
         themeAccent: 'var(--accent)',
         themeAccent2: 'var(--accent2)',
         themeSelect: 'var(--select)',
-        themeSelectOpacity: 'rgba(var(--selectNum), var(--bg-opacity))',
+        themeSelectOpacity: 'rgba(var(--selectNum), var(--tw-bg-opacity))',
       },
       opacity: {
         10: '0.10',
@@ -58,6 +58,7 @@ module.exports = {
         screenVh: 'calc(var(--vh) * 100)',
       },
       height: {
+        '1/12': '8.33333%',
         screenVh: 'calc(var(--vh) * 100)',
       },
     },
@@ -67,13 +68,4 @@ module.exports = {
     process.env.NODE_ENV === 'production'
       ? plugins
       : [...plugins, ...devOnlyPlugins],
-  future: {
-    removeDeprecatedGapUtilities: true,
-    purgeLayersByDefault: true,
-  },
-  experimental: {
-    uniformColorPalette: true, // color shades are similar brightness
-    extendedSpacingScale: true, // 72, 80, 96
-    extendedFontSizeScale: true, // 7xl, 8xl, 9xl
-  },
 }

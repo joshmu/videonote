@@ -1,12 +1,12 @@
 /**
- * @path /src/components/Sidebar/Search/Search.tsx
+ * @path /src/components/Sidebar/SidebarHeader/Search/Search.tsx
  *
  * @project videonote
  * @file Search.tsx
  *
  * @author Josh Mu <hello@joshmu.dev>
  * @created Saturday, 19th September 2020
- * @modified Sunday, 22nd November 2020 2:22:26 pm
+ * @modified Monday, 30th November 2020 7:54:25 pm
  * @copyright © 2020 - 2020 MU
  */
 

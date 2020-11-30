@@ -6,7 +6,7 @@
  *
  * @author Josh Mu <hello@joshmu.dev>
  * @created Thursday, 22nd October 2020
- * @modified Monday, 23rd November 2020 3:26:14 pm
+ * @modified Monday, 30th November 2020 7:41:44 pm
  * @copyright © 2020 - 2020 MU
  */
 
@@ -72,7 +72,7 @@ export const Hero = () => {
                 duration: 0.8,
               },
             }}
-            className='absolute z-0 w-full transition-colors duration-300 ease-in-out rounded-r-md h-10/12 bg-themeAccent'
+            className='absolute z-0 w-full transition-colors duration-300 ease-in-out rounded-r-md h-5/6 bg-themeAccent'
           >
             {/* neu video background */}
             <motion.div
