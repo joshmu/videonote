@@ -6,7 +6,7 @@
  *
  * @author Josh Mu <hello@joshmu.dev>
  * @created Tuesday, 6th October 2020
- * @modified Sunday, 22nd November 2020 7:15:48 pm
+ * @modified Tuesday, 1st December 2020 12:27:20 pm
  * @copyright © 2020 - 2020 MU
  */
 
@@ -41,6 +41,7 @@ interface NoteContextInterface {
   removeCompleted: RemoveCompletedType
   checkProximity: (note: NoteInterface) => boolean
   currentNote: NoteInterface | null
+  notesExist: boolean
 }
 
 const noteContext = createContext<NoteContextInterface>(null!)
@@ -175,6 +176,8 @@ export function NoteProvider(props: { [key: string]: any }) {
     setNotes(updatedNotes)
   }
 
+  const notesExist: boolean = notes.length > 0
+
   const value: NoteContextInterface = {
     notes,
     addNote,
@@ -186,6 +189,7 @@ export function NoteProvider(props: { [key: string]: any }) {
     removeCompleted,
     checkProximity,
     currentNote,
+    notesExist,
   }
 
   return <noteContext.Provider value={value} {...props} />

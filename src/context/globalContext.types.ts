@@ -6,7 +6,7 @@
  *
  * @author Josh Mu <hello@joshmu.dev>
  * @created Thursday, 19th November 2020
- * @modified Wednesday, 25th November 2020 12:48:00 pm
+ * @modified Tuesday, 1st December 2020 12:27:44 pm
  * @copyright © 2020 - 2020 MU
  */
 
@@ -65,6 +65,7 @@ export interface GlobalContextInterface {
   actionInputRef: MutableRefObject<HTMLInputElement | null>
   actionInputFocus: ActionInputFocusType
   warnLocalVideo: WarnLocalVideoType
+  projectsExist: boolean
 }
 
 export type NoteApiType = (

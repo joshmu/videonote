@@ -6,7 +6,7 @@
  *
  * @author Josh Mu <hello@joshmu.dev>
  * @created Monday, 12th October 2020
- * @modified Tuesday, 1st December 2020 12:18:16 pm
+ * @modified Tuesday, 1st December 2020 12:28:15 pm
  * @copyright © 2020 - 2020 MU
  */
 
@@ -22,15 +22,17 @@ import { useNoteContext } from '@/root/src/context/noteContext'
 import { SidebarTitle } from './SidebarTitle/SidebarTitle'
 
 export const SidebarHeader = () => {
-  const { sidebarOpen, toggleSidebar, projects, project } = useGlobalContext()
-  const { notes } = useNoteContext()
+  const {
+    sidebarOpen,
+    toggleSidebar,
+    projectsExist,
+    project,
+  } = useGlobalContext()
+  const { notesExist } = useNoteContext()
 
   const toggleOpen = (): void => {
     toggleSidebar()
   }
-
-  const notesExist: boolean = notes.length > 0
-  const projectsExist: boolean = projects.length > 0
 
   return (
     <div

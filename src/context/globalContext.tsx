@@ -6,7 +6,7 @@
  *
  * @author Josh Mu <hello@joshmu.dev>
  * @created Tuesday, 6th October 2020
- * @modified Wednesday, 25th November 2020 12:48:21 pm
+ * @modified Tuesday, 1st December 2020 12:27:56 pm
  * @copyright © 2020 - 2020 MU
  */
 
@@ -743,6 +743,8 @@ export const GlobalProvider = ({
     toggleModalOpen(ModalType.CURRENT_PROJECT)
   }
 
+  const projectsExist: boolean = projects.length > 0
+
   const value: GlobalContextInterface = {
     user,
     updateUser,
@@ -780,6 +782,7 @@ export const GlobalProvider = ({
     actionInputRef,
     actionInputFocus,
     warnLocalVideo,
+    projectsExist,
   }
 
   return (
