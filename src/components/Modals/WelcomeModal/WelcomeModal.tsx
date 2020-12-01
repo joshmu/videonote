@@ -6,7 +6,7 @@
  *
  * @author Josh Mu <hello@joshmu.dev>
  * @created Saturday, 17th October 2020
- * @modified Tuesday, 1st December 2020 7:58:24 pm
+ * @modified Tuesday, 1st December 2020 8:02:16 pm
  * @copyright © 2020 - 2020 MU
  */
 
@@ -26,7 +26,7 @@ export const WelcomeModal = ({
 }) => {
   return (
     <ModalContainer toggle={toggleModal} motionKey={motionKey}>
-      <ModalHeader>Welcome!</ModalHeader>
+      <ModalHeader>Welcome to VideoNote</ModalHeader>
 
       <ModalInnerContainer>
         <p className='mt-2'>

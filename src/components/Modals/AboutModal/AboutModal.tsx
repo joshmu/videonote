@@ -6,13 +6,14 @@
  *
  * @author Josh Mu <hello@joshmu.dev>
  * @created Monday, 12th October 2020
- * @modified Sunday, 22nd November 2020 4:44:11 pm
+ * @modified Tuesday, 1st December 2020 8:03:11 pm
  * @copyright © 2020 - 2020 MU
  */
 
 import { ModalContainer } from '@/shared/Modal/ModalContainer'
 import { ModalHeader } from '@/shared/Modal/ModalHeader'
 import { ModalInnerContainer } from '@/shared/Modal/ModalInnerContainer'
+import { Hl } from '@/shared/Text/Text'
 
 export const AboutModal = ({
   toggle: toggleModal,
@@ -27,16 +28,16 @@ export const AboutModal = ({
 
       <ModalInnerContainer>
         <p>
-          <span className='font-semibold text-themeAccent'>VideoNote</span> aims
-          to provide the fastest possible workflow to review video content.
-          Utilising a variety of intuitive keyboard shortcuts, seamless sharing
-          of projects with a minimal design to keep you focused on what matters
-          most.
+          <Hl className='font-bold'>VideoNote</Hl> aims to provide the fastest
+          possible workflow to review video content. Utilising a variety of
+          intuitive keyboard shortcuts, seamless sharing of projects with a
+          minimal design to keep you focused on what matters most.
         </p>
         <p className='mt-2'>
-          We are currently in a beta development stage. If you have feature
-          requests or any feedback then the VideoNote team would love to hear
-          from you.
+          <Hl className='font-bold'>VideoNote</Hl> is currently in beta stage
+          development, so things will be evolving and you may find a bug 🐛. If
+          so let us know, or tell us how we can make your experience even
+          better! ✨
         </p>
         <div className='w-full mt-2 text-right'>
           <a
