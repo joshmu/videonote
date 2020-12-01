@@ -6,7 +6,7 @@
  *
  * @author Josh Mu <hello@joshmu.dev>
  * @created Tuesday, 6th October 2020
- * @modified Monday, 30th November 2020 5:30:47 pm
+ * @modified Tuesday, 1st December 2020 11:44:31 am
  * @copyright © 2020 - 2020 MU
  */
 
@@ -48,7 +48,8 @@ const variants: Variants = {
   exit: { opacity: 0, transition: { duration: 0.2 } },
 }
 
-export const Menu = ({ open }: { open: boolean }) => {
+export const Menu = () => {
+  const { menuOpen } = useGlobalContext()
   const {
     toggleMenuOpen,
     toggleModalOpen,
@@ -80,7 +81,7 @@ export const Menu = ({ open }: { open: boolean }) => {
   return (
     <div>
       <AnimatePresence>
-        {open && (
+        {menuOpen && (
           <motion.div
             key='optionsDropdown'
             initial='initial'
