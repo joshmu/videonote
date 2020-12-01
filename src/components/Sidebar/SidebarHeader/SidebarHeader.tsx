@@ -6,7 +6,7 @@
  *
  * @author Josh Mu <hello@joshmu.dev>
  * @created Monday, 12th October 2020
- * @modified Tuesday, 1st December 2020 11:46:30 am
+ * @modified Tuesday, 1st December 2020 12:18:16 pm
  * @copyright © 2020 - 2020 MU
  */
 
@@ -18,30 +18,41 @@ import { Menu } from './Menu/Menu'
 import { Search } from './Search/Search'
 import { SidebarOpenIcon } from './SidebarOpenIcon/SidebarOpenIcon'
 import { MenuButton } from './Menu/MenuButton/MenuButton'
+import { useNoteContext } from '@/root/src/context/noteContext'
+import { SidebarTitle } from './SidebarTitle/SidebarTitle'
 
 export const SidebarHeader = () => {
-  const { sidebarOpen, toggleSidebar, projects } = useGlobalContext()
+  const { sidebarOpen, toggleSidebar, projects, project } = useGlobalContext()
+  const { notes } = useNoteContext()
 
   const toggleOpen = (): void => {
     toggleSidebar()
   }
 
-  const projectsExist = projects.length > 0
+  const notesExist: boolean = notes.length > 0
+  const projectsExist: boolean = projects.length > 0
 
   return (
     <div
       className={`${
         projectsExist ? 'border-b' : ''
-      } bg-themeBg relative flex items-center justify-between transition-colors duration-300 ease-in-out border-themeText2`}
+      } bg-themeBg relative flex items-center h-10 justify-between transition-colors duration-300 ease-in-out border-themeText2`}
     >
-      <div className='flex items-center w-full h-10'>
+      {/* inner content area */}
+      <div className='flex items-center w-full h-full'>
         <SidebarOpenIcon
           isVisible={projectsExist}
           toggleOpen={toggleOpen}
           sidebarOpen={sidebarOpen}
         />
 
-        <Search />
+        {notesExist ? (
+          <Search />
+        ) : (
+          <SidebarTitle>
+            {project?.title ? project.title : 'VideoNote'}
+          </SidebarTitle>
+        )}
       </div>
 
       {/* menu dropdown*/}

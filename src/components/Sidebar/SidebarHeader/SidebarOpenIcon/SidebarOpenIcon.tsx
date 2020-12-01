@@ -6,7 +6,7 @@
  *
  * @author Josh Mu <hello@joshmu.dev>
  * @created Tuesday, 1st December 2020
- * @modified Tuesday, 1st December 2020 11:46:25 am
+ * @modified Tuesday, 1st December 2020 12:14:27 pm
  * @copyright © 2020 - 2020 MU
  */
 
@@ -24,7 +24,7 @@ export const SidebarOpenIcon = ({
   isVisible && (
     <div
       onClick={toggleOpen}
-      className={`relative z-10 mr-2 transition-all duration-200 ease-in-out cursor-pointer text-themeAccent2 hover:text-themeAccent ${
+      className={`relative z-10 transition-all duration-200 ease-in-out cursor-pointer text-themeAccent2 hover:text-themeAccent ${
         sidebarOpen ? '' : 'rotate-180 -translate-x-full transform'
       }`}
     >

@@ -6,7 +6,7 @@
  *
  * @author Josh Mu <hello@joshmu.dev>
  * @created Saturday, 19th September 2020
- * @modified Monday, 30th November 2020 7:54:25 pm
+ * @modified Tuesday, 1st December 2020 12:16:09 pm
  * @copyright © 2020 - 2020 MU
  */
 
@@ -18,7 +18,7 @@ import { useNoteContext } from '@/context/noteContext'
 
 export const Search = () => {
   const { project } = useGlobalContext()
-  const { search, updateSearch, notes } = useNoteContext()
+  const { search, updateSearch } = useNoteContext()
   const { toggleSmartControls } = useControlsContext()
 
   // enable smart controls when search box is empty
@@ -34,14 +34,12 @@ export const Search = () => {
   }
 
   return (
-    notes.length > 0 && (
-      <input
-        className='w-full transition-colors duration-300 ease-in-out bg-transparent placeholder-themeText2 focus:outline-none fo5us:outline-none text-temeText'
-        type='text'
-        placeholder={`Search - ${project.title}`}
-        value={search}
-        onChange={handleChange}
-      />
-    )
+    <input
+      className='w-full ml-2 transition-colors duration-300 ease-in-out bg-transparent text-md placeholder-themeText2 focus:outline-none text-temeText'
+      type='text'
+      placeholder={project?.title ? `Search - ${project.title}` : 'Search'}
+      value={search}
+      onChange={handleChange}
+    />
   )
 }
