@@ -6,7 +6,7 @@
  *
  * @author Josh Mu <hello@joshmu.dev>
  * @created Monday, 12th October 2020
- * @modified Wednesday, 25th November 2020 9:14:15 pm
+ * @modified Tuesday, 1st December 2020 12:31:23 pm
  * @copyright © 2020 - 2020 MU
  */
 
@@ -48,9 +48,11 @@ export const RemoveNotes = () => {
     setShowLabel(false)
   }
 
+  const completedNotesExist: boolean = completedNotes(notes).length > 0
+
   return (
     <AnimatePresence>
-      {completedNotes(notes).length > 0 && (
+      {completedNotesExist && (
         <div
           onClick={handleRemoveCompleted}
           onMouseEnter={handleEnter}

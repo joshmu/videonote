@@ -6,7 +6,7 @@
  *
  * @author Josh Mu <hello@joshmu.dev>
  * @created Friday, 9th October 2020
- * @modified Wednesday, 25th November 2020 9:14:27 pm
+ * @modified Tuesday, 1st December 2020 12:35:00 pm
  * @copyright © 2020 - 2020 MU
  */
 
@@ -20,6 +20,7 @@ import { useGlobalContext } from '@/context/globalContext'
 import { useNotificationContext } from '@/context/notificationContext'
 import { ProjectInterface } from '@/shared/types'
 import { formatDuration } from '@/utils/clientHelpers'
+import { useNoteContext } from '@/root/src/context/noteContext'
 
 export const ExportNotes = ({
   dynamicLabel = true,
@@ -27,6 +28,7 @@ export const ExportNotes = ({
   dynamicLabel?: boolean
 }) => {
   const { project } = useGlobalContext()
+  const { notesExist } = useNoteContext()
   const { addAlert } = useNotificationContext()
 
   const [showLabel, setShowLabel] = useState<boolean>(false)
@@ -68,26 +70,38 @@ export const ExportNotes = ({
   }
 
   return isFileSaverSupported ? (
-    <div
-      onClick={handleExport}
-      onMouseEnter={handleEnter}
-      onMouseLeave={handleExit}
-      className='flex items-center justify-start h-4 text-sm duration-200 ease-in-out cursor-pointer text-themeText2 hover:text-themeAccent transtion-colors'
-    >
-      <DownloadIcon className='w-4 h-4 stroke-current' />
-      <AnimatePresence>
-        {(!dynamicLabel || showLabel) && (
-          <motion.span
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className='ml-2 text-md'
+    <AnimatePresence>
+      {notesExist && (
+        <div
+          onClick={handleExport}
+          onMouseEnter={handleEnter}
+          onMouseLeave={handleExit}
+          className='flex items-center justify-start h-4 text-sm duration-200 ease-in-out cursor-pointer text-themeText2 hover:text-themeAccent transtion-colors'
+        >
+          <motion.div
+            key='exportNotesIcon'
+            initial={{ scale: 0 }}
+            animate={{ scale: 1 }}
+            exit={{ scale: 0 }}
+            className='flex items-center'
           >
-            Export Notes
-          </motion.span>
-        )}
-      </AnimatePresence>
-    </div>
+            <DownloadIcon className='w-4 h-4 stroke-current' />
+          </motion.div>
+          <AnimatePresence>
+            {(!dynamicLabel || showLabel) && (
+              <motion.span
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className='ml-2 text-md'
+              >
+                Export Notes
+              </motion.span>
+            )}
+          </AnimatePresence>
+        </div>
+      )}
+    </AnimatePresence>
   ) : null
 }
 
