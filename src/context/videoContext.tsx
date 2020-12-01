@@ -6,7 +6,7 @@
  *
  * @author Josh Mu <hello@joshmu.dev>
  * @created Tuesday, 6th October 2020
- * @modified Wednesday, 25th November 2020 12:48:50 pm
+ * @modified Tuesday, 1st December 2020 8:14:35 pm
  * @copyright © 2020 - 2020 MU
  */
 
@@ -125,6 +125,12 @@ export const VideoProvider = (props: { [key: string]: any }) => {
     const playPosition = secs + (offset ? settings.playOffset : 0)
 
     playerRef.current.seekTo(playPosition, 'seconds')
+
+    // if a video has not loaded then also initiate and play
+    if (!progress.loaded) {
+      console.log('video not loaded, initiating...')
+      togglePlay()
+    }
   }
 
   const jumpBack = (): void => {
