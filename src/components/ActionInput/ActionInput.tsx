@@ -6,7 +6,7 @@
  *
  * @author Josh Mu <hello@joshmu.dev>
  * @created Thursday, 17th September 2020
- * @modified Monday, 30th November 2020 7:51:02 pm
+ * @modified Tuesday, 1st December 2020 8:20:08 pm
  * @copyright © 2020 - 2020 MU
  */
 
@@ -127,7 +127,7 @@ export const ActionInput = () => {
         ref={actionInputRef}
         className={`${
           isActive ? 'opacity-100' : 'opacity-50'
-        } relative w-full h-full px-2 py-1 transition-all duration-150 ease-in-out bg-transparent rounded-sm rounded-b-none rounded-l-none placeholder-themeText2 text-themeText text-md focus:outline-none`}
+        } relative w-full h-full px-2 py-1 transition-colors duration-150 ease-in-out bg-transparent rounded-sm rounded-b-none rounded-l-none placeholder-themeText2 text-themeText text-md focus:outline-none`}
         autoFocus={true}
         id='actionInput'
         name='addNote'
