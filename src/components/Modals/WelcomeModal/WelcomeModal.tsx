@@ -6,7 +6,7 @@
  *
  * @author Josh Mu <hello@joshmu.dev>
  * @created Saturday, 17th October 2020
- * @modified Sunday, 22nd November 2020 6:24:24 pm
+ * @modified Tuesday, 1st December 2020 7:58:24 pm
  * @copyright © 2020 - 2020 MU
  */
 
@@ -15,6 +15,7 @@ import { MdSettings as MenuIcon } from 'react-icons/md'
 import { ModalContainer } from '@/shared/Modal/ModalContainer'
 import { ModalHeader } from '@/shared/Modal/ModalHeader'
 import { ModalInnerContainer } from '@/shared/Modal/ModalInnerContainer'
+import { Hl } from '@/shared/Text/Text'
 
 export const WelcomeModal = ({
   toggle: toggleModal,
@@ -30,33 +31,30 @@ export const WelcomeModal = ({
       <ModalInnerContainer>
         <p className='mt-2'>
           All actions can be accessed from the{' '}
-          <span className='capitalize text-themeAccent'>
-            menu <MenuIcon className='inline-block mb-1 text-xl' />
-          </span>{' '}
+          <Hl className='font-bold capitalize'>
+            Menu <MenuIcon className='inline-block mb-1 text-xl' />
+          </Hl>{' '}
           dropdown in the right hand corner of the screen.
         </p>
         <p className='mt-2'>
-          Select <span className='capitalize text-themeAccent'>Create New</span>{' '}
-          to create a new project providing a{' '}
-          <span className='text-themeAccent'>title</span> and a{' '}
-          <span className='text-themeAccent'>video url</span>.
+          Select <Hl className='font-bold capitalize'>Create New</Hl> to start a
+          project providing a <Hl>title</Hl> and a <Hl>video url</Hl>.
         </p>
         <p className='mt-2'>
           Once the project has loaded you will then be able to add timestamped
-          notes whilst using the{' '}
-          <span className='capitalize text-themeAccent'>spacebar</span> to{' '}
-          <span className='text-themeAccent'>play/pause</span> the video if you
-          choose.
+          notes whilst using the <Hl>spacebar</Hl> to <Hl>play/pause</Hl> the
+          video. ⚡️
         </p>
         <p className='mt-2'>
-          For further information feel free to check the{' '}
-          <span className='capitalize text-themeAccent'>help</span> section in
-          the settings dropdown.
+          All <Hl>keyboard shortcuts</Hl> are available when the text input area
+          is <Hl>empty</Hl>. For further information feel free to refer to the{' '}
+          <Hl className='font-bold capitalize'>help</Hl> section.
         </p>
         <p className='mt-2'>
-          We are currently in our beta development stage. If you have feature
-          requests or any feedback then the VideoNote team would love to hear
-          from you.
+          <Hl className='font-bold'>VideoNote</Hl> is currently in beta stage
+          development, so things will be evolving and you may find a bug 🐛. If
+          so let us know, or tell us how we can make your experience even
+          better! ✨
         </p>
         <div className='w-full mt-2 text-right'>
           <a

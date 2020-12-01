@@ -6,7 +6,7 @@
  *
  * @author Josh Mu <hello@joshmu.dev>
  * @created Monday, 14th September 2020
- * @modified Tuesday, 1st December 2020 3:20:48 pm
+ * @modified Tuesday, 1st December 2020 4:03:30 pm
  * @copyright © 2020 - 2020 MU
  */
 
@@ -17,8 +17,6 @@ import {
   useEffect,
   useState,
 } from 'react'
-
-// import { useSetVh } from '@/hooks/useSetVh'
 
 interface ThemeContextInterface {
   theme: string

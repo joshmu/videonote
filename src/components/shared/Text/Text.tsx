@@ -6,9 +6,11 @@
  *
  * @author Josh Mu <hello@joshmu.dev>
  * @created Tuesday, 15th September 2020
- * @modified Monday, 30th November 2020 7:26:29 pm
+ * @modified Tuesday, 1st December 2020 7:52:19 pm
  * @copyright © 2020 - 2020 MU
  */
+
+import { ReactNode } from 'react'
 
 interface TextProps extends React.HTMLAttributes<HTMLElement> {
   className?: string
@@ -41,3 +43,12 @@ export const Text = ({ className = '', ...props }: TextProps) => {
     ></p>
   )
 }
+
+// highlight/accent text
+export const Hl = ({
+  children,
+  className = '',
+}: {
+  children: ReactNode
+  className?: string
+}) => <span className={`text-themeAccent ${className}`}>{children}</span>
