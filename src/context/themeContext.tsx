@@ -6,7 +6,7 @@
  *
  * @author Josh Mu <hello@joshmu.dev>
  * @created Monday, 14th September 2020
- * @modified Sunday, 22nd November 2020 7:45:22 pm
+ * @modified Tuesday, 1st December 2020 3:20:48 pm
  * @copyright © 2020 - 2020 MU
  */
 
@@ -42,7 +42,7 @@ export const ThemeProvider = ({ children }: { children: ReactNode }) => {
 
   // initialize theme with first enum entry
   const [theme, setTheme] = useState<ThemeType>(
-    Object.keys(ThemeType)[0] as ThemeType
+    Object.values(ThemeType)[0] as ThemeType
   )
 
   // initial theme
