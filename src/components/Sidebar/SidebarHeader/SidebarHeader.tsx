@@ -6,7 +6,7 @@
  *
  * @author Josh Mu <hello@joshmu.dev>
  * @created Monday, 12th October 2020
- * @modified Monday, 30th November 2020 5:33:47 pm
+ * @modified Tuesday, 1st December 2020 11:04:03 am
  * @copyright © 2020 - 2020 MU
  */
 
@@ -48,17 +48,13 @@ export const SidebarHeader = () => {
       <div className='flex items-center w-full h-10'>
         {/* arrow slider icon */}
         {projectsExist() && (
-          <div className='relative z-10 mr-2 text-4xl transition-all duration-200 ease-in-out cursor-pointer text-themeAccent2 hover:text-themeAccent'>
-            <motion.div
-              onClick={toggleOpen}
-              style={{
-                rotate: sidebarOpen ? 0 : 180,
-                translateX: sidebarOpen ? 0 : '-100%',
-              }}
-              transition={{ duration: 0.5 }}
-            >
-              <ArrowIcon className='fill-current' />
-            </motion.div>
+          <div
+            onClick={toggleOpen}
+            className={`relative z-10 mr-2 transition-all duration-200 ease-in-out cursor-pointer text-themeAccent2 hover:text-themeAccent ${
+              sidebarOpen ? '' : 'rotate-180 -translate-x-full transform'
+            }`}
+          >
+            <ArrowIcon className='text-4xl' />
           </div>
         )}
 
@@ -73,10 +69,7 @@ export const SidebarHeader = () => {
             projects.length === 0 ? 'animate-pulse text-themeAccent' : ''
           }
         >
-          <MenuIcon
-            onClick={handleSettingsClick}
-            className='text-2xl fill-current'
-          />
+          <MenuIcon onClick={handleSettingsClick} className='text-2xl' />
         </motion.div>
 
         <Menu open={menuOpen} />
