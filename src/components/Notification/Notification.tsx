@@ -6,11 +6,12 @@
  *
  * @author Josh Mu <hello@joshmu.dev>
  * @created Friday, 25th September 2020
- * @modified Monday, 23rd November 2020 11:45:15 am
+ * @modified Wednesday, 2nd December 2020 3:38:15 pm
  * @copyright © 2020 - 2020 MU
  */
 
 import { AnimatePresence, motion } from 'framer-motion'
+import { ReactNode } from 'react'
 import {
   AiOutlineInfoCircle as InfoIcon,
   AiOutlineVideoCamera as ProjectIcon,
@@ -96,35 +97,43 @@ const Alert = ({ type, msg, cancel }: AlertProps) => (
       <div className='mx-3'>
         {type === 'project' && (
           <>
-            <span className='font-semibold text-themeAccent'>Project</span>
-            <p className='text-sm text-themeText'>{msg}</p>
+            <AlertTitle>Project</AlertTitle>
+            <AlertMsg>{msg}</AlertMsg>
           </>
         )}
         {type === 'success' && (
           <>
-            <span className='font-semibold text-green-400'>Success</span>
-            <p className='text-sm text-themeText'>{msg}</p>
+            <AlertTitle>Success</AlertTitle>
+            <AlertMsg>{msg}</AlertMsg>
           </>
         )}
         {type === 'info' && (
           <>
-            <span className='font-semibold text-blue-400'>Info</span>
-            <p className='text-sm text-themeText'>{msg}</p>
+            <AlertTitle>Info</AlertTitle>
+            <AlertMsg>{msg}</AlertMsg>
           </>
         )}
         {type === 'warning' && (
           <>
-            <span className='font-semibold text-yellow-400'>Warning</span>
-            <p className='text-sm text-themeText'>{msg}</p>
+            <AlertTitle>Warning</AlertTitle>
+            <AlertMsg>{msg}</AlertMsg>
           </>
         )}
         {type === 'error' && (
           <>
-            <span className='font-semibold text-red-400'>Error</span>
-            <p className='text-sm text-themeText'>{msg}</p>
+            <AlertTitle>Error</AlertTitle>
+            <AlertMsg>{msg}</AlertMsg>
           </>
         )}
       </div>
     </div>
   </div>
+)
+
+const AlertTitle = ({ children }: { children: ReactNode }) => (
+  <span className='font-semibold text-themeAccent'>{children}</span>
+)
+
+const AlertMsg = ({ children }: { children: ReactNode }) => (
+  <p className='text-sm text-themeText'>{children}</p>
 )

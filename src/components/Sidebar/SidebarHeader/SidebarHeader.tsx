@@ -6,19 +6,19 @@
  *
  * @author Josh Mu <hello@joshmu.dev>
  * @created Monday, 12th October 2020
- * @modified Tuesday, 1st December 2020 12:28:15 pm
+ * @modified Wednesday, 2nd December 2020 3:44:55 pm
  * @copyright © 2020 - 2020 MU
  */
 
 import React from 'react'
 
 import { useGlobalContext } from '@/context/globalContext'
+import { useNoteContext } from '@/root/src/context/noteContext'
 
 import { Menu } from './Menu/Menu'
+import { MenuButton } from './Menu/MenuButton/MenuButton'
 import { Search } from './Search/Search'
 import { SidebarOpenIcon } from './SidebarOpenIcon/SidebarOpenIcon'
-import { MenuButton } from './Menu/MenuButton/MenuButton'
-import { useNoteContext } from '@/root/src/context/noteContext'
 import { SidebarTitle } from './SidebarTitle/SidebarTitle'
 
 export const SidebarHeader = () => {
@@ -52,7 +52,7 @@ export const SidebarHeader = () => {
           <Search />
         ) : (
           <SidebarTitle>
-            {project?.title ? project.title : 'VideoNote'}
+            {project?.title ? project.title.toUpperCase() : 'VideoNote'}
           </SidebarTitle>
         )}
       </div>

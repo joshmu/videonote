@@ -6,7 +6,7 @@
  *
  * @author Josh Mu <hello@joshmu.dev>
  * @created Tuesday, 6th October 2020
- * @modified Tuesday, 1st December 2020 11:44:31 am
+ * @modified Wednesday, 2nd December 2020 3:39:48 pm
  * @copyright © 2020 - 2020 MU
  */
 
@@ -99,7 +99,9 @@ export const Menu = () => {
                 <IconMenuItemWrapper>
                   <ProjectIcon />
                 </IconMenuItemWrapper>
-                <span className='uppercase'>{project.title}</span>
+                <span className='font-serif font-semibold tracking-wide uppercase'>
+                  {project.title}
+                </span>
               </Select>
             )}
             {!admin && (

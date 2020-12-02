@@ -6,7 +6,7 @@
  *
  * @author Josh Mu <hello@joshmu.dev>
  * @created Tuesday, 6th October 2020
- * @modified Wednesday, 2nd December 2020 1:34:13 pm
+ * @modified Wednesday, 2nd December 2020 3:29:53 pm
  * @copyright © 2020 - 2020 MU
  */
 
@@ -18,6 +18,7 @@ import { ChangeEvent, useEffect, useState } from 'react'
 import { ModalPrimaryBtn } from '@/components/shared/Modal/ModalBtn'
 import { useNotificationContext } from '@/context/notificationContext'
 import { ModalInput } from '@/shared/Modal/ModalInput'
+import { Heading2, SubHeading } from '@/shared/Text/Text'
 import { isValidCredentials } from '@/utils/clientHelpers'
 import { fetcher } from '@/utils/clientHelpers'
 
@@ -100,15 +101,11 @@ export const LoginModal = ({
       <div className='px-6 py-4'>
         <Link href='/hello' passHref>
           <a>
-            <h2 className='text-3xl font-bold text-center text-themeAccent'>
-              VideoNote
-            </h2>
+            <Heading2>VideoNote</Heading2>
           </a>
         </Link>
 
-        <h3 className='mt-1 text-xl font-medium text-center text-themeText'>
-          Welcome back!
-        </h3>
+        <SubHeading>Welcome back!</SubHeading>
 
         <p className='mt-1 text-center text-themeText2'>
           Sign in to your account

@@ -6,7 +6,7 @@
  *
  * @author Josh Mu <hello@joshmu.dev>
  * @created Monday, 14th September 2020
- * @modified Wednesday, 2nd December 2020 3:01:11 pm
+ * @modified Wednesday, 2nd December 2020 3:41:50 pm
  * @copyright © 2020 - 2020 MU
  */
 
@@ -34,6 +34,7 @@ module.exports = {
   theme: {
     extend: {
       fontFamily: {
+        serif: ['Playfair Display', ...defaultTheme.fontFamily.serif],
         sans: ['Roboto', ...defaultTheme.fontFamily.sans],
       },
       colors: {
