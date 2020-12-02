@@ -6,7 +6,7 @@
  *
  * @author Josh Mu <hello@joshmu.dev>
  * @created Monday, 14th September 2020
- * @modified Sunday, 22nd November 2020 2:35:14 pm
+ * @modified Wednesday, 2nd December 2020 3:02:25 pm
  * @copyright © 2020 - 2020 MU
  */
 
@@ -17,9 +17,9 @@ import { Layout } from '@/components/Layout/Layout'
 import ThemeToggle from '@/components/shared/ThemeToggle/ThemeToggle'
 
 const HelloPage: NextPage = () => {
-  const handleAboutClick = (): void => {
-    window.scrollTo({ top: 0, behavior: 'smooth' })
-  }
+  // const handleAboutClick = (): void => {
+  //   window.scrollTo({ top: 0, behavior: 'smooth' })
+  // }
 
   return (
     <Layout>

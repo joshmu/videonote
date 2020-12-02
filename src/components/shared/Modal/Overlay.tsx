@@ -6,7 +6,7 @@
  *
  * @author Josh Mu <hello@joshmu.dev>
  * @created Sunday, 27th September 2020
- * @modified Sunday, 22nd November 2020 4:08:36 pm
+ * @modified Wednesday, 2nd December 2020 2:46:48 pm
  * @copyright © 2020 - 2020 MU
  */
 
@@ -61,7 +61,7 @@ export const Overlay = () => {
           onClick={handleOverlayClick}
           className={`${
             promptState.isOpen ? 'z-40 bg-opacity-75' : 'z-10 bg-opacity-50'
-          } absolute top-0 bottom-0 left-0 right-0 bg-black`}
+          } absolute inset-0 bg-black`}
         ></motion.div>
       )}
     </AnimatePresence>
