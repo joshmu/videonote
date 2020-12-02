@@ -1,19 +1,19 @@
 /**
- * @path /src/components/LoginPage/Register/Register.js
- * 
+ * @path /src/components/LoginPage/LoginModal/LoginModal.tsx
+ *
  * @project videonote
- * @file Register.js
- * 
+ * @file LoginModal.tsx
+ *
  * @author Josh Mu <hello@joshmu.dev>
  * @created Tuesday, 6th October 2020
- * @modified Sunday, 22nd November 2020 6:26:23 pm
+ * @modified Wednesday, 2nd December 2020 1:34:13 pm
  * @copyright © 2020 - 2020 MU
  */
 
 import { motion } from 'framer-motion'
 import { StatusCodes } from 'http-status-codes'
 import Link from 'next/link'
-import { useEffect, useState } from 'react'
+import { ChangeEvent, useEffect, useState } from 'react'
 
 import { ModalPrimaryBtn } from '@/components/shared/Modal/ModalBtn'
 import { useNotificationContext } from '@/context/notificationContext'
@@ -21,65 +21,77 @@ import { ModalInput } from '@/shared/Modal/ModalInput'
 import { isValidCredentials } from '@/utils/clientHelpers'
 import { fetcher } from '@/utils/clientHelpers'
 
-export default function Register({ toggleLoginView, handleLogin, email }) {
-  const [user, setUser] = useState({
-    registerEmail: '',
-    registerPassword: '',
-    registerPassword2: '',
-  })
+type LoginBodyType = {
+  email: string
+  password: string
+}
+
+export const LoginModal = ({
+  toggleLoginView: toggleLoginRegisterModal,
+  handleLogin,
+  handleEmail,
+}) => {
   const { addAlert } = useNotificationContext()
+  const [user, setUser] = useState<LoginBodyType>({
+    email: '',
+    password: '',
+  })
 
-  // if email has been entered accidentally on login page then prefill for register page
+  // passing back email input to global page for autofill on register page if need be
   useEffect(() => {
-    setUser({ ...user, registerEmail: email })
-  }, [email])
+    handleEmail(user.email)
+  }, [user.email])
 
-  const handleChange = e => {
-    setUser({ ...user, [e.target.id]: e.target.value })
+  const handleChange = (event: ChangeEvent<HTMLInputElement>): void => {
+    setUser({ ...user, [event.target.id]: event.target.value })
   }
 
-  const handleSubmit = async e => {
-    e.preventDefault()
+  const handleSubmit = (event: ChangeEvent<HTMLInputElement>): void => {
+    event.preventDefault()
 
     if (
       !isValidCredentials({
-        email: user.registerEmail,
-        password: user.registerPassword,
-        password2: user.registerPassword2,
+        email: user.email,
+        password: user.password,
         addAlert,
       })
     )
       return
 
-    await handleRegister()
+    requestLogin()
   }
 
-  const handleRegister = async () => {
-    console.log('registering new user')
-    const body = {
-      email: user.registerEmail,
-      password: user.registerPassword2,
-    }
-    const { res, data } = await fetcher('/api/register', body)
+  const requestLogin = async (): Promise<void> => {
+    console.log('logging in user')
 
-    if (res.status === StatusCodes.CREATED) {
-      addAlert({
-        type: 'info',
-        msg: 'Account created',
-      })
-      handleLogin(data)
-    } else {
+    addAlert({
+      type: 'info',
+      msg: `Logging in...`,
+    })
+
+    const body: LoginBodyType = {
+      email: user.email,
+      password: user.password,
+    }
+    const { res, data } = await fetcher('/api/login', body)
+
+    // if we haven't found the account
+    if (res.status !== StatusCodes.MOVED_TEMPORARILY) {
       addAlert({ type: 'error', msg: data.msg })
+      return
     }
+
+    // continue to app
+    handleLogin(data)
   }
 
-  const handleSwitchView = () => {
-    toggleLoginView(true)
+  const handleToggleLoginRegisterModal = (): void => {
+    toggleLoginRegisterModal(false)
   }
 
   return (
     <motion.div
-      key='register-modal'
+      key='login-modal'
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
@@ -95,19 +107,21 @@ export default function Register({ toggleLoginView, handleLogin, email }) {
         </Link>
 
         <h3 className='mt-1 text-xl font-medium text-center text-themeText'>
-          Welcome!
+          Welcome back!
         </h3>
 
-        <p className='mt-1 text-center text-themeText2'>Create an account</p>
+        <p className='mt-1 text-center text-themeText2'>
+          Sign in to your account
+        </p>
 
         <form>
           <div className='w-full mt-4'>
             <ModalInput
               type='email'
-              id='registerEmail'
+              id='email'
               placeholder='Email Address'
               aria-label='Email Address'
-              value={user.registerEmail}
+              value={user.email}
               onChange={handleChange}
               autoFocus
             />
@@ -116,40 +130,28 @@ export default function Register({ toggleLoginView, handleLogin, email }) {
           <div className='w-full mt-4'>
             <ModalInput
               type='password'
-              id='registerPassword'
+              id='password'
               placeholder='Password'
               aria-label='Password'
-              value={user.registerPassword}
-              onChange={handleChange}
-            />
-          </div>
-          <div className='w-full mt-4'>
-            <ModalInput
-              type='password'
-              id='registerPassword2'
-              placeholder='Confirm Password'
-              aria-label='Password'
-              value={user.registerPassword2}
+              value={user.password}
               onChange={handleChange}
             />
           </div>
 
           <div className='flex items-center justify-end mt-4'>
-            <ModalPrimaryBtn handleClick={handleSubmit}>
-              Register
-            </ModalPrimaryBtn>
+            <ModalPrimaryBtn handleClick={handleSubmit}>Login</ModalPrimaryBtn>
           </div>
         </form>
       </div>
 
       <div className='flex items-center justify-center py-4 text-center'>
-        <span className='text-sm text-themeText2'>Have an account?</span>
+        <span className='text-sm text-themeText2'>Don't have an account? </span>
 
         <button
-          onClick={handleSwitchView}
+          onClick={handleToggleLoginRegisterModal}
           className='mx-2 text-sm font-bold transition-colors duration-300 ease-in-out focus:outline-none text-themeAccent2 hover:text-themeAccent'
         >
-          Sign In
+          Register
         </button>
       </div>
     </motion.div>

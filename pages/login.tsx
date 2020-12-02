@@ -6,7 +6,7 @@
  *
  * @author Josh Mu <hello@joshmu.dev>
  * @created Tuesday, 6th October 2020
- * @modified Monday, 23rd November 2020 11:39:30 am
+ * @modified Wednesday, 2nd December 2020 1:37:05 pm
  * @copyright © 2020 - 2020 MU
  */
 
@@ -15,8 +15,8 @@ import Router from 'next/router'
 import { useState } from 'react'
 
 import { Layout } from '@/components/Layout/Layout'
-import LoginView from '@/components/LoginPage/Login/Login'
-import RegisterView from '@/components/LoginPage/Register/Register'
+import { LoginModal } from '@/components/LoginPage/LoginModal/LoginModal'
+import { RegisterModal } from '@/components/LoginPage/RegisterModal/RegisterModal'
 import { Notification } from '@/components/Notification/Notification'
 import ThemeToggle from '@/components/shared/ThemeToggle/ThemeToggle'
 import useTwConfig from '@/hooks/useTwConfig'
@@ -53,13 +53,13 @@ const Login: NextPage = () => {
         }}
       >
         {loginView ? (
-          <LoginView
+          <LoginModal
             toggleLoginView={toggleLoginView}
             handleLogin={handleLogin}
             handleEmail={handleEmail}
           />
         ) : (
-          <RegisterView
+          <RegisterModal
             toggleLoginView={toggleLoginView}
             handleLogin={handleLogin}
             email={email}
