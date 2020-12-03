@@ -6,7 +6,7 @@
  *
  * @author Josh Mu <hello@joshmu.dev>
  * @created Monday, 14th September 2020
- * @modified Wednesday, 2nd December 2020 2:42:14 pm
+ * @modified Thursday, 3rd December 2020 4:16:52 pm
  * @copyright © 2020 - 2020 MU
  */
 
@@ -81,7 +81,7 @@ export const Layout = ({ children }: { children: ReactNode }) => {
 
       <div className='relative min-h-screen overflow-hidden font-sans antialiased transition-colors duration-300 ease-in-out debug-screens'>
         <main>
-          <div className='flex flex-col w-full h-screen overflow-hidden'>
+          <div className='flex flex-col w-full min-h-screen overflow-hidden'>
             {children}
           </div>
         </main>

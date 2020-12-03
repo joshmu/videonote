@@ -6,7 +6,7 @@
  * 
  * @author Josh Mu <hello@joshmu.dev>
  * @created Monday, 14th September 2020
- * @modified Wednesday, 2nd December 2020 3:45:56 pm
+ * @modified Thursday, 3rd December 2020 6:04:54 pm
  * @copyright © 2020 - 2020 MU
  */
 
@@ -109,11 +109,28 @@ body {
   -webkit-font-smoothing: antialiased;
   -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
 
+  @apply text-caret;
+  @apply text-select;
+  // background-image: radial-gradient(circle farthest-corner at center, #3C4B57 0%, #1C262B 100%);;
+}
+
+// text selection color
+.text-select {
+  ::-moz-selection {
+    /* Code for Firefox */
+    color: theme('colors.themeAccent');
+    background: theme('colors.themeBg2');
+  }
+  ::selection {
+    color: theme('colors.themeAccent');
+    background: theme('colors.themeBg2');
+  }
+}
+// text caret color
+.text-caret {
   input {
     caret-color: theme('colors.themeAccent');
   }
-
-  // background-image: radial-gradient(circle farthest-corner at center, #3C4B57 0%, #1C262B 100%);
 }
 
 .scrollbar {

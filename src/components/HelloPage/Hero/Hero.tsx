@@ -6,7 +6,7 @@
  *
  * @author Josh Mu <hello@joshmu.dev>
  * @created Thursday, 22nd October 2020
- * @modified Monday, 30th November 2020 7:41:44 pm
+ * @modified Thursday, 3rd December 2020 5:57:21 pm
  * @copyright © 2020 - 2020 MU
  */
 
@@ -23,7 +23,7 @@ export const Hero = () => {
   }
 
   return (
-    <div className='relative w-full min-h-screen transition-colors duration-300 ease-in-out bg-themeBg'>
+    <div className='relative w-full min-h-screen'>
       <div className='absolute top-0 flex w-full h-screen'>
         {/* left */}
         <div className='relative flex items-center justify-end w-full h-full'>

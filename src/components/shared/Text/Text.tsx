@@ -6,7 +6,7 @@
  *
  * @author Josh Mu <hello@joshmu.dev>
  * @created Tuesday, 15th September 2020
- * @modified Wednesday, 2nd December 2020 3:31:35 pm
+ * @modified Thursday, 3rd December 2020 4:33:08 pm
  * @copyright © 2020 - 2020 MU
  */
 
@@ -32,7 +32,7 @@ export const Heading = ({ className = '', children, ...props }: TextProps) => {
 export const Heading2 = ({ className = '', children, ...props }: TextProps) => {
   return (
     <h2
-      className={`${className} text-3xl font-bold text-center text-themeAccent mt-0 mb-2 font-serif tracking-tight`}
+      className={`text-3xl font-bold text-themeAccent mt-0 mb-2 font-serif tracking-tight ${className}`}
       {...props}
     >
       {children}

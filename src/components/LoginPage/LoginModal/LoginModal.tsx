@@ -6,7 +6,7 @@
  *
  * @author Josh Mu <hello@joshmu.dev>
  * @created Tuesday, 6th October 2020
- * @modified Wednesday, 2nd December 2020 3:29:53 pm
+ * @modified Thursday, 3rd December 2020 4:32:35 pm
  * @copyright © 2020 - 2020 MU
  */
 
@@ -101,7 +101,7 @@ export const LoginModal = ({
       <div className='px-6 py-4'>
         <Link href='/hello' passHref>
           <a>
-            <Heading2>VideoNote</Heading2>
+            <Heading2 className='text-center'>VideoNote</Heading2>
           </a>
         </Link>
 
