@@ -1,4 +1,7 @@
-import { Heading, Heading2 } from '@/shared/Text/Text'
+import { AnimatePresence, Variants, motion } from 'framer-motion'
+
+import { useReveal } from '@/root/src/hooks/useReveal'
+import { Heading } from '@/shared/Text/Text'
 
 const featuresData = [
   {
@@ -31,9 +34,17 @@ const featuresData = [
   },
 ]
 
+const featureVariants: Variants = {
+  initial: { opacity: 0 },
+  animate: custom => ({ opacity: 1, transition: { delay: 0.1 * custom } }),
+  exit: { opacity: 0 },
+}
+
 export const Features = () => {
+  const [ref, controls] = useReveal()
+
   return (
-    <div className='container px-4 mx-auto my-24'>
+    <div id='features' className='container px-4 mx-auto my-24'>
       {/* header */}
       <div className='flex items-center mb-2'>
         <Heading>Features</Heading>
@@ -43,10 +54,21 @@ export const Features = () => {
       </div>
 
       {/* features */}
-      <div className='grid grid-cols-2 gap-10 md:grid-cols-3'>
-        {featuresData.map((data, idx) => (
-          <FeatureItem key={idx} idx={idx} data={data} />
-        ))}
+      <div ref={ref} className='grid grid-cols-2 gap-10 md:grid-cols-3'>
+        <AnimatePresence>
+          {featuresData.map((data, idx) => (
+            <motion.div
+              custom={idx}
+              key={data.title}
+              initial='initial'
+              animate={controls}
+              exit='exit'
+              variants={featureVariants}
+            >
+              <FeatureItem idx={idx} data={data} />
+            </motion.div>
+          ))}
+        </AnimatePresence>
       </div>
     </div>
   )

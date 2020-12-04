@@ -6,19 +6,18 @@
  *
  * @author Josh Mu <hello@joshmu.dev>
  * @created Monday, 14th September 2020
- * @modified Friday, 4th December 2020 12:10:33 pm
+ * @modified Friday, 4th December 2020 1:02:51 pm
  * @copyright © 2020 - 2020 MU
  */
 
 import { NextPage } from 'next'
-import { useRouter } from 'next/router'
 
+import { CTA } from '@/components/HelloPage/CTA/CTA'
 import { Features } from '@/components/HelloPage/Features/Features'
 import { Hero } from '@/components/HelloPage/Hero/Hero'
+import { Footer } from '@/components/Layout/Footer/Footer'
 import { Layout } from '@/components/Layout/Layout'
-import { ThemeToggle } from '@/components/shared/ThemeToggle/ThemeToggle'
-import { Reveal } from '@/components/shared/ux/Reveal'
-import { Footer } from '@/root/src/components/Layout/Footer/Footer'
+import { ThemeToggle } from '@/shared/ThemeToggle/ThemeToggle'
 
 const HelloPage: NextPage = () => {
   return (
@@ -40,27 +39,3 @@ const HelloPage: NextPage = () => {
 }
 
 export default HelloPage
-
-const CTA = () => {
-  const router = useRouter()
-
-  const handleStart = () => {
-    window.scrollTo({ top: 0, behavior: 'smooth' })
-    router.push('/login')
-  }
-
-  return (
-    <Reveal>
-      <div className='relative flex items-center justify-center pb-16'>
-        <button
-          className='relative font-serif text-4xl text-themeAccent focus:outline-none'
-          onClick={handleStart}
-        >
-          <div className='w-full h-px mb-4 transform bg-gradient-to-l from-themeAccent -rotate-3'></div>
-          <span>Let's get started!</span>
-          <div className='w-full h-px mt-4 transform bg-gradient-to-r from-themeAccent -rotate-3'></div>
-        </button>
-      </div>
-    </Reveal>
-  )
-}

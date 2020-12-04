@@ -6,13 +6,15 @@
  *
  * @author Josh Mu <hello@joshmu.dev>
  * @created Thursday, 22nd October 2020
- * @modified Friday, 4th December 2020 12:12:54 pm
+ * @modified Friday, 4th December 2020 1:04:44 pm
  * @copyright © 2020 - 2020 MU
  */
 
 import { motion } from 'framer-motion'
 import Link from 'next/link'
 import Router from 'next/router'
+import { AiOutlineArrowDown as ArrowDownIcon } from 'react-icons/ai'
+import { scroller } from 'react-scroll'
 
 import { Heading } from '@/components/shared/Text/Text'
 import { MotionFadeUp } from '@/components/shared/ux/MotionFadeUp'
@@ -41,6 +43,7 @@ export const Hero = () => {
             </Heading>
           </motion.div>
 
+          {/* let's go button */}
           <MotionFadeUp
             k='navbtn'
             animate={{ transition: { delay: 0.7 } }}
@@ -122,6 +125,32 @@ export const Hero = () => {
           </motion.div>
         </div>
       </div>
+      <DownButton />
     </div>
   )
+}
+
+const DownButton = () => {
+  const handleDown = (): void => {
+    scrollTo('features')
+  }
+
+  return (
+    <div className='absolute bottom-0 flex items-center justify-center w-full h-16'>
+      <button
+        onClick={handleDown}
+        className='text-2xl cursor-pointer animate-pulse text-themeAccent focus:outline-none'
+      >
+        <ArrowDownIcon />
+      </button>
+    </div>
+  )
+}
+
+const scrollTo = (elemId: string): void => {
+  scroller.scrollTo(elemId, {
+    duration: 800,
+    delay: 0,
+    smooth: 'easeInOutQuint',
+  })
 }

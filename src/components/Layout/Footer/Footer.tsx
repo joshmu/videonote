@@ -4,7 +4,7 @@ export const Footer = () => {
   return (
     <footer className='container py-20 mx-auto text-center'>
       <p>
-        Made with <span>❤️</span> by{' '}
+        Made with <span>♡</span> by{' '}
         <a
           className='font-bold underline text-themeAccent'
           href='https://joshmu.dev'
@@ -17,9 +17,9 @@ export const Footer = () => {
         <Link href='/privacy' passHref>
           <a className='underline'>Privacy Policy</a>
         </Link>{' '}
-        <a className='underline' href='/terms'>
+        {/* <a className='underline' href='/terms'>
           Terms
-        </a>
+        </a> */}
       </p>
     </footer>
   )
