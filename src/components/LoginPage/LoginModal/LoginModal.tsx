@@ -6,7 +6,7 @@
  *
  * @author Josh Mu <hello@joshmu.dev>
  * @created Tuesday, 6th October 2020
- * @modified Thursday, 3rd December 2020 4:32:35 pm
+ * @modified Friday, 4th December 2020 1:34:55 pm
  * @copyright © 2020 - 2020 MU
  */
 
@@ -105,7 +105,7 @@ export const LoginModal = ({
           </a>
         </Link>
 
-        <SubHeading>Welcome back!</SubHeading>
+        <SubHeading className='text-center'>Welcome back!</SubHeading>
 
         <p className='mt-1 text-center text-themeText2'>
           Sign in to your account

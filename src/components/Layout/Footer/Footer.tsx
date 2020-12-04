@@ -13,13 +13,16 @@ export const Footer = () => {
         </a>{' '}
         and other team members @ VideoNote™
       </p>
+      <p className='mt-2 text-sm opacity-75 text-themeText'>
+        2020 - {new Date().getFullYear()}
+      </p>
       <p className='mt-4 space-x-4 text-themeText2'>
         <Link href='/privacy' passHref>
           <a className='underline'>Privacy Policy</a>
         </Link>{' '}
-        {/* <a className='underline' href='/terms'>
+        <a className='underline' href='/terms'>
           Terms
-        </a> */}
+        </a>
       </p>
     </footer>
   )

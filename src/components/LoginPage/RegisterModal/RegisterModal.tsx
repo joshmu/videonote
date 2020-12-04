@@ -6,7 +6,7 @@
  *
  * @author Josh Mu <hello@joshmu.dev>
  * @created Tuesday, 6th October 2020
- * @modified Thursday, 3rd December 2020 4:32:52 pm
+ * @modified Friday, 4th December 2020 1:35:21 pm
  * @copyright © 2020 - 2020 MU
  */
 
@@ -106,7 +106,7 @@ export const RegisterModal = ({
           </a>
         </Link>
 
-        <SubHeading>Welcome!</SubHeading>
+        <SubHeading className='text-center'>Welcome!</SubHeading>
 
         <p className='mt-1 text-center text-themeText2'>Create an account</p>
 

@@ -6,7 +6,7 @@
  *
  * @author Josh Mu <hello@joshmu.dev>
  * @created Tuesday, 15th September 2020
- * @modified Thursday, 3rd December 2020 4:33:08 pm
+ * @modified Friday, 4th December 2020 1:30:50 pm
  * @copyright © 2020 - 2020 MU
  */
 
@@ -47,7 +47,7 @@ export const SubHeading = ({
 }: TextProps) => {
   return (
     <h3
-      className={`${className} mt-1 text-xl font-normal text-center text-themeText font-sans`}
+      className={`${className} mt-1 text-xl font-normal text-themeText font-sans`}
       {...props}
     >
       {children}
