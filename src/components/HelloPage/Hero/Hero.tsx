@@ -6,7 +6,7 @@
  *
  * @author Josh Mu <hello@joshmu.dev>
  * @created Thursday, 22nd October 2020
- * @modified Thursday, 3rd December 2020 5:57:21 pm
+ * @modified Friday, 4th December 2020 12:12:54 pm
  * @copyright © 2020 - 2020 MU
  */
 
@@ -31,7 +31,6 @@ export const Hero = () => {
             key='videoTitle'
             initial={{ opacity: 0 }}
             animate={{ opacity: 1, transition: { delay: 0.2 } }}
-            exit={{ opacity: 0, y: -10, transition: { delay: 0 } }}
             className='z-10'
           >
             <Heading
@@ -45,7 +44,6 @@ export const Hero = () => {
           <MotionFadeUp
             k='navbtn'
             animate={{ transition: { delay: 0.7 } }}
-            exit={{ transition: { delay: 0.4 } }}
             className='relative'
           >
             <Link href='/login'>
@@ -68,8 +66,7 @@ export const Hero = () => {
             exit={{
               x: '-100%',
               transition: {
-                delay: 0.6,
-                duration: 0.8,
+                duration: 0.6,
               },
             }}
             className='absolute z-0 w-full transition-colors duration-300 ease-in-out rounded-r-md h-5/6 bg-themeAccent'
@@ -95,7 +92,6 @@ export const Hero = () => {
             k='note'
             animate={{ transition: { delay: 0.5 } }}
             className='z-10'
-            exit={{ y: -10, transition: { delay: 0 } }}
           >
             <Heading
               onClick={handleClick}

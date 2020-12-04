@@ -6,7 +6,7 @@
  *
  * @author Josh Mu <hello@joshmu.dev>
  * @created Tuesday, 6th October 2020
- * @modified Wednesday, 2nd December 2020 1:37:05 pm
+ * @modified Friday, 4th December 2020 11:15:45 am
  * @copyright © 2020 - 2020 MU
  */
 
@@ -18,7 +18,7 @@ import { Layout } from '@/components/Layout/Layout'
 import { LoginModal } from '@/components/LoginPage/LoginModal/LoginModal'
 import { RegisterModal } from '@/components/LoginPage/RegisterModal/RegisterModal'
 import { Notification } from '@/components/Notification/Notification'
-import ThemeToggle from '@/components/shared/ThemeToggle/ThemeToggle'
+import { ThemeToggle } from '@/components/shared/ThemeToggle/ThemeToggle'
 import useTwConfig from '@/hooks/useTwConfig'
 
 import { handleJwtToken } from '../utils/clientHelpers'

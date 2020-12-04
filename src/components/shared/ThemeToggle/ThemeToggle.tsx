@@ -6,7 +6,7 @@
  *
  * @author Josh Mu <hello@joshmu.dev>
  * @created Tuesday, 15th September 2020
- * @modified Sunday, 22nd November 2020 2:13:53 pm
+ * @modified Friday, 4th December 2020 11:14:54 am
  * @copyright © 2020 - 2020 MU
  */
 
@@ -25,12 +25,12 @@ interface ThemeToggleInterface {
   props?: object
 }
 
-export default function ThemeToggle({
+export const ThemeToggle = ({
   lightColor = '',
   darkColor = '',
   className = '',
   ...props
-}: ThemeToggleInterface) {
+}: ThemeToggleInterface) => {
   const { toggleTheme, theme } = useThemeContext()
 
   const handleClick = (): void => {

@@ -33,7 +33,7 @@ const featuresData = [
 
 export const Features = () => {
   return (
-    <div className='container px-4 mx-auto my-32'>
+    <div className='container px-4 mx-auto my-24'>
       {/* header */}
       <div className='flex items-center mb-2'>
         <Heading>Features</Heading>

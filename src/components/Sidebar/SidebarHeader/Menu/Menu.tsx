@@ -6,7 +6,7 @@
  *
  * @author Josh Mu <hello@joshmu.dev>
  * @created Tuesday, 6th October 2020
- * @modified Wednesday, 2nd December 2020 3:39:48 pm
+ * @modified Friday, 4th December 2020 11:15:33 am
  * @copyright © 2020 - 2020 MU
  */
 
@@ -31,7 +31,7 @@ import { ModalType } from '@/components/Modals/Modals'
 import { useGlobalContext } from '@/context/globalContext'
 import { useThemeContext } from '@/context/themeContext'
 import { Select } from '@/shared/Select/Select'
-import ThemeToggle from '@/shared/ThemeToggle/ThemeToggle'
+import { ThemeToggle } from '@/shared/ThemeToggle/ThemeToggle'
 
 import { IconMenuItemWrapper } from './IconMenuItemWrapper/IconMenuItemWrapper'
 
