@@ -6,7 +6,7 @@
  *
  * @author Josh Mu <hello@joshmu.dev>
  * @created Thursday, 22nd October 2020
- * @modified Friday, 4th December 2020 1:04:44 pm
+ * @modified Friday, 4th December 2020 1:43:23 pm
  * @copyright © 2020 - 2020 MU
  */
 
@@ -50,9 +50,12 @@ export const Hero = () => {
             className='relative'
           >
             <Link href='/login'>
-              <button className='absolute z-10 px-3 py-2 -mb-32 tracking-wider text-left uppercase transition-colors duration-300 ease-in-out rounded-r-sm cursor-pointer focus:outline-none bottom-1/2 hover:text-themeBg text-themeAccent hover:bg-themeAccent'>
+              <motion.button
+                whileHover={{ scale: 1.1 }}
+                className='absolute z-10 px-3 py-2 -mb-32 tracking-wider text-left uppercase rounded-r-sm cursor-pointer focus:outline-none bottom-1/2 text-themeAccent'
+              >
                 Let's Go
-              </button>
+              </motion.button>
             </Link>
           </MotionFadeUp>
 
