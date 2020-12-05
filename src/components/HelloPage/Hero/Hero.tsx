@@ -6,18 +6,20 @@
  *
  * @author Josh Mu <hello@joshmu.dev>
  * @created Thursday, 22nd October 2020
- * @modified Friday, 4th December 2020 1:43:23 pm
+ * @modified Saturday, 5th December 2020 4:19:16 pm
  * @copyright © 2020 - 2020 MU
  */
 
 import { motion } from 'framer-motion'
 import Link from 'next/link'
 import Router from 'next/router'
-import { AiOutlineArrowDown as ArrowDownIcon } from 'react-icons/ai'
-import { scroller } from 'react-scroll'
 
-import { Heading } from '@/components/shared/Text/Text'
 import { MotionFadeUp } from '@/components/shared/ux/MotionFadeUp'
+
+import { HeroTitle } from './HeroTitle/HeroTitle'
+import { NotesBackground } from './NotesBackground/NotesBackground'
+import { ScrollDown } from './ScrollDown/ScrollDown'
+import { VideoBackground } from './VideoBackground/VideoBackground'
 
 export const Hero = () => {
   const handleClick = (): void => {
@@ -35,12 +37,9 @@ export const Hero = () => {
             animate={{ opacity: 1, transition: { delay: 0.2 } }}
             className='z-10'
           >
-            <Heading
-              onClick={handleClick}
-              className='z-10 transition-colors duration-300 ease-in-out cursor-pointer text-8xl text-themeBg'
-            >
+            <HeroTitle onClick={handleClick} className='text-themeBg'>
               Video
-            </Heading>
+            </HeroTitle>
           </motion.div>
 
           {/* let's go button */}
@@ -77,18 +76,7 @@ export const Hero = () => {
             }}
             className='absolute z-0 w-full transition-colors duration-300 ease-in-out rounded-r-md h-5/6 bg-themeAccent'
           >
-            {/* neu video background */}
-            <motion.div
-              key='neu-video-image-bg'
-              initial={{
-                opacity: 0,
-              }}
-              animate={{ opacity: 1, transition: { delay: 0.8 } }}
-              exit={{ opacity: 0 }}
-              className='flex items-center justify-center w-full h-full'
-            >
-              <div className='w-3/4 neu-accent h-1/2'></div>
-            </motion.div>
+            <VideoBackground />
           </motion.div>
         </div>
 
@@ -99,61 +87,16 @@ export const Hero = () => {
             animate={{ transition: { delay: 0.5 } }}
             className='z-10'
           >
-            <Heading
-              onClick={handleClick}
-              className='transition-colors duration-300 ease-in-out cursor-pointer text-themeAccent text-8xl'
-            >
+            <HeroTitle onClick={handleClick} className='text-themeAccent'>
               Note
-            </Heading>
+            </HeroTitle>
           </MotionFadeUp>
 
-          {/* neu notes background */}
-          <motion.div
-            key='neu-notes-bg-image'
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1, transition: { delay: 0.8 } }}
-            exit={{ opacity: 0 }}
-            className='absolute z-0 flex items-center justify-center w-full h-full'
-          >
-            <div className='flex flex-col justify-between w-3/4 transition-colors duration-300 ease-in-out h-1/2'>
-              <div className='h-1/12 neu-bg'></div>
-              <div className='h-1/12 neu-bg'></div>
-              <div className='h-1/12 neu-bg'></div>
-              <div className='h-1/12 neu-bg'></div>
-              <div className='h-1/12 neu-bg'></div>
-              <div className='h-1/12 neu-bg'></div>
-              <div className='h-1/12 neu-bg'></div>
-              <div className='h-1/12 neu-bg'></div>
-            </div>
-          </motion.div>
+          <NotesBackground />
         </div>
       </div>
-      <DownButton />
+
+      <ScrollDown to={'features'} />
     </div>
   )
-}
-
-const DownButton = () => {
-  const handleDown = (): void => {
-    scrollTo('features')
-  }
-
-  return (
-    <div className='absolute bottom-0 flex items-center justify-center w-full h-16'>
-      <button
-        onClick={handleDown}
-        className='text-2xl cursor-pointer animate-pulse text-themeAccent focus:outline-none'
-      >
-        <ArrowDownIcon />
-      </button>
-    </div>
-  )
-}
-
-const scrollTo = (elemId: string): void => {
-  scroller.scrollTo(elemId, {
-    duration: 800,
-    delay: 0,
-    smooth: 'easeInOutQuint',
-  })
 }
