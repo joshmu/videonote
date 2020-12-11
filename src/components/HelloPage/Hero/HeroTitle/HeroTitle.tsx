@@ -14,7 +14,7 @@ export const HeroTitle = ({
   return (
     <h1
       onClick={onClick}
-      className={`z-10 font-serif tracking-tight cursor-pointer text-8xl ${className}`}
+      className={`z-10 font-serif tracking-tight cursor-pointer text-7xl sm:text-8xl ${className}`}
       {...props}
     >
       {children}
