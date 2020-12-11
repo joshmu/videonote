@@ -6,15 +6,14 @@
  *
  * @author Josh Mu <hello@joshmu.dev>
  * @created Friday, 11th December 2020
- * @modified Friday, 11th December 2020 12:26:47 pm
+ * @modified Friday, 11th December 2020 1:00:14 pm
  * @copyright © 2020 - 2020 MU
  */
 
 import Image from 'next/image'
 
 import { Heading } from '@/shared/Text/Text'
-
-import { Reveal } from '../../shared/ux/Reveal'
+import { Reveal } from '@/shared/ux/Reveal'
 
 export const Overview = () => {
   const imgSrc =
