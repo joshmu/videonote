@@ -6,7 +6,7 @@
  *
  * @author Josh Mu <hello@joshmu.dev>
  * @created Thursday, 17th September 2020
- * @modified Sunday, 22nd November 2020 3:26:20 pm
+ * @modified Friday, 11th December 2020 10:40:46 am
  * @copyright © 2020 - 2020 MU
  */
 
@@ -16,9 +16,10 @@ import ReactPlayer from 'react-player'
 
 import { useVideoContext } from '@/context/videoContext'
 import { useIsMount } from '@/hooks/useIsMount'
+import { Loader } from '@/shared/Loader/Loader'
 
 import { ActionInput } from '../ActionInput/ActionInput'
-import { Loader } from '../shared/Loader/Loader'
+import { Underlay } from './Underlay/Underlay'
 import style from './videoPlayer.module.scss'
 
 const videoContentVariants: Variants = {
@@ -46,6 +47,7 @@ export const VideoPlayer = () => {
     handleProgress,
     handlePlayerError,
     handleDuration,
+    playerRef,
   } = useVideoContext()
 
   const isMount = useIsMount()
@@ -54,6 +56,7 @@ export const VideoPlayer = () => {
   useEffect(() => {
     if (isMount) return
     // if url changes then presume we are loading a new video
+    console.log(`loading ${url}`)
     if (typeof url === 'string' && url.length > 0) setIsLoading(true)
   }, [url, isMount])
 
@@ -62,43 +65,53 @@ export const VideoPlayer = () => {
     setIsLoading(false)
   }
 
+  const isPlayerReady = !isLoading && playerRef.current
+
   return (
-    // wrapper to position input
-    <motion.div
-      key='videoContent'
-      initial='initial'
-      animate='animate'
-      exit='exit'
-      variants={videoContentVariants}
-      id='videoContent'
-      className='relative w-full h-full transition-all duration-500 ease-in-out'
-    >
-      {/* resposive video wrapper */}
-      <div className={`${style.playerWrapper} w-full h-full`}>
-        {url && (
-          <ReactPlayer
-            url={url}
-            onError={handlePlayerError}
-            controls={false}
-            playing={playing}
-            volume={volume}
-            playbackRate={playbackRate}
-            progressInterval={500}
-            onDuration={handleDuration}
-            onReady={preHandleReady}
-            onProgress={handleProgress}
-            config={{
-              youtube: {
-                playerVars: { showinfo: 0, autoplay: 0 },
-              },
-              vimeo: {},
-            }}
-            className={`${style.reactPlayer} `}
-            width='100%'
-            height='100%'
-          />
-        )}
+    <div className='relative flex w-full transition-all duration-500 ease-in-out'>
+      <Underlay show={isPlayerReady} />
+
+      <div className='relative z-10 w-full my-auto'>
+        {/* // wrapper to position input */}
+        <motion.div
+          key='videoContent'
+          initial='initial'
+          animate='animate'
+          exit='exit'
+          variants={videoContentVariants}
+          id='videoContent'
+        >
+          {/* resposive video wrapper */}
+          <div className={`${style.playerWrapper} w-full h-full`}>
+            {url && (
+              <ReactPlayer
+                url={url}
+                onError={handlePlayerError}
+                controls={false}
+                playing={playing}
+                volume={volume}
+                playbackRate={playbackRate}
+                progressInterval={500}
+                onDuration={handleDuration}
+                onReady={preHandleReady}
+                onProgress={handleProgress}
+                config={{
+                  youtube: {
+                    playerVars: { showinfo: 0, autoplay: 0 },
+                  },
+                  vimeo: {},
+                }}
+                className={`${style.reactPlayer} `}
+                width='100%'
+                height='100%'
+              />
+            )}
+          </div>
+        </motion.div>
+
+        <Loader show={isLoading} />
       </div>
+
       {/* input wrapper */}
       {!isLoading && url && (
         <motion.div
@@ -112,7 +125,6 @@ export const VideoPlayer = () => {
           </div>
         </motion.div>
       )}
-      {isLoading && <Loader />}
-    </motion.div>
+    </div>
   )
 }
