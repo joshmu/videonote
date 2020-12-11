@@ -6,11 +6,11 @@
  *
  * @author Josh Mu <hello@joshmu.dev>
  * @created Friday, 11th December 2020
- * @modified Friday, 11th December 2020 1:00:14 pm
+ * @modified Friday, 11th December 2020 1:05:03 pm
  * @copyright © 2020 - 2020 MU
  */
 
-import Image from 'next/image'
+// import Image from 'next/image'
 
 import { Heading } from '@/shared/Text/Text'
 import { Reveal } from '@/shared/ux/Reveal'
@@ -47,7 +47,7 @@ export const Overview = () => {
 
         {/* image */}
         <div className='relative w-2/3 overflow-hidden rounded-lg shadow-xl'>
-          <Image src={imgSrc} width={2400} height={1431} layout='responsive' />
+          {/* <Image src={imgSrc} width={2400} height={1431} layout='responsive' /> */}
         </div>
       </div>
     </div>
