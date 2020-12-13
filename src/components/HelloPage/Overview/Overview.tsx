@@ -6,7 +6,7 @@
  *
  * @author Josh Mu <hello@joshmu.dev>
  * @created Friday, 11th December 2020
- * @modified Friday, 11th December 2020 4:00:48 pm
+ * @modified Sunday, 13th December 2020 11:55:11 am
  * @copyright © 2020 - 2020 MU
  */
 
@@ -21,7 +21,7 @@ export const Overview = () => {
   const imgSrc = '/images/vn-overview-hero.png'
 
   return (
-    <div id='overview' className='container px-4 mx-auto mb-12 mt-36'>
+    <div id='overview' className='container px-4 pt-24 mx-auto my-12'>
       <div className='flex flex-col items-center justify-center w-full md:flex-row'>
         <div className='relative w-full sm:w-3/4 md:flex-1'>
           {/* border */}

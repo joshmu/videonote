@@ -6,7 +6,7 @@
  *
  * @author Josh Mu <hello@joshmu.dev>
  * @created Thursday, 22nd October 2020
- * @modified Saturday, 5th December 2020 4:19:16 pm
+ * @modified Sunday, 13th December 2020 11:53:31 am
  * @copyright © 2020 - 2020 MU
  */
 
@@ -96,7 +96,7 @@ export const Hero = () => {
         </div>
       </div>
 
-      <ScrollDown to={'features'} />
+      <ScrollDown to={'overview'} />
     </div>
   )
 }
