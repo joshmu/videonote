@@ -6,7 +6,7 @@
  *
  * @author Josh Mu <hello@joshmu.dev>
  * @created Friday, 11th December 2020
- * @modified Sunday, 13th December 2020 11:55:11 am
+ * @modified Monday, 14th December 2020 6:19:35 pm
  * @copyright © 2020 - 2020 MU
  */
 
@@ -50,7 +50,21 @@ export const Overview = () => {
 
         {/* image */}
         <div className='relative w-full mx-auto mt-12 overflow-hidden rounded-lg shadow-xl md:ml-8 md:mt-0 md:w-2/3'>
-          <Image src={imgSrc} width={2400} height={1431} layout='responsive' />
+          <Reveal
+            variants={{
+              initial: { opacity: 0 },
+              animate: { opacity: 1 },
+              exit: { opacity: 0 },
+            }}
+          >
+            <Image
+              alt='app overview'
+              src={imgSrc}
+              width={2400}
+              height={1431}
+              layout='responsive'
+            />
+          </Reveal>
         </div>
       </div>
     </div>
