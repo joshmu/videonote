@@ -6,11 +6,12 @@
  *
  * @author Josh Mu <hello@joshmu.dev>
  * @created Friday, 4th December 2020
- * @modified Friday, 11th December 2020 12:28:43 pm
+ * @modified Tuesday, 15th December 2020 10:00:21 am
  * @copyright © 2020 - 2020 MU
  */
 
 import { useRouter } from 'next/router'
+import { MouseEvent } from 'react'
 import { animateScroll as scroll } from 'react-scroll'
 
 import { Reveal } from '@/shared/ux/Reveal'
@@ -18,12 +19,20 @@ import { Reveal } from '@/shared/ux/Reveal'
 export const CTA = () => {
   const router = useRouter()
 
-  const handleStart = () => {
+  const handleStart = (event: MouseEvent) => {
+    event.preventDefault()
+    const duration = 600
+
     scroll.scrollToTop({
-      duration: 600,
+      duration,
     })
-    // window.scrollTo({ top: 0, behavior: 'smooth' })
-    router.push('/login')
+
+    // * scroll to top during next router change is causing animate presence conflict?
+    // route change instead after completed animation event
+    setTimeout(() => {
+      // window.scrollTo({ top: 0, behavior: 'smooth' })
+      router.push('/login')
+    }, duration)
   }
 
   return (
