@@ -6,7 +6,7 @@
  *
  * @author Josh Mu <hello@joshmu.dev>
  * @created Tuesday, 13th October 2020
- * @modified Monday, 23rd November 2020 4:58:55 pm
+ * @modified Wednesday, 16th December 2020 2:55:07 pm
  * @copyright © 2020 - 2020 MU
  */
 
@@ -25,7 +25,7 @@ const UserSchema = new Schema(
     email: { type: String, required: true, unique: true },
     username: { type: String },
     projects: [{ type: Schema.Types.ObjectId, ref: 'Project' }],
-    settings: { type: Schema.Types.ObjectId, ref: 'Settings', unique: true },
+    settings: { type: Schema.Types.ObjectId, ref: 'Settings' },
     role: { type: String, default: 'free' },
     password: String,
   },

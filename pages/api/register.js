@@ -1,3 +1,15 @@
+/**
+ * @path /pages/api/register.js
+ *
+ * @project videonote
+ * @file register.js
+ *
+ * @author Josh Mu <hello@joshmu.dev>
+ * @created Thursday, 1st October 2020
+ * @modified Wednesday, 16th December 2020 3:04:37 pm
+ * @copyright © 2020 - 2020 MU
+ */
+
 import bcrypt from 'bcryptjs'
 import { StatusCodes } from 'http-status-codes'
 import isEmail from 'validator/lib/isEmail'
@@ -43,9 +55,11 @@ export default async (req, res) => {
   try {
     await userDoc.save()
   } catch (err) {
+    console.error(err)
     res
       .status(StatusCodes.INTERNAL_SERVER_ERROR)
       .json({ msg: 'Database Error' })
+    return
   }
 
   // token
