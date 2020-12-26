@@ -6,7 +6,7 @@
  *
  * @author Josh Mu <hello@joshmu.dev>
  * @created Friday, 4th December 2020
- * @modified Tuesday, 15th December 2020 10:13:17 am
+ * @modified Saturday, 26th December 2020 6:09:13 pm
  * @copyright © 2020 - 2020 MU
  */
 
@@ -43,7 +43,7 @@ export const CTA = () => {
           onClick={handleStart}
         >
           <span>Let's get started!</span>
-          <div className='w-full h-1 mt-6 rounded-full bg-gradient-to-r from-themeAccent'></div>
+          <span className='inline-block w-full h-1 mt-6 rounded-full bg-gradient-to-r from-themeAccent'></span>
         </button>
       </div>
     </Reveal>

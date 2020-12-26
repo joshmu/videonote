@@ -14,7 +14,7 @@ class MyDocument extends Document {
 
   render() {
     return (
-      <Html lang='en'>
+      <Html lang='en' itemScope itemType='http://schema.org/WebPage'>
         <Head />
         <body>
           <Main />
