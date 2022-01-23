@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion'
-import { StyleHTMLAttributes } from 'react'
+import { CSSProperties, StyleHTMLAttributes } from 'react'
 import { AiOutlineArrowDown as ArrowDownIcon } from 'react-icons/ai'
 import { scroller } from 'react-scroll'
 
@@ -8,7 +8,7 @@ export const ScrollDown = ({
   style = {},
 }: {
   to: string
-  style?: { [key: string]: React.CSSProperties }
+  style?: CSSProperties | undefined
 }) => {
   const handleDown = (): void => {
     scrollTo(to)
