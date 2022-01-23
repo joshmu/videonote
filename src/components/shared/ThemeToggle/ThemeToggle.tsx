@@ -6,15 +6,18 @@
  *
  * @author Josh Mu <hello@joshmu.dev>
  * @created Tuesday, 15th September 2020
- * @modified Friday, 4th December 2020 11:14:54 am
+ * @modified Sunday, 23rd January 2022 6:14:47 pm
  * @copyright © 2020 - 2020 MU
  */
 
 import { Variants, motion } from 'framer-motion'
 import { AnimatePresence } from 'framer-motion'
-import { BsMoon as MoonIcon, BsLightningFill as ZapIcon } from 'react-icons/bs'
-import { GiHeatHaze as HotIcon } from 'react-icons/gi'
-import { HiSun as SunIcon } from 'react-icons/hi'
+import {
+  BsMoonFill as MoonIcon,
+  BsLightningFill as ZapIcon,
+  BsSunFill as SunIcon,
+} from 'react-icons/bs'
+import { IoMdFlame as FlameIcon } from 'react-icons/io'
 
 import { ThemeType, useThemeContext } from '@/context/themeContext'
 
@@ -91,7 +94,7 @@ export const ThemeToggle = ({
             {...motionStyle}
             className='relative focus:outline-none'
           >
-            <HotIcon className='fill-current' />
+            <FlameIcon className='fill-current' />
           </motion.button>
         )}
       </AnimatePresence>

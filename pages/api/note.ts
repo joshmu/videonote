@@ -28,10 +28,8 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
   }
 
   // 'note' is inclusive of projectId
-  const {
-    action,
-    note,
-  }: { action: NoteApiAction; note: NoteInterface } = req.body
+  const { action, note }: { action: NoteApiAction; note: NoteInterface } =
+    req.body
 
   // if the user is not a guest then grab their information
   let userDoc: UserDocInterface
@@ -103,7 +101,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
 
   // populate the 'user' field if it is a user created note
   if (noteDoc.user && !noteDoc.populated('user'))
-    await noteDoc.populate('user', 'username email').execPopulate()
+    await noteDoc.populate('user', 'username email')
 
   res.status(StatusCodes.OK).json({
     note: noteDoc.toObject(),

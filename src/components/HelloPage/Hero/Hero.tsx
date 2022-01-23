@@ -6,7 +6,7 @@
  *
  * @author Josh Mu <hello@joshmu.dev>
  * @created Thursday, 22nd October 2020
- * @modified Sunday, 13th December 2020 11:53:31 am
+ * @modified Sunday, 23rd January 2022 6:10:35 pm
  * @copyright © 2020 - 2020 MU
  */
 
@@ -27,8 +27,8 @@ export const Hero = () => {
   }
 
   return (
-    <div className='relative w-full min-h-screen'>
-      <div className='absolute top-0 flex w-full h-screen'>
+    <div className='relative w-full' style={{ minHeight: 'max(60vh, 400px)' }}>
+      <div className='absolute top-0 flex w-full h-full'>
         {/* left */}
         <div className='relative flex items-center justify-end w-full h-full'>
           <motion.div
@@ -96,7 +96,7 @@ export const Hero = () => {
         </div>
       </div>
 
-      <ScrollDown to={'overview'} />
+      <ScrollDown to={'overview'} style={{ paddingTop: '4rem' }} />
     </div>
   )
 }
