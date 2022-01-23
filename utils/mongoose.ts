@@ -6,19 +6,14 @@
  *
  * @author Josh Mu <hello@joshmu.dev>
  * @created Tuesday, 13th October 2020
- * @modified Wednesday, 16th December 2020 2:55:07 pm
+ * @modified Sunday, 23rd January 2022 5:51:11 pm
  * @copyright © 2020 - 2020 MU
  */
 
 import mongoose from 'mongoose'
 const { Schema } = mongoose
 
-mongoose.connect(process.env.MONGODB_URI, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-  useCreateIndex: true,
-  useFindAndModify: false,
-})
+mongoose.connect(process.env.MONGODB_URI, {})
 
 const UserSchema = new Schema(
   {

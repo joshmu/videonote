@@ -1,14 +1,24 @@
 import { motion } from 'framer-motion'
+import { CSSProperties, StyleHTMLAttributes } from 'react'
 import { AiOutlineArrowDown as ArrowDownIcon } from 'react-icons/ai'
 import { scroller } from 'react-scroll'
 
-export const ScrollDown = ({ to }: { to: string }) => {
+export const ScrollDown = ({
+  to,
+  style = {},
+}: {
+  to: string
+  style?: CSSProperties | undefined
+}) => {
   const handleDown = (): void => {
     scrollTo(to)
   }
 
   return (
-    <div className='absolute bottom-0 flex items-center justify-center w-full h-16'>
+    <div
+      className='absolute bottom-0 flex items-center justify-center w-full h-16'
+      style={style}
+    >
       <motion.button
         whileHover={{ scale: 1.1 }}
         onClick={handleDown}

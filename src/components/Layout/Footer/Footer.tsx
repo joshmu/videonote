@@ -11,7 +11,7 @@ export const Footer = () => {
         >
           MU
         </a>{' '}
-        and other team members @ VideoNote™
+        @ VideoNote™
       </p>
       <p className='mt-2 text-sm opacity-75 text-themeText'>
         {new Date().getFullYear()}
