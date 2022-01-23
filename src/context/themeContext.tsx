@@ -6,7 +6,7 @@
  *
  * @author Josh Mu <hello@joshmu.dev>
  * @created Monday, 14th September 2020
- * @modified Tuesday, 1st December 2020 4:03:30 pm
+ * @modified Sunday, 23rd January 2022 6:30:30 pm
  * @copyright © 2020 - 2020 MU
  */
 
@@ -28,9 +28,9 @@ const themeContext = createContext<ThemeContextInterface>(null!)
 const LOCALSTORAGE_KEY: string = 'vn:theme'
 
 export enum ThemeType {
+  SUPERHERO = 'theme-superhero',
   DARK = 'theme-dark',
   LIGHT = 'theme-light',
-  SUPERHERO = 'theme-superhero',
   HOT = 'theme-hot',
 }
 
