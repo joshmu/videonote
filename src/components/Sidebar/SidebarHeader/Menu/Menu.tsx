@@ -6,7 +6,7 @@
  *
  * @author Josh Mu <hello@joshmu.dev>
  * @created Tuesday, 6th October 2020
- * @modified Friday, 4th December 2020 11:15:33 am
+ * @modified Sunday, 1st May 2022 11:23:18 am
  * @copyright © 2020 - 2020 MU
  */
 
@@ -50,13 +50,8 @@ const variants: Variants = {
 
 export const Menu = () => {
   const { menuOpen } = useGlobalContext()
-  const {
-    toggleMenuOpen,
-    toggleModalOpen,
-    project,
-    admin,
-    projects,
-  } = useGlobalContext()
+  const { toggleMenuOpen, toggleModalOpen, project, admin, projects } =
+    useGlobalContext()
   const { toggleTheme } = useThemeContext()
 
   const handleModalOpen = (modalId: ModalType): void => {
@@ -158,16 +153,14 @@ export const Menu = () => {
               </Select>
             )}
             {admin && (
-              <Link href='/hello' passHref>
-                <a>
-                  <Select onClick={handleSignOutClick}>
-                    <IconMenuItemWrapper>
-                      <SignoutIcon />
-                    </IconMenuItemWrapper>
-                    Sign Out
-                  </Select>
-                </a>
-              </Link>
+              <a href='/api/auth/logout'>
+                <Select onClick={() => {}}>
+                  <IconMenuItemWrapper>
+                    <SignoutIcon />
+                  </IconMenuItemWrapper>
+                  Sign Out
+                </Select>
+              </a>
             )}
 
             <Select onClick={handleThemeToggleClick}>

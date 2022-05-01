@@ -6,7 +6,7 @@
  *
  * @author Josh Mu <hello@joshmu.dev>
  * @created Tuesday, 6th October 2020
- * @modified Tuesday, 1st December 2020 12:27:56 pm
+ * @modified Sunday, 1st May 2022 12:55:22 pm
  * @copyright © 2020 - 2020 MU
  */
 
@@ -270,19 +270,20 @@ export const GlobalProvider = ({
 
   // to have access to general projects information (like note count) we need to update the projects list
   // we do not alter the current project state with the notes change to avoid a potential update loop
-  const updateProjectsStateWithUpdatedNotes: UpdateProjectsStateWithUpdatedNotesType = async notes => {
-    console.log('update projects notes state')
-    // alter state of projects
-    setProjects(current =>
-      current.map(p => {
-        if (p._id === currentProject._id) {
-          p.notes = notes
-        }
-        return p
-        // return p._id === currentProject._id ? { ...currentProject, notes } : p
-      })
-    )
-  }
+  const updateProjectsStateWithUpdatedNotes: UpdateProjectsStateWithUpdatedNotesType =
+    async notes => {
+      console.log('update projects notes state')
+      // alter state of projects
+      setProjects(current =>
+        current.map(p => {
+          if (p._id === currentProject._id) {
+            p.notes = notes
+          }
+          return p
+          // return p._id === currentProject._id ? { ...currentProject, notes } : p
+        })
+      )
+    }
 
   const loadProject: LoadProjectType = async projectId => {
     const projectData = { _id: projectId }
@@ -455,40 +456,42 @@ export const GlobalProvider = ({
     }
   }
 
-  const fetchWithPasswordPublicProject: FetchWithPasswordPublicProjectType = async password => {
-    // get id
-    const shareUrl = window.location.pathname.split('/').slice(-1)[0]
+  const fetchWithPasswordPublicProject: FetchWithPasswordPublicProjectType =
+    async password => {
+      // get id
+      const shareUrl = window.location.pathname.split('/').slice(-1)[0]
 
-    // fetch config
-    const origin = window.location.origin
-    const url = `${origin}/api/public_project`
-    const body = {
-      shareUrl,
-      password,
+      // fetch config
+      const origin = window.location.origin
+      const url = `${origin}/api/public_project`
+      const body = {
+        shareUrl,
+        password,
+      }
+
+      // request project
+      const res = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(body),
+      })
+
+      // if an error occurs, redirect to homepage for a guest
+      if (res.status !== StatusCodes.OK) {
+        Router.push('/')
+      }
+
+      // parse
+      const data = await res.json()
+
+      return data
     }
-
-    // request project
-    const res = await fetch(url, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(body),
-    })
-
-    // if an error occurs, redirect to homepage for a guest
-    if (res.status !== StatusCodes.OK) {
-      Router.push('/')
-    }
-
-    // parse
-    const data = await res.json()
-
-    return data
-  }
 
   //-------------------------------
   const handleInitialServerData: HandleInitialServerDataType = data => {
+    console.log('handleInitialServerData', { data })
     // if password is required then lets exit early
     // fetch data again providing password
     // re-init 'handleInitialServerData'
@@ -545,8 +548,6 @@ export const GlobalProvider = ({
       return
     }
 
-    console.log('handle initial server data', data)
-
     // PARSE SERVER DATA
     // user data and msg for server messages
     const { user: serverData, msg } = data
@@ -564,6 +565,7 @@ export const GlobalProvider = ({
 
     // HANDLE DATA
     // allocate server data to respective areas
+    console.log({ projects })
     setProjects(projects)
 
     if (Object.keys(userAccount).length > 0) {
@@ -600,11 +602,14 @@ export const GlobalProvider = ({
         )
       }
       // if we still don't have anything then just grab last project entry in the list
+      console.log({ currentProject })
       if (!currentProject) {
         currentProject = projects.slice(-1)[0]
       }
 
-      loadProject(currentProject._id)
+      console.log('here', currentProject)
+      // todo: had to hack passing ID of project, most likely due to mongo issue (not expanding object data)
+      loadProject(currentProject._id || currentProject)
       // setCurrentProject(currentProject)
       // alertProjectLoaded(currentProject)
     }

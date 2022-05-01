@@ -6,7 +6,7 @@
  *
  * @author Josh Mu <hello@joshmu.dev>
  * @created Tuesday, 6th October 2020
- * @modified Friday, 4th December 2020 11:15:45 am
+ * @modified Sunday, 1st May 2022 11:01:29 am
  * @copyright © 2020 - 2020 MU
  */
 
@@ -22,6 +22,7 @@ import { ThemeToggle } from '@/components/shared/ThemeToggle/ThemeToggle'
 import useTwConfig from '@/hooks/useTwConfig'
 
 import { handleJwtToken } from '../utils/clientHelpers'
+import { LoginUniversalModal } from '../src/components/LoginPage/LoginModal/LoginUniversalModal'
 
 const Login: NextPage = () => {
   const [loginView, setLoginView] = useState<boolean>(true)
@@ -53,7 +54,7 @@ const Login: NextPage = () => {
         }}
       >
         {loginView ? (
-          <LoginModal
+          <LoginUniversalModal
             toggleLoginView={toggleLoginView}
             handleLogin={handleLogin}
             handleEmail={handleEmail}

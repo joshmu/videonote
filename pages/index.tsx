@@ -6,7 +6,7 @@
  *
  * @author Josh Mu <hello@joshmu.dev>
  * @created Tuesday, 6th October 2020
- * @modified Friday, 11th December 2020 9:55:34 am
+ * @modified Sunday, 1st May 2022 12:56:22 pm
  * @copyright © 2020 - 2020 MU
  */
 
@@ -27,12 +27,33 @@ import { VideoProvider } from '@/context/videoContext'
 import { AppContainer } from '@/layout/AppContainer/AppContainer'
 import { Overlay } from '@/shared/Modal/Overlay'
 import { fetcher } from '@/utils/clientHelpers'
+import { useUser, withPageAuthRequired } from '@auth0/nextjs-auth0'
+import { useEffect, useState } from 'react'
 
-interface Props {
-  serverData?: {}
-}
+interface Props {}
 
-const IndexPage: NextPage<Props> = ({ serverData = {} }) => {
+const IndexPage: NextPage<Props> = ({}) => {
+  const [serverData, setServerData] = useState(null)
+  const { user } = useUser()
+
+  async function getData(user) {
+    const { data } = await fetcher('/api/login', { email: user.email })
+    setServerData(data)
+  }
+
+  useEffect(() => {
+    // todo: use 'sub' instead of 'email' in all DB records
+    // user 'sub' is the unique auth0 ID for the user which we can use as reference for the DB
+    if (!user || !user?.sub || serverData) return
+    getData(user)
+  }, [user])
+
+  // todo: query db for userID
+  // todo: if nothing exists then create user project db
+  // todo: refactor this logic to server side?
+
+  if (!user || !serverData) return null
+
   return (
     <GlobalProvider serverData={serverData}>
       <VideoProvider>
@@ -55,6 +76,7 @@ const IndexPage: NextPage<Props> = ({ serverData = {} }) => {
   )
 }
 
+/*
 IndexPage.getInitialProps = async (ctx: NextPageContext) => {
   const cookies = new Cookies(
     ctx?.req?.headers?.cookie ? ctx.req.headers.cookie : null
@@ -88,5 +110,10 @@ IndexPage.getInitialProps = async (ctx: NextPageContext) => {
 
   return { serverData: data }
 }
+*/
+
+// You can optionally pass your own `getServerSideProps` function into
+// `withPageAuthRequired` and the props will be merged with the `user` prop
+export const getServerSideProps = withPageAuthRequired()
 
 export default IndexPage

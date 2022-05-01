@@ -1,12 +1,12 @@
 /**
  * @path /pages/api/project.ts
- * 
+ *
  * @project videonote
  * @file project.ts
- * 
+ *
  * @author Josh Mu <hello@joshmu.dev>
  * @created Tuesday, 6th October 2020
- * @modified Sunday, 22nd November 2020 7:01:59 pm
+ * @modified Sunday, 1st May 2022 12:54:56 pm
  * @copyright © 2020 - 2020 MU
  */
 
@@ -47,6 +47,8 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
 
   // data passed
   const { action, project } = req.body
+  // todo: project information not expanded properly
+  console.log('>>>', req.body)
 
   let projectDoc: ProjectDocInterface
   try {

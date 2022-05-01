@@ -9,25 +9,13 @@ import { User } from '@/utils/mongoose'
 
 export default async (req, res) => {
   // get user data
-  const { password } = req.body
+  // todo-mu: remove temp pass
+  console.log(`todo-mu: remove temp pass`)
+  const { password = process.env.TEMP_PASS } = req.body
   const email = normalizeEmail(req.body.email)
 
   // validate
   const globalResponseMsg = 'Your Email and/or Password is incorrect.'
-  if (email && !isEmail(email)) {
-    // res.status(400).json({ msg: 'The email you entered is invalid.' })
-    res.status(StatusCodes.BAD_REQUEST).json({ msg: globalResponseMsg })
-    return
-  }
-  if (!password) {
-    res.status(StatusCodes.BAD_REQUEST).json({ msg: 'Missing field(s)' })
-    return
-  }
-  if ((await User.countDocuments({ email })) === 0) {
-    // res.status(404).json({ msg: 'Email not found, registration required.' })
-    res.status(StatusCodes.NOT_FOUND).json({ msg: globalResponseMsg })
-    return
-  }
 
   // get user via email
   const user = await User.findOne({ email }).lean()

@@ -1,12 +1,12 @@
 /**
  * @path /utils/clientHelpers.ts
- * 
+ *
  * @project videonote
  * @file clientHelpers.ts
- * 
+ *
  * @author Josh Mu <hello@joshmu.dev>
  * @created Tuesday, 6th October 2020
- * @modified Sunday, 22nd November 2020 7:25:48 pm
+ * @modified Sunday, 1st May 2022 12:37:39 pm
  * @copyright © 2020 - 2020 MU
  */
 
