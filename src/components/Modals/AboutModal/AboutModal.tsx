@@ -6,7 +6,7 @@
  *
  * @author Josh Mu <hello@joshmu.dev>
  * @created Monday, 12th October 2020
- * @modified Tuesday, 1st December 2020 8:03:11 pm
+ * @modified Sunday, 4th June 2023 1:53:55 pm
  * @copyright © 2020 - 2020 MU
  */
 
@@ -39,7 +39,17 @@ export const AboutModal = ({
           so let us know, or tell us how we can make your experience even
           better! ✨
         </p>
+        <p className='mt-2'>
+          Feel free to report an <a className='cursor-pointer text-themeAccent text-md' rel='noopener' target='_blank' href='https://github.com/joshmu/videonote/issues/new'>issue</a> or <a className='cursor-pointer text-themeAccent text-md' rel='noopener' target='_blank' href='https://github.com/joshmu/videonote'>contribute</a>!
+        </p>
         <div className='w-full mt-2 text-right'>
+          <a
+            href='https://github.com/joshmu/videonote'
+            className='cursor-pointer text-themeAccent text-md'
+          >
+            github.com/videonote
+          </a>
+          <br />
           <a
             href='mailto:hello@videonote.app'
             className='cursor-pointer text-themeAccent text-md'
