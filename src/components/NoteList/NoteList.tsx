@@ -6,7 +6,7 @@
  *
  * @author Josh Mu <hello@joshmu.dev>
  * @created Monday, 14th September 2020
- * @modified Wednesday, 2nd December 2020 2:56:30 pm
+ * @modified Sunday, 4th June 2023 1:15:44 pm
  * @copyright © 2020 - 2020 MU
  */
 
@@ -44,7 +44,7 @@ export const NoteList = () => {
   const { notes, sort, checkProximity } = useNoteContext()
 
   return (
-    <div className='w-full bg-transparent'>
+    <div className='w-full pb-8 bg-transparent'>
       <AnimatePresence exitBeforeEnter>
         <motion.ul
           key='noteList'
