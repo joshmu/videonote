@@ -17,6 +17,14 @@ A video review app with slick intuitive controls to create timestamped notes on 
 
 Some additional experimental features are enabled in `tailwind.config.js`: _uniformColorPalette, extendedSpacingScale, extendedFontSizeScale_
 
+### Setup
+
+- MongoDB database
+- SMTP email server
+- JWT
+
+Create a `.env.local` based on the `.env.example` for local development.
+
 ### Run it
 
 `npm i && npm run dev`
