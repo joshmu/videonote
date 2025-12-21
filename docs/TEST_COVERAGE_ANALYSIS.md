@@ -155,7 +155,47 @@ npm install -D mongodb-memory-server
 
 ## Implementation Roadmap
 
-### Phase 1: Foundation (Week 1-2)
+### Phase 0: CI/CD Setup (Day 1) ✅
+
+**Set up continuous integration to run tests automatically on every PR.**
+
+A GitHub Actions workflow has been added at `.github/workflows/test.yml` that:
+- Runs on push/PR to main/master branches
+- Tests against Node.js 18.x and 20.x
+- Installs dependencies with `npm ci`
+- Runs `npm test` with coverage
+- Uploads coverage reports to Codecov (optional)
+
+```yaml
+# .github/workflows/test.yml
+name: Test
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [18.x, 20.x]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'npm'
+      - run: npm ci
+      - run: npm test -- --passWithNoTests --coverage
+```
+
+**Why this is first:** Having CI in place ensures all future tests are validated automatically, catches regressions immediately, and establishes testing as a core part of the development workflow.
+
+---
+
+### Phase 1: Foundation
 1. Add tests for `utils/clientHelpers.ts` - pure functions, quick wins
 2. Add tests for `utils/apiHelpers.ts` - data extraction
 3. Add tests for `utils/jwt.ts` - authentication core
