@@ -5,7 +5,23 @@ import {
   checkPasswordMatch,
   formatDuration,
   isValidCredentials,
+  handleJwtToken,
+  fetcher,
 } from './clientHelpers'
+
+// Mock universal-cookie
+const mockSet = jest.fn()
+const mockGet = jest.fn()
+jest.mock('universal-cookie', () => {
+  return jest.fn().mockImplementation(() => ({
+    set: mockSet,
+    get: mockGet,
+  }))
+})
+
+// Mock global fetch
+const mockFetch = jest.fn()
+global.fetch = mockFetch
 
 describe('clientHelpers', () => {
   describe('checkEmail', () => {
@@ -205,6 +221,118 @@ describe('clientHelpers', () => {
       })
       expect(result).toBe(false)
       expect(mockAddAlert).toHaveBeenCalledTimes(4)
+    })
+  })
+
+  describe('handleJwtToken', () => {
+    beforeEach(() => {
+      mockSet.mockClear()
+    })
+
+    it('sets token in cookie with path /', () => {
+      handleJwtToken('test-token-123')
+      expect(mockSet).toHaveBeenCalledWith('token', 'test-token-123', { path: '/' })
+    })
+
+    it('handles empty token', () => {
+      handleJwtToken('')
+      expect(mockSet).toHaveBeenCalledWith('token', '', { path: '/' })
+    })
+  })
+
+  describe('fetcher', () => {
+    beforeEach(() => {
+      mockFetch.mockClear()
+      mockGet.mockClear()
+      mockSet.mockClear()
+    })
+
+    it('makes POST request with JSON body', async () => {
+      mockFetch.mockResolvedValue({
+        json: jest.fn().mockResolvedValue({ success: true }),
+      })
+
+      await fetcher('/api/test', { key: 'value' }, 'test-token')
+
+      expect(mockFetch).toHaveBeenCalledWith('/api/test', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: 'Bearer test-token',
+        },
+        body: JSON.stringify({ key: 'value' }),
+      })
+    })
+
+    it('gets token from cookie when not provided', async () => {
+      mockGet.mockReturnValue('cookie-token')
+      mockFetch.mockResolvedValue({
+        json: jest.fn().mockResolvedValue({ data: 'test' }),
+      })
+
+      await fetcher('/api/test', { key: 'value' })
+
+      expect(mockGet).toHaveBeenCalledWith('token')
+      expect(mockFetch).toHaveBeenCalledWith('/api/test', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: 'Bearer cookie-token',
+        },
+        body: JSON.stringify({ key: 'value' }),
+      })
+    })
+
+    it('omits Authorization header when no token available', async () => {
+      mockGet.mockReturnValue(undefined)
+      mockFetch.mockResolvedValue({
+        json: jest.fn().mockResolvedValue({ data: 'test' }),
+      })
+
+      await fetcher('/api/test', { key: 'value' })
+
+      expect(mockFetch).toHaveBeenCalledWith('/api/test', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ key: 'value' }),
+      })
+    })
+
+    it('returns response and data', async () => {
+      const mockResponse = {
+        json: jest.fn().mockResolvedValue({ result: 'success' }),
+      }
+      mockFetch.mockResolvedValue(mockResponse)
+
+      const { res, data } = await fetcher('/api/test', {}, 'token')
+
+      expect(res).toBe(mockResponse)
+      expect(data).toEqual({ result: 'success' })
+    })
+
+    it('saves new token from response', async () => {
+      mockFetch.mockResolvedValue({
+        json: jest.fn().mockResolvedValue({
+          data: 'test',
+          token: 'new-refreshed-token'
+        }),
+      })
+
+      await fetcher('/api/test', {}, 'old-token')
+
+      expect(mockSet).toHaveBeenCalledWith('token', 'new-refreshed-token', { path: '/' })
+    })
+
+    it('does not save token when response has no token', async () => {
+      mockFetch.mockResolvedValue({
+        json: jest.fn().mockResolvedValue({ data: 'test' }),
+      })
+
+      await fetcher('/api/test', {}, 'token')
+
+      expect(mockSet).not.toHaveBeenCalled()
     })
   })
 })
