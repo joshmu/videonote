@@ -276,6 +276,273 @@ describe('/api/project', () => {
     })
   })
 
+  describe('SHARE action', () => {
+    it('creates a new share when project has no existing share', async () => {
+      const projectWithoutShare = {
+        ...mockProjectDoc,
+        share: null,
+        save: jest.fn().mockResolvedValue(undefined),
+      }
+
+      const createdShare = {
+        _id: 'share123',
+        url: 'test-share-url',
+        password: '',
+        canEdit: true,
+      }
+
+      const populatedProject = {
+        ...projectWithoutShare,
+        share: createdShare,
+        toObject: jest.fn().mockReturnValue({
+          ...mockProjectDoc,
+          share: createdShare,
+        }),
+      }
+
+      const { req, res } = createMocks<NextApiRequest, NextApiResponse>({
+        method: 'POST',
+        headers: {
+          authorization: 'Bearer valid-token',
+        },
+        body: {
+          action: 'SHARE',
+          project: { _id: 'project123' },
+          share: { url: 'test-share-url', password: '', canEdit: true },
+        },
+      })
+
+      mockAuthenticateToken.mockReturnValue('test@example.com')
+      mockUserFindOne.mockResolvedValue(mockUserDoc)
+      mockProjectFindOne.mockResolvedValue(projectWithoutShare)
+      ;(Share.create as jest.Mock).mockResolvedValue(createdShare)
+      ;(Project.findById as jest.Mock).mockReturnValue({
+        populate: jest.fn().mockReturnValue({
+          populate: jest.fn().mockResolvedValue(populatedProject),
+        }),
+      })
+      mockGenerateAccessToken.mockReturnValue('new-token')
+
+      await handler(req, res)
+
+      expect(res._getStatusCode()).toBe(200)
+      expect(Share.create).toHaveBeenCalledWith({
+        url: 'test-share-url',
+        password: '',
+        canEdit: true,
+        project: 'project123',
+        user: 'user123',
+      })
+    })
+
+    it('updates existing share when project already has share', async () => {
+      const existingShare = {
+        _id: 'share123',
+        url: 'old-url',
+        password: '',
+        updateOne: jest.fn().mockResolvedValue(undefined),
+        save: jest.fn().mockResolvedValue(undefined),
+      }
+
+      const projectWithShare = {
+        ...mockProjectDoc,
+        share: 'share123',
+      }
+
+      const updatedProject = {
+        ...projectWithShare,
+        share: { ...existingShare, url: 'new-url' },
+        toObject: jest.fn().mockReturnValue({
+          ...mockProjectDoc,
+          share: { _id: 'share123', url: 'new-url' },
+        }),
+      }
+
+      const { req, res } = createMocks<NextApiRequest, NextApiResponse>({
+        method: 'POST',
+        headers: {
+          authorization: 'Bearer valid-token',
+        },
+        body: {
+          action: 'SHARE',
+          project: { _id: 'project123' },
+          share: { url: 'new-url', password: '', canEdit: true },
+        },
+      })
+
+      mockAuthenticateToken.mockReturnValue('test@example.com')
+      mockUserFindOne.mockResolvedValue(mockUserDoc)
+      mockProjectFindOne
+        .mockResolvedValueOnce(projectWithShare)
+        .mockReturnValueOnce({
+          populate: jest.fn().mockResolvedValue(updatedProject),
+        })
+      ;(Share.findById as jest.Mock).mockResolvedValue(existingShare)
+      mockGenerateAccessToken.mockReturnValue('new-token')
+
+      await handler(req, res)
+
+      expect(res._getStatusCode()).toBe(200)
+      expect(existingShare.updateOne).toHaveBeenCalledWith({
+        $set: { url: 'new-url', password: '', canEdit: true },
+      })
+    })
+
+    it('hashes password when creating share with password', async () => {
+      const projectWithoutShare = {
+        ...mockProjectDoc,
+        share: null,
+        save: jest.fn().mockResolvedValue(undefined),
+      }
+
+      const { req, res } = createMocks<NextApiRequest, NextApiResponse>({
+        method: 'POST',
+        headers: {
+          authorization: 'Bearer valid-token',
+        },
+        body: {
+          action: 'SHARE',
+          project: { _id: 'project123' },
+          share: { url: 'test-url', password: 'secret123', canEdit: true },
+        },
+      })
+
+      mockAuthenticateToken.mockReturnValue('test@example.com')
+      mockUserFindOne.mockResolvedValue(mockUserDoc)
+      mockProjectFindOne.mockResolvedValue(projectWithoutShare)
+      ;(Share.create as jest.Mock).mockResolvedValue({ _id: 'share123' })
+      ;(Project.findById as jest.Mock).mockReturnValue({
+        populate: jest.fn().mockReturnValue({
+          populate: jest.fn().mockResolvedValue({
+            ...projectWithoutShare,
+            toObject: jest.fn().mockReturnValue(mockProjectDoc),
+          }),
+        }),
+      })
+      mockGenerateAccessToken.mockReturnValue('new-token')
+
+      await handler(req, res)
+
+      expect(res._getStatusCode()).toBe(200)
+      // Password should have been hashed (not the original)
+      expect((Share.create as jest.Mock).mock.calls[0][0].password).not.toBe('secret123')
+      expect((Share.create as jest.Mock).mock.calls[0][0].password.length).toBeGreaterThan(10)
+    })
+
+    it('returns 500 when share URL is already taken', async () => {
+      const projectWithoutShare = {
+        ...mockProjectDoc,
+        share: null,
+      }
+
+      const { req, res } = createMocks<NextApiRequest, NextApiResponse>({
+        method: 'POST',
+        headers: {
+          authorization: 'Bearer valid-token',
+        },
+        body: {
+          action: 'SHARE',
+          project: { _id: 'project123' },
+          share: { url: 'duplicate-url', password: '', canEdit: true },
+        },
+      })
+
+      mockAuthenticateToken.mockReturnValue('test@example.com')
+      mockUserFindOne.mockResolvedValue(mockUserDoc)
+      mockProjectFindOne.mockResolvedValue(projectWithoutShare)
+      ;(Share.create as jest.Mock).mockRejectedValue(new Error('Duplicate key'))
+
+      await handler(req, res)
+
+      expect(res._getStatusCode()).toBe(500)
+      expect(JSON.parse(res._getData()).msg).toBe('Specified share project url is taken.')
+    })
+  })
+
+  describe('REMOVE_SHARE action', () => {
+    it('removes share and clears project reference', async () => {
+      const projectWithShare = {
+        ...mockProjectDoc,
+        share: 'share123',
+        save: jest.fn().mockResolvedValue(undefined),
+      }
+
+      const projectAfterRemoval = {
+        ...mockProjectDoc,
+        share: null,
+        toObject: jest.fn().mockReturnValue({ ...mockProjectDoc, share: null }),
+      }
+
+      const { req, res } = createMocks<NextApiRequest, NextApiResponse>({
+        method: 'POST',
+        headers: {
+          authorization: 'Bearer valid-token',
+        },
+        body: {
+          action: 'REMOVE SHARE',
+          project: { _id: 'project123' },
+          share: { _id: 'share123' },
+        },
+      })
+
+      mockAuthenticateToken.mockReturnValue('test@example.com')
+      mockUserFindOne.mockResolvedValue(mockUserDoc)
+      mockProjectFindOne
+        .mockResolvedValueOnce(projectWithShare)
+        .mockReturnValueOnce({
+          populate: jest.fn().mockResolvedValue(projectAfterRemoval),
+        })
+      mockGenerateAccessToken.mockReturnValue('new-token')
+
+      await handler(req, res)
+
+      expect(res._getStatusCode()).toBe(200)
+      expect(Share.deleteOne).toHaveBeenCalledWith({
+        _id: 'share123',
+        user: 'user123',
+        project: 'project123',
+      })
+      expect(projectWithShare.save).toHaveBeenCalled()
+    })
+
+    it('returns new token after removing share', async () => {
+      const projectWithShare = {
+        ...mockProjectDoc,
+        share: 'share123',
+        save: jest.fn().mockResolvedValue(undefined),
+      }
+
+      const { req, res } = createMocks<NextApiRequest, NextApiResponse>({
+        method: 'POST',
+        headers: {
+          authorization: 'Bearer valid-token',
+        },
+        body: {
+          action: 'REMOVE SHARE',
+          project: { _id: 'project123' },
+          share: { _id: 'share123' },
+        },
+      })
+
+      mockAuthenticateToken.mockReturnValue('test@example.com')
+      mockUserFindOne.mockResolvedValue(mockUserDoc)
+      mockProjectFindOne
+        .mockResolvedValueOnce(projectWithShare)
+        .mockReturnValueOnce({
+          populate: jest.fn().mockResolvedValue({
+            ...mockProjectDoc,
+            toObject: jest.fn().mockReturnValue(mockProjectDoc),
+          }),
+        })
+      mockGenerateAccessToken.mockReturnValue('refreshed-token')
+
+      await handler(req, res)
+
+      expect(mockGenerateAccessToken).toHaveBeenCalledWith('test@example.com')
+      expect(JSON.parse(res._getData()).token).toBe('refreshed-token')
+    })
+  })
+
   describe('token refresh', () => {
     it('includes new token in response', async () => {
       const { req, res } = createMocks<NextApiRequest, NextApiResponse>({
