@@ -100,7 +100,7 @@ export const VideoProvider = (props: { [key: string]: any }) => {
 
   const changeVolume = (increment: number): void => {
     // validate
-    if (Number(increment) === NaN) return
+    if (Number.isNaN(increment)) return
 
     // increment
     let newVolume = volume + Number(increment)
@@ -119,7 +119,7 @@ export const VideoProvider = (props: { [key: string]: any }) => {
 
   const seekTo: SeekToType = (secs, { offset = true } = {}): void => {
     // validate
-    if (Number(secs) === NaN || playerRef === null) return
+    if (Number.isNaN(secs) || playerRef === null) return
 
     // settings offset
     const playPosition = secs + (offset ? settings.playOffset : 0)
