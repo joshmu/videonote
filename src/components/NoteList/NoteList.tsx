@@ -45,7 +45,7 @@ export const NoteList = () => {
 
   return (
     <div className='w-full pb-8 bg-transparent'>
-      <AnimatePresence exitBeforeEnter>
+      <AnimatePresence mode="wait">
         <motion.ul
           key='noteList'
           initial='initial'

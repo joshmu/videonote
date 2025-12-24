@@ -498,7 +498,7 @@ export const GlobalProvider = ({
         msg: (
           <div>
             <h2 className='mb-2 text-xl font-bold text-themeAccent'>
-              <Link href='/'><a>VideoNote</a></Link>
+              <Link href='/'>VideoNote</Link>
             </h2>
             <span className='whitespace-pre'>
               A <span className='text-themeAccent'>password </span>
@@ -523,7 +523,7 @@ export const GlobalProvider = ({
         msg: (
           <div>
             <h2 className='mb-2 text-xl font-bold text-themeAccent'>
-              <Link href='/'><a>VideoNote</a></Link>
+              <Link href='/'>VideoNote</Link>
             </h2>
             <span className='whitespace-pre'>
               The <span className='text-themeAccent'>password </span>

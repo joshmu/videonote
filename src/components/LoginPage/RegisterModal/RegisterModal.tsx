@@ -100,10 +100,10 @@ export const RegisterModal = ({
       className='w-full max-w-sm mx-auto overflow-hidden border rounded-sm border-themeText bg-themeBg'
     >
       <div className='px-6 py-4'>
-        <Link href='/hello' passHref>
-          <a>
-            <Heading2 className='text-center'>VideoNote</Heading2>
-          </a>
+        <Link href='/hello'>
+
+          <Heading2 className='text-center'>VideoNote</Heading2>
+
         </Link>
 
         <SubHeading className='text-center'>Welcome!</SubHeading>
@@ -151,7 +151,6 @@ export const RegisterModal = ({
           </div>
         </form>
       </div>
-
       <div className='flex items-center justify-center py-4 text-center'>
         <span className='text-sm text-themeText2'>Have an account?</span>
 
@@ -163,5 +162,5 @@ export const RegisterModal = ({
         </button>
       </div>
     </motion.div>
-  )
+  );
 }

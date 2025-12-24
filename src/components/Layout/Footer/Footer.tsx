@@ -17,13 +17,13 @@ export const Footer = () => {
         {new Date().getFullYear()}
       </p>
       <p className='mt-4 space-x-4 text-themeText2'>
-        <Link href='/privacy' passHref>
-          <a className='underline'>Privacy Policy</a>
+        <Link href='/privacy' className='underline'>
+          Privacy Policy
         </Link>{' '}
-        <Link href='/terms' passHref>
-          <a className='underline'>Terms</a>
+        <Link href='/terms' className='underline'>
+          Terms
         </Link>
       </p>
     </footer>
-  )
+  );
 }

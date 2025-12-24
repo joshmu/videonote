@@ -1,5 +1,5 @@
 import React from 'react'
-import { renderHook, act } from '@testing-library/react-hooks'
+import { renderHook, act } from '@testing-library/react'
 import { VideoProvider, useVideoContext, PlayerAction } from '../videoContext'
 
 // Mock the hooks

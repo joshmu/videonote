@@ -158,15 +158,15 @@ export const Menu = () => {
               </Select>
             )}
             {admin && (
-              <Link href='/hello' passHref>
-                <a>
-                  <Select onClick={handleSignOutClick}>
-                    <IconMenuItemWrapper>
-                      <SignoutIcon />
-                    </IconMenuItemWrapper>
-                    Sign Out
-                  </Select>
-                </a>
+              <Link href='/hello'>
+
+                <Select onClick={handleSignOutClick}>
+                  <IconMenuItemWrapper>
+                    <SignoutIcon />
+                  </IconMenuItemWrapper>
+                  Sign Out
+                </Select>
+
               </Link>
             )}
 
@@ -194,5 +194,5 @@ export const Menu = () => {
         )}
       </AnimatePresence>
     </div>
-  )
+  );
 }

@@ -1,5 +1,5 @@
 import React from 'react'
-import { renderHook, act } from '@testing-library/react-hooks'
+import { renderHook, act } from '@testing-library/react'
 import { NoteProvider, useNoteContext } from '../noteContext'
 import { NoteInterface } from '@/root/src/components/shared/types'
 
@@ -184,7 +184,7 @@ describe('NoteContext', () => {
       mockCheckCanEdit.mockReturnValue(true)
       mockNoteApi.mockResolvedValue({ _id: 'note123', content: 'Test note', time: 10 })
 
-      const { result, waitForNextUpdate } = renderHook(() => useNoteContext(), { wrapper })
+      const { result } = renderHook(() => useNoteContext(), { wrapper })
 
       act(() => {
         result.current.addNote({ content: 'Test note', time: 10 })
@@ -200,7 +200,7 @@ describe('NoteContext', () => {
       mockCheckCanEdit.mockReturnValue(true)
       mockNoteApi.mockResolvedValue('error')
 
-      const { result, waitForNextUpdate } = renderHook(() => useNoteContext(), { wrapper })
+      const { result } = renderHook(() => useNoteContext(), { wrapper })
 
       await act(async () => {
         result.current.addNote({ content: 'Will fail', time: 10 })

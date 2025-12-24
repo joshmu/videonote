@@ -23,7 +23,7 @@ const MyApp = ({ Component, pageProps, router }: AppProps) => {
   return (
     <NotificationProvider>
       <ThemeProvider>
-        <AnimatePresence exitBeforeEnter>
+        <AnimatePresence mode="wait">
           <Component {...pageProps} key={router.route} />
         </AnimatePresence>
       </ThemeProvider>
