@@ -42,7 +42,7 @@ export const CTA = () => {
           className='relative font-serif text-4xl italic transition-colors duration-300 ease-in-out focus:outline-none hover:text-themeAccent'
           onClick={handleStart}
         >
-          <span>Let's get started!</span>
+          <span>Let&apos;s get started!</span>
           <span className='inline-block w-full h-1 mt-6 rounded-full bg-gradient-to-r from-themeAccent'></span>
         </button>
       </div>

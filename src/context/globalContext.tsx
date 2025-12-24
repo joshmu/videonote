@@ -11,6 +11,7 @@
  */
 
 import { StatusCodes } from 'http-status-codes'
+import Link from 'next/link'
 import Router from 'next/router'
 import { createContext, useContext, useEffect, useRef, useState } from 'react'
 import Cookie from 'universal-cookie'
@@ -497,7 +498,7 @@ export const GlobalProvider = ({
         msg: (
           <div>
             <h2 className='mb-2 text-xl font-bold text-themeAccent'>
-              <a href='/'>VideoNote</a>
+              <Link href='/'><a>VideoNote</a></Link>
             </h2>
             <span className='whitespace-pre'>
               A <span className='text-themeAccent'>password </span>
@@ -522,7 +523,7 @@ export const GlobalProvider = ({
         msg: (
           <div>
             <h2 className='mb-2 text-xl font-bold text-themeAccent'>
-              <a href='/'>VideoNote</a>
+              <Link href='/'><a>VideoNote</a></Link>
             </h2>
             <span className='whitespace-pre'>
               The <span className='text-themeAccent'>password </span>

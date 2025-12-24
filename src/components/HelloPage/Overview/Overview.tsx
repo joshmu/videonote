@@ -34,7 +34,7 @@ export const Overview = () => {
             </Reveal>
             <Reveal>
               <h2 className='mb-8 text-xl italic opacity-50 text-themeText'>
-                ...efficiency at it's core.
+                ...efficiency at it&apos;s core.
               </h2>
             </Reveal>
             <Reveal>

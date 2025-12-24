@@ -142,7 +142,7 @@ export const LoginModal = ({
       </div>
 
       <div className='flex items-center justify-center py-4 text-center'>
-        <span className='text-sm text-themeText2'>Don't have an account? </span>
+        <span className='text-sm text-themeText2'>Don&apos;t have an account? </span>
 
         <button
           onClick={handleToggleLoginRegisterModal}

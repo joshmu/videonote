@@ -40,7 +40,7 @@ export const AboutModal = ({
           better! ✨
         </p>
         <p className='mt-2'>
-          Feel free to report an <a className='cursor-pointer text-themeAccent text-md' rel='noopener' target='_blank' href='https://github.com/joshmu/videonote/issues/new'>issue</a> or <a className='cursor-pointer text-themeAccent text-md' rel='noopener' target='_blank' href='https://github.com/joshmu/videonote'>contribute</a>!
+          Feel free to report an <a className='cursor-pointer text-themeAccent text-md' rel='noreferrer' target='_blank' href='https://github.com/joshmu/videonote/issues/new'>issue</a> or <a className='cursor-pointer text-themeAccent text-md' rel='noreferrer' target='_blank' href='https://github.com/joshmu/videonote'>contribute</a>!
         </p>
         <div className='w-full mt-2 text-right'>
           <a

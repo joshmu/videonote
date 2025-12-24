@@ -20,9 +20,9 @@ export const Footer = () => {
         <Link href='/privacy' passHref>
           <a className='underline'>Privacy Policy</a>
         </Link>{' '}
-        <a className='underline' href='/terms'>
-          Terms
-        </a>
+        <Link href='/terms' passHref>
+          <a className='underline'>Terms</a>
+        </Link>
       </p>
     </footer>
   )
