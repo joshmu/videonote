@@ -10,8 +10,8 @@
  * @copyright © 2020 - 2020 MU
  */
 
-import { Variants, motion, useAnimation } from 'framer-motion'
-import { ReactNode, useEffect } from 'react'
+import { Variants, motion } from 'framer-motion'
+import { ReactNode } from 'react'
 import { useInView } from 'react-intersection-observer'
 
 interface RevealProps {
@@ -32,11 +32,10 @@ export const Reveal = ({
   transition = {},
   ...props
 }: RevealProps) => {
-  const controls = useAnimation()
   const [ref, inView] = useInView({
     triggerOnce: true,
     threshold: 0,
-    rootMargin: '50px 0px',
+    rootMargin: '100px 0px',
   })
 
   const mergedVariants = {
@@ -44,25 +43,11 @@ export const Reveal = ({
     animate: { ...defaultVariants.animate, ...variants.animate },
   }
 
-  useEffect(() => {
-    if (inView) {
-      controls.start('animate')
-    }
-  }, [controls, inView])
-
-  // Fallback: if not animated after 2 seconds, show content anyway
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      controls.start('animate')
-    }, 2000)
-    return () => clearTimeout(timer)
-  }, [controls])
-
   return (
     <motion.div
       ref={ref}
       initial='initial'
-      animate={controls}
+      animate={inView ? 'animate' : 'initial'}
       variants={mergedVariants}
       transition={{
         duration: 0.6,

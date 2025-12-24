@@ -41,7 +41,7 @@ const featureVariants: Variants = {
 }
 
 export const Features = () => {
-  const [ref, controls] = useReveal()
+  const [ref, inView] = useReveal()
 
   return (
     <div id='features' className='container px-4 mx-auto my-24'>
@@ -61,7 +61,7 @@ export const Features = () => {
               custom={idx}
               key={data.title}
               initial='initial'
-              animate={controls}
+              animate={inView ? 'animate' : 'initial'}
               exit='exit'
               variants={featureVariants}
             >
