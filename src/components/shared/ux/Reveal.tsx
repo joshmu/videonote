@@ -10,8 +10,9 @@
  * @copyright © 2020 - 2020 MU
  */
 
-import { Variants, motion } from 'framer-motion'
-import { ReactNode } from 'react'
+import { Variants, motion, useAnimation } from 'framer-motion'
+import { ReactNode, useEffect } from 'react'
+import { useInView } from 'react-intersection-observer'
 
 interface RevealProps {
   children: ReactNode
@@ -21,8 +22,8 @@ interface RevealProps {
 }
 
 const defaultVariants: Variants = {
-  hidden: { opacity: 0, y: 10 },
-  visible: { opacity: 1, y: 0 },
+  initial: { opacity: 0, y: 10 },
+  animate: { opacity: 1, y: 0 },
 }
 
 export const Reveal = ({
@@ -31,16 +32,37 @@ export const Reveal = ({
   transition = {},
   ...props
 }: RevealProps) => {
+  const controls = useAnimation()
+  const [ref, inView] = useInView({
+    triggerOnce: true,
+    threshold: 0,
+    rootMargin: '50px 0px',
+  })
+
   const mergedVariants = {
-    hidden: { ...defaultVariants.hidden, ...variants.initial },
-    visible: { ...defaultVariants.visible, ...variants.animate },
+    initial: { ...defaultVariants.initial, ...variants.initial },
+    animate: { ...defaultVariants.animate, ...variants.animate },
   }
+
+  useEffect(() => {
+    if (inView) {
+      controls.start('animate')
+    }
+  }, [controls, inView])
+
+  // Fallback: if not animated after 2 seconds, show content anyway
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      controls.start('animate')
+    }, 2000)
+    return () => clearTimeout(timer)
+  }, [controls])
 
   return (
     <motion.div
-      initial='hidden'
-      whileInView='visible'
-      viewport={{ once: true, amount: 0.1 }}
+      ref={ref}
+      initial='initial'
+      animate={controls}
       variants={mergedVariants}
       transition={{
         duration: 0.6,
