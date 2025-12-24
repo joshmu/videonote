@@ -10,9 +10,8 @@
  * @copyright © 2020 - 2020 MU
  */
 
-import { Variants, motion, useAnimation } from 'framer-motion'
-import { ReactNode, useEffect } from 'react'
-import { useInView } from 'react-intersection-observer'
+import { Variants, motion } from 'framer-motion'
+import { ReactNode } from 'react'
 
 interface RevealProps {
   children: ReactNode
@@ -21,31 +20,28 @@ interface RevealProps {
   props?: { [key: string]: any }
 }
 
+const defaultVariants: Variants = {
+  hidden: { opacity: 0, y: 10 },
+  visible: { opacity: 1, y: 0 },
+}
+
 export const Reveal = ({
   children,
-  variants = null,
-  transition = null,
+  variants = {},
+  transition = {},
   ...props
 }: RevealProps) => {
-  const controls = useAnimation()
-  const [ref, inView] = useInView()
-
-  useEffect(() => {
-    if (inView) controls.start('animate')
-  }, [controls, inView])
+  const mergedVariants = {
+    hidden: { ...defaultVariants.hidden, ...variants.initial },
+    visible: { ...defaultVariants.visible, ...variants.animate },
+  }
 
   return (
     <motion.div
-      ref={ref}
-      initial='initial'
-      animate={controls}
-      exit='exit'
-      variants={{
-        initial: { opacity: 0, y: 10 },
-        animate: { opacity: 1, y: 0 },
-        exit: { opacity: 0, y: 10 },
-        ...variants,
-      }}
+      initial='hidden'
+      whileInView='visible'
+      viewport={{ once: true, amount: 0.1 }}
+      variants={mergedVariants}
       transition={{
         duration: 0.6,
         ease: [0.6, 0.05, -0.01, 0.9],

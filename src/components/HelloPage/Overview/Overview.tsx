@@ -10,7 +10,7 @@
  * @copyright © 2020 - 2020 MU
  */
 
-import Image from 'next/image'
+import Image from "next/legacy/image"
 
 import { Heading } from '@/shared/Text/Text'
 import { Reveal } from '@/shared/ux/Reveal'
