@@ -72,15 +72,15 @@ export const setupTests = (() => {
     const useAnimation = jest.fn(() => ({ start: () => null }))
     const useTransform = jest.fn(() => null)
     const useSpring = jest.fn(() => null)
-    const scrollYProgress = jest.fn(() => 0)
-    const useViewportScroll = jest.fn(() => ({ scrollYProgress }))
+    const mockMotionValue = { get: () => 0, set: () => {}, onChange: () => () => {} }
+    const useScroll = jest.fn(() => ({ scrollY: mockMotionValue, scrollYProgress: mockMotionValue }))
     return {
       AnimatePresence,
       motion,
       useTransform,
       useSpring,
       useAnimation,
-      useViewportScroll,
+      useScroll,
     }
   })
 
