@@ -33,7 +33,7 @@ jobs:
         continue-on-error: true
 
       - name: Type check
-        run: npx tsc --noEmit --skipLibCheck
+        run: npm run type-check
         continue-on-error: true
 
       - name: Run tests
