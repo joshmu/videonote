@@ -67,7 +67,7 @@ const Terms = () => {
       <ol type='a'>
         <li>
           Permission is granted to temporarily download one copy of the
-          materials (information or software) on VideoNote's website for
+          materials (information or software) on VideoNote&apos;s website for
           personal, non-commercial transitory viewing only. This is the grant of
           a license, not a transfer of title, and under this license you may
           not:
@@ -79,14 +79,14 @@ const Terms = () => {
             </li>
             <li>
               attempt to decompile or reverse engineer any software contained on
-              VideoNote's website;
+              VideoNote&apos;s website;
             </li>
             <li>
               remove any copyright or other proprietary notations from the
               materials; or
             </li>
             <li>
-              transfer the materials to another person or "mirror" the materials
+              transfer the materials to another person or &quot;mirror&quot; the materials
               on any other server.
             </li>
           </ol>
@@ -102,7 +102,7 @@ const Terms = () => {
       <SubHeading className='mt-4 mb-1 font-serif'>3. Disclaimer</SubHeading>
       <ol type='a'>
         <li>
-          The materials on VideoNote's website are provided on an 'as is' basis.
+          The materials on VideoNote&apos;s website are provided on an &apos;as is&apos; basis.
           VideoNote makes no warranties, expressed or implied, and hereby
           disclaims and negates all other warranties including, without
           limitation, implied warranties or conditions of merchantability,
@@ -121,7 +121,7 @@ const Terms = () => {
         In no event shall VideoNote or its suppliers be liable for any damages
         (including, without limitation, damages for loss of data or profit, or
         due to business interruption) arising out of the use or inability to use
-        the materials on VideoNote's website, even if VideoNote or a VideoNote
+        the materials on VideoNote&apos;s website, even if VideoNote or a VideoNote
         authorized representative has been notified orally or in writing of the
         possibility of such damage. Because some jurisdictions do not allow
         limitations on implied warranties, or limitations of liability for
@@ -132,7 +132,7 @@ const Terms = () => {
         5. Accuracy of materials
       </SubHeading>
       <p>
-        The materials appearing on VideoNote's website could include technical,
+        The materials appearing on VideoNote&apos;s website could include technical,
         typographical, or photographic errors. VideoNote does not warrant that
         any of the materials on its website are accurate, complete or current.
         VideoNote may make changes to the materials contained on its website at
@@ -144,7 +144,7 @@ const Terms = () => {
         VideoNote has not reviewed all of the sites linked to its website and is
         not responsible for the contents of any such linked site. The inclusion
         of any link does not imply endorsement by VideoNote of the site. Use of
-        any such linked website is at the font-serif's own risk.
+        any such linked website is at the user&apos;s own risk.
       </p>
       <SubHeading className='mt-4 mb-1 italic'>7. Modifications</SubHeading>
       <p>

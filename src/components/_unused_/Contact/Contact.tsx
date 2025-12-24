@@ -73,7 +73,7 @@ export const Contact = (props: { [key: string]: any }) => {
             FEEL FREE TO <span className='font-semibold'>CONTACT</span>
           </h2>
           <p className='mx-auto mt-4 text-sm italic leading-relaxed lg:w-2/3 text-themeTextSecondary'>
-            Let's talk!
+            Let&apos;s talk!
           </p>
         </div>
         <div className='mx-auto lg:w-1/2 md:w-2/3'>

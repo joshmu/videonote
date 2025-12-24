@@ -53,7 +53,7 @@ export const Hero = () => {
                 whileHover={{ scale: 1.1 }}
                 className='absolute z-10 px-3 py-2 -mb-32 tracking-wider text-left uppercase rounded-r-sm cursor-pointer focus:outline-none bottom-1/2 text-themeAccent'
               >
-                Let's Go
+                Let&apos;s Go
               </motion.button>
             </Link>
           </MotionFadeUp>
