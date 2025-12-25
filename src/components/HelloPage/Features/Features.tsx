@@ -1,6 +1,5 @@
-import { AnimatePresence, Variants, motion } from 'framer-motion'
+import { Variants, motion } from 'framer-motion'
 
-import { useReveal } from '@/root/src/hooks/useReveal'
 import { Heading } from '@/shared/Text/Text'
 
 const featuresData = [
@@ -35,14 +34,15 @@ const featuresData = [
 ]
 
 const featureVariants: Variants = {
-  initial: { opacity: 0 },
-  animate: custom => ({ opacity: 1, transition: { delay: 0.1 * custom } }),
-  exit: { opacity: 0 },
+  hidden: { opacity: 0, y: 10 },
+  visible: (custom: number) => ({
+    opacity: 1,
+    y: 0,
+    transition: { delay: 0.1 * custom, duration: 0.5 },
+  }),
 }
 
 export const Features = () => {
-  const [ref, inView] = useReveal()
-
   return (
     <div id='features' className='container px-4 mx-auto my-24'>
       {/* header */}
@@ -54,21 +54,19 @@ export const Features = () => {
       </div>
 
       {/* features */}
-      <div ref={ref} className='grid grid-cols-2 gap-10 md:grid-cols-3'>
-        <AnimatePresence>
-          {featuresData.map((data, idx) => (
-            <motion.div
-              custom={idx}
-              key={data.title}
-              initial='initial'
-              animate={inView ? 'animate' : 'initial'}
-              exit='exit'
-              variants={featureVariants}
-            >
-              <FeatureItem idx={idx} data={data} />
-            </motion.div>
-          ))}
-        </AnimatePresence>
+      <div className='grid grid-cols-2 gap-10 md:grid-cols-3'>
+        {featuresData.map((data, idx) => (
+          <motion.div
+            custom={idx}
+            key={data.title}
+            initial='hidden'
+            whileInView='visible'
+            viewport={{ once: true, amount: 0.1 }}
+            variants={featureVariants}
+          >
+            <FeatureItem idx={idx} data={data} />
+          </motion.div>
+        ))}
       </div>
     </div>
   )
