@@ -1,4 +1,17 @@
+/**
+ * @path /src/components/HelloPage/Features/Features.tsx
+ *
+ * @project videonote
+ * @file Features.tsx
+ *
+ * @author Josh Mu <hello@joshmu.dev>
+ * @created Friday, 4th December 2020
+ * @modified Saturday, 26th December 2020 6:31:05 pm
+ * @copyright © 2020 - 2020 MU
+ */
+
 import { Heading } from '@/shared/Text/Text'
+import { Reveal } from '@/shared/ux/Reveal'
 
 const featuresData = [
   {
@@ -35,19 +48,21 @@ export const Features = () => {
   return (
     <div id='features' className='container px-4 mx-auto my-24'>
       {/* header */}
-      <div className='flex items-center mb-2'>
-        <Heading>Features</Heading>
-        <h2 className='ml-3 text-xl italic opacity-50 text-themeText'>
-          ...more to come!
-        </h2>
-      </div>
+      <Reveal>
+        <div className='flex items-center mb-2'>
+          <Heading>Features</Heading>
+          <h2 className='ml-3 text-xl italic opacity-50 text-themeText'>
+            ...more to come!
+          </h2>
+        </div>
+      </Reveal>
 
-      {/* features - temporarily no animation */}
+      {/* features with staggered animation */}
       <div className='grid grid-cols-2 gap-10 md:grid-cols-3'>
         {featuresData.map((data, idx) => (
-          <div key={data.title}>
+          <Reveal key={data.title} delay={idx * 100}>
             <FeatureItem idx={idx} data={data} />
-          </div>
+          </Reveal>
         ))}
       </div>
     </div>
