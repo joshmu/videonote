@@ -93,7 +93,7 @@ const FeatureTitle = ({ children, idx }) => {
 }
 
 const FeatureContent = ({ children }) => {
-  return <p className='tracking-wide text-themetext2'>{children}</p>
+  return <p className='tracking-wide text-themeText2'>{children}</p>
 }
 
 const Shape = ({ idx }) => {

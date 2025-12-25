@@ -12,7 +12,6 @@
 
 import { Variants, motion } from 'framer-motion'
 import { ReactNode } from 'react'
-import { useInView } from 'react-intersection-observer'
 
 interface RevealProps {
   children: ReactNode
@@ -22,8 +21,8 @@ interface RevealProps {
 }
 
 const defaultVariants: Variants = {
-  initial: { opacity: 0, y: 10 },
-  animate: { opacity: 1, y: 0 },
+  hidden: { opacity: 0, y: 10 },
+  visible: { opacity: 1, y: 0 },
 }
 
 export const Reveal = ({
@@ -32,22 +31,16 @@ export const Reveal = ({
   transition = {},
   ...props
 }: RevealProps) => {
-  const [ref, inView] = useInView({
-    triggerOnce: true,
-    threshold: 0,
-    rootMargin: '100px 0px',
-  })
-
   const mergedVariants = {
-    initial: { ...defaultVariants.initial, ...variants.initial },
-    animate: { ...defaultVariants.animate, ...variants.animate },
+    hidden: { ...defaultVariants.hidden, ...variants.initial },
+    visible: { ...defaultVariants.visible, ...variants.animate },
   }
 
   return (
     <motion.div
-      ref={ref}
-      initial='initial'
-      animate={inView ? 'animate' : 'initial'}
+      initial='hidden'
+      whileInView='visible'
+      viewport={{ once: true, amount: 0.1 }}
       variants={mergedVariants}
       transition={{
         duration: 0.6,
