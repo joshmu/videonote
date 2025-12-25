@@ -1,5 +1,3 @@
-import { Variants, motion } from 'framer-motion'
-
 import { Heading } from '@/shared/Text/Text'
 
 const featuresData = [
@@ -33,15 +31,6 @@ const featuresData = [
   },
 ]
 
-const featureVariants: Variants = {
-  hidden: { opacity: 0, y: 10 },
-  visible: (custom: number) => ({
-    opacity: 1,
-    y: 0,
-    transition: { delay: 0.1 * custom, duration: 0.5 },
-  }),
-}
-
 export const Features = () => {
   return (
     <div id='features' className='container px-4 mx-auto my-24'>
@@ -53,19 +42,12 @@ export const Features = () => {
         </h2>
       </div>
 
-      {/* features */}
+      {/* features - temporarily no animation */}
       <div className='grid grid-cols-2 gap-10 md:grid-cols-3'>
         {featuresData.map((data, idx) => (
-          <motion.div
-            custom={idx}
-            key={data.title}
-            initial='hidden'
-            whileInView='visible'
-            viewport={{ once: true, amount: 0.1 }}
-            variants={featureVariants}
-          >
+          <div key={data.title}>
             <FeatureItem idx={idx} data={data} />
-          </motion.div>
+          </div>
         ))}
       </div>
     </div>
