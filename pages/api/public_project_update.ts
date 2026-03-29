@@ -1,38 +1,34 @@
-import { StatusCodes } from 'http-status-codes'
-import { NextApiRequest, NextApiResponse } from 'next'
+import { StatusCodes } from "http-status-codes";
+import { NextApiRequest, NextApiResponse } from "next";
 
-import { Project } from '@/utils/mongoose'
+import { Project } from "@/utils/mongoose";
 
 export default async (req: NextApiRequest, res: NextApiResponse) => {
   // project
-  const { project } = req.body
+  const { project } = req.body;
 
   // get project
-  const projectDoc = await Project.findById(project._id)
+  const projectDoc = await Project.findById(project._id);
   // not found
   if (projectDoc === null)
-    return res
-      .status(StatusCodes.NOT_FOUND)
-      .json({ msg: 'Project does not exist.' })
+    return res.status(StatusCodes.NOT_FOUND).json({ msg: "Project does not exist." });
 
   // project is public
   if (projectDoc.share === null)
-    return res
-      .status(StatusCodes.UNAUTHORIZED)
-      .json({ msg: 'Project is private.' })
+    return res.status(StatusCodes.UNAUTHORIZED).json({ msg: "Project is private." });
 
   try {
     // update project
     //* only allow notes to be updated
-    await projectDoc.updateOne({ $set: { notes: project.notes } })
-    await projectDoc.save()
+    await projectDoc.updateOne({ $set: { notes: project.notes } });
+    await projectDoc.save();
   } catch (error) {
-    console.error(error)
-    return res.status(StatusCodes.BAD_REQUEST).json({ msg: error.message })
+    console.error(error);
+    return res.status(StatusCodes.BAD_REQUEST).json({ msg: error.message });
   }
 
   // send data
   res.status(StatusCodes.OK).json({
     msg: `Success, project updated. (${projectDoc._id})`,
-  })
-}
+  });
+};

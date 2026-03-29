@@ -10,36 +10,31 @@
  * @copyright © 2020 - 2020 MU
  */
 
-import { Variants, motion, useAnimation } from 'motion/react'
-import { ReactNode, useEffect } from 'react'
-import { useInView } from 'react-intersection-observer'
+import { Variants, motion, useAnimation } from "motion/react";
+import { ReactNode, useEffect } from "react";
+import { useInView } from "react-intersection-observer";
 
 interface RevealProps {
-  children: ReactNode
-  variants?: Variants
-  transition?: { [key: string]: any }
-  props?: { [key: string]: any }
+  children: ReactNode;
+  variants?: Variants;
+  transition?: { [key: string]: any };
+  props?: { [key: string]: any };
 }
 
-export const Reveal = ({
-  children,
-  variants = null,
-  transition = null,
-  ...props
-}: RevealProps) => {
-  const controls = useAnimation()
-  const [ref, inView] = useInView()
+export const Reveal = ({ children, variants = null, transition = null, ...props }: RevealProps) => {
+  const controls = useAnimation();
+  const [ref, inView] = useInView();
 
   useEffect(() => {
-    if (inView) controls.start('animate')
-  }, [controls, inView])
+    if (inView) controls.start("animate");
+  }, [controls, inView]);
 
   return (
     <motion.div
       ref={ref}
-      initial='initial'
+      initial="initial"
       animate={controls}
-      exit='exit'
+      exit="exit"
       variants={{
         initial: { opacity: 0, y: 10 },
         animate: { opacity: 1, y: 0 },
@@ -55,5 +50,5 @@ export const Reveal = ({
     >
       {children}
     </motion.div>
-  )
-}
+  );
+};

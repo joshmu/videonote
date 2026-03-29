@@ -10,24 +10,24 @@
  * @copyright © 2020 - 2020 MU
  */
 
-import { StatusCodes } from 'http-status-codes'
-import { NextPage } from 'next'
-import absoluteUrl from 'next-absolute-url'
+import { StatusCodes } from "http-status-codes";
+import { NextPage } from "next";
+import absoluteUrl from "next-absolute-url";
 
-import { Layout } from '@/components/Layout/Layout'
-import { Modals } from '@/components/Modals/Modals'
-import { Notification } from '@/components/Notification/Notification'
-import { Sidebar } from '@/components/Sidebar/Sidebar'
-import { VideoPlayer } from '@/components/VideoPlayer/VideoPlayer'
-import { ControlsProvider } from '@/context/controlsContext'
-import { GlobalProvider } from '@/context/globalContext'
-import { NoteProvider } from '@/context/noteContext'
-import { VideoProvider } from '@/context/videoContext'
-import { AppContainer } from '@/layout/AppContainer/AppContainer'
-import { Overlay } from '@/shared/Modal/Overlay'
+import { Layout } from "@/components/Layout/Layout";
+import { Modals } from "@/components/Modals/Modals";
+import { Notification } from "@/components/Notification/Notification";
+import { Sidebar } from "@/components/Sidebar/Sidebar";
+import { VideoPlayer } from "@/components/VideoPlayer/VideoPlayer";
+import { ControlsProvider } from "@/context/controlsContext";
+import { GlobalProvider } from "@/context/globalContext";
+import { NoteProvider } from "@/context/noteContext";
+import { VideoProvider } from "@/context/videoContext";
+import { AppContainer } from "@/layout/AppContainer/AppContainer";
+import { Overlay } from "@/shared/Modal/Overlay";
 
 interface Props {
-  serverData?: {}
+  serverData?: {};
 }
 
 const ShareProjectPage: NextPage<Props> = ({ serverData = {} }) => {
@@ -50,43 +50,43 @@ const ShareProjectPage: NextPage<Props> = ({ serverData = {} }) => {
         </NoteProvider>
       </VideoProvider>
     </GlobalProvider>
-  )
-}
+  );
+};
 
-ShareProjectPage.getInitialProps = async ctx => {
+ShareProjectPage.getInitialProps = async (ctx) => {
   // get id
-  const shareUrl = ctx.query.id
+  const shareUrl = ctx.query.id;
 
   // fetch config
-  const { origin } = absoluteUrl(ctx.req)
-  const url = `${origin}/api/public_project`
+  const { origin } = absoluteUrl(ctx.req);
+  const url = `${origin}/api/public_project`;
   const body = {
     shareUrl,
-  }
+  };
 
   // request project
   const res = await fetch(url, {
-    method: 'POST',
+    method: "POST",
     headers: {
-      'Content-Type': 'application/json',
+      "Content-Type": "application/json",
     },
     body: JSON.stringify(body),
-  })
+  });
 
   // if an error occurs, redirect
   if (res.status !== StatusCodes.OK) {
     ctx.res.writeHead(StatusCodes.MOVED_TEMPORARILY, {
       Location: `/hello`,
-    })
-    ctx.res.end()
-    return
+    });
+    ctx.res.end();
+    return;
   }
 
   // parse
-  const data = await res.json()
+  const data = await res.json();
 
   // pass to react
-  return { serverData: data }
-}
+  return { serverData: data };
+};
 
-export default ShareProjectPage
+export default ShareProjectPage;

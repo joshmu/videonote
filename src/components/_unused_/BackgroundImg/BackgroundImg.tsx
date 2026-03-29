@@ -11,10 +11,10 @@
  */
 
 interface BackgroundImgProps {
-  src?: string | null
-  style?: object
-  className?: object
-  props?: { [key: string]: any }
+  src?: string | null;
+  style?: object;
+  className?: object;
+  props?: { [key: string]: any };
 }
 
 export const BackgroundImg = ({
@@ -23,9 +23,7 @@ export const BackgroundImg = ({
   className = {},
   ...props
 }: BackgroundImgProps) => {
-  const bgImageSrc: { backgroundImage?: string } = src
-    ? { backgroundImage: `url(${src})` }
-    : {}
+  const bgImageSrc: { backgroundImage?: string } = src ? { backgroundImage: `url(${src})` } : {};
 
   return (
     <div
@@ -33,10 +31,10 @@ export const BackgroundImg = ({
       style={{
         ...bgImageSrc,
         ...style,
-        backgroundSize: '100%',
-        backgroundRepeat: 'no-repeat',
+        backgroundSize: "100%",
+        backgroundRepeat: "no-repeat",
       }}
       {...props}
     ></div>
-  )
-}
+  );
+};

@@ -26,7 +26,7 @@ const createPageTest = {
 
 module.exports = function (
   /** @type {import('plop').NodePlopAPI} */
-  plop
+  plop,
 ) {
   plop.setGenerator("component", {
     description: "create react component",

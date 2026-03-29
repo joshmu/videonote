@@ -10,18 +10,18 @@
  * @copyright © 2020 - 2020 MU
  */
 
-import { useGlobalContext } from '@/root/src/context/globalContext'
-import { ExportNotes } from '@/shared/ExportNotes/ExportNotes'
+import { useGlobalContext } from "@/root/src/context/globalContext";
+import { ExportNotes } from "@/shared/ExportNotes/ExportNotes";
 
-import { RemoveNotes } from './RemoveNotes/RemoveNotes'
+import { RemoveNotes } from "./RemoveNotes/RemoveNotes";
 
 export const SidebarFooter = () => {
-  const { admin } = useGlobalContext()
+  const { admin } = useGlobalContext();
 
   return (
-    <div className='absolute bottom-0 flex items-center justify-between w-full h-8 px-4 border-t bg-themeBg border-themeText2'>
+    <div className="absolute bottom-0 flex items-center justify-between w-full h-8 px-4 border-t bg-themeBg border-themeText2">
       <ExportNotes />
       {admin && <RemoveNotes />}
     </div>
-  )
-}
+  );
+};

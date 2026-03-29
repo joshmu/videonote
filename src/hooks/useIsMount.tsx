@@ -10,14 +10,14 @@
  * @copyright © 2020 - 2020 MU
  */
 
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef } from "react";
 
 export const useIsMount = (): boolean => {
-  const isMountRef = useRef<boolean>(true)
+  const isMountRef = useRef<boolean>(true);
 
   useEffect(() => {
-    isMountRef.current = false
-  }, [])
+    isMountRef.current = false;
+  }, []);
 
-  return isMountRef.current
-}
+  return isMountRef.current;
+};

@@ -10,14 +10,14 @@
  * @copyright © 2020 - 2020 MU
  */
 
-import '@/styles/globals.scss'
+import "@/styles/globals.scss";
 
-import { AnimatePresence } from 'motion/react'
-import { AppProps } from 'next/app'
+import { AnimatePresence } from "motion/react";
+import { AppProps } from "next/app";
 
-import { NotificationProvider } from '@/context/notificationContext'
+import { NotificationProvider } from "@/context/notificationContext";
 
-import { ThemeProvider } from '../src/context/themeContext'
+import { ThemeProvider } from "../src/context/themeContext";
 
 const MyApp = ({ Component, pageProps, router }: AppProps) => {
   return (
@@ -28,7 +28,7 @@ const MyApp = ({ Component, pageProps, router }: AppProps) => {
         </AnimatePresence>
       </ThemeProvider>
     </NotificationProvider>
-  )
-}
+  );
+};
 
-export default MyApp
+export default MyApp;

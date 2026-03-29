@@ -10,12 +10,12 @@
  * @copyright © 2020 - 2020 MU
  */
 
-import { StatusCodes } from 'http-status-codes'
-import Router from 'next/router'
-import { createContext, useContext, useEffect, useRef, useState } from 'react'
-import Cookie from 'universal-cookie'
+import { StatusCodes } from "http-status-codes";
+import Router from "next/router";
+import { createContext, useContext, useEffect, useRef, useState } from "react";
+import Cookie from "universal-cookie";
 
-import { usePrompt } from '@/hooks/usePrompt'
+import { usePrompt } from "@/hooks/usePrompt";
 import {
   NoteApiAction,
   ProjectApiActions,
@@ -23,10 +23,10 @@ import {
   SettingsInterface,
   ShareProjectInterface,
   UserInterface,
-} from '@/root/src/components/shared/types'
-import { fetcher } from '@/utils/clientHelpers'
+} from "@/root/src/components/shared/types";
+import { fetcher } from "@/utils/clientHelpers";
 
-import { ModalType } from '../components/Modals/Modals'
+import { ModalType } from "../components/Modals/Modals";
 import {
   ActionInputFocusType,
   AlertProjectLoadedType,
@@ -55,8 +55,8 @@ import {
   UpdateSettingsType,
   UpdateUserType,
   WarnLocalVideoType,
-} from './globalContext.types'
-import { useNotificationContext } from './notificationContext'
+} from "./globalContext.types";
+import { useNotificationContext } from "./notificationContext";
 
 const SETTINGS_DEFAULTS: SettingsInterface = {
   playOffset: -4,
@@ -64,651 +64,648 @@ const SETTINGS_DEFAULTS: SettingsInterface = {
   seekJump: 10,
   sidebarWidth: 400,
   currentProject: null,
-}
+};
 
 const HINTS: string[] = [
-  'Spacebar = Play/Pause',
-  'Left/Right = Seek',
-  'Up/Down = Volume',
-  'Shift + Spacebar = show/hide notes',
-  'Click note to jump to time',
-  'Mark notes done by clicking their time',
-  'Double click note = Edit',
-  'Shift + Left/Right = Prev/Next note',
-  'Click video timeline to jump',
-  'Drag list edge to resize',
-]
+  "Spacebar = Play/Pause",
+  "Left/Right = Seek",
+  "Up/Down = Volume",
+  "Shift + Spacebar = show/hide notes",
+  "Click note to jump to time",
+  "Mark notes done by clicking their time",
+  "Double click note = Edit",
+  "Shift + Left/Right = Prev/Next note",
+  "Click video timeline to jump",
+  "Drag list edge to resize",
+];
 
-const globalContext = createContext<GlobalContextInterface>(null!)
+const globalContext = createContext<GlobalContextInterface>(null!);
 
 export const GlobalProvider = ({
   children,
   serverData,
   ...props
 }: {
-  children: React.ReactElement
-  serverData: {}
-  props?: {}
+  children: React.ReactElement;
+  serverData: {};
+  props?: {};
 }) => {
-  const [user, setUser] = useState<UserInterface>(null!)
-  const [projects, setProjects] = useState<ProjectInterface[]>([])
-  const [settings, setSettings] = useState<SettingsInterface>(SETTINGS_DEFAULTS)
+  const [user, setUser] = useState<UserInterface>(null!);
+  const [projects, setProjects] = useState<ProjectInterface[]>([]);
+  const [settings, setSettings] = useState<SettingsInterface>(SETTINGS_DEFAULTS);
 
-  const [currentProject, setCurrentProject] = useState<ProjectInterface>(null!)
+  const [currentProject, setCurrentProject] = useState<ProjectInterface>(null!);
 
-  const [sidebarOpen, setSidebarOpen] = useState<boolean>(true)
-  const [menuOpen, setMenuOpen] = useState<boolean>(false)
-  const [modalsOpen, setModalsOpen] = useState<ModalType[]>([])
-  const actionInputRef = useRef<HTMLInputElement | null>(null)
+  const [sidebarOpen, setSidebarOpen] = useState<boolean>(true);
+  const [menuOpen, setMenuOpen] = useState<boolean>(false);
+  const [modalsOpen, setModalsOpen] = useState<ModalType[]>([]);
+  const actionInputRef = useRef<HTMLInputElement | null>(null);
 
-  const [admin, setAdmin] = useState<boolean>(true)
+  const [admin, setAdmin] = useState<boolean>(true);
 
-  const { addAlert } = useNotificationContext()
-  const { promptState, createPrompt, confirmPrompt, cancelPrompt } = usePrompt()
+  const { addAlert } = useNotificationContext();
+  const { promptState, createPrompt, confirmPrompt, cancelPrompt } = usePrompt();
 
   // initial load
   useEffect(() => {
     // initial response from server
-    handleInitialServerData(serverData)
-  }, [])
+    handleInitialServerData(serverData);
+  }, []);
 
   // notification recommend creating a project if there are no projects and we have loaded the user
   useEffect(() => {
     if (projects.length === 0 && user) {
       // wipe any existing state if there were previously projects
-      setCurrentProject(null)
+      setCurrentProject(null);
       // presume user could be new (this could also occur if previous projects have been removed)
 
       // if we have a previously open modal, close it
-      if (modalsOpen.length > 0) toggleModalOpen()
+      if (modalsOpen.length > 0) toggleModalOpen();
 
       // welcome modal
-      toggleModalOpen(ModalType.WELCOME)
+      toggleModalOpen(ModalType.WELCOME);
 
       addAlert({
-        type: 'info',
-        msg: 'Create a project to start',
-      })
+        type: "info",
+        msg: "Create a project to start",
+      });
     }
-  }, [projects, user])
+  }, [projects, user]);
 
   // reset settings.currentProject when projects are empty
   useEffect(() => {
     if (projects.length === 0 && settings.currentProject)
-      updateSettings({ currentProject: null, _id: settings._id })
-  }, [projects, settings])
+      updateSettings({ currentProject: null, _id: settings._id });
+  }, [projects, settings]);
 
-  const noteApi: NoteApiType = async noteData => {
-    console.log('note api request', noteData)
+  const noteApi: NoteApiType = async (noteData) => {
+    console.log("note api request", noteData);
     // merge note and user information together match 'user' mongo doc
     const body = {
       note: noteData,
-    }
+    };
     // send updated note to server, token will hold user information required
     const {
       res,
       // @ts-ignore
       data: { note, msg },
-    } = await fetcher('/api/note', body)
+    } = await fetcher("/api/note", body);
 
-    if (badResponse(res, msg)) return 'error'
+    if (badResponse(res, msg)) return "error";
 
-    return note
-  }
+    return note;
+  };
 
   const noteApiRemoveDoneNotes: NoteApiRemoveDoneNotes = async () => {
-    console.log('remove completed notes')
+    console.log("remove completed notes");
     // api request to delete 'done' notes in current project
     // merge note and user information together match 'user' mongo doc
     const body = {
       action: NoteApiAction.REMOVE_DONE_NOTES,
       projectId: currentProject._id,
-    }
+    };
     // send updated note to server, token will hold user information required
     const {
       res,
       // @ts-ignore
       data: { notes, msg },
-    } = await fetcher('/api/note', body)
+    } = await fetcher("/api/note", body);
 
-    if (badResponse(res, msg)) return 'error'
+    if (badResponse(res, msg)) return "error";
 
-    return notes
-  }
+    return notes;
+  };
 
-  const updateProject: UpdateProjectType = async projectData => {
-    if (!admin) return
+  const updateProject: UpdateProjectType = async (projectData) => {
+    if (!admin) return;
 
     // add _id for db processing
-    projectData._id = currentProject._id
+    projectData._id = currentProject._id;
 
-    const response = await projectApi(ProjectApiActions.UPDATE, projectData)
-    if (!response) return console.error('api error')
+    const response = await projectApi(ProjectApiActions.UPDATE, projectData);
+    if (!response) return console.error("api error");
 
-    const { project } = response
+    const { project } = response;
 
     // update the relevant project
     // ! avoid updating the 'notes' as this was previously populated by mongoose converting the _id references to data
-    setProjects(current =>
-      current.map(p => {
-        return p._id === project._id ? { ...project, notes: p.notes } : p
-      })
-    )
+    setProjects((current) =>
+      current.map((p) => {
+        return p._id === project._id ? { ...project, notes: p.notes } : p;
+      }),
+    );
     // also update current project state
     // ! avoid updating the 'notes' as this was previously populated by mongoose converting the _id references to data
-    setCurrentProject(current => ({ ...project, notes: current.notes }))
-  }
+    setCurrentProject((current) => ({ ...project, notes: current.notes }));
+  };
 
-  const shareProject: ShareProjectType = async shareData => {
+  const shareProject: ShareProjectType = async (shareData) => {
     const body = {
-      action: 'share',
+      action: "share",
       project: { _id: currentProject._id },
       share: shareData,
-    }
+    };
 
     const {
       res,
       data: { msg, ...data },
-    } = await fetcher('/api/project', body)
+    } = await fetcher("/api/project", body);
 
-    if (badResponse(res, msg)) return
+    if (badResponse(res, msg)) return;
 
     if (!data) {
-      console.error('api error')
-      return false
+      console.error("api error");
+      return false;
     }
 
-    console.log('share project api response...')
-    console.log(data)
-    const { project } = data
+    console.log("share project api response...");
+    console.log(data);
+    const { project } = data;
 
     // update the relevant project 'share' prop
-    setProjects(current =>
-      current.map(p => {
-        return p._id === project._id ? { ...p, share: project.share } : p
-      })
-    )
+    setProjects((current) =>
+      current.map((p) => {
+        return p._id === project._id ? { ...p, share: project.share } : p;
+      }),
+    );
     // also update current project state with new 'share' data
-    setCurrentProject(current => ({ ...current, share: project.share }))
+    setCurrentProject((current) => ({ ...current, share: project.share }));
 
     // return true/false based on returned data matching data sent to server
-    const valuesToCheck = ['canEdit', 'url']
-    return valuesToCheck.every(key => project.share[key] === shareData[key])
-  }
+    const valuesToCheck = ["canEdit", "url"];
+    return valuesToCheck.every((key) => project.share[key] === shareData[key]);
+  };
 
   const removeShareProject: RemoveShareProjectType = async () => {
     const body = {
-      action: 'remove share',
+      action: "remove share",
       project: { _id: currentProject._id },
       share: { _id: (currentProject.share as ShareProjectInterface)._id },
-    }
+    };
     const {
       res,
       data: { msg, ...data },
-    } = await fetcher('/api/project', body)
+    } = await fetcher("/api/project", body);
 
-    if (badResponse(res, msg)) return
+    if (badResponse(res, msg)) return;
 
     if (!data) {
-      console.error('api error')
-      return false
+      console.error("api error");
+      return false;
     }
 
-    const { project } = data
+    const { project } = data;
 
     // update the relevant project
-    setProjects(current =>
-      current.map(p => {
-        return p._id === project._id ? project : p
-      })
-    )
+    setProjects((current) =>
+      current.map((p) => {
+        return p._id === project._id ? project : p;
+      }),
+    );
     // also update current project state
-    setCurrentProject(project)
+    setCurrentProject(project);
 
-    return res.status === 200
-  }
+    return res.status === 200;
+  };
 
   // to have access to general projects information (like note count) we need to update the projects list
   // we do not alter the current project state with the notes change to avoid a potential update loop
-  const updateProjectsStateWithUpdatedNotes: UpdateProjectsStateWithUpdatedNotesType = async notes => {
-    console.log('update projects notes state')
+  const updateProjectsStateWithUpdatedNotes: UpdateProjectsStateWithUpdatedNotesType = async (
+    notes,
+  ) => {
+    console.log("update projects notes state");
     // alter state of projects
-    setProjects(current =>
-      current.map(p => {
+    setProjects((current) =>
+      current.map((p) => {
         if (p._id === currentProject._id) {
-          p.notes = notes
+          p.notes = notes;
         }
-        return p
+        return p;
         // return p._id === currentProject._id ? { ...currentProject, notes } : p
-      })
-    )
-  }
+      }),
+    );
+  };
 
-  const loadProject: LoadProjectType = async projectId => {
-    const projectData = { _id: projectId }
-    const response = await projectApi(ProjectApiActions.GET, projectData)
-    if (!response) return console.error('api error')
+  const loadProject: LoadProjectType = async (projectId) => {
+    const projectData = { _id: projectId };
+    const response = await projectApi(ProjectApiActions.GET, projectData);
+    if (!response) return console.error("api error");
 
-    const { project } = response
+    const { project } = response;
 
     // update the relevant project
-    setProjects(current =>
-      current.map(p => {
-        return p._id === project._id ? project : p
-      })
-    )
+    setProjects((current) =>
+      current.map((p) => {
+        return p._id === project._id ? project : p;
+      }),
+    );
 
     // also update current project state
-    setCurrentProject(project)
+    setCurrentProject(project);
 
     // update current project settings if it has changed
-    console.log('updateProject', project._id, settings.currentProject)
+    console.log("updateProject", project._id, settings.currentProject);
     if (project._id !== settings.currentProject) {
-      console.log('updating settings')
-      updateSettings({ currentProject: project._id, _id: settings._id })
+      console.log("updating settings");
+      updateSettings({ currentProject: project._id, _id: settings._id });
     }
 
-    alertProjectLoaded(project)
-    if (project.src.length === 0) warnLocalVideo(project)
-  }
+    alertProjectLoaded(project);
+    if (project.src.length === 0) warnLocalVideo(project);
+  };
 
-  const guestUpdatingProject: GuestUpdatingProjectType = async project => {
-    console.log('guest is updating project', project)
+  const guestUpdatingProject: GuestUpdatingProjectType = async (project) => {
+    console.log("guest is updating project", project);
     const body = {
       project,
-    }
-    const res = await fetch('/api/public_project_update', {
-      method: 'POST',
+    };
+    const res = await fetch("/api/public_project_update", {
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
       body: JSON.stringify(body),
-    })
-    const data = await res.json()
+    });
+    const data = await res.json();
 
-    const { project: updatedProject, msg } = data
+    const { project: updatedProject, msg } = data;
 
     // handle if we get a bad response
-    if (badResponse(res, msg)) return
+    if (badResponse(res, msg)) return;
 
     // success
-    console.log(data.msg)
-  }
+    console.log(data.msg);
+  };
 
-  const updateUser: UpdateUserType = async userData => {
+  const updateUser: UpdateUserType = async (userData) => {
     // respect format of user mongo object on server
     // @ts-ignore
-    console.log('updating user...', userData)
+    console.log("updating user...", userData);
     // merge settings and user information together match 'user' mongo doc
     const body = {
-      action: 'update',
+      action: "update",
       user: userData,
-    }
+    };
     // send data to update to server, token will hold user information required to authenticate
     const {
       res,
       // @ts-ignore
       data: { user: account, msg },
-    } = await fetcher('/api/user', body)
+    } = await fetcher("/api/user", body);
 
     // handle if we get a bad response
-    if (badResponse(res, msg)) return
+    if (badResponse(res, msg)) return;
 
     // api returns all projects for the user
     if (!account) {
-      console.error('user from server is incorrect')
-      return
+      console.error("user from server is incorrect");
+      return;
     }
 
-    const { settings, ...user } = account
+    const { settings, ...user } = account;
 
-    console.log({ settings, user })
-    if (settings) setSettings(settings)
-    setUser(user)
-  }
+    console.log({ settings, user });
+    if (settings) setSettings(settings);
+    setUser(user);
+  };
 
-  const updateSettings: UpdateSettingsType = async newSettingsData => {
-    if (!admin) return
+  const updateSettings: UpdateSettingsType = async (newSettingsData) => {
+    if (!admin) return;
 
-    console.log('updating settings...', newSettingsData)
+    console.log("updating settings...", newSettingsData);
     // always make sure we include settings _id if we have one (this has been passed earlier)
     const body = {
       settings: newSettingsData,
-    }
+    };
     // send updated settings to server, token will hold user information required
     const {
       res,
       data: { settings, msg },
-    } = await fetcher('/api/settings', body)
+    } = await fetcher("/api/settings", body);
 
-    if (badResponse(res, msg)) return
+    if (badResponse(res, msg)) return;
 
     // any settings which are not present from DB we fill with defaults
-    const fullSettings = { ...SETTINGS_DEFAULTS, ...settings }
+    const fullSettings = { ...SETTINGS_DEFAULTS, ...settings };
 
-    setSettings(fullSettings)
-  }
+    setSettings(fullSettings);
+  };
 
   const toggleMenuOpen: ToggleMenuOpenType = (state = undefined) => {
-    const ismenuOpen = state ? state : !menuOpen
-    setMenuOpen(ismenuOpen)
-  }
+    const ismenuOpen = state ? state : !menuOpen;
+    setMenuOpen(ismenuOpen);
+  };
 
   const toggleSidebar: ToggleSidebarType = (state = undefined) => {
-    setSidebarOpen(currentState => {
-      const updatedState = state ? state : !currentState
-      return updatedState
-    })
-  }
+    setSidebarOpen((currentState) => {
+      const updatedState = state ? state : !currentState;
+      return updatedState;
+    });
+  };
 
   const toggleModalOpen: ToggleModalOpenType = (modalName = undefined) => {
-    console.log('opening modal', modalName)
+    console.log("opening modal", modalName);
     // if no param then turn off modals
-    if (!modalName) return setModalsOpen([])
+    if (!modalName) return setModalsOpen([]);
     // if modal name exists then find it and remove from modals open list
     if (modalsOpen.includes(modalName))
-      return setModalsOpen(currentModals =>
-        currentModals.filter(modal => modal !== modalName)
-      )
+      return setModalsOpen((currentModals) => currentModals.filter((modal) => modal !== modalName));
     // otherwise add modal to list of open modals
-    setModalsOpen(currentModals => [...currentModals, modalName])
+    setModalsOpen((currentModals) => [...currentModals, modalName]);
     // setModalsOpen(modalsOpen === modalName ? null : modalName)
-  }
+  };
 
-  const createProject: CreateProjectType = async projectData => {
-    const response = await projectApi(ProjectApiActions.CREATE, projectData)
-    if (!response) return console.error('api error')
+  const createProject: CreateProjectType = async (projectData) => {
+    const response = await projectApi(ProjectApiActions.CREATE, projectData);
+    if (!response) return console.error("api error");
 
     // expect project as response from server
-    const { project } = response
+    const { project } = response;
 
     // add project
-    setProjects(current => [...current, project])
+    setProjects((current) => [...current, project]);
 
     // set current project
-    setCurrentProject(project)
+    setCurrentProject(project);
 
     // update settings
-    updateSettings({ currentProject: project._id })
+    updateSettings({ currentProject: project._id });
 
-    alertProjectLoaded(project)
-  }
+    alertProjectLoaded(project);
+  };
 
-  const removeProject: RemoveProjectType = async _id => {
-    const projectData = { _id }
-    const response = await projectApi(ProjectApiActions.REMOVE, projectData)
-    if (!response) return console.error('api error')
+  const removeProject: RemoveProjectType = async (_id) => {
+    const projectData = { _id };
+    const response = await projectApi(ProjectApiActions.REMOVE, projectData);
+    if (!response) return console.error("api error");
 
-    const { project } = response
+    const { project } = response;
 
     // if 'project' received then 'delete' is successful
     if (project) {
-      const remainingProjects = projects.filter(p => p._id !== project._id)
+      const remainingProjects = projects.filter((p) => p._id !== project._id);
       // remove project from state
-      setProjects(remainingProjects)
+      setProjects(remainingProjects);
 
       // load another project if we are removing current project
       if (remainingProjects.length > 0 && settings.currentProject === _id) {
-        const newCurrentProject = remainingProjects.slice(-1)[0]
-        loadProject(newCurrentProject._id)
+        const newCurrentProject = remainingProjects.slice(-1)[0];
+        loadProject(newCurrentProject._id);
       }
     }
-  }
+  };
 
-  const fetchWithPasswordPublicProject: FetchWithPasswordPublicProjectType = async password => {
+  const fetchWithPasswordPublicProject: FetchWithPasswordPublicProjectType = async (password) => {
     // get id
-    const shareUrl = window.location.pathname.split('/').slice(-1)[0]
+    const shareUrl = window.location.pathname.split("/").slice(-1)[0];
 
     // fetch config
-    const origin = window.location.origin
-    const url = `${origin}/api/public_project`
+    const origin = window.location.origin;
+    const url = `${origin}/api/public_project`;
     const body = {
       shareUrl,
       password,
-    }
+    };
 
     // request project
     const res = await fetch(url, {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
       body: JSON.stringify(body),
-    })
+    });
 
     // if an error occurs, redirect to homepage for a guest
     if (res.status !== StatusCodes.OK) {
-      Router.push('/')
+      Router.push("/");
     }
 
     // parse
-    const data = await res.json()
+    const data = await res.json();
 
-    return data
-  }
+    return data;
+  };
 
   //-------------------------------
-  const handleInitialServerData: HandleInitialServerDataType = data => {
+  const handleInitialServerData: HandleInitialServerDataType = (data) => {
     // if password is required then lets exit early
     // fetch data again providing password
     // re-init 'handleInitialServerData'
-    if (data.msg === 'shared project password required') {
+    if (data.msg === "shared project password required") {
       createPrompt({
         msg: (
           <div>
-            <h2 className='mb-2 text-xl font-bold text-themeAccent'>
-              <a href='/'>VideoNote</a>
+            <h2 className="mb-2 text-xl font-bold text-themeAccent">
+              <a href="/">VideoNote</a>
             </h2>
-            <span className='whitespace-pre'>
-              A <span className='text-themeAccent'>password </span>
+            <span className="whitespace-pre">
+              A <span className="text-themeAccent">password </span>
               is required to access this project
             </span>
           </div>
         ),
         passwordRequired: true,
         action: async (data: any) => {
-          cancelPrompt()
-          const { password } = data
+          cancelPrompt();
+          const { password } = data;
           setTimeout(async () => {
             // get password and send again
-            const serverData = await fetchWithPasswordPublicProject(password)
-            handleInitialServerData(serverData)
-          }, 300)
+            const serverData = await fetchWithPasswordPublicProject(password);
+            handleInitialServerData(serverData);
+          }, 300);
         },
-      })
-      return
-    } else if (data.msg === 'password incorrect') {
+      });
+      return;
+    } else if (data.msg === "password incorrect") {
       createPrompt({
         msg: (
           <div>
-            <h2 className='mb-2 text-xl font-bold text-themeAccent'>
-              <a href='/'>VideoNote</a>
+            <h2 className="mb-2 text-xl font-bold text-themeAccent">
+              <a href="/">VideoNote</a>
             </h2>
-            <span className='whitespace-pre'>
-              The <span className='text-themeAccent'>password </span>
+            <span className="whitespace-pre">
+              The <span className="text-themeAccent">password </span>
               is incorrect. Do you want to try again?
             </span>
           </div>
         ),
         passwordRequired: true,
         action: async (data: any) => {
-          cancelPrompt()
-          const { password } = data
+          cancelPrompt();
+          const { password } = data;
 
           setTimeout(async () => {
             // get password and send again
-            const serverData = await fetchWithPasswordPublicProject(password)
-            handleInitialServerData(serverData)
-          }, 300)
+            const serverData = await fetchWithPasswordPublicProject(password);
+            handleInitialServerData(serverData);
+          }, 300);
         },
-      })
-      return
+      });
+      return;
     }
 
-    console.log('handle initial server data', data)
+    console.log("handle initial server data", data);
 
     // PARSE SERVER DATA
     // user data and msg for server messages
-    const { user: serverData, msg } = data
+    const { user: serverData, msg } = data;
     // grab user projects as seperate var and rest is the account
-    const { projects, ...userAccount } = serverData
-    const { settings, ...user }: { settings: SettingsInterface } = userAccount
+    const { projects, ...userAccount } = serverData;
+    const { settings, ...user }: { settings: SettingsInterface } = userAccount;
 
     // ERROR
     // if msg presume there is an error
     if (msg) {
-      Router.push('/login')
-      addAlert({ type: 'error', msg })
-      return
+      Router.push("/login");
+      addAlert({ type: "error", msg });
+      return;
     }
 
     // HANDLE DATA
     // allocate server data to respective areas
-    setProjects(projects)
+    setProjects(projects);
 
     if (Object.keys(userAccount).length > 0) {
-      setUser(user as UserInterface)
+      setUser(user as UserInterface);
 
       // avoid null values from mongo
       // if we have any null property values in returned settings then replace with defaults
-      if (typeof settings === 'object' && settings !== null) {
+      if (typeof settings === "object" && settings !== null) {
         // if we have any null settings lets swap them to their defaults
-        Object.keys(settings).forEach(key => {
-          if (settings[key] === null) settings[key] = SETTINGS_DEFAULTS[key]
-        })
-        setSettings({ ...SETTINGS_DEFAULTS, ...settings })
+        Object.keys(settings).forEach((key) => {
+          if (settings[key] === null) settings[key] = SETTINGS_DEFAULTS[key];
+        });
+        setSettings({ ...SETTINGS_DEFAULTS, ...settings });
       }
 
       addAlert({
-        type: 'success',
+        type: "success",
         msg: `Logged in: ${(user as UserInterface).username}`,
-      })
+      });
     } else {
       // if there is no account data then admin is not present, client is guest
-      console.log('GUEST MODE')
-      setAdmin(false)
+      console.log("GUEST MODE");
+      setAdmin(false);
     }
 
     if (projects.length > 0) {
-      let currentProject: ProjectInterface
+      let currentProject: ProjectInterface;
 
       // if settings data is passed back and we have a currentProject Id
       // stored then lets find the project and assign
       if (settings && settings.currentProject) {
         currentProject = (projects as ProjectInterface[]).find(
-          project => project._id === settings.currentProject
-        )
+          (project) => project._id === settings.currentProject,
+        );
       }
       // if we still don't have anything then just grab last project entry in the list
       if (!currentProject) {
-        currentProject = projects.slice(-1)[0]
+        currentProject = projects.slice(-1)[0];
       }
 
-      loadProject(currentProject._id)
+      loadProject(currentProject._id);
       // setCurrentProject(currentProject)
       // alertProjectLoaded(currentProject)
     }
-  }
+  };
 
-  const alertProjectLoaded: AlertProjectLoadedType = project => {
+  const alertProjectLoaded: AlertProjectLoadedType = (project) => {
     // notification when we load a project
     addAlert({
-      type: 'project',
+      type: "project",
       msg: `${project.title.toUpperCase()}`,
-    })
-  }
+    });
+  };
 
   const projectApi: ProjectApiType = async (action, project) => {
-    console.log(action, { project })
+    console.log(action, { project });
     // api request to create project, assign user id to it
     const body = {
       action: action,
       project,
-    }
+    };
     // api sends all available projects back
     const {
       res,
       data: { msg, ...data },
-    } = await fetcher('/api/project', body)
+    } = await fetcher("/api/project", body);
 
-    if (badResponse(res, msg)) return
+    if (badResponse(res, msg)) return;
 
     // api returns all projects for the user
     if (!projects) {
-      console.error('projects from server is incorrect')
-      return
+      console.error("projects from server is incorrect");
+      return;
     }
 
-    return data
-  }
+    return data;
+  };
 
-  const copyToClipboard: CopyToClipboardType = (
-    txt,
-    alertMsg = 'Copied to clipboard!'
-  ) => {
-    if (!txt) return
+  const copyToClipboard: CopyToClipboardType = (txt, alertMsg = "Copied to clipboard!") => {
+    if (!txt) return;
 
     // copy to clipboard
     navigator.clipboard.writeText(txt).then(
       function () {
         /* clipboard successfully set */
-        addAlert({ type: 'info', msg: `${alertMsg} ${txt}` })
+        addAlert({ type: "info", msg: `${alertMsg} ${txt}` });
       },
       function () {
         /* clipboard write failed */
-        console.log('clipboard copy failed')
-      }
-    )
-  }
+        console.log("clipboard copy failed");
+      },
+    );
+  };
 
   const badResponse: BadResponseType = (res, msg) => {
     if (res.status !== StatusCodes.OK) {
       if (msg.match(/invalid token/i)) {
-        console.log('invalid token, redirecting...')
-        const alertMsg = 'Session expired, please re-enter your credentials'
-        addAlert({ type: 'error', msg: alertMsg })
-        Router.push('/login')
-        return true
+        console.log("invalid token, redirecting...");
+        const alertMsg = "Session expired, please re-enter your credentials";
+        addAlert({ type: "error", msg: alertMsg });
+        Router.push("/login");
+        return true;
       }
-      addAlert({ type: 'error', msg: msg })
-      return true
+      addAlert({ type: "error", msg: msg });
+      return true;
     }
-    return false
-  }
+    return false;
+  };
 
-  const removeAccount: RemoveAccountType = async userData => {
-    console.log('removing account', userData.username)
+  const removeAccount: RemoveAccountType = async (userData) => {
+    console.log("removing account", userData.username);
 
     // request account deletion
     // api request to create project, assign user id to it
     const body = {
-      action: 'remove',
+      action: "remove",
       // use passed data otherwise use current user information in global state
       user: userData || user,
-    }
+    };
 
     // api sends all available projects back
-    const { res, data } = await fetcher('/api/user', body)
+    const { res, data } = await fetcher("/api/user", body);
 
-    if (badResponse(res, data.msg)) return
+    if (badResponse(res, data.msg)) return;
 
     // presume status 200
-    addAlert({ type: 'success', msg: 'Account removed. Goodbye! 👋' })
+    addAlert({ type: "success", msg: "Account removed. Goodbye! 👋" });
 
     // remove JWT token cookie
-    const cookies = new Cookie()
-    cookies.remove('token')
+    const cookies = new Cookie();
+    cookies.remove("token");
 
     // redirect to landing page
-    Router.push('/hello')
-  }
+    Router.push("/hello");
+  };
 
   const cancelModals: CancelModalsType = () => {
-    console.log('cancel modals')
-    if (modalsOpen.length > 0) setModalsOpen([])
-    if (promptState.isOpen) cancelPrompt()
-    if (menuOpen) setMenuOpen(false)
-  }
+    console.log("cancel modals");
+    if (modalsOpen.length > 0) setModalsOpen([]);
+    if (promptState.isOpen) cancelPrompt();
+    if (menuOpen) setMenuOpen(false);
+  };
 
   // todo: move to controls context
   // const handleGlobalEscapeKey: HandleGlobalEscapeKeyType = key => {
@@ -719,31 +716,29 @@ export const GlobalProvider = ({
   // useGlobalKeydown(handleGlobalEscapeKey)
 
   const checkCanEdit: CheckCanEditType = () => {
-    return admin || (currentProject?.share as ShareProjectInterface).canEdit
-  }
+    return admin || (currentProject?.share as ShareProjectInterface).canEdit;
+  };
 
   const actionInputFocus: ActionInputFocusType = () => {
-    console.log('autoFocus')
-    actionInputRef.current.focus()
-  }
+    console.log("autoFocus");
+    actionInputRef.current.focus();
+  };
 
-  const warnLocalVideo: WarnLocalVideoType = project => {
+  const warnLocalVideo: WarnLocalVideoType = (project) => {
     addAlert({
-      type: 'warning',
+      type: "warning",
       msg: (
         <span>
-          Please provide video source for project:{' '}
-          {project?.title && (
-            <span className='text-themeAccent'>{project.title}</span>
-          )}
+          Please provide video source for project:{" "}
+          {project?.title && <span className="text-themeAccent">{project.title}</span>}
         </span>
       ),
       duration: 12000,
-    })
-    toggleModalOpen(ModalType.CURRENT_PROJECT)
-  }
+    });
+    toggleModalOpen(ModalType.CURRENT_PROJECT);
+  };
 
-  const projectsExist: boolean = projects.length > 0
+  const projectsExist: boolean = projects.length > 0;
 
   const value: GlobalContextInterface = {
     user,
@@ -783,15 +778,15 @@ export const GlobalProvider = ({
     actionInputFocus,
     warnLocalVideo,
     projectsExist,
-  }
+  };
 
   return (
     <globalContext.Provider value={value} {...props}>
       {children}
     </globalContext.Provider>
-  )
-}
+  );
+};
 
 export const useGlobalContext = (): GlobalContextInterface => {
-  return useContext(globalContext)
-}
+  return useContext(globalContext);
+};

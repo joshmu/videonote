@@ -10,25 +10,25 @@
  * @copyright © 2020 - 2020 MU
  */
 
-import React, { ReactNode } from 'react'
+import React, { ReactNode } from "react";
 
 interface SelectProps extends React.HTMLAttributes<HTMLDivElement> {
-  children: ReactNode
-  modalId?: string
-  padding?: string
-  animate?: string
-  text?: string
-  cursor?: string
-  props?: { [key: string]: any }
+  children: ReactNode;
+  modalId?: string;
+  padding?: string;
+  animate?: string;
+  text?: string;
+  cursor?: string;
+  props?: { [key: string]: any };
 }
 
 export const Select = ({
   children,
   modalId = null,
-  padding = 'px-4 py-2',
-  animate = '',
-  text = 'text-themeText',
-  cursor = 'cursor-pointer',
+  padding = "px-4 py-2",
+  animate = "",
+  text = "text-themeText",
+  cursor = "cursor-pointer",
   ...props
 }: SelectProps) => {
   return (
@@ -39,5 +39,5 @@ export const Select = ({
     >
       {children}
     </div>
-  )
-}
+  );
+};

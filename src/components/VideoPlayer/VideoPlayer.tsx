@@ -10,17 +10,17 @@
  * @copyright © 2020 - 2020 MU
  */
 
-import { Variants, motion } from 'motion/react'
-import { useEffect, useState } from 'react'
-import ReactPlayer from 'react-player'
+import { Variants, motion } from "motion/react";
+import { useEffect, useState } from "react";
+import ReactPlayer from "react-player";
 
-import { useVideoContext } from '@/context/videoContext'
-import { useIsMount } from '@/hooks/useIsMount'
-import { Loader } from '@/shared/Loader/Loader'
+import { useVideoContext } from "@/context/videoContext";
+import { useIsMount } from "@/hooks/useIsMount";
+import { Loader } from "@/shared/Loader/Loader";
 
-import { ActionInput } from '../ActionInput/ActionInput'
-import { Underlay } from './Underlay/Underlay'
-import style from './videoPlayer.module.scss'
+import { ActionInput } from "../ActionInput/ActionInput";
+import { Underlay } from "./Underlay/Underlay";
+import style from "./videoPlayer.module.scss";
 
 const videoContentVariants: Variants = {
   initial: {
@@ -35,7 +35,7 @@ const videoContentVariants: Variants = {
     opacity: 0,
     // x: '-100%',
   },
-}
+};
 
 export const VideoPlayer = () => {
   const {
@@ -48,38 +48,38 @@ export const VideoPlayer = () => {
     handlePlayerError,
     handleDuration,
     playerRef,
-  } = useVideoContext()
+  } = useVideoContext();
 
-  const isMount = useIsMount()
-  const [isLoading, setIsLoading] = useState<boolean>(false)
+  const isMount = useIsMount();
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
   useEffect(() => {
-    if (isMount) return
+    if (isMount) return;
     // if url changes then presume we are loading a new video
-    console.log(`loading ${url}`)
-    if (typeof url === 'string' && url.length > 0) setIsLoading(true)
-  }, [url, isMount])
+    console.log(`loading ${url}`);
+    if (typeof url === "string" && url.length > 0) setIsLoading(true);
+  }, [url, isMount]);
 
   const preHandleReady = (reactPlayer: InstanceType<typeof ReactPlayer>) => {
-    handleReady(reactPlayer)
-    setIsLoading(false)
-  }
+    handleReady(reactPlayer);
+    setIsLoading(false);
+  };
 
-  const isPlayerReady = !isLoading && !!playerRef.current
+  const isPlayerReady = !isLoading && !!playerRef.current;
 
   return (
-    <div className='relative flex w-full transition-all duration-500 ease-in-out'>
+    <div className="relative flex w-full transition-all duration-500 ease-in-out">
       <Underlay show={isPlayerReady} />
 
-      <div className='relative z-10 w-full my-auto'>
+      <div className="relative z-10 w-full my-auto">
         {/* // wrapper to position input */}
         <motion.div
-          key='videoContent'
-          initial='initial'
-          animate='animate'
-          exit='exit'
+          key="videoContent"
+          initial="initial"
+          animate="animate"
+          exit="exit"
           variants={videoContentVariants}
-          id='videoContent'
+          id="videoContent"
         >
           {/* resposive video wrapper */}
           <div className={`${style.playerWrapper} w-full h-full`}>
@@ -102,8 +102,8 @@ export const VideoPlayer = () => {
                   vimeo: {},
                 }}
                 className={`${style.reactPlayer} `}
-                width='100%'
-                height='100%'
+                width="100%"
+                height="100%"
               />
             )}
           </div>
@@ -115,16 +115,16 @@ export const VideoPlayer = () => {
       {/* input wrapper */}
       {!isLoading && url && (
         <motion.div
-          key='action-input'
+          key="action-input"
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -10 }}
         >
-          <div className='absolute bottom-0 z-10 w-2/3 h-12 mb-8 transform -translate-x-1/2 left-1/2'>
+          <div className="absolute bottom-0 z-10 w-2/3 h-12 mb-8 transform -translate-x-1/2 left-1/2">
             <ActionInput />
           </div>
         </motion.div>
       )}
     </div>
-  )
-}
+  );
+};

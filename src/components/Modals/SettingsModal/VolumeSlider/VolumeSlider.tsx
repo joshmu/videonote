@@ -10,27 +10,27 @@
  * @copyright © 2020 - 2020 MU
  */
 
-import { ChangeEvent } from 'react'
+import { ChangeEvent } from "react";
 
-import { useVideoContext } from '@/context/videoContext'
-import { ModalInput } from '@/shared/Modal/ModalInput'
+import { useVideoContext } from "@/context/videoContext";
+import { ModalInput } from "@/shared/Modal/ModalInput";
 
 export const VolumeSlider = () => {
-  const { volume, setVolume } = useVideoContext()
+  const { volume, setVolume } = useVideoContext();
 
   const handleChange = (event: ChangeEvent<HTMLInputElement>): void =>
-    setVolume(+event.target.value)
+    setVolume(+event.target.value);
 
   return (
     <ModalInput
       title={`Volume (${Math.floor(volume * 100)}%)`}
-      id='volume'
+      id="volume"
       value={volume}
       onChange={handleChange}
-      type='range'
-      min='0'
-      max='1'
-      step='0.01'
+      type="range"
+      min="0"
+      max="1"
+      step="0.01"
     />
-  )
-}
+  );
+};

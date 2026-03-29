@@ -10,11 +10,11 @@
  * @copyright © 2020 - 2020 MU
  */
 
-import { AnimatePresence, Variants, motion } from 'motion/react'
+import { AnimatePresence, Variants, motion } from "motion/react";
 
-import { useNoteContext } from '@/context/noteContext'
+import { useNoteContext } from "@/context/noteContext";
 
-import { NoteItem } from './NoteItem/NoteItem'
+import { NoteItem } from "./NoteItem/NoteItem";
 
 const parentVariants: Variants = {
   initial: { opacity: 0 },
@@ -26,7 +26,7 @@ const parentVariants: Variants = {
     },
   },
   exit: { opacity: 0 },
-}
+};
 
 const childVariants: Variants = {
   initial: { opacity: 0 },
@@ -38,22 +38,22 @@ const childVariants: Variants = {
     },
   },
   exit: { opacity: 0 },
-}
+};
 
 export const NoteList = () => {
-  const { notes, sort, checkProximity } = useNoteContext()
+  const { notes, sort, checkProximity } = useNoteContext();
 
   return (
-    <div className='w-full pb-8 bg-transparent'>
+    <div className="w-full pb-8 bg-transparent">
       <AnimatePresence mode="wait">
         <motion.ul
-          key='noteList'
-          initial='initial'
-          animate='animate'
-          exit='exit'
+          key="noteList"
+          initial="initial"
+          animate="animate"
+          exit="exit"
           variants={parentVariants}
         >
-          {sort(notes).map(note => (
+          {sort(notes).map((note) => (
             <NoteItem
               note={note}
               key={note._id}
@@ -64,5 +64,5 @@ export const NoteList = () => {
         </motion.ul>
       </AnimatePresence>
     </div>
-  )
-}
+  );
+};

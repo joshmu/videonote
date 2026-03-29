@@ -10,15 +10,15 @@
  * @copyright © 2020 - 2020 MU
  */
 
-import { AnimatePresence, Variants, motion } from 'motion/react'
+import { AnimatePresence, Variants, motion } from "motion/react";
 
-import styles from './LoaderStyle.module.scss'
+import styles from "./LoaderStyle.module.scss";
 
 const variants: Variants = {
   initial: { opacity: 0 },
   animate: { opacity: 75, transition: { duration: 0.8 } },
   exit: { opacity: 0 },
-}
+};
 
 // @see https://codepen.io/martinvd
 
@@ -27,12 +27,12 @@ export const Loader = ({ show }: { show: boolean }) => {
     <AnimatePresence>
       {show && (
         <motion.div
-          key='videoLoader'
-          initial='initial'
-          animate='animate'
-          exit='exit'
+          key="videoLoader"
+          initial="initial"
+          animate="animate"
+          exit="exit"
           variants={variants}
-          className='absolute inset-0 z-0 bg-black'
+          className="absolute inset-0 z-0 bg-black"
         >
           <div className={styles.loader}>
             <div className={`${styles.inner} ${styles.one}`}></div>
@@ -42,5 +42,5 @@ export const Loader = ({ show }: { show: boolean }) => {
         </motion.div>
       )}
     </AnimatePresence>
-  )
-}
+  );
+};

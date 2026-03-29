@@ -1,12 +1,12 @@
-import { useEffect } from 'react'
+import { useEffect } from "react";
 
 // Redirect any 404 to the landing page
 const Custom404 = () => {
   useEffect(() => {
-    window.location.href = '/'
-  }, [])
+    window.location.href = "/";
+  }, []);
 
-  return <></>
-}
+  return <></>;
+};
 
-export default Custom404
+export default Custom404;

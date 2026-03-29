@@ -10,10 +10,10 @@
  * @copyright © 2020 - 2020 MU
  */
 
-import { ReactNode } from 'react'
+import { ReactNode } from "react";
 
 export const ModalForm = ({ children }: { children: ReactNode }) => (
-  <form onSubmit={e => e.preventDefault()}>
-    <div className='grid grid-cols-1 gap-6 mt-2 sm:grid-cols-2'>{children}</div>
+  <form onSubmit={(e) => e.preventDefault()}>
+    <div className="grid grid-cols-1 gap-6 mt-2 sm:grid-cols-2">{children}</div>
   </form>
-)
+);

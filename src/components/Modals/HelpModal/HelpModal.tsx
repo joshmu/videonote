@@ -10,19 +10,19 @@
  * @copyright © 2020 - 2020 MU
  */
 
-import { useGlobalContext } from '@/context/globalContext'
-import { ModalContainer } from '@/shared/Modal/ModalContainer'
-import { ModalHeader } from '@/shared/Modal/ModalHeader'
-import { ModalInnerContainer } from '@/shared/Modal/ModalInnerContainer'
+import { useGlobalContext } from "@/context/globalContext";
+import { ModalContainer } from "@/shared/Modal/ModalContainer";
+import { ModalHeader } from "@/shared/Modal/ModalHeader";
+import { ModalInnerContainer } from "@/shared/Modal/ModalInnerContainer";
 
 export const HelpModal = ({
   toggle: toggleModal,
   motionKey,
 }: {
-  toggle: () => void
-  motionKey: string
+  toggle: () => void;
+  motionKey: string;
 }) => {
-  const { HINTS } = useGlobalContext()
+  const { HINTS } = useGlobalContext();
 
   return (
     <ModalContainer toggle={toggleModal} motionKey={motionKey}>
@@ -30,11 +30,11 @@ export const HelpModal = ({
 
       <ModalInnerContainer>
         {HINTS.map((hint, idx) => (
-          <p key={idx} className='mb-2'>
+          <p key={idx} className="mb-2">
             - {hint}
           </p>
         ))}
       </ModalInnerContainer>
     </ModalContainer>
-  )
-}
+  );
+};

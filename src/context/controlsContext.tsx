@@ -10,139 +10,127 @@
  * @copyright © 2020 - 2020 MU
  */
 
-import { createContext, useContext, useState } from 'react'
+import { createContext, useContext, useState } from "react";
 
-import { useGlobalKeydown } from '@/hooks/useGlobalKeydown'
+import { useGlobalKeydown } from "@/hooks/useGlobalKeydown";
 
-import { useGlobalContext } from './globalContext'
-import { useNoteContext } from './noteContext'
-import { useVideoContext } from './videoContext'
+import { useGlobalContext } from "./globalContext";
+import { useNoteContext } from "./noteContext";
+import { useVideoContext } from "./videoContext";
 
-type ControlsType = (key: string, keypressed: string[]) => void
-type ToggleSmartControlsType = (a?: boolean) => void
+type ControlsType = (key: string, keypressed: string[]) => void;
+type ToggleSmartControlsType = (a?: boolean) => void;
 interface ControlsContextInterface {
-  smartControls: ControlsType
-  isSmartControlsEnabled: boolean
-  toggleSmartControls: ToggleSmartControlsType
+  smartControls: ControlsType;
+  isSmartControlsEnabled: boolean;
+  toggleSmartControls: ToggleSmartControlsType;
 }
 export enum Keymap {
-  SPACE = ' ',
-  LEFT = 'ArrowLeft',
-  RIGHT = 'ArrowRight',
-  UP = 'ArrowUp',
-  DOWN = 'ArrowDown',
-  CMD = 'Meta',
-  SHIFT = 'Shift',
-  ALT = 'Alt',
-  ESC = 'Escape',
+  SPACE = " ",
+  LEFT = "ArrowLeft",
+  RIGHT = "ArrowRight",
+  UP = "ArrowUp",
+  DOWN = "ArrowDown",
+  CMD = "Meta",
+  SHIFT = "Shift",
+  ALT = "Alt",
+  ESC = "Escape",
 }
 
-const controlsContext = createContext<ControlsContextInterface>(null!)
+const controlsContext = createContext<ControlsContextInterface>(null!);
 
 export function ControlsProvider(props: { [key: string]: any }) {
-  const { toggleSidebar, toggleMenuOpen, cancelModals } = useGlobalContext()
-  const {
-    togglePlay,
-    jumpBack,
-    jumpForward,
-    changeVolume,
-    seekTo,
-  } = useVideoContext()
-  const { notes, currentNote } = useNoteContext()
+  const { toggleSidebar, toggleMenuOpen, cancelModals } = useGlobalContext();
+  const { togglePlay, jumpBack, jumpForward, changeVolume, seekTo } = useVideoContext();
+  const { notes, currentNote } = useNoteContext();
 
-  const [isSmartControlsEnabled, setIsSmartControlsEnabled] = useState<boolean>(
-    true
-  )
+  const [isSmartControlsEnabled, setIsSmartControlsEnabled] = useState<boolean>(true);
 
   const globalControls: ControlsType = (key, _keysPressed) => {
     switch (key) {
       case Keymap.ESC:
-        cancelModals()
-        break
+        cancelModals();
+        break;
       default:
     }
-  }
+  };
 
   const smartControls: ControlsType = (key, keysPressed) => {
-    if (!isSmartControlsEnabled) return
+    if (!isSmartControlsEnabled) return;
 
     switch (key) {
       case Keymap.SPACE:
-        keysPressed.includes(Keymap.SHIFT) ? toggleSidebar() : togglePlay()
-        break
+        keysPressed.includes(Keymap.SHIFT) ? toggleSidebar() : togglePlay();
+        break;
       case Keymap.LEFT:
-        keysPressed.includes(Keymap.SHIFT) ? nextPrevNote('prev') : jumpBack()
-        break
+        keysPressed.includes(Keymap.SHIFT) ? nextPrevNote("prev") : jumpBack();
+        break;
       case Keymap.RIGHT:
-        keysPressed.includes(Keymap.SHIFT)
-          ? nextPrevNote('next')
-          : jumpForward()
-        break
+        keysPressed.includes(Keymap.SHIFT) ? nextPrevNote("next") : jumpForward();
+        break;
       case Keymap.UP:
-        changeVolume(0.1)
-        break
+        changeVolume(0.1);
+        break;
       case Keymap.DOWN:
-        changeVolume(-0.1)
-        break
+        changeVolume(-0.1);
+        break;
       case Keymap.ALT:
-        toggleMenuOpen()
-        break
+        toggleMenuOpen();
+        break;
       case Keymap.ESC:
-        cancelModals()
-        break
+        cancelModals();
+        break;
       default:
       // console.log('unused key', { key })
     }
-  }
+  };
 
   // add listeners
-  useGlobalKeydown(globalControls)
-  useGlobalKeydown(smartControls)
+  useGlobalKeydown(globalControls);
+  useGlobalKeydown(smartControls);
 
-  const toggleSmartControls: ToggleSmartControlsType = isEnabled => {
+  const toggleSmartControls: ToggleSmartControlsType = (isEnabled) => {
     // don't do anything if already enabled
-    if (isEnabled === isSmartControlsEnabled) return
+    if (isEnabled === isSmartControlsEnabled) return;
 
-    setIsSmartControlsEnabled(current => {
+    setIsSmartControlsEnabled((current) => {
       // if isEnable undefined then toggle
-      const updatedState = isEnabled === undefined ? !current : isEnabled
+      const updatedState = isEnabled === undefined ? !current : isEnabled;
       // console.log('smart controls enabled:', updatedState)
-      return updatedState
-    })
-  }
+      return updatedState;
+    });
+  };
 
-  const nextPrevNote = (direction: 'next' | 'prev' = 'next'): void => {
+  const nextPrevNote = (direction: "next" | "prev" = "next"): void => {
     // sort via time
-    const sortedNotes = notes.sort((a, b) => a.time - b.time)
-    const currentIndex = sortedNotes.findIndex(
-      note => note._id === currentNote._id
-    )
+    const sortedNotes = notes.sort((a, b) => a.time - b.time);
+    const currentIndex = sortedNotes.findIndex((note) => note._id === currentNote._id);
     // based on direction grab next/prev note or stop at the limit
     const idx =
-      direction === 'next'
+      direction === "next"
         ? currentIndex === sortedNotes.length - 1
           ? currentIndex
           : currentIndex + 1
         : currentIndex === 0
-        ? currentIndex
-        : currentIndex - 1
+          ? currentIndex
+          : currentIndex - 1;
 
     // get the destination note via the index
-    const destinationNote = sortedNotes[idx]
+    const destinationNote = sortedNotes[idx];
 
     // go
-    seekTo(destinationNote.time, { offset: false })
-  }
+    seekTo(destinationNote.time, { offset: false });
+  };
 
   const value: ControlsContextInterface = {
     smartControls,
     isSmartControlsEnabled,
     toggleSmartControls,
-  }
+  };
 
-  return <controlsContext.Provider value={value} {...props} />
+  return <controlsContext.Provider value={value} {...props} />;
 }
 
 export const useControlsContext = (): ControlsContextInterface => {
-  return useContext(controlsContext)
-}
+  return useContext(controlsContext);
+};

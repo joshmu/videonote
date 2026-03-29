@@ -13,33 +13,33 @@
 // take only needed user fields to avoid sensitive ones (such as password)
 
 export const extractUser = <T extends { password: string; created: string }>(
-  user: T
+  user: T,
 ): { [key: string]: any } => {
-  if (!user) return null
-  const { password, created, ...data } = user
+  if (!user) return null;
+  const { password, created, ...data } = user;
   return {
     ...data,
-  }
-}
+  };
+};
 
 export const extractProject = <T extends { created: string; updated: string }>(
-  project: T
+  project: T,
 ): { [key: string]: any } => {
-  if (!project) return null
-  const { created, updated, ...data } = project
+  if (!project) return null;
+  const { created, updated, ...data } = project;
   return {
     ...data,
-  }
-}
+  };
+};
 
 export const extractPublicProject = <
-  T extends { created: string; updated: string; userIds: string[] }
+  T extends { created: string; updated: string; userIds: string[] },
 >(
-  project: T
+  project: T,
 ): { [key: string]: any } => {
-  if (!project) return null
-  const { created, updated, userIds, ...data } = project
+  if (!project) return null;
+  const { created, updated, userIds, ...data } = project;
   return {
     ...data,
-  }
-}
+  };
+};

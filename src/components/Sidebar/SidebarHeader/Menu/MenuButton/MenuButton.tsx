@@ -10,25 +10,25 @@
  * @copyright © 2020 - 2020 MU
  */
 
-import { MdSettings as MenuIcon } from 'react-icons/md'
-import { motion } from 'motion/react'
-import { useGlobalContext } from '@/root/src/context/globalContext'
+import { MdSettings as MenuIcon } from "react-icons/md";
+import { motion } from "motion/react";
+import { useGlobalContext } from "@/root/src/context/globalContext";
 
 export const MenuButton = ({ drawAttention }: { drawAttention: boolean }) => {
   // * 'projectsExists' used to animate menu button on initial welcome
 
-  const { toggleMenuOpen } = useGlobalContext()
+  const { toggleMenuOpen } = useGlobalContext();
 
   const handleMenuClick = (): void => {
-    toggleMenuOpen()
-  }
+    toggleMenuOpen();
+  };
 
   return (
     <motion.div
       whileHover={{ rotate: 90 }}
-      className={drawAttention ? '' : 'animate-pulse text-themeAccent'}
+      className={drawAttention ? "" : "animate-pulse text-themeAccent"}
     >
-      <MenuIcon onClick={handleMenuClick} className='text-2xl' />
+      <MenuIcon onClick={handleMenuClick} className="text-2xl" />
     </motion.div>
-  )
-}
+  );
+};

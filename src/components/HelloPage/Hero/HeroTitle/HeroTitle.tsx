@@ -1,15 +1,15 @@
-import { ReactNode } from 'react'
+import { ReactNode } from "react";
 
 export const HeroTitle = ({
   children,
-  className = '',
+  className = "",
   onClick = null,
   ...props
 }: {
-  children: ReactNode
-  className?: string
-  onClick?: () => void
-  props?: { [key: string]: any }
+  children: ReactNode;
+  className?: string;
+  onClick?: () => void;
+  props?: { [key: string]: any };
 }) => {
   return (
     <h1
@@ -19,5 +19,5 @@ export const HeroTitle = ({
     >
       {children}
     </h1>
-  )
-}
+  );
+};

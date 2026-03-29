@@ -10,15 +10,15 @@
  * @copyright © 2020 - 2020 MU
  */
 
-import { Variants, motion } from 'motion/react'
-import { ReactNode } from 'react'
+import { Variants, motion } from "motion/react";
+import { ReactNode } from "react";
 
 interface MotionFadeInOutProps {
-  motionKey: string
-  duration?: number
-  variants?: Variants
-  children?: ReactNode
-  props?: { [key: string]: any }
+  motionKey: string;
+  duration?: number;
+  variants?: Variants;
+  children?: ReactNode;
+  props?: { [key: string]: any };
 }
 
 export const MotionFadeInOut = ({
@@ -40,11 +40,11 @@ export const MotionFadeInOut = ({
   return (
     <motion.div
       key={motionKey}
-      initial='initial'
-      animate='animate'
-      exit='exit'
+      initial="initial"
+      animate="animate"
+      exit="exit"
       variants={variants}
       {...props}
     ></motion.div>
-  )
-}
+  );
+};

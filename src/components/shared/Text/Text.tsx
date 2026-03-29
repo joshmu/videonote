@@ -10,15 +10,15 @@
  * @copyright © 2020 - 2020 MU
  */
 
-import { ReactNode } from 'react'
+import { ReactNode } from "react";
 
 interface TextProps extends React.HTMLAttributes<HTMLElement> {
-  className?: string
-  children: ReactNode
-  props?: { [key: string]: any }
+  className?: string;
+  children: ReactNode;
+  props?: { [key: string]: any };
 }
 
-export const Heading = ({ className = '', children, ...props }: TextProps) => {
+export const Heading = ({ className = "", children, ...props }: TextProps) => {
   return (
     <h1
       className={`${className} mt-0 mb-2 text-6xl font-normal leading-normal tracking-tight font-serif`}
@@ -26,10 +26,10 @@ export const Heading = ({ className = '', children, ...props }: TextProps) => {
     >
       {children}
     </h1>
-  )
-}
+  );
+};
 
-export const Heading2 = ({ className = '', children, ...props }: TextProps) => {
+export const Heading2 = ({ className = "", children, ...props }: TextProps) => {
   return (
     <h2
       className={`text-3xl font-bold text-themeAccent mt-0 mb-2 font-serif tracking-tight ${className}`}
@@ -37,38 +37,28 @@ export const Heading2 = ({ className = '', children, ...props }: TextProps) => {
     >
       {children}
     </h2>
-  )
-}
+  );
+};
 
-export const SubHeading = ({
-  className = '',
-  children,
-  ...props
-}: TextProps) => {
+export const SubHeading = ({ className = "", children, ...props }: TextProps) => {
   return (
-    <h3
-      className={`${className} mt-1 text-xl font-normal text-themeText font-sans`}
-      {...props}
-    >
+    <h3 className={`${className} mt-1 text-xl font-normal text-themeText font-sans`} {...props}>
       {children}
     </h3>
-  )
-}
+  );
+};
 
-export const Text = ({ className = '', children, ...props }: TextProps) => {
+export const Text = ({ className = "", children, ...props }: TextProps) => {
   return (
-    <p
-      className={`${className} mt-0 mb-4 text-base leading-relaxed text-gray-800`}
-      {...props}
-    >
+    <p className={`${className} mt-0 mb-4 text-base leading-relaxed text-gray-800`} {...props}>
       {children}
     </p>
-  )
-}
+  );
+};
 
 // highlight/accent text
-export const Hl = ({ className = '', children, ...props }: TextProps) => (
+export const Hl = ({ className = "", children, ...props }: TextProps) => (
   <span className={`text-themeAccent ${className}`} {...props}>
     {children}
   </span>
-)
+);

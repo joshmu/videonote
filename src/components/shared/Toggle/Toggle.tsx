@@ -10,41 +10,32 @@
  * @copyright © 2020 - 2020 MU
  */
 
-import { MouseEventHandler } from 'react'
-import {
-  FiCheckCircle as CheckIcon,
-  FiCircle as CircleIcon,
-} from 'react-icons/fi'
+import { MouseEventHandler } from "react";
+import { FiCheckCircle as CheckIcon, FiCircle as CircleIcon } from "react-icons/fi";
 
-export const Toggle = ({
-  state,
-  onClick,
-}: {
-  state: boolean
-  onClick: MouseEventHandler
-}) => {
+export const Toggle = ({ state, onClick }: { state: boolean; onClick: MouseEventHandler }) => {
   return (
-    <div onClick={onClick} className='cursor-pointer'>
+    <div onClick={onClick} className="cursor-pointer">
       {state ? <CheckIcon /> : <CircleIcon />}
     </div>
-  )
-}
+  );
+};
 
 export const ToggleInput = ({
   title,
   state,
   onClick,
 }: {
-  title: string
-  state: boolean
-  onClick: MouseEventHandler
+  title: string;
+  state: boolean;
+  onClick: MouseEventHandler;
 }) => {
   return (
-    <div className='flex items-center gap-2'>
+    <div className="flex items-center gap-2">
       <Toggle state={state} onClick={onClick} />
-      <p onClick={onClick} className='cursor-pointer'>
+      <p onClick={onClick} className="cursor-pointer">
         {title}
       </p>
     </div>
-  )
-}
+  );
+};

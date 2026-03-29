@@ -10,49 +10,47 @@
  * @copyright © 2020 - 2020 MU
  */
 
-import { KeyboardEvent, useEffect, useState } from 'react'
+import { KeyboardEvent, useEffect, useState } from "react";
 
-import { Keymap } from '@/context/controlsContext'
+import { Keymap } from "@/context/controlsContext";
 
-type HandlerType = (eventKey: Keymap, keysPressed: Keymap[]) => void
+type HandlerType = (eventKey: Keymap, keysPressed: Keymap[]) => void;
 
 export const useGlobalKeydown = (handler: HandlerType): void => {
-  const [keysPressed, setKeysPressed] = useState<Keymap[]>([])
+  const [keysPressed, setKeysPressed] = useState<Keymap[]>([]);
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent): void => {
       // do nothing if it is not part of our desired keymap
-      if (!Object.values(Keymap).includes(event.key as Keymap)) return
+      if (!Object.values(Keymap).includes(event.key as Keymap)) return;
 
-      const key = event.key as Keymap
+      const key = event.key as Keymap;
 
-      const updatedKeysPressed = [...keysPressed, key]
-      setKeysPressed(updatedKeysPressed)
-      handler(key, keysPressed)
-    }
+      const updatedKeysPressed = [...keysPressed, key];
+      setKeysPressed(updatedKeysPressed);
+      handler(key, keysPressed);
+    };
 
     const handleKeyup = (event: KeyboardEvent): void => {
       // do nothing if it is not part of our desired keymap
-      if (!Object.values(Keymap).includes(event.key as Keymap)) return
+      if (!Object.values(Keymap).includes(event.key as Keymap)) return;
 
-      const key = event.key as Keymap
+      const key = event.key as Keymap;
 
       if (keysPressed.includes(key))
-        setKeysPressed(current =>
-          current.filter(pressedKey => key !== pressedKey)
-        )
-    }
+        setKeysPressed((current) => current.filter((pressedKey) => key !== pressedKey));
+    };
 
     // @ts-ignore
-    window.addEventListener('keydown', handleKeyDown)
+    window.addEventListener("keydown", handleKeyDown);
     // @ts-ignore
-    window.addEventListener('keyup', handleKeyup)
+    window.addEventListener("keyup", handleKeyup);
 
     return () => {
       // @ts-ignore
-      window.removeEventListener('keydown', handleKeyDown)
+      window.removeEventListener("keydown", handleKeyDown);
       // @ts-ignore
-      window.removeEventListener('keyup', handleKeyup)
-    }
-  }, [handler, keysPressed])
-}
+      window.removeEventListener("keyup", handleKeyup);
+    };
+  }, [handler, keysPressed]);
+};

@@ -10,8 +10,8 @@
  * @copyright © 2020 - 2020 MU
  */
 
-import { Variants, motion, useAnimation, useScroll } from 'motion/react'
-import React, { useEffect, useState } from 'react'
+import { Variants, motion, useAnimation, useScroll } from "motion/react";
+import React, { useEffect, useState } from "react";
 
 const animationVariants: Variants = {
   hide: {
@@ -19,66 +19,58 @@ const animationVariants: Variants = {
     opacity: 0,
   },
   show: {
-    width: 'auto',
+    width: "auto",
     opacity: 1,
     transition: {
       duration: 1,
       ease: [0.6, 0.05, -0.01, 0.9],
     },
   },
-}
+};
 
 export const Compressor = ({
   text,
   hide,
   ...props
 }: {
-  text: string
-  hide: string
-  props: { [key: string]: any }
+  text: string;
+  hide: string;
+  props: { [key: string]: any };
 }) => {
-  const [output, setOutput] = useState<[string, string, string]>(['', '', ''])
-  const [toggle, setToggle] = useState<boolean>(false)
+  const [output, setOutput] = useState<[string, string, string]>(["", "", ""]);
+  const [toggle, setToggle] = useState<boolean>(false);
 
-  const { scrollYProgress } = useScroll()
-  const controls = useAnimation()
+  const { scrollYProgress } = useScroll();
+  const controls = useAnimation();
 
   useEffect(() => {
     // split text in to 3 parts
-    const textArray: [string, string, string] = Array(3) as [
-      string,
-      string,
-      string
-    ]
-    textArray[0] = text.slice(0, text.indexOf(hide))
-    textArray[1] = hide
-    textArray[2] = text.slice(text.indexOf(hide) + hide.length)
-    setOutput(textArray)
-  }, [])
+    const textArray: [string, string, string] = Array(3) as [string, string, string];
+    textArray[0] = text.slice(0, text.indexOf(hide));
+    textArray[1] = hide;
+    textArray[2] = text.slice(text.indexOf(hide) + hide.length);
+    setOutput(textArray);
+  }, []);
 
   useEffect(() => {
-    controls.start(toggle ? 'hide' : 'show')
-  }, [toggle])
+    controls.start(toggle ? "hide" : "show");
+  }, [toggle]);
 
   useEffect(() => {
     if (scrollYProgress.get() > 0) {
-      setToggle(true)
+      setToggle(true);
     } else if (toggle && scrollYProgress.get() === 0) {
-      setToggle(false)
+      setToggle(false);
     }
-  }, [scrollYProgress])
+  }, [scrollYProgress]);
 
   return (
-    <p className='flex items-center justify-center whitespace-pre' {...props}>
+    <p className="flex items-center justify-center whitespace-pre" {...props}>
       <span>{output[0]}</span>
-      <motion.span
-        variants={animationVariants}
-        animate={controls}
-        className='overflow-hidden'
-      >
+      <motion.span variants={animationVariants} animate={controls} className="overflow-hidden">
         <span>{output[1]}</span>
       </motion.span>
       <span>{output[2]}</span>
     </p>
-  )
-}
+  );
+};

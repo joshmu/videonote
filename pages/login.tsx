@@ -10,44 +10,44 @@
  * @copyright © 2020 - 2020 MU
  */
 
-import { NextPage } from 'next'
-import Router from 'next/router'
-import { useState } from 'react'
+import { NextPage } from "next";
+import Router from "next/router";
+import { useState } from "react";
 
-import { Layout } from '@/components/Layout/Layout'
-import { LoginModal } from '@/components/LoginPage/LoginModal/LoginModal'
-import { RegisterModal } from '@/components/LoginPage/RegisterModal/RegisterModal'
-import { Notification } from '@/components/Notification/Notification'
-import { ThemeToggle } from '@/components/shared/ThemeToggle/ThemeToggle'
-import useTwConfig from '@/hooks/useTwConfig'
+import { Layout } from "@/components/Layout/Layout";
+import { LoginModal } from "@/components/LoginPage/LoginModal/LoginModal";
+import { RegisterModal } from "@/components/LoginPage/RegisterModal/RegisterModal";
+import { Notification } from "@/components/Notification/Notification";
+import { ThemeToggle } from "@/components/shared/ThemeToggle/ThemeToggle";
+import useTwConfig from "@/hooks/useTwConfig";
 
-import { handleJwtToken } from '../utils/clientHelpers'
+import { handleJwtToken } from "../utils/clientHelpers";
 
 const Login: NextPage = () => {
-  const [loginView, setLoginView] = useState<boolean>(true)
-  const [email, setEmail] = useState<string>('')
+  const [loginView, setLoginView] = useState<boolean>(true);
+  const [email, setEmail] = useState<string>("");
 
-  const twConfig = useTwConfig()
+  const twConfig = useTwConfig();
 
   const toggleLoginView = (state: boolean = undefined): void => {
-    const isLoginViewShowing = state === undefined ? !loginView : state
-    setLoginView(isLoginViewShowing)
-  }
+    const isLoginViewShowing = state === undefined ? !loginView : state;
+    setLoginView(isLoginViewShowing);
+  };
 
   const handleLogin = (data: { token: string }): void => {
-    handleJwtToken(data.token)
-    Router.push('/')
-  }
+    handleJwtToken(data.token);
+    Router.push("/");
+  };
 
-  const handleEmail = (email: string): void => setEmail(email)
+  const handleEmail = (email: string): void => setEmail(email);
 
   return (
     <Layout>
-      <div className='absolute top-0 right-0 z-50 p-4 text-2xl text-themeAccent'>
+      <div className="absolute top-0 right-0 z-50 p-4 text-2xl text-themeAccent">
         <ThemeToggle />
       </div>
       <div
-        className='flex items-center justify-center h-screen bg-opacity-25'
+        className="flex items-center justify-center h-screen bg-opacity-25"
         style={{
           backgroundImage: `radial-gradient(circle farthest-corner at center, ${twConfig.theme.colors.themeSelectOpacity} 0%, ${twConfig.theme.colors.themeBg} 100%)`,
         }}
@@ -69,7 +69,7 @@ const Login: NextPage = () => {
 
       <Notification />
     </Layout>
-  )
-}
+  );
+};
 
-export default Login
+export default Login;

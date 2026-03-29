@@ -10,182 +10,175 @@
  * @copyright © 2020 - 2020 MU
  */
 
-import { type RefObject, createContext, useContext, useEffect, useRef, useState } from 'react'
-import type ReactPlayer from 'react-player'
+import { type RefObject, createContext, useContext, useEffect, useRef, useState } from "react";
+import type ReactPlayer from "react-player";
 
-import { ProgressInterface } from '@/components/shared/types'
-import { useAnounceAction } from '@/hooks/useAnounceAction'
+import { ProgressInterface } from "@/components/shared/types";
+import { useAnounceAction } from "@/hooks/useAnounceAction";
 
-import { useGlobalContext } from './globalContext'
-import { useNotificationContext } from './notificationContext'
+import { useGlobalContext } from "./globalContext";
+import { useNotificationContext } from "./notificationContext";
 
 export enum PlayerAction {
-  PLAY = 'play',
-  PAUSE = 'pause',
-  VOLUME_UP = 'volumeUp',
-  VOLUME_DOWN = 'volumeDown',
-  SEEK_FORWARD = 'seekForward',
-  SEEK_BACK = 'seekBack',
+  PLAY = "play",
+  PAUSE = "pause",
+  VOLUME_UP = "volumeUp",
+  VOLUME_DOWN = "volumeDown",
+  SEEK_FORWARD = "seekForward",
+  SEEK_BACK = "seekBack",
 }
-type SeekToType = (secs: number, settings?: { offset?: boolean }) => void
+type SeekToType = (secs: number, settings?: { offset?: boolean }) => void;
 interface VideoContextInterface {
-  playing: boolean
-  volume: number
-  setVolume: (vol: number) => void
-  playbackRate: number
-  setPlaybackRate: (rate: number) => void
-  duration: number | null
-  handleDuration: (duration: number) => void
-  progress: ProgressInterface
-  handleReady: (reactPlayer: ReactPlayer) => void
-  url: string
-  togglePlay: () => void
-  changeVolume: (increment: number) => void
-  handleProgress: (progress: ProgressInterface) => void
-  seekTo: SeekToType
-  playerRef: RefObject<ReactPlayer>
-  handlePlayerError: (error: any) => void
-  jumpBack: () => void
-  jumpForward: () => void
-  action: string
+  playing: boolean;
+  volume: number;
+  setVolume: (vol: number) => void;
+  playbackRate: number;
+  setPlaybackRate: (rate: number) => void;
+  duration: number | null;
+  handleDuration: (duration: number) => void;
+  progress: ProgressInterface;
+  handleReady: (reactPlayer: ReactPlayer) => void;
+  url: string;
+  togglePlay: () => void;
+  changeVolume: (increment: number) => void;
+  handleProgress: (progress: ProgressInterface) => void;
+  seekTo: SeekToType;
+  playerRef: RefObject<ReactPlayer>;
+  handlePlayerError: (error: any) => void;
+  jumpBack: () => void;
+  jumpForward: () => void;
+  action: string;
 }
 
-const videoContext = createContext<VideoContextInterface>(null!)
+const videoContext = createContext<VideoContextInterface>(null!);
 
 export const VideoProvider = (props: { [key: string]: any }) => {
-  const {
-    project,
-    updateProject,
-    settings,
-    warnLocalVideo,
-  } = useGlobalContext()
-  const { addAlert } = useNotificationContext()
-  const playerRef = useRef<ReactPlayer>(null!)
-  const [url, setUrl] = useState<string>(null!)
-  const [playing, setPlaying] = useState<boolean>(false)
-  const [volume, setVolume] = useState<number>(0.75)
-  const [playbackRate, setPlaybackRate] = useState<number>(1)
-  const [duration, setDuration] = useState<number>(null!)
+  const { project, updateProject, settings, warnLocalVideo } = useGlobalContext();
+  const { addAlert } = useNotificationContext();
+  const playerRef = useRef<ReactPlayer>(null!);
+  const [url, setUrl] = useState<string>(null!);
+  const [playing, setPlaying] = useState<boolean>(false);
+  const [volume, setVolume] = useState<number>(0.75);
+  const [playbackRate, setPlaybackRate] = useState<number>(1);
+  const [duration, setDuration] = useState<number>(null!);
   // todo: this type cast is incorrect and null conditionals need to be checked in useNoteProximity
-  const [progress, setProgress] = useState<ProgressInterface>(
-    {} as ProgressInterface
-  )
+  const [progress, setProgress] = useState<ProgressInterface>({} as ProgressInterface);
 
-  const [action, setAction] = useAnounceAction('')
+  const [action, setAction] = useAnounceAction("");
 
   useEffect(() => {
     if (project !== null && project.src !== null) {
       if (project.src !== url) {
-        console.log('project changed, setting url')
-        setUrl(project.src)
+        console.log("project changed, setting url");
+        setUrl(project.src);
       }
     } else {
-      setUrl(null)
+      setUrl(null);
     }
-  }, [project])
+  }, [project]);
 
   const handleReady = (reactPlayer: ReactPlayer): void => {
     // assign react player
-    playerRef.current = reactPlayer
-  }
+    playerRef.current = reactPlayer;
+  };
 
   const togglePlay = (): void => {
-    setPlaying(playing => {
-      const updatedPlayState = !playing
+    setPlaying((playing) => {
+      const updatedPlayState = !playing;
       // console.log({ playing, newState })
-      setAction(updatedPlayState ? PlayerAction.PLAY : PlayerAction.PAUSE)
-      return updatedPlayState
-    })
-  }
+      setAction(updatedPlayState ? PlayerAction.PLAY : PlayerAction.PAUSE);
+      return updatedPlayState;
+    });
+  };
 
   const changeVolume = (increment: number): void => {
     // validate
-    if (Number.isNaN(Number(increment))) return
+    if (Number.isNaN(Number(increment))) return;
 
     // increment
-    let newVolume = volume + Number(increment)
+    let newVolume = volume + Number(increment);
     // limit between 0 - 1
-    newVolume = newVolume < 0 ? 0 : newVolume > 1 ? 1 : newVolume
-    setVolume(newVolume)
+    newVolume = newVolume < 0 ? 0 : newVolume > 1 ? 1 : newVolume;
+    setVolume(newVolume);
 
-    setAction(increment > 0 ? PlayerAction.VOLUME_UP : PlayerAction.VOLUME_DOWN)
-  }
+    setAction(increment > 0 ? PlayerAction.VOLUME_UP : PlayerAction.VOLUME_DOWN);
+  };
 
   const handleProgress = (progressObj: ProgressInterface): void => {
     // * config progress interval via -> progressInterval prop
     // {playedSeconds: 8.362433858856201, played: 0.03743574367943649, loadedSeconds: 38.721, loaded: 0.17334061536119902}
-    setProgress(progressObj)
-  }
+    setProgress(progressObj);
+  };
 
   const seekTo: SeekToType = (secs, { offset = true } = {}): void => {
     // validate
-    if (Number.isNaN(Number(secs)) || playerRef === null) return
+    if (Number.isNaN(Number(secs)) || playerRef === null) return;
 
     // settings offset
-    const playPosition = secs + (offset ? settings.playOffset : 0)
+    const playPosition = secs + (offset ? settings.playOffset : 0);
 
-    playerRef.current.seekTo(playPosition, 'seconds')
+    playerRef.current.seekTo(playPosition, "seconds");
 
     // if a video has not loaded then also initiate and play
     if (!progress.loaded) {
-      console.log('video not loaded, initiating...')
-      togglePlay()
+      console.log("video not loaded, initiating...");
+      togglePlay();
     }
-  }
+  };
 
   const jumpBack = (): void => {
-    const destination = progress.playedSeconds - settings.seekJump
-    seekTo(destination > 0 ? destination : 0)
+    const destination = progress.playedSeconds - settings.seekJump;
+    seekTo(destination > 0 ? destination : 0);
 
-    setAction(PlayerAction.SEEK_BACK)
-  }
+    setAction(PlayerAction.SEEK_BACK);
+  };
 
   const jumpForward = (): void => {
-    const destination = progress.playedSeconds + settings.seekJump
-    seekTo(destination)
+    const destination = progress.playedSeconds + settings.seekJump;
+    seekTo(destination);
 
-    setAction(PlayerAction.SEEK_FORWARD)
-  }
+    setAction(PlayerAction.SEEK_FORWARD);
+  };
 
   const handlePlayerError = (error: any): void => {
-    console.log('vn player error', error)
+    console.log("vn player error", error);
 
-    if (error.target && error.target.error.message.includes('Format error')) {
-      updateProject({ src: '' })
+    if (error.target && error.target.error.message.includes("Format error")) {
+      updateProject({ src: "" });
 
-      warnLocalVideo(project)
+      warnLocalVideo(project);
       // requestLocalVideo()
 
-      return
+      return;
     }
 
-    addAlert({ type: 'error', msg: 'Player unable to load video.' })
-  }
+    addAlert({ type: "error", msg: "Player unable to load video." });
+  };
 
   // todo: remove automatic pop up and replace with a button alternative ( or better > auto pop up current project settings modal)
   const requestLocalVideo = (): void => {
-    console.log('reqesting local video')
-    var input = document.createElement('input')
-    input.type = 'file'
+    console.log("reqesting local video");
+    var input = document.createElement("input");
+    input.type = "file";
 
     input.onchange = (event: Event) => {
-      const file = (event.target as HTMLInputElement).files[0]
-      const url = URL.createObjectURL(file)
-      console.log(url)
-      if (typeof url !== 'string' || url.length === 0) return
+      const file = (event.target as HTMLInputElement).files[0];
+      const url = URL.createObjectURL(file);
+      console.log(url);
+      if (typeof url !== "string" || url.length === 0) return;
 
       // if we have a src url we will update the project information and reset the React Player URL
-      const updatedProject = { ...project, src: url }
-      updateProject(updatedProject)
-      setUrl(url)
-    }
+      const updatedProject = { ...project, src: url };
+      updateProject(updatedProject);
+      setUrl(url);
+    };
 
-    input.click()
-  }
+    input.click();
+  };
 
   const handleDuration = (secs: number): void => {
-    setDuration(secs)
-  }
+    setDuration(secs);
+  };
 
   const value = {
     handleReady,
@@ -207,11 +200,11 @@ export const VideoProvider = (props: { [key: string]: any }) => {
     jumpForward,
     jumpBack,
     action,
-  }
+  };
 
-  return <videoContext.Provider value={value} {...props} />
-}
+  return <videoContext.Provider value={value} {...props} />;
+};
 
 export const useVideoContext = (): VideoContextInterface => {
-  return useContext(videoContext)
-}
+  return useContext(videoContext);
+};

@@ -10,21 +10,21 @@
  * @copyright © 2020 - 2020 MU
  */
 
-import { motion } from 'motion/react'
-import { IoMdClose as CloseIcon } from 'react-icons/io'
+import { motion } from "motion/react";
+import { IoMdClose as CloseIcon } from "react-icons/io";
 
 export const CancelBtn = ({ cancel }: { cancel: () => void }) => {
-  const handleClick = (): void => cancel()
+  const handleClick = (): void => cancel();
 
   return (
     <motion.div
       onClick={handleClick}
-      className='absolute top-0 right-0 p-2 text-xl transition-colors duration-300 ease-in-out cursor-pointer hover:text-themeAccent text-themeText2'
+      className="absolute top-0 right-0 p-2 text-xl transition-colors duration-300 ease-in-out cursor-pointer hover:text-themeAccent text-themeText2"
       whileHover={{
         rotate: 90,
       }}
     >
       <CloseIcon />
     </motion.div>
-  )
-}
+  );
+};

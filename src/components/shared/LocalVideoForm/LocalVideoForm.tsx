@@ -10,10 +10,10 @@
  * @copyright © 2020 - 2020 MU
  */
 
-import { AnimatePresence, Variants, motion } from 'motion/react'
-import { useState } from 'react'
+import { AnimatePresence, Variants, motion } from "motion/react";
+import { useState } from "react";
 
-import { LocalVideoLoader } from './LocalVideoLoader'
+import { LocalVideoLoader } from "./LocalVideoLoader";
 
 const variants: Variants = {
   initial: {
@@ -28,37 +28,36 @@ const variants: Variants = {
   exit: {
     opacity: 0,
   },
-}
+};
 
 export const LocalVideoForm = ({ handleVideoSrc }) => {
-  const [hover, setHover] = useState<boolean>(false)
+  const [hover, setHover] = useState<boolean>(false);
 
   return (
     <>
       <div
         onMouseEnter={() => setHover(true)}
         onMouseLeave={() => setHover(false)}
-        className='h-10 mx-auto'
+        className="h-10 mx-auto"
       >
         <LocalVideoLoader handleVideoSrc={handleVideoSrc} />
       </div>
-      <div className='relative'>
+      <div className="relative">
         <AnimatePresence>
           {hover && (
             <motion.span
-              initial='initial'
-              animate='animate'
-              exit='exit'
+              initial="initial"
+              animate="animate"
+              exit="exit"
               variants={variants}
-              className='absolute text-xs'
+              className="absolute text-xs"
             >
-              Local videos cannot be shared with other users and need to be
-              re-located per session. For the best experience use web accessible
-              videos.
+              Local videos cannot be shared with other users and need to be re-located per session.
+              For the best experience use web accessible videos.
             </motion.span>
           )}
         </AnimatePresence>
       </div>
     </>
-  )
-}
+  );
+};

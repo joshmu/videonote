@@ -15,14 +15,14 @@
 @tailwind utilities;
 
 // playfair display
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,500;1,600;1,700;1,800&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,500;1,600;1,700;1,800&display=swap");
 
 .theme-light {
   --text: #202020;
-  --text2: theme('colors.gray.400');
+  --text2: theme("colors.gray.400");
 
-  --bg: theme('colors.gray.50');
-  --bg2: theme('colors.gray.400');
+  --bg: theme("colors.gray.50");
+  --bg2: theme("colors.gray.400");
   --bgNum: 255, 255, 255;
 
   // https://www.colorhexa.com/4056a1
@@ -41,10 +41,10 @@
 }
 
 .theme-dark {
-  --text: theme('colors.white');
-  --text2: theme('colors.gray.600');
+  --text: theme("colors.white");
+  --text2: theme("colors.gray.600");
   --bg: #202020;
-  --bg2: theme('colors.gray.400');
+  --bg2: theme("colors.gray.400");
   --bgNum: 32, 32, 32;
 
   --accent: #ffa170;
@@ -62,7 +62,7 @@
 }
 
 .theme-superhero {
-  --text: theme('colors.gray.100');
+  --text: theme("colors.gray.100");
   --text2: #5a5560;
   --bg: #46344e;
   --bg2: #9d8d8f;
@@ -104,8 +104,8 @@
 }
 
 body {
-  background-color: theme('colors.themeBg');
-  color: theme('colors.themeText');
+  background-color: theme("colors.themeBg");
+  color: theme("colors.themeText");
   -webkit-font-smoothing: antialiased;
   -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
 
@@ -118,18 +118,18 @@ body {
 .text-select {
   ::-moz-selection {
     /* Code for Firefox */
-    color: theme('colors.themeAccent');
-    background: theme('colors.themeBg2');
+    color: theme("colors.themeAccent");
+    background: theme("colors.themeBg2");
   }
   ::selection {
-    color: theme('colors.themeAccent');
-    background: theme('colors.themeBg2');
+    color: theme("colors.themeAccent");
+    background: theme("colors.themeBg2");
   }
 }
 // text caret color
 .text-caret {
   input {
-    caret-color: theme('colors.themeAccent');
+    caret-color: theme("colors.themeAccent");
   }
 }
 
@@ -198,45 +198,61 @@ body {
 .neu-dark {
   border-radius: 0.75rem;
   background: linear-gradient(225deg, #1d1d1d, #222222);
-  box-shadow: -20px 20px 60px #1b1b1b, 20px -20px 60px #252525;
+  box-shadow:
+    -20px 20px 60px #1b1b1b,
+    20px -20px 60px #252525;
 }
 // https://neumorphism.io/#ffa170
 .neu-dark-accent {
   border-radius: 0.75rem;
   background: linear-gradient(225deg, #e69165, #ffac78);
-  box-shadow: -20px 20px 60px #d9895f, 20px -20px 60px #ffb981;
+  box-shadow:
+    -20px 20px 60px #d9895f,
+    20px -20px 60px #ffb981;
 }
 
 // https://neumorphism.io/#FFFFFF
 .neu-light {
   border-radius: 0.75rem;
   background: linear-gradient(225deg, #e6e6e6, #ffffff);
-  box-shadow: -20px 20px 60px #d9d9d9, 20px -20px 60px #ffffff;
+  box-shadow:
+    -20px 20px 60px #d9d9d9,
+    20px -20px 60px #ffffff;
 }
 .neu-light-accent {
   border-radius: 0.75rem;
   background: linear-gradient(145deg, #3a4d91, #445cac);
-  box-shadow: 20px 20px 60px #364989, -20px -20px 60px #4a63b9;
+  box-shadow:
+    20px 20px 60px #364989,
+    -20px -20px 60px #4a63b9;
 }
 
 .neu-superhero {
   border-radius: 0.75rem;
   background: linear-gradient(145deg, #3f2f46, #4b3853);
-  box-shadow: 20px 20px 60px #3c2c42, -20px -20px 60px #513c5a;
+  box-shadow:
+    20px 20px 60px #3c2c42,
+    -20px -20px 60px #513c5a;
 }
 .neu-superhero-accent {
   border-radius: 0.75rem;
   background: linear-gradient(145deg, #e1d522, #fffe29);
-  box-shadow: 20px 20px 60px #d5c920, -20px -20px 60px #ffff2c;
+  box-shadow:
+    20px 20px 60px #d5c920,
+    -20px -20px 60px #ffff2c;
 }
 
 .neu-hot {
   border-radius: 0.75rem;
   background: linear-gradient(145deg, #2c3d4d, #34495b);
-  box-shadow: 20px 20px 60px #2a3a48, -20px -20px 60px #384e62;
+  box-shadow:
+    20px 20px 60px #2a3a48,
+    -20px -20px 60px #384e62;
 }
 .neu-hot-accent {
   border-radius: 0.75rem;
   background: linear-gradient(145deg, #b55b5d, #d76c6e);
-  box-shadow: 20px 20px 60px #ab5658, -20px -20px 60px #e77476;
+  box-shadow:
+    20px 20px 60px #ab5658,
+    -20px -20px 60px #e77476;
 }

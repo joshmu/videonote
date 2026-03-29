@@ -10,10 +10,8 @@
  * @copyright © 2020 - 2020 MU
  */
 
-import { ReactNode } from 'react'
+import { ReactNode } from "react";
 
 export const ModalInnerContainer = ({ children }: { children: ReactNode }) => {
-  return (
-    <div className='overflow-y-scroll max-h-80vh scrollbar'>{children}</div>
-  )
-}
+  return <div className="overflow-y-scroll max-h-80vh scrollbar">{children}</div>;
+};

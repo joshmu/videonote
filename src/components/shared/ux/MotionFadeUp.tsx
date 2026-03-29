@@ -10,17 +10,17 @@
  * @copyright © 2020 - 2020 MU
  */
 
-import { motion } from 'motion/react'
-import { ReactNode } from 'react'
+import { motion } from "motion/react";
+import { ReactNode } from "react";
 
 interface MotionFadeUpProps {
-  k: string
-  initial?: object
-  animate?: object
-  exit?: object
-  className: string
-  children: ReactNode
-  props?: { [key: string]: any }
+  k: string;
+  initial?: object;
+  animate?: object;
+  exit?: object;
+  className: string;
+  children: ReactNode;
+  props?: { [key: string]: any };
 }
 
 export const MotionFadeUp = ({
@@ -45,15 +45,15 @@ export const MotionFadeUp = ({
       opacity: 0,
       ...exit,
     },
-  }
+  };
   return (
     <motion.div
       key={k}
-      initial='initial'
-      animate='animate'
-      exit='exit'
+      initial="initial"
+      animate="animate"
+      exit="exit"
       variants={variants}
       {...props}
     ></motion.div>
-  )
-}
+  );
+};

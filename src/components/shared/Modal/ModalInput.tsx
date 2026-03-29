@@ -10,26 +10,25 @@
  * @copyright © 2020 - 2020 MU
  */
 
-interface ModalInputInterface
-  extends React.HTMLAttributes<HTMLDivElement | HTMLInputElement> {
-  title?: string
-  id?: string
-  type?: string
-  value: string | number
-  placeholder?: string
-  autoFocus?: boolean
-  min?: string | number
-  max?: string | number
-  step?: string | number
-  props?: { [key: string]: any }
+interface ModalInputInterface extends React.HTMLAttributes<HTMLDivElement | HTMLInputElement> {
+  title?: string;
+  id?: string;
+  type?: string;
+  value: string | number;
+  placeholder?: string;
+  autoFocus?: boolean;
+  min?: string | number;
+  max?: string | number;
+  step?: string | number;
+  props?: { [key: string]: any };
 }
 
 export const ModalInput = ({
-  title = '',
-  id = '',
-  type = 'text',
+  title = "",
+  id = "",
+  type = "text",
   value,
-  placeholder = '',
+  placeholder = "",
   autoFocus = false,
   min = undefined,
   max = undefined,
@@ -38,7 +37,7 @@ export const ModalInput = ({
 }: ModalInputInterface) => {
   return (
     <div>
-      <label className='text-themeText' htmlFor={id}>
+      <label className="text-themeText" htmlFor={id}>
         {title}
       </label>
       <input
@@ -48,10 +47,10 @@ export const ModalInput = ({
         autoFocus={autoFocus}
         placeholder={placeholder}
         className={`block w-full ${
-          type === 'range' ? 'px-0' : 'px-4'
+          type === "range" ? "px-0" : "px-4"
         } py-2 mt-2 border rounded-sm border-themeText2 text-themeText bg-themeBg focus:border-themeText focus:outline-none`}
         {...props}
       />
     </div>
-  )
-}
+  );
+};

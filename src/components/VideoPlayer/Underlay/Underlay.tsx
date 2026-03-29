@@ -10,27 +10,27 @@
  * @copyright © 2020 - 2020 MU
  */
 
-import { AnimatePresence, Variants, motion } from 'motion/react'
+import { AnimatePresence, Variants, motion } from "motion/react";
 
 const variants: Variants = {
   initial: { opacity: 0 },
   animate: { opacity: 75, transition: { duration: 0.8 } },
   exit: { opacity: 0 },
-}
+};
 
 export const Underlay = ({ show }: { show: boolean }) => {
   return (
     <AnimatePresence>
       {show && (
         <motion.div
-          key='videoUnderaly'
-          initial='initial'
-          animate='animate'
-          exit='exit'
+          key="videoUnderaly"
+          initial="initial"
+          animate="animate"
+          exit="exit"
           variants={variants}
-          className='absolute inset-0 z-0 bg-black'
+          className="absolute inset-0 z-0 bg-black"
         ></motion.div>
       )}
     </AnimatePresence>
-  )
-}
+  );
+};

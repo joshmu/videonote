@@ -10,45 +10,45 @@
  * @copyright © 2020 - 2020 MU
  */
 
-import { AnimatePresence, motion } from 'motion/react'
-import React, { useState } from 'react'
-import { ImBin2 as TrashIcon } from 'react-icons/im'
+import { AnimatePresence, motion } from "motion/react";
+import React, { useState } from "react";
+import { ImBin2 as TrashIcon } from "react-icons/im";
 
-import { useGlobalContext } from '@/context/globalContext'
-import { useNoteContext } from '@/context/noteContext'
+import { useGlobalContext } from "@/context/globalContext";
+import { useNoteContext } from "@/context/noteContext";
 
-import { NoteInterface } from '../../../shared/types'
+import { NoteInterface } from "../../../shared/types";
 
 export const RemoveNotes = () => {
-  const { createPrompt, project } = useGlobalContext()
-  const { removeCompleted, notes } = useNoteContext()
-  const [showLabel, setShowLabel] = useState<boolean>(false)
+  const { createPrompt, project } = useGlobalContext();
+  const { removeCompleted, notes } = useNoteContext();
+  const [showLabel, setShowLabel] = useState<boolean>(false);
 
   const handleRemoveCompleted = () => {
-    const noteCompletedCount = notes.filter(note => note.done).length
+    const noteCompletedCount = notes.filter((note) => note.done).length;
     createPrompt({
       msg: (
         <span>
-          Are you sure you want to remove your{' '}
-          <span className='text-themeAccent'>{noteCompletedCount}</span>{' '}
-          completed note{noteCompletedCount > 1 && 's'} for project:{' '}
-          <span className='text-themeAccent'>{project.title}</span>?
+          Are you sure you want to remove your{" "}
+          <span className="text-themeAccent">{noteCompletedCount}</span> completed note
+          {noteCompletedCount > 1 && "s"} for project:{" "}
+          <span className="text-themeAccent">{project.title}</span>?
         </span>
       ),
       action: () => {
-        removeCompleted()
+        removeCompleted();
       },
-    })
-  }
+    });
+  };
 
   const handleEnter = (): void => {
-    setShowLabel(true)
-  }
+    setShowLabel(true);
+  };
   const handleExit = (): void => {
-    setShowLabel(false)
-  }
+    setShowLabel(false);
+  };
 
-  const completedNotesExist: boolean = completedNotes(notes).length > 0
+  const completedNotesExist: boolean = completedNotes(notes).length > 0;
 
   return (
     <AnimatePresence>
@@ -57,35 +57,35 @@ export const RemoveNotes = () => {
           onClick={handleRemoveCompleted}
           onMouseEnter={handleEnter}
           onMouseLeave={handleExit}
-          className='duration-200 ease-in-out cursor-pointer text-themeText2 hover:text-themeAccent transtion-colors'
+          className="duration-200 ease-in-out cursor-pointer text-themeText2 hover:text-themeAccent transtion-colors"
         >
           <motion.div
-            key='removeNotesIcon'
+            key="removeNotesIcon"
             initial={{ scale: 0 }}
             animate={{ scale: 1 }}
             exit={{ scale: 0 }}
-            className='flex items-center'
+            className="flex items-center"
           >
             <AnimatePresence>
               {showLabel && (
                 <motion.p
-                  key='removeNotesLabel'
+                  key="removeNotesLabel"
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
-                  className='mr-2 text-sm'
+                  className="mr-2 text-sm"
                 >
                   Remove {completedNotes(notes).length} Notes
                 </motion.p>
               )}
             </AnimatePresence>
-            <TrashIcon className='stroke-current' />
+            <TrashIcon className="stroke-current" />
           </motion.div>
         </div>
       )}
     </AnimatePresence>
-  )
-}
+  );
+};
 
 const completedNotes = (notes: NoteInterface[]): NoteInterface[] =>
-  notes.filter(note => note.done)
+  notes.filter((note) => note.done);

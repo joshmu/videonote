@@ -10,26 +10,21 @@
  * @copyright © 2020 - 2020 MU
  */
 
-import { Dispatch, SetStateAction, useEffect, useState } from 'react'
+import { Dispatch, SetStateAction, useEffect, useState } from "react";
 
-import { PlayerAction } from '../context/videoContext'
+import { PlayerAction } from "../context/videoContext";
 
-type UseAnounceActionType = [
-  PlayerAction | '',
-  Dispatch<SetStateAction<PlayerAction | ''>>
-]
+type UseAnounceActionType = [PlayerAction | "", Dispatch<SetStateAction<PlayerAction | "">>];
 
-export const useAnounceAction = (
-  initialState: PlayerAction | '' = ''
-): UseAnounceActionType => {
-  const [action, setAction] = useState<PlayerAction | ''>('')
+export const useAnounceAction = (initialState: PlayerAction | "" = ""): UseAnounceActionType => {
+  const [action, setAction] = useState<PlayerAction | "">("");
   // we want to capture action events and reset so we can receive multiple of the same events elsewhere
   // so we quickly reset to base state
   useEffect(() => {
     setTimeout(() => {
-      setAction(initialState)
-    }, 10)
-  }, [action])
+      setAction(initialState);
+    }, 10);
+  }, [action]);
 
-  return [action, setAction]
-}
+  return [action, setAction];
+};

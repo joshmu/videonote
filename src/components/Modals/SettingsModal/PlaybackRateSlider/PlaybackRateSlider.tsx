@@ -10,29 +10,29 @@
  * @copyright © 2020 - 2020 MU
  */
 
-import { ChangeEvent } from 'react'
+import { ChangeEvent } from "react";
 
-import { useVideoContext } from '@/context/videoContext'
-import { ModalInput } from '@/shared/Modal/ModalInput'
+import { useVideoContext } from "@/context/videoContext";
+import { ModalInput } from "@/shared/Modal/ModalInput";
 
 export const PlaybackRateSlider = () => {
-  const { playbackRate, setPlaybackRate } = useVideoContext()
+  const { playbackRate, setPlaybackRate } = useVideoContext();
 
   const handleChange = (event: ChangeEvent<HTMLInputElement>): void =>
-    setPlaybackRate(+event.target.value)
+    setPlaybackRate(+event.target.value);
 
   return (
     <div>
       <ModalInput
         title={`Playback Rate (${playbackRate}x)`}
-        id='playbackRate'
+        id="playbackRate"
         value={playbackRate}
         onChange={handleChange}
-        type='range'
-        min='0.5'
-        max='4'
-        step='0.01'
+        type="range"
+        min="0.5"
+        max="4"
+        step="0.01"
       />
     </div>
-  )
-}
+  );
+};

@@ -10,41 +10,41 @@
  * @copyright © 2020 - 2020 MU
  */
 
-import mongoose from 'mongoose'
-const { Schema } = mongoose
+import mongoose from "mongoose";
+const { Schema } = mongoose;
 
-mongoose.connect(process.env.MONGODB_URI, {})
+mongoose.connect(process.env.MONGODB_URI, {});
 
 const UserSchema = new Schema(
   {
     email: { type: String, required: true, unique: true },
     username: { type: String },
-    projects: [{ type: Schema.Types.ObjectId, ref: 'Project' }],
-    settings: { type: Schema.Types.ObjectId, ref: 'Settings' },
-    role: { type: String, default: 'free' },
+    projects: [{ type: Schema.Types.ObjectId, ref: "Project" }],
+    settings: { type: Schema.Types.ObjectId, ref: "Settings" },
+    role: { type: String, default: "free" },
     password: String,
   },
-  { timestamps: true }
-)
+  { timestamps: true },
+);
 
 const ProjectSchema = new Schema(
   {
     title: { type: String, required: true },
     src: String,
-    notes: [{ type: Schema.Types.ObjectId, ref: 'Note' }],
+    notes: [{ type: Schema.Types.ObjectId, ref: "Note" }],
     user: {
       type: Schema.Types.ObjectId,
-      ref: 'User',
+      ref: "User",
       required: true,
     },
-    sharedUsers: [{ type: Schema.Types.ObjectId, ref: 'User' }],
+    sharedUsers: [{ type: Schema.Types.ObjectId, ref: "User" }],
     share: {
       type: Schema.Types.ObjectId,
-      ref: 'Share',
+      ref: "Share",
     },
   },
-  { timestamps: true }
-)
+  { timestamps: true },
+);
 
 const NoteSchema = new Schema(
   {
@@ -53,75 +53,75 @@ const NoteSchema = new Schema(
     done: { type: Boolean, default: false },
     user: {
       type: Schema.Types.ObjectId,
-      ref: 'User',
+      ref: "User",
     },
-    project: { type: Schema.Types.ObjectId, ref: 'Project' },
+    project: { type: Schema.Types.ObjectId, ref: "Project" },
   },
-  { timestamps: true }
-)
+  { timestamps: true },
+);
 
 const SettingsSchema = new Schema(
   {
     user: {
       type: Schema.Types.ObjectId,
-      ref: 'User',
+      ref: "User",
       required: true,
       unique: true,
     },
-    currentProject: { type: Schema.Types.ObjectId, ref: 'Project' },
+    currentProject: { type: Schema.Types.ObjectId, ref: "Project" },
     playOffset: Number,
     showHints: { type: Boolean, default: true },
     seekJump: Number,
     sidebarWidth: Number,
   },
-  { timestamps: true }
-)
+  { timestamps: true },
+);
 
 const ShareProjectSchema = new Schema(
   {
     url: { type: String, required: true, unique: true },
     user: {
       type: Schema.Types.ObjectId,
-      ref: 'User',
+      ref: "User",
       required: true,
     },
-    project: { type: Schema.Types.ObjectId, ref: 'Project' },
-    password: { type: String, default: '' },
+    project: { type: Schema.Types.ObjectId, ref: "Project" },
+    password: { type: String, default: "" },
     canEdit: { type: Boolean, default: true },
   },
-  { timestamps: true }
-)
+  { timestamps: true },
+);
 
 // prevent overwrite model error
-let User
+let User;
 try {
-  User = mongoose.model('User')
+  User = mongoose.model("User");
 } catch (error) {
-  User = mongoose.model('User', UserSchema)
+  User = mongoose.model("User", UserSchema);
 }
-let Project
+let Project;
 try {
-  Project = mongoose.model('Project')
+  Project = mongoose.model("Project");
 } catch (error) {
-  Project = mongoose.model('Project', ProjectSchema)
+  Project = mongoose.model("Project", ProjectSchema);
 }
-let Note
+let Note;
 try {
-  Note = mongoose.model('Note')
+  Note = mongoose.model("Note");
 } catch (error) {
-  Note = mongoose.model('Note', NoteSchema)
+  Note = mongoose.model("Note", NoteSchema);
 }
-let Settings
+let Settings;
 try {
-  Settings = mongoose.model('Settings')
+  Settings = mongoose.model("Settings");
 } catch (error) {
-  Settings = mongoose.model('Settings', SettingsSchema)
+  Settings = mongoose.model("Settings", SettingsSchema);
 }
-let Share
+let Share;
 try {
-  Share = mongoose.model('Share')
+  Share = mongoose.model("Share");
 } catch (error) {
-  Share = mongoose.model('Share', ShareProjectSchema)
+  Share = mongoose.model("Share", ShareProjectSchema);
 }
 
-export { User, Project, Note, Settings, Share }
+export { User, Project, Note, Settings, Share };

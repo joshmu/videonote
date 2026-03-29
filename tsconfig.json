@@ -3,47 +3,21 @@
     "ignoreDeprecations": "6.0",
     "baseUrl": ".",
     "paths": {
-      "@/root/*": [
-        "./*"
-      ],
-      "@/layout/*": [
-        "src/components/Layout/*"
-      ],
-      "@/components/*": [
-        "src/components/*"
-      ],
-      "@/shared/*": [
-        "src/components/shared/*"
-      ],
-      "@/context/*": [
-        "src/context/*"
-      ],
-      "@/hooks/*": [
-        "src/hooks/*"
-      ],
-      "@/styles/*": [
-        "src/styles/*"
-      ],
-      "@/pages/*": [
-        "pages/*"
-      ],
-      "@/api/*": [
-        "pages/api/*"
-      ],
-      "@/services/*": [
-        "src/services/*"
-      ],
-      "@/utils/*": [
-        "utils/*"
-      ]
+      "@/root/*": ["./*"],
+      "@/layout/*": ["src/components/Layout/*"],
+      "@/components/*": ["src/components/*"],
+      "@/shared/*": ["src/components/shared/*"],
+      "@/context/*": ["src/context/*"],
+      "@/hooks/*": ["src/hooks/*"],
+      "@/styles/*": ["src/styles/*"],
+      "@/pages/*": ["pages/*"],
+      "@/api/*": ["pages/api/*"],
+      "@/services/*": ["src/services/*"],
+      "@/utils/*": ["utils/*"]
     },
     "checkJs": true,
     "target": "es2017",
-    "lib": [
-      "dom",
-      "dom.iterable",
-      "esnext"
-    ],
+    "lib": ["dom", "dom.iterable", "esnext"],
     "allowJs": true,
     "skipLibCheck": true,
     "strict": false,
@@ -57,15 +31,6 @@
     "jsx": "react-jsx",
     "incremental": true
   },
-  "include": [
-    "next-env.d.ts",
-    "**/*.ts",
-    "**/*.tsx",
-    "**/*.js",
-    "**/*.jsx"
-  ],
-  "exclude": [
-    "node_modules",
-    "src/__test__"
-  ]
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", "**/*.js", "**/*.jsx"],
+  "exclude": ["node_modules", "src/__test__", "vitest.config.ts"]
 }

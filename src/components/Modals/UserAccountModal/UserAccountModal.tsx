@@ -10,34 +10,34 @@
  * @copyright © 2020 - 2020 MU
  */
 
-import { ChangeEvent, MouseEvent, useEffect, useState } from 'react'
+import { ChangeEvent, MouseEvent, useEffect, useState } from "react";
 
-import { ModalPrimaryBtn } from '@/components/shared/Modal/ModalBtn'
-import { useGlobalContext } from '@/context/globalContext'
-import { useNotificationContext } from '@/context/notificationContext'
-import { ModalContainer } from '@/shared/Modal/ModalContainer'
-import { ModalForm } from '@/shared/Modal/ModalForm'
-import { ModalHeader } from '@/shared/Modal/ModalHeader'
-import { ModalInnerContainer } from '@/shared/Modal/ModalInnerContainer'
-import { ModalInput } from '@/shared/Modal/ModalInput'
-import { UserInterface } from '@/shared/types'
-import { isValidCredentials } from '@/utils/clientHelpers'
+import { ModalPrimaryBtn } from "@/components/shared/Modal/ModalBtn";
+import { useGlobalContext } from "@/context/globalContext";
+import { useNotificationContext } from "@/context/notificationContext";
+import { ModalContainer } from "@/shared/Modal/ModalContainer";
+import { ModalForm } from "@/shared/Modal/ModalForm";
+import { ModalHeader } from "@/shared/Modal/ModalHeader";
+import { ModalInnerContainer } from "@/shared/Modal/ModalInnerContainer";
+import { ModalInput } from "@/shared/Modal/ModalInput";
+import { UserInterface } from "@/shared/types";
+import { isValidCredentials } from "@/utils/clientHelpers";
 
 export const UserAccountModal = ({
   toggle: toggleModal,
   motionKey,
 }: {
-  toggle: () => void
-  motionKey: string
+  toggle: () => void;
+  motionKey: string;
 }) => {
-  const { user, updateUser, removeAccount, createPrompt } = useGlobalContext()
-  const { addAlert } = useNotificationContext()
+  const { user, updateUser, removeAccount, createPrompt } = useGlobalContext();
+  const { addAlert } = useNotificationContext();
   const [userAccountState, setUserAccountState] = useState<
     UserInterface | { username: string; email: string }
   >({
-    username: '',
-    email: '',
-  })
+    username: "",
+    email: "",
+  });
 
   useEffect(() => {
     if (user)
@@ -45,11 +45,11 @@ export const UserAccountModal = ({
         ...userAccountState,
         username: user.username,
         email: user.email,
-      })
-  }, [user])
+      });
+  }, [user]);
 
   const handleUpdate = (event: MouseEvent<HTMLElement>): void => {
-    event.preventDefault()
+    event.preventDefault();
 
     if (
       !isValidCredentials({
@@ -59,55 +59,51 @@ export const UserAccountModal = ({
         addAlert,
       })
     )
-      return
+      return;
 
     createPrompt({
-      msg: 'Are you sure you want to update your account?',
+      msg: "Are you sure you want to update your account?",
       action: () => {
         const name =
           userAccountState.username !== userAccountState.email
             ? userAccountState.username
-            : userAccountState.email
-        addAlert({ type: 'info', msg: `Updating account: ${name}` })
-        console.log('updating account')
+            : userAccountState.email;
+        addAlert({ type: "info", msg: `Updating account: ${name}` });
+        console.log("updating account");
         const updateData = {
           username: userAccountState.username,
           email: userAccountState.email,
-        }
-        updateUser(updateData)
-        toggleModal()
+        };
+        updateUser(updateData);
+        toggleModal();
       },
-    })
-  }
+    });
+  };
 
   const handleRemoveAccount = (event: MouseEvent<HTMLElement>): void => {
-    event.preventDefault()
+    event.preventDefault();
 
     createPrompt({
       msg: (
         <span>
-          Are you sure you want to permanently delete your account and all data
-          associated to{' '}
-          <span className='text-themeAccent'>
-            {user.username || user.email}
-          </span>
-          ?
+          Are you sure you want to permanently delete your account and all data associated to{" "}
+          <span className="text-themeAccent">{user.username || user.email}</span>?
         </span>
       ),
       passwordRequired: true,
       action: ({ password }: { password: string }) => {
-        removeAccount({ ...user, password })
-        toggleModal()
+        removeAccount({ ...user, password });
+        toggleModal();
       },
-    })
-  }
+    });
+  };
 
   const handleChange = (event: ChangeEvent<HTMLInputElement>): void => {
     setUserAccountState({
       ...userAccountState,
       [event.target.id]: event.target.value,
-    })
-  }
+    });
+  };
 
   return (
     <ModalContainer toggle={toggleModal} motionKey={motionKey}>
@@ -118,29 +114,25 @@ export const UserAccountModal = ({
           <ModalInput
             value={userAccountState.username}
             onChange={handleChange}
-            title='Username'
-            id='username'
-            type='text'
+            title="Username"
+            id="username"
+            type="text"
           />
           <ModalInput
             value={userAccountState.email}
             onChange={handleChange}
-            title='Email'
-            id='email'
-            type='email'
+            title="Email"
+            id="email"
+            type="email"
           />
 
           <div></div>
           <div></div>
 
           {/* remove account btn */}
-          <div className='flex items-center'>
-            <ModalPrimaryBtn
-              handleClick={handleRemoveAccount}
-              type='button'
-              color='bg-red-400'
-            >
-              <span className='italic'>Remove Account</span>
+          <div className="flex items-center">
+            <ModalPrimaryBtn handleClick={handleRemoveAccount} type="button" color="bg-red-400">
+              <span className="italic">Remove Account</span>
             </ModalPrimaryBtn>
           </div>
 
@@ -148,5 +140,5 @@ export const UserAccountModal = ({
         </ModalForm>
       </ModalInnerContainer>
     </ModalContainer>
-  )
-}
+  );
+};

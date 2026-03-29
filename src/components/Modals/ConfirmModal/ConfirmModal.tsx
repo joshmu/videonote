@@ -10,43 +10,43 @@
  * @copyright © 2020 - 2020 MU
  */
 
-import { ChangeEvent, useState } from 'react'
+import { ChangeEvent, useState } from "react";
 
-import { ModalPrimaryBtn } from '@/components/shared/Modal/ModalBtn'
-import { ModalInput } from '@/components/shared/Modal/ModalInput'
-import { useGlobalContext } from '@/context/globalContext'
-import { ModalContainer } from '@/shared/Modal/ModalContainer'
-import { ModalForm } from '@/shared/Modal/ModalForm'
-import { ModalInnerContainer } from '@/shared/Modal/ModalInnerContainer'
+import { ModalPrimaryBtn } from "@/components/shared/Modal/ModalBtn";
+import { ModalInput } from "@/components/shared/Modal/ModalInput";
+import { useGlobalContext } from "@/context/globalContext";
+import { ModalContainer } from "@/shared/Modal/ModalContainer";
+import { ModalForm } from "@/shared/Modal/ModalForm";
+import { ModalInnerContainer } from "@/shared/Modal/ModalInnerContainer";
 
 export const ConfirmModal = ({
   toggle: toggleModal,
   motionKey,
 }: {
-  toggle: () => void
-  motionKey: string
+  toggle: () => void;
+  motionKey: string;
 }) => {
-  const { promptState, confirmPrompt } = useGlobalContext()
-  const [password, setPassword] = useState<string>('')
+  const { promptState, confirmPrompt } = useGlobalContext();
+  const [password, setPassword] = useState<string>("");
 
   const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
-    setPassword(event.target.value)
-  }
+    setPassword(event.target.value);
+  };
   const handleConfirm = (): void => {
-    confirmPrompt({ password })
-  }
+    confirmPrompt({ password });
+  };
 
   return (
-    <ModalContainer toggle={toggleModal} motionKey={motionKey} zIndex='z-50'>
-      <p className='mt-2'>{promptState.msg}</p>
+    <ModalContainer toggle={toggleModal} motionKey={motionKey} zIndex="z-50">
+      <p className="mt-2">{promptState.msg}</p>
 
       <ModalInnerContainer>
         <ModalForm>
           {promptState.passwordRequired ? (
             <ModalInput
-              placeholder='verify password'
-              id='password'
-              type='password'
+              placeholder="verify password"
+              id="password"
+              type="password"
               value={password}
               onChange={handleChange}
               autoFocus={true}
@@ -58,11 +58,11 @@ export const ConfirmModal = ({
             </>
           )}
 
-          <ModalPrimaryBtn handleClick={handleConfirm} type='button'>
+          <ModalPrimaryBtn handleClick={handleConfirm} type="button">
             Confirm
           </ModalPrimaryBtn>
         </ModalForm>
       </ModalInnerContainer>
     </ModalContainer>
-  )
-}
+  );
+};

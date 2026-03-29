@@ -1,16 +1,16 @@
-import { useAnimation } from 'motion/react'
-import { Ref, useEffect } from 'react'
-import { useInView } from 'react-intersection-observer'
+import { useAnimation } from "motion/react";
+import { Ref, useEffect } from "react";
+import { useInView } from "react-intersection-observer";
 
 export const useReveal = (): [Ref<HTMLDivElement>, ReturnType<typeof useAnimation>] => {
-  const controls = useAnimation()
+  const controls = useAnimation();
   const [ref, inView] = useInView({
     triggerOnce: true,
-  })
+  });
 
   useEffect(() => {
-    if (inView) controls.start('animate')
-  }, [controls, inView])
+    if (inView) controls.start("animate");
+  }, [controls, inView]);
 
-  return [ref, controls]
-}
+  return [ref, controls];
+};
