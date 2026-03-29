@@ -100,7 +100,7 @@ export const VideoProvider = (props: { [key: string]: any }) => {
 
   const changeVolume = (increment: number): void => {
     // validate
-    if (Number(increment) === NaN) return
+    if (Number.isNaN(Number(increment))) return
 
     // increment
     let newVolume = volume + Number(increment)
