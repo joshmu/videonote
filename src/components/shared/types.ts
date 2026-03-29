@@ -10,7 +10,7 @@
  * @copyright © 2020 - 2020 MU
  */
 
-import { Document } from 'mongoose'
+import type { Document } from 'mongoose'
 
 export interface UserInterface {
   _id?: string

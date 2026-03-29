@@ -10,7 +10,7 @@
  * @copyright © 2020 - 2020 MU
  */
 
-import { motion } from 'framer-motion'
+import { motion } from 'motion/react'
 import { StatusCodes } from 'http-status-codes'
 import Link from 'next/link'
 import { ChangeEvent, useEffect, useState } from 'react'
@@ -99,10 +99,8 @@ export const LoginModal = ({
       className='w-full max-w-sm mx-auto overflow-hidden border rounded-sm border-themeText bg-themeBg'
     >
       <div className='px-6 py-4'>
-        <Link href='/hello' passHref>
-          <a>
-            <Heading2 className='text-center'>VideoNote</Heading2>
-          </a>
+        <Link href='/hello'>
+          <Heading2 className='text-center'>VideoNote</Heading2>
         </Link>
 
         <SubHeading className='text-center'>Welcome back!</SubHeading>

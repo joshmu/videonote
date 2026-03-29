@@ -62,7 +62,7 @@ export const Overview = () => {
               src={imgSrc}
               width={2400}
               height={1431}
-              layout='responsive'
+              style={{ width: '100%', height: 'auto' }}
             />
           </Reveal>
         </div>

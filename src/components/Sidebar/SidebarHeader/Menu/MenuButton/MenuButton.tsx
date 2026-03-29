@@ -11,7 +11,7 @@
  */
 
 import { MdSettings as MenuIcon } from 'react-icons/md'
-import { motion } from 'framer-motion'
+import { motion } from 'motion/react'
 import { useGlobalContext } from '@/root/src/context/globalContext'
 
 export const MenuButton = ({ drawAttention }: { drawAttention: boolean }) => {

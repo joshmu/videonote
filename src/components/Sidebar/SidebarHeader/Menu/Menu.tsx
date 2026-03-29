@@ -10,7 +10,7 @@
  * @copyright © 2020 - 2020 MU
  */
 
-import { AnimatePresence, Variants, motion } from 'framer-motion'
+import { AnimatePresence, Variants, motion } from 'motion/react'
 import Link from 'next/link'
 import {
   AiOutlineFile as ProjectIcon,
@@ -158,15 +158,13 @@ export const Menu = () => {
               </Select>
             )}
             {admin && (
-              <Link href='/hello' passHref>
-                <a>
-                  <Select onClick={handleSignOutClick}>
-                    <IconMenuItemWrapper>
-                      <SignoutIcon />
-                    </IconMenuItemWrapper>
-                    Sign Out
-                  </Select>
-                </a>
+              <Link href='/hello'>
+                <Select onClick={handleSignOutClick}>
+                  <IconMenuItemWrapper>
+                    <SignoutIcon />
+                  </IconMenuItemWrapper>
+                  Sign Out
+                </Select>
               </Link>
             )}
 

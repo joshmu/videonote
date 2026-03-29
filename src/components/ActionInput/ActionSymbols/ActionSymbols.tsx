@@ -10,7 +10,7 @@
  * @copyright © 2020 - 2020 MU
  */
 
-import { AnimatePresence } from 'framer-motion'
+import { AnimatePresence } from 'motion/react'
 import { useEffect, useState } from 'react'
 import {
   BsVolumeDownFill as VolumeDownIcon,
@@ -46,7 +46,7 @@ export default function ActionSymbols() {
 
   return (
     <div className='mr-2 text-2xl text-themeAccent'>
-      <AnimatePresence exitBeforeEnter>
+      <AnimatePresence mode="wait">
         {action === PlayerAction.PLAY && (
           <MotionFadeInOut motionKey={action} duration={0.5}>
             <PlayIcon />

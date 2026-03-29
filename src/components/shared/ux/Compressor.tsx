@@ -10,8 +10,7 @@
  * @copyright © 2020 - 2020 MU
  */
 
-import { Variants, motion, useAnimation } from 'framer-motion'
-import { useViewportScroll } from 'framer-motion'
+import { Variants, motion, useAnimation, useScroll } from 'motion/react'
 import React, { useEffect, useState } from 'react'
 
 const animationVariants: Variants = {
@@ -41,7 +40,7 @@ export const Compressor = ({
   const [output, setOutput] = useState<[string, string, string]>(['', '', ''])
   const [toggle, setToggle] = useState<boolean>(false)
 
-  const { scrollYProgress } = useViewportScroll()
+  const { scrollYProgress } = useScroll()
   const controls = useAnimation()
 
   useEffect(() => {

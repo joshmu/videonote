@@ -10,7 +10,7 @@
  * @copyright © 2020 - 2020 MU
  */
 
-import { motion } from 'framer-motion'
+import { motion } from 'motion/react'
 import { NextPage } from 'next'
 
 import { Footer } from '@/components/Layout/Footer/Footer'

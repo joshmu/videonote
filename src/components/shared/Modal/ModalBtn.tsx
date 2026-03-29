@@ -10,7 +10,7 @@
  * @copyright © 2020 - 2020 MU
  */
 
-import { motion } from 'framer-motion'
+import { motion } from 'motion/react'
 import { ReactNode } from 'react'
 
 interface ModalPrimaryBtnInterface {

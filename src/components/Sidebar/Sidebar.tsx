@@ -10,7 +10,7 @@
  * @copyright © 2020 - 2020 MU
  */
 
-import { Variants, motion } from 'framer-motion'
+import { Variants, motion } from 'motion/react'
 import { useEffect } from 'react'
 
 import { NoteList } from '@/components/NoteList/NoteList'

@@ -65,7 +65,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
       if (noteDoc) {
         // update user if we have one (in case we have a different user modifying a note)
         // todo: array of users who modify the note when original 'user' is present?
-        if (!isGuestUser) data.user = userDoc._id
+        if (!isGuestUser) data.user = userDoc._id as any
 
         await noteDoc.updateOne({ $set: data })
         await noteDoc.save()
@@ -75,7 +75,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
         // create note
 
         // add user info to note
-        if (!isGuestUser) note.user = userDoc._id
+        if (!isGuestUser) note.user = userDoc._id as any
 
         // create with whole 'note' since we are passing a manually created _id for faster state management client side
         noteDoc = new Note(note)

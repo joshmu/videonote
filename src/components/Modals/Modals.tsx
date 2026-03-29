@@ -10,7 +10,7 @@
  * @copyright © 2020 - 2020 MU
  */
 
-import { AnimatePresence } from 'framer-motion'
+import { AnimatePresence } from 'motion/react'
 import { useEffect } from 'react'
 
 import { useControlsContext } from '@/context/controlsContext'

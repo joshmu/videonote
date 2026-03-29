@@ -10,7 +10,7 @@
  * @copyright © 2020 - 2020 MU
  */
 
-import { AnimatePresence, Variants, motion } from 'framer-motion'
+import { AnimatePresence, Variants, motion } from 'motion/react'
 
 import { useNoteContext } from '@/context/noteContext'
 
@@ -45,7 +45,7 @@ export const NoteList = () => {
 
   return (
     <div className='w-full pb-8 bg-transparent'>
-      <AnimatePresence exitBeforeEnter>
+      <AnimatePresence mode="wait">
         <motion.ul
           key='noteList'
           initial='initial'

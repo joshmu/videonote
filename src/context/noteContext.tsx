@@ -10,7 +10,7 @@
  * @copyright © 2020 - 2020 MU
  */
 
-import mongoose from 'mongoose'
+import { nanoid } from 'nanoid'
 import { createContext, useContext, useEffect, useRef, useState } from 'react'
 
 import { useIsMount } from '@/hooks/useIsMount'
@@ -20,7 +20,7 @@ import { NoteInterface } from '@/root/src/components/shared/types'
 import { useGlobalContext } from './globalContext'
 import { useVideoContext } from './videoContext'
 
-const createMongooseId = () => new mongoose.Types.ObjectId().toString()
+const createId = () => nanoid(24)
 
 type AddNoteType = (
   note: NoteInterface | { content: string; time: number }
@@ -101,7 +101,7 @@ export function NoteProvider(props: { [key: string]: any }) {
     if (!checkCanEdit()) return
 
     const newNote: NoteInterface = {
-      _id: createMongooseId(),
+      _id: createId(),
       content: note.content,
       time: note.time,
       done: false,

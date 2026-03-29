@@ -10,7 +10,7 @@
  * @copyright © 2020 - 2020 MU
  */
 
-import { AnimatePresence, Variants, motion } from 'framer-motion'
+import { AnimatePresence, Variants, motion } from 'motion/react'
 
 import styles from './LoaderStyle.module.scss'
 

@@ -10,7 +10,7 @@
  * @copyright © 2020 - 2020 MU
  */
 
-import { HTMLMotionProps, motion } from 'framer-motion'
+import { HTMLMotionProps, motion } from 'motion/react'
 import { ReactNode } from 'react'
 
 import { CancelBtn } from '@/shared/CancelBtn/CancelBtn'

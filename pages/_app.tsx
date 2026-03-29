@@ -12,7 +12,7 @@
 
 import '@/styles/globals.scss'
 
-import { AnimatePresence } from 'framer-motion'
+import { AnimatePresence } from 'motion/react'
 import { AppProps } from 'next/app'
 
 import { NotificationProvider } from '@/context/notificationContext'
@@ -23,7 +23,7 @@ const MyApp = ({ Component, pageProps, router }: AppProps) => {
   return (
     <NotificationProvider>
       <ThemeProvider>
-        <AnimatePresence exitBeforeEnter>
+        <AnimatePresence mode="wait">
           <Component {...pageProps} key={router.route} />
         </AnimatePresence>
       </ThemeProvider>

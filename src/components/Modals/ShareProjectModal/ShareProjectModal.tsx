@@ -10,7 +10,7 @@
  * @copyright © 2020 - 2020 MU
  */
 
-import { motion } from 'framer-motion'
+import { motion } from 'motion/react'
 import { ChangeEvent, FormEvent, MouseEvent, useEffect, useState } from 'react'
 
 import { ModalPrimaryBtn } from '@/components/shared/Modal/ModalBtn'

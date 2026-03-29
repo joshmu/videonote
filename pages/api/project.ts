@@ -132,7 +132,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
               .json({ msg: 'Specified share project url is taken.', error })
           }
           // add reference to project
-          projectDoc.share = shareDoc._id
+          projectDoc.share = shareDoc._id as any
           await projectDoc.save()
           // reassign projectDoc as save() does not return updated version plus populate all avail fields
           projectDoc = await Project.findById(projectDoc._id)
@@ -202,7 +202,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
         await userDoc.save()
 
         // remove project
-        await projectDoc.remove()
+        await projectDoc.deleteOne()
 
         // token (keep resetting their session length)
         const newTokenFromRemoveAction = generateAccessToken(userDoc.email)

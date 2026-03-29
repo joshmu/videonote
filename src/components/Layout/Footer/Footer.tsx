@@ -17,8 +17,8 @@ export const Footer = () => {
         {new Date().getFullYear()}
       </p>
       <p className='mt-4 space-x-4 text-themeText2'>
-        <Link href='/privacy' passHref>
-          <a className='underline'>Privacy Policy</a>
+        <Link href='/privacy' className='underline'>
+          Privacy Policy
         </Link>{' '}
         <a className='underline' href='/terms'>
           Terms

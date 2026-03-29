@@ -1,4 +1,4 @@
-import { motion } from 'framer-motion'
+import { motion } from 'motion/react'
 import { CSSProperties, StyleHTMLAttributes } from 'react'
 import { AiOutlineArrowDown as ArrowDownIcon } from 'react-icons/ai'
 import { scroller } from 'react-scroll'

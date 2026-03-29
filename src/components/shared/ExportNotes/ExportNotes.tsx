@@ -12,7 +12,7 @@
 
 import { format } from 'date-fns'
 import { saveAs } from 'file-saver'
-import { AnimatePresence, motion } from 'framer-motion'
+import { AnimatePresence, motion } from 'motion/react'
 import React, { useEffect, useState } from 'react'
 import { BsCloudDownload as DownloadIcon } from 'react-icons/bs'
 

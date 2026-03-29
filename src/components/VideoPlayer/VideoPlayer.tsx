@@ -10,7 +10,7 @@
  * @copyright © 2020 - 2020 MU
  */
 
-import { Variants, motion } from 'framer-motion'
+import { Variants, motion } from 'motion/react'
 import { useEffect, useState } from 'react'
 import ReactPlayer from 'react-player'
 
@@ -60,12 +60,12 @@ export const VideoPlayer = () => {
     if (typeof url === 'string' && url.length > 0) setIsLoading(true)
   }, [url, isMount])
 
-  const preHandleReady = (reactPlayer: ReactPlayer) => {
+  const preHandleReady = (reactPlayer: InstanceType<typeof ReactPlayer>) => {
     handleReady(reactPlayer)
     setIsLoading(false)
   }
 
-  const isPlayerReady = !isLoading && playerRef.current
+  const isPlayerReady = !isLoading && !!playerRef.current
 
   return (
     <div className='relative flex w-full transition-all duration-500 ease-in-out'>

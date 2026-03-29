@@ -10,7 +10,7 @@
  * @copyright © 2020 - 2020 MU
  */
 
-import { AnimatePresence, motion } from 'framer-motion'
+import { AnimatePresence, motion } from 'motion/react'
 import React, { useState } from 'react'
 import { ImBin2 as TrashIcon } from 'react-icons/im'
 

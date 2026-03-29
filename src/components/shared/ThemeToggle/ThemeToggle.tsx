@@ -10,8 +10,8 @@
  * @copyright © 2020 - 2020 MU
  */
 
-import { Variants, motion } from 'framer-motion'
-import { AnimatePresence } from 'framer-motion'
+import { Variants, motion } from 'motion/react'
+import { AnimatePresence } from 'motion/react'
 import {
   BsMoonFill as MoonIcon,
   BsLightningFill as ZapIcon,
@@ -57,7 +57,7 @@ export const ThemeToggle = ({
       } cursor-pointer relative flex items-center`}
       {...props}
     >
-      <AnimatePresence exitBeforeEnter>
+      <AnimatePresence mode="wait">
         {ThemeType.DARK === theme && (
           <motion.button
             key='themeToggle-dark'

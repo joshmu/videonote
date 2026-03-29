@@ -10,7 +10,7 @@
  * @copyright © 2020 - 2020 MU
  */
 
-import { Variants, motion, useAnimation } from 'framer-motion'
+import { Variants, motion, useAnimation } from 'motion/react'
 import { ReactNode, useEffect } from 'react'
 import { useInView } from 'react-intersection-observer'
 

@@ -10,8 +10,8 @@
  * @copyright © 2020 - 2020 MU
  */
 
-import { createContext, useContext, useEffect, useRef, useState } from 'react'
-import { ReactPlayerProps } from 'react-player'
+import { type RefObject, createContext, useContext, useEffect, useRef, useState } from 'react'
+import type ReactPlayer from 'react-player'
 
 import { ProgressInterface } from '@/components/shared/types'
 import { useAnounceAction } from '@/hooks/useAnounceAction'
@@ -37,13 +37,13 @@ interface VideoContextInterface {
   duration: number | null
   handleDuration: (duration: number) => void
   progress: ProgressInterface
-  handleReady: (reactPlayer: ReactPlayerProps) => void
+  handleReady: (reactPlayer: ReactPlayer) => void
   url: string
   togglePlay: () => void
   changeVolume: (increment: number) => void
   handleProgress: (progress: ProgressInterface) => void
   seekTo: SeekToType
-  playerRef: ReactPlayerProps
+  playerRef: RefObject<ReactPlayer>
   handlePlayerError: (error: any) => void
   jumpBack: () => void
   jumpForward: () => void
@@ -60,7 +60,7 @@ export const VideoProvider = (props: { [key: string]: any }) => {
     warnLocalVideo,
   } = useGlobalContext()
   const { addAlert } = useNotificationContext()
-  const playerRef = useRef<ReactPlayerProps>(null!)
+  const playerRef = useRef<ReactPlayer>(null!)
   const [url, setUrl] = useState<string>(null!)
   const [playing, setPlaying] = useState<boolean>(false)
   const [volume, setVolume] = useState<number>(0.75)
@@ -84,7 +84,7 @@ export const VideoProvider = (props: { [key: string]: any }) => {
     }
   }, [project])
 
-  const handleReady = (reactPlayer: ReactPlayerProps): void => {
+  const handleReady = (reactPlayer: ReactPlayer): void => {
     // assign react player
     playerRef.current = reactPlayer
   }
@@ -119,7 +119,7 @@ export const VideoProvider = (props: { [key: string]: any }) => {
 
   const seekTo: SeekToType = (secs, { offset = true } = {}): void => {
     // validate
-    if (Number(secs) === NaN || playerRef === null) return
+    if (Number.isNaN(Number(secs)) || playerRef === null) return
 
     // settings offset
     const playPosition = secs + (offset ? settings.playOffset : 0)
