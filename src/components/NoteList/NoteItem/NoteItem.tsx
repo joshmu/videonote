@@ -88,7 +88,7 @@ export const NoteItem = ({ note, closestProximity, childVariants }: NoteItemInte
   };
 
   const handleDoubleClick = (): void => {
-    if (!admin && !(project?.share as ShareProjectInterface).canEdit) return;
+    if (!admin && !((project?.share ?? {}) as ShareProjectInterface).canEdit) return;
     toggleEdit(true);
   };
 

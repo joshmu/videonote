@@ -314,7 +314,7 @@ export const GlobalProvider = ({
     if (project.src.length === 0) warnLocalVideo(project);
   };
 
-  const guestUpdatingProject: GuestUpdatingProjectType = async (project) => {
+  const _guestUpdatingProject: GuestUpdatingProjectType = async (project) => {
     console.log("guest is updating project", project);
     const body = {
       project,
@@ -328,7 +328,7 @@ export const GlobalProvider = ({
     });
     const data = await res.json();
 
-    const { project: updatedProject, msg } = data;
+    const { msg } = data;
 
     // handle if we get a bad response
     if (badResponse(res, msg)) return;
@@ -716,7 +716,7 @@ export const GlobalProvider = ({
   // useGlobalKeydown(handleGlobalEscapeKey)
 
   const checkCanEdit: CheckCanEditType = () => {
-    return admin || (currentProject?.share as ShareProjectInterface).canEdit;
+    return admin || ((currentProject?.share ?? {}) as ShareProjectInterface).canEdit;
   };
 
   const actionInputFocus: ActionInputFocusType = () => {

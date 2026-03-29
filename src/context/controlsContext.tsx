@@ -60,13 +60,25 @@ export function ControlsProvider(props: { [key: string]: any }) {
 
     switch (key) {
       case Keymap.SPACE:
-        keysPressed.includes(Keymap.SHIFT) ? toggleSidebar() : togglePlay();
+        if (keysPressed.includes(Keymap.SHIFT)) {
+          toggleSidebar();
+        } else {
+          togglePlay();
+        }
         break;
       case Keymap.LEFT:
-        keysPressed.includes(Keymap.SHIFT) ? nextPrevNote("prev") : jumpBack();
+        if (keysPressed.includes(Keymap.SHIFT)) {
+          nextPrevNote("prev");
+        } else {
+          jumpBack();
+        }
         break;
       case Keymap.RIGHT:
-        keysPressed.includes(Keymap.SHIFT) ? nextPrevNote("next") : jumpForward();
+        if (keysPressed.includes(Keymap.SHIFT)) {
+          nextPrevNote("next");
+        } else {
+          jumpForward();
+        }
         break;
       case Keymap.UP:
         changeVolume(0.1);

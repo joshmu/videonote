@@ -58,7 +58,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
         { path: "share", model: "Share" },
       ])
       .lean();
-  } catch (error) {
+  } catch {
     // no project found
     return res.status(StatusCodes.BAD_REQUEST).json({ msg: "Share url does not exist." });
   }

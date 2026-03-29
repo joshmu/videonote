@@ -156,7 +156,7 @@ export const VideoProvider = (props: { [key: string]: any }) => {
   };
 
   // todo: remove automatic pop up and replace with a button alternative ( or better > auto pop up current project settings modal)
-  const requestLocalVideo = (): void => {
+  const _requestLocalVideo = (): void => {
     console.log("reqesting local video");
     var input = document.createElement("input");
     input.type = "file";

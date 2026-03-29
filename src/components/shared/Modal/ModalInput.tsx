@@ -30,9 +30,9 @@ export const ModalInput = ({
   value,
   placeholder = "",
   autoFocus = false,
-  min = undefined,
-  max = undefined,
-  step = undefined,
+  min: _min = undefined,
+  max: _max = undefined,
+  step: _step = undefined,
   ...props
 }: ModalInputInterface) => {
   return (

@@ -13,7 +13,11 @@
 import { useNoteContext } from "@/context/noteContext";
 import { useVideoContext } from "@/context/videoContext";
 
-export const TimeMarkers = ({ actionInputIsActive }: { actionInputIsActive: boolean }) => {
+export const TimeMarkers = ({
+  actionInputIsActive: _actionInputIsActive,
+}: {
+  actionInputIsActive: boolean;
+}) => {
   const { notes } = useNoteContext();
   const { duration, progress, seekTo } = useVideoContext();
 

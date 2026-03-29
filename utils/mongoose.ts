@@ -96,31 +96,31 @@ const ShareProjectSchema = new Schema(
 let User;
 try {
   User = mongoose.model("User");
-} catch (error) {
+} catch {
   User = mongoose.model("User", UserSchema);
 }
 let Project;
 try {
   Project = mongoose.model("Project");
-} catch (error) {
+} catch {
   Project = mongoose.model("Project", ProjectSchema);
 }
 let Note;
 try {
   Note = mongoose.model("Note");
-} catch (error) {
+} catch {
   Note = mongoose.model("Note", NoteSchema);
 }
 let Settings;
 try {
   Settings = mongoose.model("Settings");
-} catch (error) {
+} catch {
   Settings = mongoose.model("Settings", SettingsSchema);
 }
 let Share;
 try {
   Share = mongoose.model("Share");
-} catch (error) {
+} catch {
   Share = mongoose.model("Share", ShareProjectSchema);
 }
 

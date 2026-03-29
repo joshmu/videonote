@@ -16,7 +16,7 @@ export const extractUser = <T extends { password: string; created: string }>(
   user: T,
 ): { [key: string]: any } => {
   if (!user) return null;
-  const { password, created, ...data } = user;
+  const { password: _password, created: _created, ...data } = user;
   return {
     ...data,
   };
@@ -26,7 +26,7 @@ export const extractProject = <T extends { created: string; updated: string }>(
   project: T,
 ): { [key: string]: any } => {
   if (!project) return null;
-  const { created, updated, ...data } = project;
+  const { created: _created, updated: _updated, ...data } = project;
   return {
     ...data,
   };
@@ -38,7 +38,7 @@ export const extractPublicProject = <
   project: T,
 ): { [key: string]: any } => {
   if (!project) return null;
-  const { created, updated, userIds, ...data } = project;
+  const { created: _created, updated: _updated, userIds: _userIds, ...data } = project;
   return {
     ...data,
   };
