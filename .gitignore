@@ -31,4 +31,7 @@ yarn-error.log*
 .env.production.local
 
 # vercel
-.verceltsconfig.tsbuildinfo
+.vercel
+
+# build artifacts
+tsconfig.tsbuildinfo

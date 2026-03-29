@@ -1,114 +1,124 @@
-// add custom jest matchers from jest-dom
-import '@testing-library/jest-dom/extend-expect'
+import '@testing-library/jest-dom/vitest'
 
-// import dependencies
 import React from 'react'
+import { vi } from 'vitest'
 
-// export and init setup
-export const setupTests = (() => {
-  // console.log(`============ test setup file loaded ===========`)
+// INTERSECTION OBSERVER MOCK
+const intersectionObserverMock = () => ({
+  observe: () => null,
+  disconnect: () => null,
+  unobserve: () => null,
+})
+window.IntersectionObserver = vi
+  .fn()
+  .mockImplementation(intersectionObserverMock)
 
-  ///////////////
-  // REQUIRED MOCKS
-  ///////////////
-
-  // INTERSECTION OBSERVER MOCK
-  const intersectionObserverMock = () => ({
-    observe: () => null,
-    disconnect: () => null,
-    unobserve: () => null,
-  })
-  window.IntersectionObserver = jest
-    .fn()
-    .mockImplementation(intersectionObserverMock)
-
-  // REACT-GA
-  /*
-  jest.mock('react-ga', () => {
-    const initialize = jest.fn()
-    const set = jest.fn()
-    const pageview = jest.fn()
-    return {
-      initialize,
-      set,
-      pageview,
-    }
-  })
-  */
-
-  // FRAMER MOTION MOCK
-  jest.mock('framer-motion', () => {
-    // helper
-    const toLowerCaseList = ['whileHover']
-    const attrsToLowerCase = jest.fn(props => {
-      return Object.entries(props).reduce((acc, [key, val]) => {
+// MOTION MOCK
+vi.mock('motion/react', () => {
+  const toLowerCaseList = ['whileHover']
+  const attrsToLowerCase = vi.fn((props: Record<string, unknown>) => {
+    return Object.entries(props).reduce(
+      (acc, [key, val]) => {
         key = toLowerCaseList.includes(key) ? key.toLowerCase() : key
         acc[key] = val
         return acc
-      }, {})
-    })
+      },
+      {} as Record<string, unknown>
+    )
+  })
 
-    const AnimatePresence = jest.fn(({ children }) => children)
-    const motion = {
-      div: jest.fn(({ children, ...props }) => (
+  const AnimatePresence = vi.fn(
+    ({ children }: { children: React.ReactNode }) => children
+  )
+  const motion = {
+    div: vi.fn(
+      ({
+        children,
+        ...props
+      }: { children?: React.ReactNode } & Record<string, unknown>) => (
         <div {...attrsToLowerCase(props)}>{children}</div>
-      )),
-      span: jest.fn(({ children, ...props }) => (
+      )
+    ),
+    span: vi.fn(
+      ({
+        children,
+        ...props
+      }: { children?: React.ReactNode } & Record<string, unknown>) => (
         <span {...attrsToLowerCase(props)}>{children}</span>
-      )),
-      svg: jest.fn(({ children, ...props }) => (
+      )
+    ),
+    svg: vi.fn(
+      ({
+        children,
+        ...props
+      }: { children?: React.ReactNode } & Record<string, unknown>) => (
         <svg {...attrsToLowerCase(props)}>{children}</svg>
-      )),
-      path: jest.fn(({ children, ...props }) => (
+      )
+    ),
+    path: vi.fn(
+      ({
+        children,
+        ...props
+      }: { children?: React.ReactNode } & Record<string, unknown>) => (
         <path {...attrsToLowerCase(props)}>{children}</path>
-      )),
-      button: jest.fn(({ children, ...props }) => (
+      )
+    ),
+    button: vi.fn(
+      ({
+        children,
+        ...props
+      }: { children?: React.ReactNode } & Record<string, unknown>) => (
         <button {...attrsToLowerCase(props)}>{children}</button>
-      )),
-      ul: jest.fn(({ children, ...props }) => (
+      )
+    ),
+    ul: vi.fn(
+      ({
+        children,
+        ...props
+      }: { children?: React.ReactNode } & Record<string, unknown>) => (
         <ul {...attrsToLowerCase(props)}>{children}</ul>
-      )),
-    }
-    const useAnimation = jest.fn(() => ({ start: () => null }))
-    const useTransform = jest.fn(() => null)
-    const useSpring = jest.fn(() => null)
-    const scrollYProgress = jest.fn(() => 0)
-    const useViewportScroll = jest.fn(() => ({ scrollYProgress }))
-    return {
-      AnimatePresence,
-      motion,
-      useTransform,
-      useSpring,
-      useAnimation,
-      useViewportScroll,
-    }
-  })
+      )
+    ),
+  }
+  const useAnimation = vi.fn(() => ({ start: () => null }))
+  const useTransform = vi.fn(() => null)
+  const useSpring = vi.fn(() => null)
+  const scrollYProgress = vi.fn(() => 0)
+  const useScroll = vi.fn(() => ({ scrollYProgress, scrollY: 0 }))
+  return {
+    AnimatePresence,
+    motion,
+    useTransform,
+    useSpring,
+    useAnimation,
+    useScroll,
+  }
+})
 
-  // TW CONFIG
-  jest.mock('@/root/tailwind.config', () => {
-    const config = jest.fn(() => ({}))
-    return config
-  })
+// TW CONFIG
+vi.mock('@/root/tailwind.config', () => {
+  const config = vi.fn(() => ({}))
+  return { default: config }
+})
 
-  // GLOBAL CONTEXT
-  jest.mock('@/context/GlobalContext', () => {
-    const scrollProgress = 0
-    const values = { scrollProgress }
-    const useGlobalContext = jest.fn(() => values)
+// GLOBAL CONTEXT
+vi.mock('@/context/globalContext', () => {
+  const scrollProgress = 0
+  const values = { scrollProgress }
+  const useGlobalContext = vi.fn(() => values)
 
-    return {
-      useGlobalContext,
-    }
-  })
+  return {
+    useGlobalContext,
+  }
+})
 
-  // THEME CONTEXT
-  jest.mock('@/context/ThemeContext', () => {
-    const toggleTheme = jest.fn()
-    const values = { toggleTheme }
-    const useThemeContext = jest.fn(() => values)
+// THEME CONTEXT
+vi.mock('@/context/themeContext', () => {
+  const toggleTheme = vi.fn()
+  const values = { toggleTheme }
+  const useThemeContext = vi.fn(() => values)
 
-    return {
-      useThemeContext,
-    }
-  })
-})()
+  return {
+    useThemeContext,
+  }
+})
