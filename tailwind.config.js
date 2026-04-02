@@ -1,3 +1,4 @@
+// @ts-nocheck -- tailwindcss v4 compat layer lacks type declarations
 /**
  * @path /tailwind.config.js
  *
