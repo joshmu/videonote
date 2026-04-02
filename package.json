@@ -48,7 +48,7 @@
     "react-dom": "19.2.4",
     "react-icons": "^5.6.0",
     "react-intersection-observer": "^10.0.3",
-    "react-player": "^2.16.1",
+    "react-player": "^3.4.0",
     "react-scroll": "^1.9.3",
     "universal-cookie": "^8.0.1",
     "validator": "^13.15.26"

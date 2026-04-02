@@ -11,7 +11,7 @@
  */
 
 import { Variants, motion } from "motion/react";
-import { useEffect, useState } from "react";
+import { type SyntheticEvent, useEffect, useState } from "react";
 import ReactPlayer from "react-player";
 
 import { useVideoContext } from "@/context/videoContext";
@@ -60,9 +60,26 @@ export const VideoPlayer = () => {
     if (typeof url === "string" && url.length > 0) setIsLoading(true);
   }, [url, isMount]);
 
-  const preHandleReady = (reactPlayer: InstanceType<typeof ReactPlayer>) => {
-    handleReady(reactPlayer);
+  const preHandleReady = () => {
+    handleReady();
     setIsLoading(false);
+  };
+
+  const handleTimeUpdate = (e: SyntheticEvent<HTMLVideoElement>) => {
+    const el = e.currentTarget;
+    handleProgress({
+      playedSeconds: el.currentTime,
+      played: el.duration ? el.currentTime / el.duration : 0,
+      loadedSeconds: el.buffered.length > 0 ? el.buffered.end(el.buffered.length - 1) : 0,
+      loaded:
+        el.duration && el.buffered.length > 0
+          ? el.buffered.end(el.buffered.length - 1) / el.duration
+          : 0,
+    });
+  };
+
+  const handleLoadedMetadata = (e: SyntheticEvent<HTMLVideoElement>) => {
+    handleDuration(e.currentTarget.duration);
   };
 
   const isPlayerReady = !isLoading && !!playerRef.current;
@@ -85,22 +102,16 @@ export const VideoPlayer = () => {
           <div className={`${style.playerWrapper} w-full h-full`}>
             {url && (
               <ReactPlayer
-                url={url}
+                ref={playerRef}
+                src={url}
                 onError={handlePlayerError}
                 controls={false}
                 playing={playing}
                 volume={volume}
                 playbackRate={playbackRate}
-                progressInterval={500}
-                onDuration={handleDuration}
-                onReady={preHandleReady}
-                onProgress={handleProgress}
-                config={{
-                  youtube: {
-                    playerVars: { showinfo: 0, autoplay: 0 },
-                  },
-                  vimeo: {},
-                }}
+                onLoadedMetadata={handleLoadedMetadata}
+                onCanPlay={preHandleReady}
+                onTimeUpdate={handleTimeUpdate}
                 className={`${style.reactPlayer} `}
                 width="100%"
                 height="100%"

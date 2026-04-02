@@ -11,7 +11,6 @@
  */
 
 import { type RefObject, createContext, useContext, useEffect, useRef, useState } from "react";
-import type ReactPlayer from "react-player";
 
 import { ProgressInterface } from "@/components/shared/types";
 import { useAnounceAction } from "@/hooks/useAnounceAction";
@@ -37,13 +36,13 @@ interface VideoContextInterface {
   duration: number | null;
   handleDuration: (duration: number) => void;
   progress: ProgressInterface;
-  handleReady: (reactPlayer: ReactPlayer) => void;
+  handleReady: () => void;
   url: string;
   togglePlay: () => void;
   changeVolume: (increment: number) => void;
   handleProgress: (progress: ProgressInterface) => void;
   seekTo: SeekToType;
-  playerRef: RefObject<ReactPlayer>;
+  playerRef: RefObject<HTMLVideoElement>;
   handlePlayerError: (error: any) => void;
   jumpBack: () => void;
   jumpForward: () => void;
@@ -55,7 +54,7 @@ const videoContext = createContext<VideoContextInterface>(null!);
 export const VideoProvider = (props: { [key: string]: any }) => {
   const { project, updateProject, settings, warnLocalVideo } = useGlobalContext();
   const { addAlert } = useNotificationContext();
-  const playerRef = useRef<ReactPlayer>(null!);
+  const playerRef = useRef<HTMLVideoElement>(null!);
   const [url, setUrl] = useState<string>(null!);
   const [playing, setPlaying] = useState<boolean>(false);
   const [volume, setVolume] = useState<number>(0.75);
@@ -77,9 +76,8 @@ export const VideoProvider = (props: { [key: string]: any }) => {
     }
   }, [project]);
 
-  const handleReady = (reactPlayer: ReactPlayer): void => {
-    // assign react player
-    playerRef.current = reactPlayer;
+  const handleReady = (): void => {
+    // player ref is now assigned via the ref prop on ReactPlayer
   };
 
   const togglePlay = (): void => {
@@ -117,7 +115,7 @@ export const VideoProvider = (props: { [key: string]: any }) => {
     // settings offset
     const playPosition = secs + (offset ? settings.playOffset : 0);
 
-    playerRef.current.seekTo(playPosition, "seconds");
+    playerRef.current.currentTime = playPosition;
 
     // if a video has not loaded then also initiate and play
     if (!progress.loaded) {
