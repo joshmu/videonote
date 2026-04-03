@@ -10,7 +10,7 @@
  * @copyright © 2020 - 2020 MU
  */
 
-import "@/styles/globals.scss";
+import "@/styles/globals.css";
 
 import { AnimatePresence } from "motion/react";
 import { AppProps } from "next/app";

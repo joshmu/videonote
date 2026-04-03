@@ -1,31 +1,18 @@
-/*
- * @path /src/styles/globals.scss
- * 
- * @project videonote
- * @file globals.scss
- * 
- * @author Josh Mu <hello@joshmu.dev>
- * @created Monday, 14th September 2020
- * @modified Thursday, 3rd December 2020 6:04:54 pm
- * @copyright © 2020 - 2020 MU
- */
-
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
-// playfair display
+/* playfair display */
 @import url("https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,500;1,600;1,700;1,800&display=swap");
+
+@import "tailwindcss";
+@config "../../tailwind.config.js";
 
 .theme-light {
   --text: #202020;
-  --text2: theme("colors.gray.400");
+  --text2: #9ca3af;
 
-  --bg: theme("colors.gray.50");
-  --bg2: theme("colors.gray.400");
+  --bg: #f9fafb;
+  --bg2: #9ca3af;
   --bgNum: 255, 255, 255;
 
-  // https://www.colorhexa.com/4056a1
+  /* https://www.colorhexa.com/4056a1 */
   --accent: #4056a1;
   --accent2: #c5cbe3;
 
@@ -33,18 +20,26 @@
   --selectNum: 112, 135, 255;
 
   .neu-bg {
-    @apply neu-light;
+    border-radius: 0.75rem;
+    background: linear-gradient(225deg, #e6e6e6, #ffffff);
+    box-shadow:
+      -20px 20px 60px #d9d9d9,
+      20px -20px 60px #ffffff;
   }
   .neu-accent {
-    @apply neu-light-accent;
+    border-radius: 0.75rem;
+    background: linear-gradient(145deg, #3a4d91, #445cac);
+    box-shadow:
+      20px 20px 60px #364989,
+      -20px -20px 60px #4a63b9;
   }
 }
 
 .theme-dark {
-  --text: theme("colors.white");
-  --text2: theme("colors.gray.600");
+  --text: #ffffff;
+  --text2: #4b5563;
   --bg: #202020;
-  --bg2: theme("colors.gray.400");
+  --bg2: #9ca3af;
   --bgNum: 32, 32, 32;
 
   --accent: #ffa170;
@@ -54,15 +49,23 @@
   --selectNum: 112, 135, 255;
 
   .neu-bg {
-    @apply neu-dark;
+    border-radius: 0.75rem;
+    background: linear-gradient(225deg, #1d1d1d, #222222);
+    box-shadow:
+      -20px 20px 60px #1b1b1b,
+      20px -20px 60px #252525;
   }
   .neu-accent {
-    @apply neu-dark-accent;
+    border-radius: 0.75rem;
+    background: linear-gradient(225deg, #e69165, #ffac78);
+    box-shadow:
+      -20px 20px 60px #d9895f,
+      20px -20px 60px #ffb981;
   }
 }
 
 .theme-superhero {
-  --text: theme("colors.gray.100");
+  --text: #f3f4f6;
   --text2: #5a5560;
   --bg: #46344e;
   --bg2: #9d8d8f;
@@ -75,10 +78,18 @@
   --selectNum: 112, 135, 255;
 
   .neu-bg {
-    @apply neu-superhero;
+    border-radius: 0.75rem;
+    background: linear-gradient(145deg, #3f2f46, #4b3853);
+    box-shadow:
+      20px 20px 60px #3c2c42,
+      -20px -20px 60px #513c5a;
   }
   .neu-accent {
-    @apply neu-superhero-accent;
+    border-radius: 0.75rem;
+    background: linear-gradient(145deg, #e1d522, #fffe29);
+    box-shadow:
+      20px 20px 60px #d5c920,
+      -20px -20px 60px #ffff2c;
   }
 }
 
@@ -96,105 +107,68 @@
   --selectNum: 112, 135, 255;
 
   .neu-bg {
-    @apply neu-hot;
+    border-radius: 0.75rem;
+    background: linear-gradient(145deg, #2c3d4d, #34495b);
+    box-shadow:
+      20px 20px 60px #2a3a48,
+      -20px -20px 60px #384e62;
   }
   .neu-accent {
-    @apply neu-hot-accent;
+    border-radius: 0.75rem;
+    background: linear-gradient(145deg, #b55b5d, #d76c6e);
+    box-shadow:
+      20px 20px 60px #ab5658,
+      -20px -20px 60px #e77476;
   }
 }
 
 body {
-  background-color: theme("colors.themeBg");
-  color: theme("colors.themeText");
+  background-color: var(--bg);
+  color: var(--text);
   -webkit-font-smoothing: antialiased;
   -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
 
-  @apply text-caret;
-  @apply text-select;
-  // background-image: radial-gradient(circle farthest-corner at center, #3C4B57 0%, #1C262B 100%);;
-}
+  input {
+    caret-color: var(--accent);
+  }
 
-// text selection color
-.text-select {
   ::-moz-selection {
-    /* Code for Firefox */
-    color: theme("colors.themeAccent");
-    background: theme("colors.themeBg2");
+    color: var(--accent);
+    background: var(--bg2);
   }
   ::selection {
-    color: theme("colors.themeAccent");
-    background: theme("colors.themeBg2");
-  }
-}
-// text caret color
-.text-caret {
-  input {
-    caret-color: theme("colors.themeAccent");
+    color: var(--accent);
+    background: var(--bg2);
   }
 }
 
 .scrollbar {
   &::-webkit-scrollbar {
-    // 1px width does not seem to work
+    /* 1px width does not seem to work */
     width: 2px;
-    @apply cursor-pointer;
+    cursor: pointer;
   }
 
   &::-webkit-scrollbar-track {
-    @apply cursor-pointer;
-    /*background: red;*/
+    cursor: pointer;
   }
 
   &::-webkit-scrollbar-thumb {
-    @apply rounded-full cursor-pointer bg-themeAccent;
-  }
-}
-
-// custom scroll-bar
-@mixin custom-scroll-bar() {
-  &::-webkit-scrollbar {
-    border-radius: 10px;
-    height: 10px;
-    width: 8px;
-  }
-
-  &::-webkit-scrollbar-thumb {
-    background: #999;
-    border-radius: 10px;
-  }
-
-  &::-webkit-scrollbar-track {
-    border-radius: 10px;
-  }
-}
-
-// no scroll bar
-@mixin no-scroll-bar() {
-  &::-webkit-scrollbar {
-    height: 0;
-    width: 0;
-  }
-
-  &::-webkit-scrollbar-thumb {
-    height: 0;
-    width: 0;
-  }
-
-  &::-webkit-scrollbar-track {
-    height: 0;
-    width: 0;
+    @apply rounded-full;
+    cursor: pointer;
+    background-color: var(--accent);
   }
 }
 
 .disable-select {
-  user-select: none; /* supported by Chrome and Opera */
-  -webkit-user-select: none; /* Safari */
-  -khtml-user-select: none; /* Konqueror HTML */
-  -moz-user-select: none; /* Firefox */
-  -ms-user-select: none; /* Internet Explorer/Edge */
+  user-select: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
 }
 
-// https://neumorphism.io/#202020
+/* https://neumorphism.io/#202020 */
 .neu-dark {
   border-radius: 0.75rem;
   background: linear-gradient(225deg, #1d1d1d, #222222);
@@ -202,7 +176,7 @@ body {
     -20px 20px 60px #1b1b1b,
     20px -20px 60px #252525;
 }
-// https://neumorphism.io/#ffa170
+/* https://neumorphism.io/#ffa170 */
 .neu-dark-accent {
   border-radius: 0.75rem;
   background: linear-gradient(225deg, #e69165, #ffac78);
@@ -211,7 +185,7 @@ body {
     20px -20px 60px #ffb981;
 }
 
-// https://neumorphism.io/#FFFFFF
+/* https://neumorphism.io/#FFFFFF */
 .neu-light {
   border-radius: 0.75rem;
   background: linear-gradient(225deg, #e6e6e6, #ffffff);
