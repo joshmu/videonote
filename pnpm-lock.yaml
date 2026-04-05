@@ -27,8 +27,8 @@ importers:
         specifier: ^4.18.1
         version: 4.18.1
       mongoose:
-        specifier: ^9.3.3
-        version: 9.3.3(@aws-sdk/credential-providers@3.1019.0)(socks@2.8.7)
+        specifier: ^9.4.1
+        version: 9.4.1(@aws-sdk/credential-providers@3.1019.0)(socks@2.8.7)
       motion:
         specifier: ^12.38.0
         version: 12.38.0(@emotion/is-prop-valid@0.8.8)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
@@ -3204,8 +3204,8 @@ packages:
       socks:
         optional: true
 
-  mongoose@9.3.3:
-    resolution: {integrity: sha512-sfv5LOIPWeN5o/281kp4Rx9ZnuXb0g8CtvBTi7trYQs2PYYx8LWXegXxG3ar7VEns1o+d4h9LI/Dtc7dTTyYmA==}
+  mongoose@9.4.1:
+    resolution: {integrity: sha512-4rFBWa+/wdBQSfvnOPJBpiSG6UCEbhSQh865dEdaH9Y8WfHBUC+I2XT28dp0IBIGrEwmh+gzrgZgea5PbmrHWA==}
     engines: {node: '>=20.19.0'}
 
   motion-dom@12.38.0:
@@ -7495,7 +7495,7 @@ snapshots:
       '@aws-sdk/credential-providers': 3.1019.0
       socks: 2.8.7
 
-  mongoose@9.3.3(@aws-sdk/credential-providers@3.1019.0)(socks@2.8.7):
+  mongoose@9.4.1(@aws-sdk/credential-providers@3.1019.0)(socks@2.8.7):
     dependencies:
       kareem: 3.2.0
       mongodb: 7.1.1(@aws-sdk/credential-providers@3.1019.0)(socks@2.8.7)
