@@ -201,7 +201,7 @@ export const GlobalProvider = ({
 
   const shareProject: ShareProjectType = async (shareData) => {
     const body = {
-      action: "share",
+      action: ProjectApiActions.SHARE,
       project: { _id: currentProject._id },
       share: shareData,
     };
@@ -238,7 +238,7 @@ export const GlobalProvider = ({
 
   const removeShareProject: RemoveShareProjectType = async () => {
     const body = {
-      action: "remove share",
+      action: ProjectApiActions.REMOVE_SHARE,
       project: { _id: currentProject._id },
       share: { _id: (currentProject.share as ShareProjectInterface)._id },
     };
