@@ -68,7 +68,7 @@ export const ShareProjectModal = ({
     if (shareData.password === (project.share as ShareProjectInterface)?.password)
       delete shareData.password;
 
-    const apiSuccess = await shareProject(state);
+    const apiSuccess = await shareProject(shareData);
     if (apiSuccess) {
       addAlert({ type: "success", msg: "Shared project updated." });
       copyToClipboard(`https://videonote.app/vn/${state.url}`);
