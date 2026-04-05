@@ -93,7 +93,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
           console.log("share project exists");
           shareDoc = await Share.findById(projectDoc.share);
           // hash password if we are given one
-          if (shareData.password.length > 0)
+          if (shareData.password?.length > 0)
             shareData.password = await bcrypt.hash(shareData.password, 10);
           // update share project doc
           await shareDoc.updateOne({ $set: shareData });
@@ -109,7 +109,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
           console.log("create share project");
 
           // hash password if one is provided and overwrite
-          if (shareData.password.length > 0)
+          if (shareData.password?.length > 0)
             shareData.password = await bcrypt.hash(shareData.password, 10);
 
           try {
