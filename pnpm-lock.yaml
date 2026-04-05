@@ -63,8 +63,8 @@ importers:
         specifier: ^1.9.3
         version: 1.9.3(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
       universal-cookie:
-        specifier: ^8.0.1
-        version: 8.0.1
+        specifier: ^8.1.0
+        version: 8.1.0
       validator:
         specifier: ^13.15.26
         version: 13.15.26
@@ -4016,8 +4016,8 @@ packages:
     resolution: {integrity: sha512-wH590V9VNgYH9g3lH9wWjTrUoKsjLF6sGLjhR4sH1LWpLmCOH0Zf7PukhDA8BiS7KHe4oPNkcTHqYkj7SOGUOw==}
     engines: {node: '>=20'}
 
-  universal-cookie@8.0.1:
-    resolution: {integrity: sha512-B6ks9FLLnP1UbPPcveOidfvB9pHjP+wekP2uRYB9YDfKVpvcjKgy1W5Zj+cEXJ9KTPnqOKGfVDQBmn8/YCQfRg==}
+  universal-cookie@8.1.0:
+    resolution: {integrity: sha512-65+kikQAWq7gsJbirwB7dk6e8xeug1hx3++x2dQoymdXcV7fYv0yChOgHCg01ZwP3fE3sYeq6EWCSpFv3HLl9g==}
 
   update-browserslist-db@1.2.3:
     resolution: {integrity: sha512-Js0m9cx+qOgDxo0eMiFGEueWztz+d4+M3rGlmKPT+T4IS/jP4ylw3Nwpu6cpTTP8R1MAC1kF4VbdLt3ARf209w==}
@@ -8454,7 +8454,7 @@ snapshots:
 
   unicorn-magic@0.4.0: {}
 
-  universal-cookie@8.0.1:
+  universal-cookie@8.1.0:
     dependencies:
       cookie: 1.1.1
 
