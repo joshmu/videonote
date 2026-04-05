@@ -79,7 +79,7 @@
     "plop": "^4.0.5",
     "postcss": "^8.5.8",
     "postcss-preset-env": "^11.2.0",
-    "sass": "^1.98.0",
+    "sass": "^1.99.0",
     "tailwindcss": "^4.2.2",
     "tailwindcss-debug-screens": "^3.0.1",
     "typescript": "^6.0.2",
