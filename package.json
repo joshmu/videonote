@@ -51,7 +51,7 @@
     "react-player": "^3.4.0",
     "react-scroll": "^1.9.3",
     "universal-cookie": "^8.1.0",
-    "validator": "^13.15.26"
+    "validator": "^13.15.35"
   },
   "devDependencies": {
     "@commitlint/cli": "^20.5.0",
