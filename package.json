@@ -80,7 +80,7 @@
     "postcss": "^8.5.9",
     "postcss-preset-env": "^11.2.0",
     "sass": "^1.99.0",
-    "tailwindcss": "^4.2.2",
+    "tailwindcss": "^4.2.4",
     "tailwindcss-debug-screens": "^3.0.1",
     "typescript": "^6.0.2",
     "vitest": "^4.1.2"
