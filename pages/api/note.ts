@@ -1,5 +1,5 @@
 import { StatusCodes } from "http-status-codes";
-import { NextApiRequest, NextApiResponse } from "next";
+import { NextApiResponse } from "next";
 
 import {
   NoteApiAction,
@@ -7,47 +7,17 @@ import {
   NoteInterface,
   UserDocInterface,
 } from "@/root/src/components/shared/types";
-import { authenticateToken, generateAccessToken } from "@/utils/jwt";
-import { Note, Project, User } from "@/utils/mongoose";
+import { withOptionalUser } from "@/utils/auth/withAuthenticatedUser";
+import { generateAccessToken } from "@/utils/jwt";
+import { Note, Project } from "@/utils/mongoose";
 
-export default async (req: NextApiRequest, res: NextApiResponse) => {
-  console.log("note api");
-  // detect user via token
-  // if no user then the 'note' is not assigned a user
-  let isGuestUser: boolean = false;
-
-  // Gather the jwt access token from the request header
-  let token: string = req.headers["authorization"];
-  // strip 'bearer'
-  if (token) {
-    token = token.replace(/bearer /i, "");
-  } else {
-    // if there is no token then we could have a guest
-    console.log("Guest user");
-    isGuestUser = true;
-  }
-
+export default withOptionalUser(async (req, res, ctx) => {
   // 'note' is inclusive of projectId
   const { action, note }: { action: NoteApiAction; note: NoteInterface } = req.body;
 
-  // if the user is not a guest then grab their information
-  let userDoc: UserDocInterface;
-  if (!isGuestUser) {
-    let email: string;
-    try {
-      email = authenticateToken(token);
-    } catch (error) {
-      console.error(error.message);
-      return res.status(StatusCodes.UNAUTHORIZED).json({ msg: "Invalid token", error });
-    }
-
-    // get user
-    userDoc = await User.findOne({ email });
-  }
-
   // different route if we choose to delete all complete notes from specified project
   if (action === NoteApiAction.REMOVE_DONE_NOTES) {
-    return await removeDoneNotes(res, userDoc, req.body.projectId);
+    return await removeDoneNotes(res, ctx.userDoc, req.body.projectId);
   }
 
   let noteDoc: NoteDocInterface;
@@ -62,7 +32,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
       if (noteDoc) {
         // update user if we have one (in case we have a different user modifying a note)
         // todo: array of users who modify the note when original 'user' is present?
-        if (!isGuestUser) data.user = userDoc._id as any;
+        if (!ctx.isGuest) data.user = ctx.userDoc._id as any;
 
         await noteDoc.updateOne({ $set: data });
         await noteDoc.save();
@@ -72,7 +42,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
         // create note
 
         // add user info to note
-        if (!isGuestUser) note.user = userDoc._id as any;
+        if (!ctx.isGuest) note.user = ctx.userDoc._id as any;
 
         // create with whole 'note' since we are passing a manually created _id for faster state management client side
         noteDoc = new Note(note);
@@ -90,22 +60,18 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
     return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ msg: "Database error", error });
   }
 
-  let newToken: string = null;
-  // token (keep resetting their session length)
-  if (!isGuestUser) newToken = generateAccessToken(userDoc.email);
-
   // populate the 'user' field if it is a user created note
   if (noteDoc.user && !noteDoc.populated("user")) await noteDoc.populate("user", "username email");
 
   res.status(StatusCodes.OK).json({
     note: noteDoc.toObject(),
-    token: newToken,
+    token: ctx.newToken,
   });
-};
+});
 
 const removeDoneNotes = async (
   res: NextApiResponse,
-  userDoc: UserDocInterface,
+  userDoc: UserDocInterface | null,
   projectId: string,
 ): Promise<void> => {
   console.log("removing completed notes from project:", projectId);
@@ -114,8 +80,8 @@ const removeDoneNotes = async (
   // return all notes for project
   const notes = await Note.find({ project: projectId }).lean();
 
-  // token (keep resetting their session length)
-  const newToken = generateAccessToken(userDoc.email);
+  // token (keep resetting their session length) — guests get null
+  const newToken = userDoc ? generateAccessToken(userDoc.email) : null;
 
   res.status(StatusCodes.OK).json({
     notes,
