@@ -131,24 +131,7 @@ describe("Bug 3: ShareProjectModal passes shareData to shareProject", () => {
   });
 });
 
-// ============================================================
-// Bug 4: Server crashes when password field is undefined
-// pages/api/project.ts does shareData.password.length without null guard
-// ============================================================
-
-describe("Bug 4: Server-side password null guard", () => {
-  it("should use optional chaining for shareData.password access", async () => {
-    const fs = await import("fs");
-    const source = fs.readFileSync("pages/api/project.ts", "utf-8");
-
-    // Find all occurrences of password length check in the SHARE action
-    const passwordChecks = source.match(/shareData\.password(\??)\.\s*length/g);
-    expect(passwordChecks).toBeTruthy();
-    expect(passwordChecks!.length).toBeGreaterThanOrEqual(2);
-
-    // Every occurrence should use optional chaining
-    for (const check of passwordChecks!) {
-      expect(check).toContain("?.");
-    }
-  });
-});
+// Bug 4 (server-side password null guard) is now covered by behavior tests in
+// `share/shareIntake.test.ts` — the SHARE action no longer hand-rolls the
+// guard inside `pages/api/project.ts`. Password handling is owned by
+// `hashSharePassword`, which accepts `null | undefined | ""` by contract.
