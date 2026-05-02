@@ -88,4 +88,29 @@ describe("upsertNote — create path (no existing _id)", () => {
     expect(projectDoc.save).toHaveBeenCalledTimes(1);
     expect(result).toBe(populatedNote);
   });
+
+  it("omits the user field when authorId is null (guest path)", async () => {
+    await upsertNote(buildNoteInput(), null);
+
+    const constructed = vi.mocked(Note).mock.calls[0]![0] as Record<string, unknown>;
+    expect("user" in constructed).toBe(false);
+  });
+
+  it("sets user to the supplied authorId, ignoring any user field in the input", async () => {
+    await upsertNote(buildNoteInput({ user: "stale-from-client" }) as never, "u1");
+
+    const constructed = vi.mocked(Note).mock.calls[0]![0] as Record<string, unknown>;
+    expect(constructed.user).toBe("u1");
+  });
+
+  it("propagates a Project.findById failure (no orphan project save)", async () => {
+    const projectDoc = buildProjectDoc();
+    vi.mocked(Project.findById).mockResolvedValue(projectDoc as never);
+    vi.mocked(Project.findById).mockImplementationOnce(() => {
+      throw new Error("project lookup failed");
+    });
+
+    await expect(upsertNote(buildNoteInput(), "u1")).rejects.toThrow("project lookup failed");
+    expect(projectDoc.save).not.toHaveBeenCalled();
+  });
 });
