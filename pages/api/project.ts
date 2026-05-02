@@ -10,12 +10,12 @@
  * @copyright © 2020 - 2020 MU
  */
 
-import bcrypt from "bcryptjs";
 import { StatusCodes } from "http-status-codes";
 
 import { ProjectApiActions, ProjectDocInterface, ShareDocInterface } from "@/shared/types";
 import { withAuthenticatedUser } from "@/utils/auth/withAuthenticatedUser";
 import { Note, Project, Share } from "@/utils/mongoose";
+import { hashSharePassword } from "@/utils/share/sharePassword";
 
 export default withAuthenticatedUser(async (req, res, { userDoc, newToken }) => {
   // data passed
@@ -73,7 +73,7 @@ export default withAuthenticatedUser(async (req, res, { userDoc, newToken }) => 
           shareDoc = await Share.findById(projectDoc.share);
           // hash password if we are given one
           if (shareData.password?.length > 0)
-            shareData.password = await bcrypt.hash(shareData.password, 10);
+            shareData.password = await hashSharePassword(shareData.password);
           // update share project doc
           await shareDoc.updateOne({ $set: shareData });
           await shareDoc.save();
@@ -89,7 +89,7 @@ export default withAuthenticatedUser(async (req, res, { userDoc, newToken }) => 
 
           // hash password if one is provided and overwrite
           if (shareData.password?.length > 0)
-            shareData.password = await bcrypt.hash(shareData.password, 10);
+            shareData.password = await hashSharePassword(shareData.password);
 
           try {
             // create share doc
