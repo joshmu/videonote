@@ -2,30 +2,11 @@ import bcrypt from "bcryptjs";
 import { StatusCodes } from "http-status-codes";
 
 import { extractUser } from "@/utils/apiHelpers";
-import { authenticateToken, generateAccessToken } from "@/utils/jwt";
+import { withAuthenticatedUser } from "@/utils/auth/withAuthenticatedUser";
 import { Note, Project, Settings, Share, User } from "@/utils/mongoose";
 
-export default async (req, res) => {
-  // Gather the jwt access token from the request header
-  let token = req.headers["authorization"];
-  // strip 'bearer'
-  if (token) token = token.replace(/bearer /i, "");
-  if (!token) {
-    return res.status(StatusCodes.UNAUTHORIZED).json({ msg: "No token. Authorization denied." });
-  }
-
+export default withAuthenticatedUser(async (req, res, { userDoc, email, newToken }) => {
   const { action, user: userData } = req.body;
-
-  let email;
-  try {
-    email = await authenticateToken(token);
-  } catch (err) {
-    console.error(err.message);
-    return res.status(StatusCodes.UNAUTHORIZED).json({ msg: "Invalid token" });
-  }
-
-  // get user
-  const userDoc = await User.findOne({ email });
 
   try {
     if (action === "update") {
@@ -56,8 +37,8 @@ export default async (req, res) => {
 
       // remove user settings doc
       await Settings.deleteOne({ user: userDoc._id });
-      // remove user
-      await userDoc.remove();
+      // remove user (legacy Mongoose API; see CONTEXT.md follow-ups)
+      await /** @type {any} */ (userDoc).remove();
 
       return res.status(StatusCodes.OK).json({ msg: `${userDoc.email} removed` });
     }
@@ -71,14 +52,11 @@ export default async (req, res) => {
   // get updated user
   const updatedUser = await User.findOne({ email }).lean();
 
-  // token (keep resetting their session length)
-  const newToken = generateAccessToken(updatedUser.email);
-
   res.status(StatusCodes.OK).json({
     user: extractUser(updatedUser),
     token: newToken,
   });
-};
+});
 
 const updateUser = async (userDoc, userData) => {
   // if we have settings data to update and we have previously stored data then merge

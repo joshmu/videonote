@@ -1,28 +1,9 @@
 import { StatusCodes } from "http-status-codes";
 
-import { authenticateToken, generateAccessToken } from "@/utils/jwt";
-import { Settings, User } from "@/utils/mongoose";
+import { withAuthenticatedUser } from "@/utils/auth/withAuthenticatedUser";
+import { Settings } from "@/utils/mongoose";
 
-export default async (req, res) => {
-  // Gather the jwt access token from the request header
-  let token = req.headers["authorization"];
-  // strip 'bearer'
-  if (token) token = token.replace(/bearer /i, "");
-  if (!token) {
-    return res.status(StatusCodes.UNAUTHORIZED).json({ msg: "No token. Authorization denied." });
-  }
-
-  let email;
-  try {
-    email = await authenticateToken(token);
-  } catch (error) {
-    console.error(error.message);
-    return res.status(StatusCodes.UNAUTHORIZED).json({ msg: "Invalid token", error });
-  }
-
-  // get user
-  const userDoc = await User.findOne({ email });
-
+export default withAuthenticatedUser(async (req, res, { userDoc, newToken }) => {
   const { settings } = req.body;
 
   let settingsDoc;
@@ -53,11 +34,8 @@ export default async (req, res) => {
     return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ msg: "Database error", error });
   }
 
-  // token (keep resetting their session length)
-  const newToken = generateAccessToken(userDoc.email);
-
   res.status(StatusCodes.OK).json({
     settings: settingsDoc.toObject(),
     token: newToken,
   });
-};
+});

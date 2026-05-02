@@ -10,12 +10,12 @@
  * @copyright © 2020 - 2020 MU
  */
 
-import bcrypt from "bcryptjs";
 import { StatusCodes } from "http-status-codes";
 import { NextApiRequest, NextApiResponse } from "next";
 
 import { ProjectDocInterface, ShareDocInterface } from "@/shared/types";
 import { Project, Share } from "@/utils/mongoose";
+import { verifySharePassword } from "@/utils/share/sharePassword";
 
 // GET 1 PROJECT
 export default async (req: NextApiRequest, res: NextApiResponse) => {
@@ -24,24 +24,21 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
 
   // get project
   let projectDoc: ProjectDocInterface;
-  let shareDoc: ShareDocInterface;
   try {
-    shareDoc = await Share.findOne({ url: shareUrl });
+    const shareDoc: ShareDocInterface = await Share.findOne({ url: shareUrl });
+    if (!shareDoc) {
+      return res.status(StatusCodes.BAD_REQUEST).json({ msg: "Share url does not exist." });
+    }
 
-    if (shareDoc.password.length > 0) {
-      // 'shared project password required'
-
-      if (password) {
-        // compare passwords
-        const match = await bcrypt.compare(password, shareDoc.password);
-        console.log({ match });
-        if (!match) {
-          return res.status(StatusCodes.OK).json({ msg: "password incorrect" });
-        }
-      } else {
-        // else
-        return res.status(StatusCodes.OK).json({ msg: "shared project password required" });
-      }
+    const access = await verifySharePassword(shareDoc.password, password);
+    // Status code stays 200 here so the existing client (globalContext.tsx)
+    // keeps keying off `data.msg`. See CONTEXT.md follow-ups for the planned
+    // 401 migration once the client switches to status-based handling.
+    if (access.kind === "passwordRequired") {
+      return res.status(StatusCodes.OK).json({ msg: "shared project password required" });
+    }
+    if (access.kind === "incorrect") {
+      return res.status(StatusCodes.OK).json({ msg: "password incorrect" });
     }
 
     projectDoc = await Project.findById(shareDoc.project)

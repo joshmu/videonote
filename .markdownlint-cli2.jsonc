@@ -1,0 +1,8 @@
+{
+  "config": {
+    "MD013": false,
+    "MD028": false,
+    "MD041": false,
+  },
+  "ignores": ["node_modules", "pnpm-lock.yaml", ".next", "plop-templates"],
+}

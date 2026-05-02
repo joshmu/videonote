@@ -10,35 +10,14 @@
  * @copyright © 2020 - 2020 MU
  */
 
-import bcrypt from "bcryptjs";
 import { StatusCodes } from "http-status-codes";
-import { NextApiRequest, NextApiResponse } from "next";
 
 import { ProjectApiActions, ProjectDocInterface, ShareDocInterface } from "@/shared/types";
-import { authenticateToken, generateAccessToken } from "@/utils/jwt";
-import { Note, Project, Share, User } from "@/utils/mongoose";
+import { withAuthenticatedUser } from "@/utils/auth/withAuthenticatedUser";
+import { Note, Project, Share } from "@/utils/mongoose";
+import { hashSharePassword } from "@/utils/share/sharePassword";
 
-export default async (req: NextApiRequest, res: NextApiResponse) => {
-  // Gather the jwt access token from the request header
-  let token = req.headers["authorization"];
-  // strip 'bearer'
-  if (token) token = token.replace(/bearer /i, "");
-  if (!token) {
-    return res.status(StatusCodes.UNAUTHORIZED).json({ msg: "No token. Authorization denied." });
-  }
-
-  // validate
-  let email: string;
-  try {
-    email = authenticateToken(token);
-  } catch (err) {
-    console.error(err.message);
-    return res.status(StatusCodes.UNAUTHORIZED).json({ msg: "Invalid token" });
-  }
-
-  // get user
-  const userDoc = await User.findOne({ email });
-
+export default withAuthenticatedUser(async (req, res, { userDoc, newToken }) => {
   // data passed
   const { action, project } = req.body;
 
@@ -94,7 +73,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
           shareDoc = await Share.findById(projectDoc.share);
           // hash password if we are given one
           if (shareData.password?.length > 0)
-            shareData.password = await bcrypt.hash(shareData.password, 10);
+            shareData.password = await hashSharePassword(shareData.password);
           // update share project doc
           await shareDoc.updateOne({ $set: shareData });
           await shareDoc.save();
@@ -110,7 +89,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
 
           // hash password if one is provided and overwrite
           if (shareData.password?.length > 0)
-            shareData.password = await bcrypt.hash(shareData.password, 10);
+            shareData.password = await hashSharePassword(shareData.password);
 
           try {
             // create share doc
@@ -160,9 +139,6 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
         projectDoc.share = null;
         await projectDoc.save();
 
-        // token (keep resetting their session length)
-        const newToken = generateAccessToken(userDoc.email);
-
         projectDoc = await getEntireProject({
           _id: projectDoc._id,
         });
@@ -171,8 +147,6 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
           token: newToken,
           project: projectDoc.toObject(),
         });
-
-        break;
 
       case ProjectApiActions.REMOVE:
         // get projectDoc via project and user _id
@@ -198,15 +172,11 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
         // remove project
         await projectDoc.deleteOne();
 
-        // token (keep resetting their session length)
-        const newTokenFromRemoveAction = generateAccessToken(userDoc.email);
-
         return res.status(StatusCodes.OK).json({
           // toObject method does not work on removed/deleted mongoose document
           project: projectDoc,
-          token: newTokenFromRemoveAction,
+          token: newToken,
         });
-        break;
 
       default:
         // no action
@@ -217,14 +187,11 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
     return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ msg: "Database error", error });
   }
 
-  // token (keep resetting their session length)
-  const newToken = generateAccessToken(userDoc.email);
-
   return res.status(StatusCodes.OK).json({
     project: projectDoc.toObject(),
     token: newToken,
   });
-};
+});
 
 const getEntireProject = async (query: { [key: string]: any }): Promise<ProjectDocInterface> => {
   return Project.findOne(query).populate([
