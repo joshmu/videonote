@@ -54,5 +54,14 @@ Shared-project access goes through `utils/share/sharePassword.ts`:
   `ShareAccessResult` discriminated union: `open` | `passwordRequired` |
   `incorrect` | `ok`.
 
-Both modules have unit tests under `src/__test__/` that exercise behaviour
-through their public interface.
+Note write-path goes through `utils/note/noteIntake.ts`:
+
+- **`upsertNote(input, authorId)`** — used by `pages/api/note.ts`.
+  Creates if `_id` is not found, updates otherwise. On create also
+  attaches the note id to its Project. Pass `null` for `authorId` to
+  skip authorship (guest path).
+- **`removeDoneProjectNotes(projectId)`** — used by the same handler
+  for the `REMOVE_DONE_NOTES` action; returns the surviving notes.
+
+All three modules have unit tests under `src/__test__/` that exercise
+behaviour through their public interface.

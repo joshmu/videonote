@@ -31,6 +31,14 @@ export type OptionalAuthContext =
   | { isGuest: true; userDoc: null; email: null; newToken: null }
   | { isGuest: false; userDoc: UserDocInterface; email: string; newToken: string };
 
+/**
+ * Pull the caller's User._id out of an {@link OptionalAuthContext}, or `null`
+ * for guests. Centralises the `_id` cast that Mongoose's untyped `Document`
+ * forces on every consumer of `OptionalAuthContext`.
+ */
+export const extractAuthorId = (ctx: OptionalAuthContext): string | null =>
+  ctx.isGuest ? null : (ctx.userDoc._id as unknown as string);
+
 export type AuthenticatedHandler = (
   req: NextApiRequest,
   res: NextApiResponse,
