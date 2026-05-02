@@ -39,8 +39,9 @@ export const upsertNote = async (
  * Delete every done Note in `projectId`; return the surviving notes
  * (lean). Caller owns any guest/auth policy.
  */
-export const removeDoneProjectNotes = async (_projectId: string): Promise<NoteInterface[]> => {
-  throw new Error("not implemented");
+export const removeDoneProjectNotes = async (projectId: string): Promise<NoteInterface[]> => {
+  await Note.deleteMany({ project: projectId, done: true });
+  return Note.find({ project: projectId }).lean() as unknown as Promise<NoteInterface[]>;
 };
 
 const reloadWithAuthor = (noteId: unknown): Promise<NoteDocInterface> =>

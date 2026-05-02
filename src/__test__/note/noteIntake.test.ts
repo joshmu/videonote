@@ -19,7 +19,7 @@ vi.mock("@/utils/mongoose", () => {
 });
 
 import { Note, Project } from "@/utils/mongoose";
-import { upsertNote } from "@/utils/note/noteIntake";
+import { removeDoneProjectNotes, upsertNote } from "@/utils/note/noteIntake";
 
 type FakeProjectDoc = {
   _id: string;
@@ -163,5 +163,35 @@ describe("upsertNote — update path (existing _id)", () => {
       { $set: Record<string, unknown> },
     ];
     expect("user" in $set).toBe(false);
+  });
+});
+
+describe("removeDoneProjectNotes", () => {
+  it("deletes done notes scoped to the project and returns the survivors", async () => {
+    const survivors = [
+      { _id: "n2", content: "still todo", done: false, project: "p1" },
+      { _id: "n3", content: "still todo too", done: false, project: "p1" },
+    ];
+    vi.mocked(Note.deleteMany).mockResolvedValue({ deletedCount: 1 } as never);
+    vi.mocked(Note.find).mockReturnValue({
+      lean: vi.fn().mockResolvedValue(survivors),
+    } as never);
+
+    const result = await removeDoneProjectNotes("p1");
+
+    expect(Note.deleteMany).toHaveBeenCalledWith({ project: "p1", done: true });
+    expect(Note.find).toHaveBeenCalledWith({ project: "p1" });
+    expect(result).toBe(survivors);
+  });
+
+  it("returns an empty array when no notes remain", async () => {
+    vi.mocked(Note.deleteMany).mockResolvedValue({ deletedCount: 5 } as never);
+    vi.mocked(Note.find).mockReturnValue({
+      lean: vi.fn().mockResolvedValue([]),
+    } as never);
+
+    const result = await removeDoneProjectNotes("p1");
+
+    expect(result).toEqual([]);
   });
 });
