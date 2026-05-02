@@ -43,6 +43,8 @@ export type OptionalAuthHandler = (
   ctx: OptionalAuthContext,
 ) => unknown | Promise<unknown>;
 
+// Anchored at the start so a bogus header like "garbage bearer x.y.z" does not
+// silently slice into a valid-looking token; it falls through and 401s.
 const extractBearer = (header: string | string[] | undefined): string | null => {
   if (typeof header !== "string" || header.length === 0) return null;
   return header.replace(/^bearer\s+/i, "");

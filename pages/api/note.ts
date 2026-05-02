@@ -53,8 +53,6 @@ export default withOptionalUser(async (req, res, ctx) => {
         await projectDoc.save();
       }
     }
-    if (action === NoteApiAction.REMOVE) {
-    }
   } catch (error) {
     console.error(error);
     return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ msg: "Database error", error });
