@@ -81,6 +81,27 @@ REMOVE_SHARE) and the Share intake module. `pages/api/auth.js` and
 `pages/api/public_project.ts` still hand-roll the same populate; folding
 them into this helper is a clean follow-up.
 
+### Architecture (Note seam)
+
+**Note intake**:
+The pair `upsertNote` / `removeDoneProjectNotes` in
+`utils/note/noteIntake.ts` that owns the Project↔Note lifecycle on the
+write path. `upsertNote` decides create-vs-update by
+`Note.findById(input._id)`; on create it pushes the new id onto
+`Project.notes` and returns the Note re-loaded with its author User
+populated. The intake takes a pre-resolved `authorId: string | null` so
+guests skip authorship without the module knowing about
+`OptionalAuthContext`. `removeDoneProjectNotes` deletes every done Note
+in a project and returns the survivors. Handlers no longer reach into
+`Note.findById`, `new Note()`, `Project.findById().notes.push(...)`, or
+`Note.deleteMany` directly.
+
+**extractAuthorId**:
+The one-line helper in `utils/auth/withAuthenticatedUser.ts` that pulls
+`User._id` (or `null`) out of an `OptionalAuthContext`. Centralises the
+Mongoose `Document._id` cast so consumers of the optional-auth seam
+don't repeat it.
+
 ## Relationships
 
 - A **User** owns many **Projects**; a **Project** has one **User**.
@@ -123,8 +144,3 @@ re-suggesting in a future architecture review:
 - **`globalContext.tsx` god-object**: 792 LOC, 28 exposed properties; a
   separate review should consider splitting it along the same seam lines
   used for the API (Identity, Project, Note, Share).
-- **`pages/api/note.ts` action dispatch**: a single handler with both an
-  upsert path (no `action`) and a `REMOVE_DONE_NOTES` branch makes the
-  intake hard to test without exercising the whole route. The Share-seam
-  refactor in `pages/api/project.ts` is the template — extract a Note
-  intake module along the same lines.
