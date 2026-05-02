@@ -52,14 +52,21 @@ const populatedNote = {
   user: { _id: "u1", username: "alice", email: "a@a" },
 };
 
-const mockReloadWithAuthor = () => {
-  vi.mocked(Note.findById).mockReturnValue({
-    populate: vi.fn().mockResolvedValue(populatedNote),
-  } as never);
+// upsertNote calls Note.findById twice: first for the existing-doc lookup
+// (returns null on the create path, the doc on the update path), then for
+// the populated reload. Tests prime the first call via `lookup`; the second
+// always resolves to `populatedNote`.
+const primeFindById = (lookup: unknown) => {
+  vi.mocked(Note.findById).mockReset();
+  vi.mocked(Note.findById)
+    .mockReturnValueOnce(lookup as never)
+    .mockReturnValue({
+      populate: vi.fn().mockResolvedValue(populatedNote),
+    } as never);
 };
 
 beforeEach(() => {
-  mockReloadWithAuthor();
+  primeFindById(null);
   vi.mocked(Project.findById).mockResolvedValue(buildProjectDoc() as never);
 });
 
@@ -112,5 +119,49 @@ describe("upsertNote — create path (no existing _id)", () => {
 
     await expect(upsertNote(buildNoteInput(), "u1")).rejects.toThrow("project lookup failed");
     expect(projectDoc.save).not.toHaveBeenCalled();
+  });
+});
+
+type FakeNoteDoc = {
+  _id: string;
+  updateOne: ReturnType<typeof vi.fn>;
+  save: ReturnType<typeof vi.fn>;
+};
+
+const buildExistingNoteDoc = (overrides: Partial<FakeNoteDoc> = {}): FakeNoteDoc => ({
+  _id: "n1",
+  updateOne: vi.fn().mockResolvedValue(undefined),
+  save: vi.fn().mockResolvedValue(undefined),
+  ...overrides,
+});
+
+describe("upsertNote — update path (existing _id)", () => {
+  it("updates the existing note via updateOne+save, never constructs a new Note, and leaves Project.notes alone", async () => {
+    const existingDoc = buildExistingNoteDoc();
+    primeFindById(existingDoc);
+    const projectDoc = buildProjectDoc();
+    vi.mocked(Project.findById).mockResolvedValue(projectDoc as never);
+
+    const result = await upsertNote(buildNoteInput({ content: "edited" }), "u1");
+
+    expect(existingDoc.updateOne).toHaveBeenCalledWith({
+      $set: expect.objectContaining({ content: "edited", user: "u1" }),
+    });
+    expect(existingDoc.save).toHaveBeenCalledTimes(1);
+    expect(Note).not.toHaveBeenCalled();
+    expect(projectDoc.save).not.toHaveBeenCalled();
+    expect(result).toBe(populatedNote);
+  });
+
+  it("does not touch the user field on $set when authorId is null (guest editing)", async () => {
+    const existingDoc = buildExistingNoteDoc();
+    primeFindById(existingDoc);
+
+    await upsertNote(buildNoteInput({ content: "edited" }), null);
+
+    const [{ $set }] = vi.mocked(existingDoc.updateOne).mock.calls[0]! as [
+      { $set: Record<string, unknown> },
+    ];
+    expect("user" in $set).toBe(false);
   });
 });

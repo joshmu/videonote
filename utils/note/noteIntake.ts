@@ -18,6 +18,13 @@ export const upsertNote = async (
   const data: Partial<NoteInterface> = { ...rest };
   if (authorId !== null) data.user = authorId;
 
+  const existing = await Note.findById(_id);
+  if (existing) {
+    await existing.updateOne({ $set: data });
+    await existing.save();
+    return reloadWithAuthor(existing._id);
+  }
+
   const noteDoc = new Note({ _id, ...data });
   await noteDoc.save();
 
