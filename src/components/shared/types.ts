@@ -93,6 +93,11 @@ export interface ShareDocInterface extends Document {
 
 export interface UserDocInterface extends Document {
   email: string;
+  username?: string;
+  password?: string;
+  role?: string;
+  projects: any;
+  settings?: any;
 }
 export interface NoteDocInterface extends Document {
   user: string | UserInterface;
