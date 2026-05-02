@@ -12,20 +12,20 @@
 
 import { StatusCodes } from "http-status-codes";
 
-import { ProjectApiActions, ProjectDocInterface, ShareDocInterface } from "@/shared/types";
+import { ProjectApiActions, ProjectDocInterface } from "@/shared/types";
 import { withAuthenticatedUser } from "@/utils/auth/withAuthenticatedUser";
 import { Note, Project, Share } from "@/utils/mongoose";
-import { hashSharePassword } from "@/utils/share/sharePassword";
+import { findProjectWithRelations } from "@/utils/project/findProjectWithRelations";
+import { attachOrUpdateShare, detachShare, ShareUrlTakenError } from "@/utils/share/shareIntake";
 
 export default withAuthenticatedUser(async (req, res, { userDoc, newToken }) => {
-  // data passed
   const { action, project } = req.body;
 
   let projectDoc: ProjectDocInterface;
   try {
     switch (action) {
       case ProjectApiActions.GET:
-        projectDoc = await getEntireProject({
+        projectDoc = await findProjectWithRelations({
           _id: project._id,
           user: userDoc._id,
         });
@@ -37,139 +37,56 @@ export default withAuthenticatedUser(async (req, res, { userDoc, newToken }) => 
           user: userDoc._id,
         });
         await projectDoc.save();
-
-        // add project id to user's projectId's list
         userDoc.projects.push(projectDoc._id);
         await userDoc.save();
         break;
 
-      case ProjectApiActions.UPDATE:
-        // remove the id and any nested array/object
+      case ProjectApiActions.UPDATE: {
         const { _id, ...data } = project;
-
-        // find project by both project and user _id
         projectDoc = await Project.findOneAndUpdate(
           { _id, user: userDoc._id },
           { $set: data },
           { new: true },
         );
         break;
+      }
 
-      case ProjectApiActions.SHARE:
-        console.log("action: share");
-        // current project user is working on
-        projectDoc = await Project.findOne({
+      case ProjectApiActions.SHARE: {
+        const owned = await Project.findOne({
           _id: project._id,
           user: userDoc._id,
         });
-
-        // additional data for 'share' action
-        const shareData = req.body.share;
-
-        let shareDoc: ShareDocInterface;
-        // if the projectDoc contains a 'share' ref _id then we are sharing and we just need to update
-        if (projectDoc.share) {
-          console.log("share project exists");
-          shareDoc = await Share.findById(projectDoc.share);
-          // hash password if we are given one
-          if (shareData.password?.length > 0)
-            shareData.password = await hashSharePassword(shareData.password);
-          // update share project doc
-          await shareDoc.updateOne({ $set: shareData });
-          await shareDoc.save();
-          // assign updated version
-          shareDoc = await Share.findById(shareDoc._id);
-          // update projectDoc with populated 'share' which will be handed back
-          projectDoc = await Project.findOne({
-            _id: project._id,
-            user: userDoc._id,
-          }).populate({ path: "share", model: "Share" });
-        } else {
-          console.log("create share project");
-
-          // hash password if one is provided and overwrite
-          if (shareData.password?.length > 0)
-            shareData.password = await hashSharePassword(shareData.password);
-
-          try {
-            // create share doc
-            shareDoc = await Share.create({
-              ...shareData,
-              project: projectDoc._id,
-              user: userDoc._id,
-            });
-          } catch (error) {
-            console.error(error);
+        try {
+          projectDoc = await attachOrUpdateShare(owned, req.body.share);
+        } catch (error) {
+          if (error instanceof ShareUrlTakenError) {
             return res
               .status(StatusCodes.INTERNAL_SERVER_ERROR)
-              .json({ msg: "Specified share project url is taken.", error });
+              .json({ msg: error.message, error });
           }
-          // add reference to project
-          projectDoc.share = shareDoc._id as any;
-          await projectDoc.save();
-          // reassign projectDoc as save() does not return updated version plus populate all avail fields
-          projectDoc = await Project.findById(projectDoc._id)
-            .populate({
-              path: "notes",
-              model: "Note",
-            })
-            .populate({
-              path: "share",
-              model: "Share",
-            });
+          throw error;
         }
         break;
+      }
 
-      case ProjectApiActions.REMOVE_SHARE:
-        // current project user is working on
-        projectDoc = await Project.findOne({
+      case ProjectApiActions.REMOVE_SHARE: {
+        const owned = await Project.findOne({
           _id: project._id,
           user: userDoc._id,
         });
-
-        // additional data for 'share' action
-        const shareInfo = req.body.share;
-        await Share.deleteOne({
-          _id: shareInfo._id,
-          user: userDoc._id,
-          project: projectDoc._id,
-        });
-
-        // remove reference to share in 'project'
-        projectDoc.share = null;
-        await projectDoc.save();
-
-        projectDoc = await getEntireProject({
-          _id: projectDoc._id,
-        });
-
-        return res.status(StatusCodes.OK).json({
-          token: newToken,
-          project: projectDoc.toObject(),
-        });
+        projectDoc = await detachShare(owned, req.body.share);
+        break;
+      }
 
       case ProjectApiActions.REMOVE:
-        // get projectDoc via project and user _id
         projectDoc = await Project.findOne({
           _id: project._id,
           user: userDoc._id,
         });
-
-        // remove all notes associated to project
-        await Note.deleteMany({
-          project: projectDoc._id,
-        });
-
-        // remove all shared documents to the project
-        await Share.deleteMany({
-          project: projectDoc._id,
-        });
-
-        // remove user's reference to the project
+        await Note.deleteMany({ project: projectDoc._id });
+        await Share.deleteMany({ project: projectDoc._id });
         await userDoc.projects.pull(projectDoc._id);
         await userDoc.save();
-
-        // remove project
         await projectDoc.deleteOne();
 
         return res.status(StatusCodes.OK).json({
@@ -179,7 +96,6 @@ export default withAuthenticatedUser(async (req, res, { userDoc, newToken }) => 
         });
 
       default:
-        // no action
         return res.status(StatusCodes.BAD_REQUEST).json({ msg: "Action not specified" });
     }
   } catch (error) {
@@ -192,18 +108,3 @@ export default withAuthenticatedUser(async (req, res, { userDoc, newToken }) => 
     token: newToken,
   });
 });
-
-const getEntireProject = async (query: { [key: string]: any }): Promise<ProjectDocInterface> => {
-  return Project.findOne(query).populate([
-    {
-      path: "notes",
-      model: "Note",
-      populate: {
-        path: "user",
-        model: "User",
-        select: "username email",
-      },
-    },
-    { path: "share", model: "Share" },
-  ]);
-};

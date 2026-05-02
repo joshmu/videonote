@@ -83,7 +83,8 @@ export enum NoteApiAction {
 }
 
 export interface ProjectDocInterface extends Document {
-  share?: string | ShareProjectInterface;
+  user: string | UserInterface;
+  share?: string | ShareProjectInterface | null;
 }
 
 export interface ShareDocInterface extends Document {

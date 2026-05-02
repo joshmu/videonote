@@ -64,6 +64,23 @@ each case to a response without branching on string messages.
 The pure pair in `utils/share/sharePassword.ts` that owns the password
 contract for shares. Both treat empty/null as "no password protection".
 
+**Share intake**:
+The pair `attachOrUpdateShare` / `detachShare` in `utils/share/shareIntake.ts`
+that owns the Project↔Share lifecycle. `attachOrUpdateShare` decides
+create-vs-update by `projectDoc.share`, hashes the password (via
+`hashSharePassword`), and surfaces a duplicate `url` as `ShareUrlTakenError`.
+Both operations return the project re-loaded through `findProjectWithRelations`
+so callers can hand it straight back to the client. Handlers no longer reach
+into `Share.findById` / `Share.create` / `Share.deleteOne` directly.
+
+**findProjectWithRelations**:
+The populate spec for a hydrated Project in
+`utils/project/findProjectWithRelations.ts`: Project + Notes (with each
+Note's author User) + Share. Used by `pages/api/project.ts` (GET, SHARE,
+REMOVE_SHARE) and the Share intake module. `pages/api/auth.js` and
+`pages/api/public_project.ts` still hand-roll the same populate; folding
+them into this helper is a clean follow-up.
+
 ## Relationships
 
 - A **User** owns many **Projects**; a **Project** has one **User**.
@@ -106,6 +123,8 @@ re-suggesting in a future architecture review:
 - **`globalContext.tsx` god-object**: 792 LOC, 28 exposed properties; a
   separate review should consider splitting it along the same seam lines
   used for the API (Identity, Project, Note, Share).
-- **`pages/api/project.ts` & `pages/api/note.ts` action dispatch**: a
-  single handler with a `switch(action)` for 6+ ops makes individual
-  branches hard to test without exercising the whole route.
+- **`pages/api/note.ts` action dispatch**: a single handler with both an
+  upsert path (no `action`) and a `REMOVE_DONE_NOTES` branch makes the
+  intake hard to test without exercising the whole route. The Share-seam
+  refactor in `pages/api/project.ts` is the template — extract a Note
+  intake module along the same lines.
