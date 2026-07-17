@@ -73,7 +73,7 @@
     "husky": "^9.1.7",
     "jsdom": "^29.1.1",
     "lint-staged": "^17.0.7",
-    "markdownlint-cli2": "^0.22.1",
+    "markdownlint-cli2": "^0.23.0",
     "oxfmt": "^0.53.0",
     "oxlint": "^1.69.0",
     "plop": "^4.0.5",
