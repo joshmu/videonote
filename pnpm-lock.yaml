@@ -148,11 +148,11 @@ importers:
         specifier: ^1.101.0
         version: 1.101.0
       tailwindcss:
-        specifier: ^4.3.0
-        version: 4.3.0
+        specifier: ^4.3.3
+        version: 4.3.3
       tailwindcss-debug-screens:
         specifier: ^3.0.1
-        version: 3.0.1(tailwindcss@4.3.0)
+        version: 3.0.1(tailwindcss@4.3.3)
       typescript:
         specifier: ^6.0.2
         version: 6.0.3
@@ -3435,11 +3435,11 @@ packages:
     peerDependencies:
       tailwindcss: ^4.0
 
-  tailwindcss@4.3.0:
-    resolution: {integrity: sha512-y6nxMGB1nMW9R6k96e5gdIFzcfL/gTJRNaqGes1YvkLnPVXzWgbqFF2yLC0T8G774n24cx3Pe8XrKoniCOAH+Q==}
-
   tailwindcss@4.3.2:
     resolution: {integrity: sha512-WtctNNSH8A9jlMIqxzuYumOHU5uGZyRv0Q5svQl+oEPy5w84YpBxdb7MdqyiSPQge5jTJ6zFQLq0PFygdccSBA==}
+
+  tailwindcss@4.3.3:
+    resolution: {integrity: sha512-gOhV3P7ufE62QDGg1zVaTgCR+EtPv92k2nIhVcVKcLmxT1sUBsQGhnZj175j+MqRt4zLF7ic+sCYjfhxMxj7YQ==}
 
   tapable@2.3.3:
     resolution: {integrity: sha512-uxc/zpqFg6x7C8vOE7lh6Lbda8eEL9zmVm/PLeTPBRhh1xCgdWaQ+J1CUieGpIfm2HdtsUpRv+HshiasBMcc6A==}
@@ -6897,13 +6897,13 @@ snapshots:
 
   symbol-tree@3.2.4: {}
 
-  tailwindcss-debug-screens@3.0.1(tailwindcss@4.3.0):
+  tailwindcss-debug-screens@3.0.1(tailwindcss@4.3.3):
     dependencies:
-      tailwindcss: 4.3.0
-
-  tailwindcss@4.3.0: {}
+      tailwindcss: 4.3.3
 
   tailwindcss@4.3.2: {}
+
+  tailwindcss@4.3.3: {}
 
   tapable@2.3.3: {}
 
