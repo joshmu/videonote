@@ -74,7 +74,7 @@
     "jsdom": "^29.1.1",
     "lint-staged": "^17.0.7",
     "markdownlint-cli2": "^0.23.0",
-    "oxfmt": "^0.53.0",
+    "oxfmt": "^0.59.0",
     "oxlint": "^1.69.0",
     "plop": "^4.0.5",
     "postcss": "^8.5.15",
