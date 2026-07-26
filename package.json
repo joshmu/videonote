@@ -50,7 +50,7 @@
     "react-intersection-observer": "^10.0.3",
     "react-player": "^3.4.0",
     "react-scroll": "^1.9.3",
-    "universal-cookie": "^8.1.0",
+    "universal-cookie": "^8.1.2",
     "validator": "^13.15.35"
   },
   "devDependencies": {
