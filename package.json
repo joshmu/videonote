@@ -83,7 +83,7 @@
     "tailwindcss": "^4.3.3",
     "tailwindcss-debug-screens": "^3.0.1",
     "typescript": "^6.0.2",
-    "vitest": "^4.1.8"
+    "vitest": "^4.1.10"
   },
   "packageManager": "pnpm@10.33.0"
 }
