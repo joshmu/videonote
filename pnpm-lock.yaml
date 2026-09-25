@@ -42,8 +42,8 @@ importers:
         specifier: ^1.2.2
         version: 1.2.2
       nodemailer:
-        specifier: ^9.0.3
-        version: 9.0.5
+        specifier: ^10.0.10
+        version: 10.0.10
       react:
         specifier: 19.2.5
         version: 19.2.5
@@ -2942,9 +2942,9 @@ packages:
     resolution: {integrity: sha512-mIrE/Cw9y+9Au6dS5vDKDhQza9YvG6w+ZrS6X+ZzA7yFW/soAeaups4Qzn1bL6g5FVy8WtP79+0j82oPIbqRjQ==}
     engines: {node: '>=18'}
 
-  nodemailer@9.0.5:
-    resolution: {integrity: sha512-wvjiKvjczmsN7U/8006JOdXubgBk2XFAbioDMbT+sM7cPs0QrhJTa6KBRX7P5REGGkDcLUz/EarWidb8G8C1jQ==}
-    engines: {node: '>=6.0.0'}
+  nodemailer@10.0.10:
+    resolution: {integrity: sha512-He9XskOFms62SyAKkLu8CcGcYHAo+BSHSsORI8s4PJH8qZgZY4L4lDfvyN0twvmbpyG+eGrxpyBlskj9d9rJ8A==}
+    engines: {node: '>=20.0.0'}
 
   object-assign@4.1.1:
     resolution: {integrity: sha512-rJgTQnkUnH1sFw8yT6VSU3zD3sWmu6sZhIseY8VX+GRu3P6F7Fu+JNDoXfklElbLJSnc3FUQHVe4cU5hj+BcUg==}
@@ -6312,7 +6312,7 @@ snapshots:
 
   node-releases@2.0.55: {}
 
-  nodemailer@9.0.5: {}
+  nodemailer@10.0.10: {}
 
   object-assign@4.1.1: {}
 
