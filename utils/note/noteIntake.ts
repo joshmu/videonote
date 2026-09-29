@@ -62,8 +62,8 @@ export const upsertNote = async (
 
 /**
  * Delete every done Note in the Project, pull them from `Project.notes` and
- * return the survivors, their authors as the public view. Same write policy as {@link upsertNote}; a
- * malformed or missing project id is `invalid`.
+ * return the survivors, their authors as the public view. Same write policy
+ * as {@link upsertNote}; a malformed or missing project id is `invalid`.
  */
 export const removeDoneProjectNotes = async (
   projectId: unknown,
