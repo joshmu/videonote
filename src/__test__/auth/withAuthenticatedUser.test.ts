@@ -1,130 +1,115 @@
 import { StatusCodes } from "http-status-codes";
-import type { NextApiRequest, NextApiResponse } from "next";
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import jwt from "jsonwebtoken";
+import type { NextApiHandler } from "next";
+import { describe, expect, it, vi } from "vitest";
 
-vi.mock("@/utils/jwt", () => ({
-  authenticateToken: vi.fn(),
-  generateAccessToken: vi.fn(),
-}));
-
-vi.mock("@/utils/mongoose", () => ({
-  connectDb: vi.fn(),
-  User: { findOne: vi.fn() },
-}));
-
-import { withAuthenticatedUser } from "@/utils/auth/withAuthenticatedUser";
+import { withAuthenticatedUser, withOptionalUser } from "@/utils/auth/withAuthenticatedUser";
 import { authenticateToken, generateAccessToken } from "@/utils/jwt";
-import { connectDb, User } from "@/utils/mongoose";
+import { User } from "@/utils/mongoose";
 
-type MockResponse = {
-  status: ReturnType<typeof vi.fn>;
-  json: ReturnType<typeof vi.fn>;
-};
+import { callApi, useTestJwtSecret } from "../api/http";
+import { useTestDb } from "../db/testDb";
 
-const buildReq = (headers: Record<string, string> = {}): NextApiRequest =>
-  ({ headers, body: {} }) as unknown as NextApiRequest;
+useTestDb();
+useTestJwtSecret();
 
-const buildRes = (): MockResponse & NextApiResponse => {
-  const res: MockResponse = {
-    status: vi.fn(),
-    json: vi.fn(),
-  };
-  res.status.mockReturnValue(res);
-  res.json.mockReturnValue(res);
-  return res as MockResponse & NextApiResponse;
-};
+const EMAIL = "user@example.com";
+
+const call = (wrapped: NextApiHandler, authorization?: string) =>
+  callApi(wrapped, {}, { authorization });
 
 describe("withAuthenticatedUser", () => {
-  beforeEach(() => {
-    vi.mocked(generateAccessToken).mockReturnValue("rotated-token");
-  });
-
-  afterEach(() => {
-    vi.clearAllMocks();
-  });
-
-  it("returns 401 when authorization header is absent", async () => {
+  it("replies 401 without calling the handler when no token is sent", async () => {
     const handler = vi.fn();
-    const wrapped = withAuthenticatedUser(handler);
 
-    const req = buildReq();
-    const res = buildRes();
-    await wrapped(req, res);
+    const { status, body } = await call(withAuthenticatedUser(handler));
 
-    expect(res.status).toHaveBeenCalledWith(StatusCodes.UNAUTHORIZED);
-    expect(res.json).toHaveBeenCalledWith({ msg: "No token. Authorization denied." });
+    expect(status).toBe(StatusCodes.UNAUTHORIZED);
+    expect(body).toEqual({ msg: "No token. Authorization denied." });
     expect(handler).not.toHaveBeenCalled();
   });
 
-  it("strips the Bearer prefix case-insensitively before verifying the token", async () => {
-    vi.mocked(authenticateToken).mockReturnValue("user@example.com");
-    vi.mocked(User.findOne).mockResolvedValue({ _id: "u1", email: "user@example.com" } as never);
+  it("replies 401 for a token signed with another secret", async () => {
+    await User.create({ email: EMAIL });
+    const forged = jwt.sign({ email: EMAIL }, "other-secret");
     const handler = vi.fn();
-    const wrapped = withAuthenticatedUser(handler);
 
-    await wrapped(buildReq({ authorization: "bearer abc.def.ghi" }), buildRes());
+    const { status, body } = await call(withAuthenticatedUser(handler), `Bearer ${forged}`);
 
-    expect(authenticateToken).toHaveBeenCalledWith("abc.def.ghi");
-  });
-
-  it("returns 401 when jwt verification throws", async () => {
-    vi.mocked(authenticateToken).mockImplementation(() => {
-      throw new Error("jwt expired");
-    });
-    const handler = vi.fn();
-    const wrapped = withAuthenticatedUser(handler);
-
-    const res = buildRes();
-    await wrapped(buildReq({ authorization: "Bearer bad.token" }), res);
-
-    expect(res.status).toHaveBeenCalledWith(StatusCodes.UNAUTHORIZED);
-    expect(res.json).toHaveBeenCalledWith({ msg: "Invalid token" });
+    expect(status).toBe(StatusCodes.UNAUTHORIZED);
+    expect(body).toEqual({ msg: "Invalid token" });
     expect(handler).not.toHaveBeenCalled();
   });
 
-  it("returns 401 when no user matches the verified email", async () => {
-    vi.mocked(authenticateToken).mockReturnValue("ghost@example.com");
-    vi.mocked(User.findOne).mockResolvedValue(null as never);
+  it("replies 401 when no User has the token's email", async () => {
     const handler = vi.fn();
-    const wrapped = withAuthenticatedUser(handler);
 
-    const res = buildRes();
-    await wrapped(buildReq({ authorization: "Bearer t" }), res);
+    const { status, body } = await call(
+      withAuthenticatedUser(handler),
+      `Bearer ${generateAccessToken("ghost@example.com")}`,
+    );
 
-    expect(res.status).toHaveBeenCalledWith(StatusCodes.UNAUTHORIZED);
-    expect(res.json).toHaveBeenCalledWith({ msg: "No user found." });
+    expect(status).toBe(StatusCodes.UNAUTHORIZED);
+    expect(body).toEqual({ msg: "No user found." });
     expect(handler).not.toHaveBeenCalled();
   });
 
-  it("invokes the handler with userDoc, email and a freshly rotated token on the happy path", async () => {
-    const userDoc = { _id: "u1", email: "user@example.com" };
-    vi.mocked(authenticateToken).mockReturnValue("user@example.com");
-    vi.mocked(User.findOne).mockResolvedValue(userDoc as never);
-    vi.mocked(generateAccessToken).mockReturnValue("fresh-jwt");
-    const handler = vi.fn().mockResolvedValue(undefined);
-    const wrapped = withAuthenticatedUser(handler);
+  it("passes the stored User, the email and a rotated token, accepting a lowercase bearer", async () => {
+    const user = await User.create({ email: EMAIL });
+    const handler = vi.fn();
 
-    const req = buildReq({ authorization: "Bearer good.token" });
-    const res = buildRes();
-    await wrapped(req, res);
+    await call(withAuthenticatedUser(handler), `bearer ${generateAccessToken(EMAIL)}`);
 
-    expect(connectDb).toHaveBeenCalled();
-    expect(generateAccessToken).toHaveBeenCalledWith("user@example.com");
     expect(handler).toHaveBeenCalledTimes(1);
-    expect(handler).toHaveBeenCalledWith(req, res, {
-      userDoc,
-      email: "user@example.com",
-      newToken: "fresh-jwt",
+    const ctx = handler.mock.calls[0][2];
+    expect(ctx.userDoc._id).toEqual(user._id);
+    expect(ctx.email).toBe(EMAIL);
+    expect(authenticateToken(ctx.newToken)).toBe(EMAIL);
+  });
+
+  it("propagates handler errors", async () => {
+    await User.create({ email: EMAIL });
+    const boom = new Error("boom");
+    const failing = withAuthenticatedUser(() => {
+      throw boom;
+    });
+
+    await expect(call(failing, `Bearer ${generateAccessToken(EMAIL)}`)).rejects.toBe(boom);
+  });
+});
+
+describe("withOptionalUser", () => {
+  it("calls the handler as a guest when no token is sent", async () => {
+    const handler = vi.fn();
+
+    await call(withOptionalUser(handler));
+
+    expect(handler.mock.calls[0][2]).toEqual({
+      isGuest: true,
+      userDoc: null,
+      email: null,
+      newToken: null,
     });
   });
 
-  it("propagates handler errors so the framework's error handling can run", async () => {
-    vi.mocked(authenticateToken).mockReturnValue("user@example.com");
-    vi.mocked(User.findOne).mockResolvedValue({ _id: "u1", email: "user@example.com" } as never);
-    const boom = new Error("db down");
-    const handler = vi.fn().mockRejectedValue(boom);
-    const wrapped = withAuthenticatedUser(handler);
+  it("calls the handler with the stored User when the token is valid", async () => {
+    const user = await User.create({ email: EMAIL });
+    const handler = vi.fn();
 
-    await expect(wrapped(buildReq({ authorization: "Bearer t" }), buildRes())).rejects.toBe(boom);
+    await call(withOptionalUser(handler), `Bearer ${generateAccessToken(EMAIL)}`);
+
+    const ctx = handler.mock.calls[0][2];
+    expect(ctx.isGuest).toBe(false);
+    expect(ctx.userDoc._id).toEqual(user._id);
+  });
+
+  it("replies 401 for an invalid token instead of falling back to guest", async () => {
+    const handler = vi.fn();
+
+    const { status, body } = await call(withOptionalUser(handler), "Bearer not-a-jwt");
+
+    expect(status).toBe(StatusCodes.UNAUTHORIZED);
+    expect(body).toEqual({ msg: "Invalid token" });
+    expect(handler).not.toHaveBeenCalled();
   });
 });

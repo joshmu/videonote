@@ -12,13 +12,17 @@ export const useTestJwtSecret = () => {
 
 export type ApiResult = { status: number; body: Record<string, any> };
 
-/** Call a Next.js API handler with a fake req/res and capture the reply. */
+/**
+ * Call a Next.js API handler with a fake req/res and capture the reply.
+ * `email` sends a valid token for that email; `authorization` sends the header as is.
+ */
 export const callApi = async (
   handler: NextApiHandler,
   body: unknown,
-  { email }: { email?: string } = {},
+  { email, authorization }: { email?: string; authorization?: string } = {},
 ): Promise<ApiResult> => {
-  const headers = email ? { authorization: `Bearer ${generateAccessToken(email)}` } : {};
+  const header = email ? `Bearer ${generateAccessToken(email)}` : authorization;
+  const headers = header ? { authorization: header } : {};
   const req = { method: "POST", headers, body } as unknown as NextApiRequest;
   const result: ApiResult = { status: 0, body: undefined };
   const res = {
