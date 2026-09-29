@@ -368,15 +368,11 @@ export const GlobalProvider = ({
   };
 
   const toggleMenuOpen: ToggleMenuOpenType = (state = undefined) => {
-    const ismenuOpen = state ? state : !menuOpen;
-    setMenuOpen(ismenuOpen);
+    setMenuOpen(state ?? !menuOpen);
   };
 
   const toggleSidebar: ToggleSidebarType = (state = undefined) => {
-    setSidebarOpen((currentState) => {
-      const updatedState = state ? state : !currentState;
-      return updatedState;
-    });
+    setSidebarOpen((currentState) => state ?? !currentState);
   };
 
   const toggleModalOpen: ToggleModalOpenType = (modalName = undefined) => {
