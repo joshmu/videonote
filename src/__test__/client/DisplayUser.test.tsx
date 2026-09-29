@@ -3,26 +3,25 @@ import { describe, expect, it } from "vitest";
 
 import DisplayUser from "@/components/NoteList/NoteItem/DisplayUser/DisplayUser";
 
+const label = (props: Record<string, unknown>) => render(<DisplayUser {...props} />).container;
+
 describe("DisplayUser", () => {
-  it("renders nothing for the current user's own note", () => {
-    const { container } = render(
-      <DisplayUser noteUser={{ _id: "u1" }} currentUser={{ _id: "u1" }} />,
-    );
-
-    expect(container.textContent).toBe("");
+  it("renders nothing on the viewer's own note", () => {
+    expect(label({ author: { _id: "u1", role: "owner" }, own: true }).textContent).toBe("");
   });
 
-  it("labels an id-only author as guest", () => {
-    const { container } = render(<DisplayUser noteUser={{ _id: "u2" }} currentUser={null} />);
-
-    expect(container.textContent).toBe("guest");
+  it("labels an author without a public username by role", () => {
+    expect(label({ author: { _id: "u1", role: "owner" } }).textContent).toBe("owner");
+    expect(label({ author: { _id: "u2", role: "member" } }).textContent).toBe("member");
   });
 
-  it("shows another author's username", () => {
-    const { container } = render(
-      <DisplayUser noteUser={{ _id: "u2", username: "Casey" }} currentUser={{ _id: "u1" }} />,
-    );
+  it("labels a note with no author as guest", () => {
+    expect(label({}).textContent).toBe("guest");
+  });
 
-    expect(container.textContent).toBe("casey");
+  it("shows an author's public username", () => {
+    expect(label({ author: { _id: "u2", username: "Casey", role: "member" } }).textContent).toBe(
+      "casey",
+    );
   });
 });

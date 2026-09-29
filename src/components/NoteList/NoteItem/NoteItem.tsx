@@ -25,6 +25,13 @@ import { NoteInterface, ShareProjectInterface } from "@/shared/types";
 
 import DisplayUser from "./DisplayUser/DisplayUser";
 
+// A note added in this session, or authored by the signed-in viewer.
+const isOwnNote = (note: NoteInterface, userId?: string): boolean => {
+  if (note.currentSession) return true;
+  const authorId = typeof note.user === "string" ? note.user : note.user?._id;
+  return userId !== undefined && authorId === userId;
+};
+
 interface NoteItemInterface {
   note: NoteInterface;
   closestProximity: boolean;
@@ -122,11 +129,7 @@ export const NoteItem = ({ note, closestProximity, childVariants }: NoteItemInte
               state.done && !closestProximity && "text-themeText2"
             } w-full h-full py-2 pl-2`}
           >
-            <DisplayUser
-              noteUser={note.user}
-              currentUser={user}
-              currentSession={note?.currentSession}
-            />
+            <DisplayUser author={note.user} own={isOwnNote(note, user?._id)} />
             {isEditing ? (
               <input
                 type="text"

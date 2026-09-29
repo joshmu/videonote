@@ -180,7 +180,8 @@ Computed in one place, `toPublicAuthor(user, ownerId)`: `owner` for the
 Project's **User**, `member` for any other **User**. A **Note** with no
 author is a guest's and carries no `user`. Public reads, Note write
 responses and the **Owner projection** all use it; the client only reads
-the role.
+the role (`DisplayUser` shows the public username, else the role, else
+"guest", and nothing on the viewer's own Notes).
 
 **Share token**:
 `utils/share/shareToken.ts`. A 12 hour JWT proving the caller gave a

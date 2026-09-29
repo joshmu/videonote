@@ -30,12 +30,20 @@ export interface ProjectInterface {
   share?: string | ShareProjectInterface;
 }
 
+/** A note author as the server sends it; a note with no author is a guest's. */
+export interface NoteAuthor {
+  _id: string;
+  username?: string;
+  role: "owner" | "member";
+}
+
 export interface NoteInterface {
   _id?: string;
   content: string;
   time?: number;
   done?: boolean;
-  user?: string | UserInterface;
+  /** The author's id on a note added in this session. */
+  user?: string | NoteAuthor;
   project: string | ProjectInterface;
   currentSession?: boolean;
 }
