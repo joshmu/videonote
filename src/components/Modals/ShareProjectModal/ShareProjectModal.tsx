@@ -90,19 +90,9 @@ export const ShareProjectModal = ({
   };
 
   const handleChange = (event: ChangeEvent<HTMLInputElement>): void => {
-    const id: string = event.target.id;
-    let data = { url: "" };
-
-    // if 'id' is 'url' then format before adding
-    if (id === "url") {
-      data.url = formatUrl(event.target.value);
-    } else {
-      //  otherwise all other entries currently need no additional formatting
-      data[event.target.id] = event.target.value;
-    }
-
-    const updatedState = { ...state, ...data };
-    setState(updatedState);
+    const { id, value } = event.target;
+    // Only the url is formatted; every other field is kept as typed.
+    setState((current) => ({ ...current, [id]: id === "url" ? formatUrl(value) : value }));
   };
 
   const handleCanEditToggle = (): void => {

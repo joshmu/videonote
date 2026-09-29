@@ -1,4 +1,4 @@
-import { fireEvent, render } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { CurrentProjectModal } from "@/components/Modals/CurrentProjectModal/CurrentProjectModal";
@@ -81,5 +81,33 @@ describe("project modals keep edits across note changes", () => {
     rerender(modal());
 
     expect(input(container, "url").value).toBe("saved");
+  });
+});
+
+describe("ShareProjectModal fields", () => {
+  const renderShare = () =>
+    render(<ShareProjectModal toggle={vi.fn()} motionKey="share" />).container;
+  const type = (container: HTMLElement, id: string, value: string) =>
+    fireEvent.change(input(container, id), { target: { id, value } });
+
+  it("keeps the url when the password is typed after it", () => {
+    mocks.projects.project = { ...project, share: undefined };
+    const container = renderShare();
+
+    type(container, "url", "Final Cut");
+    type(container, "password", "hunter2");
+
+    expect(input(container, "url").value).toBe("final-cut");
+    expect(input(container, "password").value).toBe("hunter2");
+  });
+
+  it("keeps the url when edit access is toggled", () => {
+    mocks.projects.project = { ...project, share: undefined };
+    const container = renderShare();
+
+    type(container, "url", "final");
+    fireEvent.click(screen.getByText("Users can edit notes."));
+
+    expect(input(container, "url").value).toBe("final");
   });
 });

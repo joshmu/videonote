@@ -20,7 +20,6 @@ description: Build, run and drive VideoNote locally (real MongoDB, production bu
 - GUI: any Playwright install (headless Chromium); point `executablePath` at an installed build if the bundled revision is missing.
 - Video: a URL the browser can't play (e.g. a fake one) keeps the project `src` and shows a warning with a codec hint and a local-file picker; only a stored `blob:` src is cleared. Serve a real clip: `ffmpeg -f lavfi -i testsrc=duration=60:size=640x360:rate=24 -c:v libvpx clip.webm` and `python3 -m http.server`.
 - Menu is the gear SVG top-right (no label); items by text ("create new", "Share Project").
-- Share modal: fill password BEFORE url (typing in the password field clears the url).
 
 ## Flows worth driving
 
