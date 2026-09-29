@@ -163,6 +163,7 @@ describe("upsertNote field validation", () => {
   it.each([
     ["empty content", { content: "" }],
     ["a non-number time", { time: "soon" }],
+    ["a non-boolean done", { done: 0 }],
   ])("returns invalid on update with %s and leaves the Note unchanged", async (_label, fields) => {
     const { ownerId, projectId } = await seed();
     const note = await seedNote(projectId, { user: ownerId, time: 3 });
@@ -200,6 +201,36 @@ describe("upsertNote field validation", () => {
 
     expect(result.kind).toBe("ok");
     expect(await Note.findById(note._id)).toMatchObject({ content: "Edited", time: 3 });
+  });
+
+  it("creates with done false given a null done", async () => {
+    const { ownerId, projectId } = await seed();
+    const input = noteInput(projectId, { done: null });
+
+    const result = await upsertNote(input as never, ownerId);
+
+    expect(result.kind).toBe("ok");
+    expect(await Note.findById(input._id)).toMatchObject({ done: false });
+  });
+
+  it.each([
+    ["echoes the null done", { done: null }],
+    ["omits done", {}],
+  ])("edits a legacy Note stored with a null done when the update %s", async (_l, fields) => {
+    const { ownerId, projectId } = await seed();
+    const note = await seedNote(projectId, { user: ownerId });
+    await Note.collection.updateOne({ _id: note._id }, { $set: { done: null } });
+
+    const result = await upsertNote(
+      { _id: note._id.toString(), project: projectId, content: "Edited", ...fields } as never,
+      ownerId,
+    );
+
+    expect(result.kind).toBe("ok");
+    expect((await Note.collection.findOne({ _id: note._id })) as object).toMatchObject({
+      content: "Edited",
+      done: null,
+    });
   });
 
   it("lets an update omit content", async () => {

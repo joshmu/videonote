@@ -25,8 +25,16 @@ import { ModalInput } from "@/shared/Modal/ModalInput";
 import { ShareProjectInterface } from "@/shared/types";
 import { copyToClipboard } from "@/utils/clientHelpers";
 
-// todo: remove bad characters from url path entry
-const formatUrl = (txt: string): string => txt.replace(" ", "-").toLowerCase();
+// Lowercase, whitespace as one dash (typed a key at a time too), only url-safe characters.
+const formatUrl = (txt: string): string =>
+  txt
+    .toLowerCase()
+    .replace(/\s+/g, "-")
+    .replace(/[^a-z0-9_-]/g, "")
+    .replace(/-{2,}/g, "-");
+
+// The public link, its url encoded (older Shares may hold a space).
+const shareLink = (url: string): string => `videonote.app/vn/${encodeURIComponent(url)}`;
 
 type ShareForm = { url: string; canEdit: boolean; password: string; removePassword: boolean };
 
@@ -79,7 +87,7 @@ export const ShareProjectModal = ({
     const apiSuccess = await shareProject(toShareData(state));
     if (apiSuccess) {
       addAlert({ type: "success", msg: "Shared project updated." });
-      copyToClipboard(`https://videonote.app/vn/${state.url}`, addAlert);
+      copyToClipboard(`https://${shareLink(state.url)}`, addAlert);
     } else {
       addAlert({ type: "error", msg: "An error occurred..." });
     }
@@ -162,19 +170,18 @@ export const ShareProjectModal = ({
               <div>
                 <p>Your project share link is:</p>
                 <motion.a
-                  href={`https://videonote.app/vn/${(project.share as ShareProjectInterface).url}`}
+                  href={`https://${shareLink((project.share as ShareProjectInterface).url)}`}
                   target="_blank"
                   whileHover={{ scale: 0.95 }}
                   onClick={() =>
                     copyToClipboard(
-                      `https://videonote.app/vn/${(project.share as ShareProjectInterface).url}`,
+                      `https://${shareLink((project.share as ShareProjectInterface).url)}`,
                       addAlert,
                     )
                   }
                   className="italic cursor-pointer top-8 text-themeAccent"
                 >
-                  videonote.app/vn/
-                  {(project.share as ShareProjectInterface).url}
+                  {shareLink((project.share as ShareProjectInterface).url)}
                 </motion.a>
               </div>
             </>

@@ -11,7 +11,7 @@
  */
 
 import { Variants, motion } from "motion/react";
-import { ChangeEvent, KeyboardEvent, useEffect, useState } from "react";
+import { ChangeEvent, KeyboardEvent, useEffect, useRef, useState } from "react";
 
 import { useControlsContext } from "@/context/controlsContext";
 import { useNoteContext } from "@/context/noteContext";
@@ -47,6 +47,9 @@ export const NoteItem = ({ note, closestProximity, childVariants }: NoteItemInte
 
   const [isEditing, setIsEditing] = useState<boolean>(false);
   const [state, setState] = useState<NoteInterface>(note);
+  // The last value sent (or shown as saved), and how many saves are still in flight.
+  const lastSentRef = useRef<NoteInterface>(note);
+  const [pendingSaves, setPendingSaves] = useState(0);
 
   const isMount = useIsMount();
 
@@ -56,16 +59,31 @@ export const NoteItem = ({ note, closestProximity, childVariants }: NoteItemInte
     toggleSmartControls(enableSmartControls);
   }, [isEditing]);
 
+  // Show the saved note once no save is in flight, e.g. after a rejected edit.
+  useEffect(() => {
+    if (isMount || isEditing || pendingSaves > 0) return;
+    lastSentRef.current = note;
+    setState(note);
+  }, [note, pendingSaves]);
+
   // update note whenever their is a change
   useEffect(() => {
     // do not update on initial load
     if (isMount) return;
     // do not update whilst editing content
     if (isEditing) return;
-    // do not update if state has not been modified from the initially loaded note
-    if (Object.entries(state).every(([key, val]) => note[key] === val)) return;
+    // Emptied content is never sent: the saved content comes back.
+    if (!state.content.trim()) {
+      if (state.content !== note.content) setState({ ...state, content: note.content });
+      return;
+    }
+    // do not update if state has not changed since it was last sent
+    const lastSent = lastSentRef.current;
+    if (Object.entries(state).every(([key, val]) => lastSent[key] === val)) return;
 
-    updateNote(state);
+    lastSentRef.current = state;
+    setPendingSaves((count) => count + 1);
+    void updateNote(state).finally(() => setPendingSaves((count) => count - 1));
   }, [isEditing, state, isMount]);
 
   const handleTimeClick = (): void => {

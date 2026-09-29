@@ -119,6 +119,35 @@ describe("ShareProjectModal fields", () => {
     expect(sent()).toEqual({ url: "final-cut", canEdit: true, password: "hunter2" });
   });
 
+  it("turns every run of whitespace into a dash and drops url-unsafe characters", () => {
+    mocks.projects.project = { ...project, share: undefined };
+    const container = renderShare();
+
+    type(container, "url", "My  Final\tCut?#/%");
+
+    expect(input(container, "url").value).toBe("my-final-cut");
+  });
+
+  it("gives two spaces typed one at a time a single dash", () => {
+    mocks.projects.project = { ...project, share: undefined };
+    const container = renderShare();
+
+    type(container, "url", "rough ");
+    type(container, "url", `${input(container, "url").value} `);
+
+    expect(input(container, "url").value).toBe("rough-");
+  });
+
+  it("links to a Share stored with a space through its encoded url", () => {
+    mocks.projects.project = { ...project, share: { ...project.share, url: "rough cut" } };
+    renderShare();
+
+    expect(screen.getByRole("link")).toHaveAttribute(
+      "href",
+      "https://videonote.app/vn/rough%20cut",
+    );
+  });
+
   it("keeps the url when edit access is toggled", () => {
     mocks.projects.project = { ...project, share: undefined };
     const container = renderShare();

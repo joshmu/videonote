@@ -229,6 +229,30 @@ describe("/api/project", () => {
     expect(body.msg).toMatch(/taken/);
   });
 
+  it("replies 409 when a share is updated to a url another share uses", async () => {
+    const { owner, project } = await seed();
+    const other = await Project.create({ title: "Other", user: owner._id });
+    await Share.init();
+    await Share.create({ url: "taken", user: owner._id, project: other._id });
+    const shareAs = (url: string) =>
+      callApi(
+        handler,
+        {
+          action: ProjectApiActions.SHARE,
+          project: { _id: project._id.toString() },
+          share: { url },
+        },
+        { email: OWNER },
+      );
+    await shareAs("rough-cut");
+
+    const { status, body } = await shareAs("taken");
+
+    expect(status).toBe(StatusCodes.CONFLICT);
+    expect(body.msg).toMatch(/taken/);
+    expect(await Share.countDocuments({ url: "rough-cut", project: project._id })).toBe(1);
+  });
+
   it("removes an owned project and replies with it", async () => {
     const { project } = await seed();
 

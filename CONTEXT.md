@@ -151,7 +151,8 @@ that owns the Project↔Share lifecycle. `attachOrUpdateShare` decides
 create-vs-update by `projectDoc.share`, writes only `url`, `password` and
 `canEdit` from the caller (`project` and `user` come from the Project), hashes
 the password (via
-`hashSharePassword`), and surfaces a duplicate `url` as `ShareUrlTakenError`.
+`hashSharePassword`), and surfaces a duplicate `url` as `ShareUrlTakenError`
+on create and update alike.
 An absent `password` keeps the current one and an empty one removes it.
 Both operations return the project re-loaded through `findProjectWithRelations`
 in the **Owner projection**. `Share.password` is not selected by default;
@@ -216,9 +217,10 @@ header, and return `ok` | `invalid` | `notFound` | `forbidden` |
 404, 403 and 403 with `code: "sharePasswordRequired"`. `invalid` is a Note or Project id that is not a hex
 ObjectId string (a missing Project id too), or a field the Note schema would
 reject: `content` must be a non-empty string (required on create), `time` a
-finite number, `done` a boolean. A missing or null `time` is not `invalid`:
-it is 0 on create and left unchanged on update. It is checked before the
-permission check.
+finite number, `done` a boolean. A missing or null `time` or `done` is not
+`invalid`: `time` is 0 and `done` false on create, and either is left
+unchanged on update (legacy Notes may store a null `done`). It is checked
+before the permission check.
 `upsertNote` decides create-vs-update by `Note.findById(input._id)`; a
 missing id creates.
 On update only `content`, `time` and `done` change; `project` and `user`
@@ -284,11 +286,14 @@ An update takes only `title` and `src` from its reply, keeping the loaded
 Notes and Share.
 The Share modal reads `hasPassword`: an empty password field sends no
 `password` (kept), its remove control sends `""`, a typed value sets it.
+A typed url is lowercased, each run of whitespace becomes `-`, any other
+character outside `a-z0-9_-` is dropped and repeated dashes become one.
+The link it shows and copies encodes the url.
 
 **Shared-project access context**:
 `src/context/sharedProjectContext.tsx`. Opens a public **Share**
-(prompting for its password and retrying; a pending retry is cancelled on
-unmount), holds the **Share token** it
+(prompting for its password and retrying with the decoded url from the page
+path; a pending retry is cancelled on unmount), holds the **Share token** it
 hands out in memory (`shareToken()`), `renewShareAccess()` to ask for the
 password again when a Note write is refused for it (the project stays on
 screen; it resolves `false` if the prompt is dismissed), and `checkCanEdit`, the one canEdit source: a signed-in User on
@@ -311,7 +316,11 @@ with `sharePasswordRequired` keeps its Note, waits on `renewShareAccess`
 and is sent again; a dismissed prompt fails it with an alert. Writes to one
 Note go out one at a time, so its create lands before its updates, and a
 Note whose create failed sends nothing more. A new Note always has a
-numeric `time`: its own, else the player position, else 0.
+numeric `time`: its own, else the player position, else 0. The Notes held
+here are the last saved ones: a rejected update puts the saved Note back
+and its row shows it again. A row sends whatever differs from what it last
+sent, and takes the saved Note only once none of its saves is in flight. The note editor never sends empty or blank
+`content`; the saved content comes back instead.
 
 `HINTS` and `SETTINGS_DEFAULTS` live in `src/components/shared/constants.ts`;
 `copyToClipboard` is in `utils/clientHelpers.ts`.
