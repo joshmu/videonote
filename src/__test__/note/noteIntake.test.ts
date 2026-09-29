@@ -176,6 +176,32 @@ describe("upsertNote field validation", () => {
     expect(await Note.findById(note._id)).toMatchObject({ content: "Original", time: 3 });
   });
 
+  it.each([
+    ["no time", { time: undefined }],
+    ["a null time", { time: null }],
+  ])("creates with time 0 given %s", async (_label, overrides) => {
+    const { ownerId, projectId } = await seed();
+    const input = noteInput(projectId, overrides);
+
+    const result = await upsertNote(input as never, ownerId);
+
+    expect(result.kind).toBe("ok");
+    expect(await Note.findById(input._id)).toMatchObject({ content: "Trim the intro", time: 0 });
+  });
+
+  it("leaves the time unchanged on an update with a null time", async () => {
+    const { ownerId, projectId } = await seed();
+    const note = await seedNote(projectId, { user: ownerId, time: 3 });
+
+    const result = await upsertNote(
+      { _id: note._id.toString(), project: projectId, content: "Edited", time: null } as never,
+      ownerId,
+    );
+
+    expect(result.kind).toBe("ok");
+    expect(await Note.findById(note._id)).toMatchObject({ content: "Edited", time: 3 });
+  });
+
   it("lets an update omit content", async () => {
     const { ownerId, projectId } = await seed();
     const note = await seedNote(projectId, { user: ownerId });
