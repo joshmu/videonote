@@ -101,9 +101,10 @@ export const updateProfile = async (
 
 /**
  * Delete the account after checking its password: owned Projects (via the
- * Project intake cascade), Notes the user wrote elsewhere, Shares, Settings,
- * then the User. Any failed step throws with the User still in place, so the
- * removal can be re-run.
+ * Project intake cascade, which takes their Notes), Shares, Settings, then
+ * the User. Notes the user wrote on other owners' Projects are kept with no
+ * author. Any failed step throws with the User still in place, so the removal
+ * can be re-run.
  */
 export const removeAccount = async (
   user: UserDoc,
@@ -111,7 +112,8 @@ export const removeAccount = async (
 ): Promise<{ kind: "ok" } | WrongPassword> => {
   if (!(await passwordMatches(user, password))) return { kind: "wrongPassword" };
   await removeUserProjects(user._id);
-  await Note.deleteMany({ user: user._id });
+  // Only Notes on other owners' Projects are left after the cascade.
+  await Note.updateMany({ user: user._id }, { $unset: { user: 1 } });
   await Share.deleteMany({ user: user._id });
   await Settings.deleteMany({ user: user._id });
   await User.deleteOne({ _id: user._id });

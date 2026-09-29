@@ -87,8 +87,9 @@ be non-empty strings. A taken email is detected from the unique index
 (E11000), never by check-then-save. `updateProfile` writes `username` and
 `email` only and returns a token minted for the saved email, so an email
 change keeps the session. `removeAccount` checks the password, removes owned
-**Projects** through the **Project intake**, then the user's other
-**Notes**, **Shares** and **Settings**, and the **User** last. **Settings**
+**Projects** through the **Project intake**, unsets the author on the user's
+**Notes** on other owners' **Projects** (they read as a guest's), removes
+**Shares** and **Settings**, and the **User** last. **Settings**
 are written only through `/api/settings`, which takes `currentProject`,
 `playOffset`, `showHints`, `seekJump` and `sidebarWidth` from the body.
 
