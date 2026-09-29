@@ -11,7 +11,6 @@
  */
 
 import { motion } from "motion/react";
-import { StatusCodes } from "http-status-codes";
 import Link from "next/link";
 import { ChangeEvent, useEffect, useState } from "react";
 
@@ -20,7 +19,7 @@ import { useNotificationContext } from "@/context/notificationContext";
 import { ModalInput } from "@/shared/Modal/ModalInput";
 import { Heading2, SubHeading } from "@/shared/Text/Text";
 import { isValidCredentials } from "@/utils/clientHelpers";
-import { fetcher } from "@/utils/clientHelpers";
+import { browserApi } from "@/utils/apiClient";
 
 type LoginBodyType = {
   email: string;
@@ -74,16 +73,16 @@ export const LoginModal = ({
       email: user.email,
       password: user.password,
     };
-    const { res, data } = await fetcher("/api/login", body);
+    const result = await browserApi.login(body);
 
     // if we haven't found the account
-    if (res.status !== StatusCodes.MOVED_TEMPORARILY) {
-      addAlert({ type: "error", msg: data.msg });
+    if (result.kind !== "ok") {
+      addAlert({ type: "error", msg: result.msg });
       return;
     }
 
     // continue to app
-    handleLogin(data);
+    handleLogin();
   };
 
   const handleToggleLoginRegisterModal = (): void => {

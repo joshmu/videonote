@@ -10,7 +10,6 @@
  * @copyright © 2020 - 2020 MU
  */
 
-import Cookies from "universal-cookie";
 import isEmail from "validator/lib/isEmail";
 
 type IsValidCredentialsType = {
@@ -71,36 +70,6 @@ export const checkPassword = (txt: string): boolean => {
 };
 export const checkPasswordMatch = (password1: string, password2: string): boolean => {
   return password1 === password2;
-};
-
-export const handleJwtToken = (token: string): void => {
-  // save token in cookie for subsequent requests
-  const cookies = new Cookies();
-  cookies.set("token", token, { path: "/" });
-};
-
-export const fetcher = async (url: string, body: object, token: string | boolean = false) => {
-  if (!token) {
-    const cookies = new Cookies();
-    token = cookies.get("token");
-  }
-
-  const headers: { [key: string]: string } = {
-    "Content-Type": "application/json",
-  };
-  // include 'token' in the header if we have one available
-  if (token) headers.Authorization = `Bearer ${token}`;
-
-  const res = await fetch(url, {
-    method: "POST",
-    headers,
-    body: JSON.stringify(body),
-  });
-  const data = await res.json();
-
-  if (data.token) handleJwtToken(data.token);
-
-  return { res, data };
 };
 
 /** A MongoDB ObjectId-compatible id: 4-byte seconds timestamp + 8 random bytes, as hex. */

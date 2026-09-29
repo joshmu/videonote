@@ -11,7 +11,6 @@
  */
 
 import { motion } from "motion/react";
-import { StatusCodes } from "http-status-codes";
 import Link from "next/link";
 import { ChangeEvent, useEffect, useState } from "react";
 
@@ -20,7 +19,7 @@ import { useNotificationContext } from "@/context/notificationContext";
 import { ModalInput } from "@/shared/Modal/ModalInput";
 import { Heading2, SubHeading } from "@/shared/Text/Text";
 import { isValidCredentials } from "@/utils/clientHelpers";
-import { fetcher } from "@/utils/clientHelpers";
+import { browserApi } from "@/utils/apiClient";
 
 type RegisterBodyType = {
   email: string;
@@ -68,16 +67,16 @@ export const RegisterModal = ({ toggleLoginView: toggleLoginRegisterView, handle
       password: user.password,
       password2: user.password2,
     };
-    const { res, data } = await fetcher("/api/register", body);
+    const result = await browserApi.register(body);
 
-    if (res.status === StatusCodes.CREATED) {
+    if (result.kind === "ok") {
       addAlert({
         type: "info",
         msg: "Account created",
       });
-      handleLogin(data);
+      handleLogin();
     } else {
-      addAlert({ type: "error", msg: data.msg });
+      addAlert({ type: "error", msg: result.msg });
     }
   };
 
