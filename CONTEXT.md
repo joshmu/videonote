@@ -264,6 +264,13 @@ their own Projects may always edit, a guest only when the **Share** has
 `canEdit`. A viewer who cannot edit gets a "View only" hint in place of the
 note input.
 
+**Video context**:
+`src/context/videoContext.tsx`. The player state and the URL it plays. A
+playback error never clears a stored web `src` (another browser may play
+it): it shows a warning with a codec hint and a local-file picker, and a
+picked file plays for this session only, never saved. Only a stored `blob:`
+`src` (a local file from an earlier session) is cleared.
+
 **Note context**:
 `src/context/noteContext.tsx`. The current Project's **Notes**, search and
 proximity, and the note transport: every **Note** write goes through the

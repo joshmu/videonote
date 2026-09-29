@@ -12,7 +12,13 @@
 
 import { ChangeEvent } from "react";
 
-export const LocalVideoLoader = ({ handleVideoSrc }: { handleVideoSrc: (url: string) => void }) => {
+export const LocalVideoLoader = ({
+  handleVideoSrc,
+  id = "videoFile",
+}: {
+  handleVideoSrc: (url: string) => void;
+  id?: string;
+}) => {
   const handleFileInput = (event: ChangeEvent<HTMLInputElement>): void => {
     const file = event.target.files[0];
     const url = URL.createObjectURL(file);
@@ -21,14 +27,8 @@ export const LocalVideoLoader = ({ handleVideoSrc }: { handleVideoSrc: (url: str
 
   return (
     <div className="mt-3">
-      <label htmlFor="videoFile">
-        <input
-          className="hidden"
-          id="videoFile"
-          name="videoFile"
-          type="file"
-          onChange={handleFileInput}
-        />
+      <label htmlFor={id}>
+        <input className="hidden" id={id} name={id} type="file" onChange={handleFileInput} />
         <span className="px-4 py-2 text-sm transition-colors duration-200 ease-in-out border rounded-sm cursor-pointer text-themeText hover:border-transparent hover:text-themeBg hover:bg-themeAccent">
           Use Local Video
         </span>
