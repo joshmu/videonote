@@ -9,7 +9,8 @@ import { VideoProvider } from "@/context/videoContext";
 
 import { type Reply, type Routes, fakeTransport, ok } from "./providerHarness";
 
-vi.mock("next/router", () => ({ default: { push: vi.fn() } }));
+const mocks = vi.hoisted(() => ({ push: vi.fn() }));
+vi.mock("next/router", () => ({ default: { push: mocks.push } }));
 
 const project = {
   _id: "p1",
@@ -142,6 +143,16 @@ describe("noteContext", () => {
     });
 
     await waitFor(() => expect(ctx.notes.map((n) => n._id)).toEqual(["a", "b"]));
+  });
+
+  it("sends an expired session to login when a note save is unauthorized", async () => {
+    await renderNotes(() => ({ status: 401, body: { msg: "Invalid token" } }));
+
+    await act(async () => {
+      ctx.addNote({ content: "added", time: 30 });
+    });
+
+    await waitFor(() => expect(mocks.push).toHaveBeenCalledWith("/login"));
   });
 
   it("sorts without reordering the notes state", async () => {
