@@ -38,6 +38,11 @@ export type ApiFailure =
 
 export type ApiResult<T> = { kind: "ok"; status: number; data: T } | ApiFailure;
 
+/** A Note write, which a password-protected Share may answer by asking for its password. */
+export type NoteWriteResult<T> =
+  | ApiResult<T>
+  | { kind: "sharePasswordRequired"; status: number; msg: string };
+
 export type FetchFn = (input: string, init: RequestInit) => Promise<Response>;
 
 type AccountPayload = UserInterface & {
@@ -53,9 +58,12 @@ export type UserReply = { user: UserInterface };
 export type SettingsReply = { settings: SettingsInterface };
 export type MsgReply = { msg: string };
 
-/** A Share read from the public route, by status: 401, 403, 404 or ok. */
+/**
+ * A Share read from the public route, by status: 401, 403, 404 or ok. A
+ * password-protected Share's ok carries the Share token for Note writes.
+ */
 export type ShareAccess =
-  | { kind: "ok"; project: ProjectInterface }
+  | { kind: "ok"; project: ProjectInterface; shareToken?: string }
   | { kind: "passwordRequired" }
   | { kind: "incorrect" }
   | { kind: "notFound" }
@@ -70,6 +78,8 @@ const SHARE_STATUS: Record<number, ShareAccess> = {
 // /api/user answers a wrong password with 401 as well; only this msg tells it
 // apart from an expired session.
 const WRONG_PASSWORD_MSG = "Password is incorrect.";
+// /api/note answers 403 to a forbidden write too; only this msg asks for the Share password.
+const SHARE_PASSWORD_REQUIRED_MSG = "Share password required.";
 
 type Credentials = { email: string; password: string; password2?: string };
 
@@ -82,8 +92,15 @@ export const createApiClient = ({
   session: SessionStore;
   origin?: string;
 }) => {
-  const post = async <T>(path: string, body: object): Promise<ApiResult<T>> => {
-    const headers: Record<string, string> = { "Content-Type": "application/json" };
+  const post = async <T>(
+    path: string,
+    body: object,
+    extraHeaders: Record<string, string> = {},
+  ): Promise<ApiResult<T>> => {
+    const headers: Record<string, string> = {
+      "Content-Type": "application/json",
+      ...extraHeaders,
+    };
     const token = session.read();
     if (token) headers.Authorization = `Bearer ${token}`;
 
@@ -111,6 +128,23 @@ export const createApiClient = ({
     return { kind: "ok", status: res.status, data: data as T };
   };
 
+  // The Share token goes in its own header; Authorization carries only the session.
+  const noteWrite = async <T>(body: object, shareToken?: string): Promise<NoteWriteResult<T>> => {
+    const result = await post<T>(
+      "/api/note",
+      body,
+      shareToken ? { "x-share-token": shareToken } : {},
+    );
+    if (
+      result.kind === "error" &&
+      result.status === 403 &&
+      result.msg === SHARE_PASSWORD_REQUIRED_MSG
+    ) {
+      return { ...result, kind: "sharePasswordRequired" };
+    }
+    return result;
+  };
+
   return {
     auth: () => post<AuthReply>("/api/auth", {}),
     login: (credentials: Credentials) => post<SessionReply>("/api/login", credentials),
@@ -120,9 +154,10 @@ export const createApiClient = ({
       project: Partial<ProjectInterface>,
       share?: Partial<ShareProjectInterface>,
     ) => post<ProjectReply>("/api/project", { action, project, share }),
-    saveNote: (note: Partial<NoteInterface>) => post<NoteReply>("/api/note", { note }),
-    removeDoneNotes: (projectId: string) =>
-      post<NotesReply>("/api/note", { action: NoteApiAction.REMOVE_DONE_NOTES, projectId }),
+    saveNote: (note: Partial<NoteInterface>, shareToken?: string) =>
+      noteWrite<NoteReply>({ note }, shareToken),
+    removeDoneNotes: (projectId: string, shareToken?: string) =>
+      noteWrite<NotesReply>({ action: NoteApiAction.REMOVE_DONE_NOTES, projectId }, shareToken),
     updateUser: (user: Partial<UserInterface>) =>
       post<UserReply>("/api/user", { action: "update", user }),
     removeAccount: async (
@@ -137,7 +172,7 @@ export const createApiClient = ({
     updateSettings: (settings: Partial<SettingsInterface>) =>
       post<SettingsReply>("/api/settings", { settings }),
     openShare: async (shareUrl: string, password?: string): Promise<ShareAccess> => {
-      const result = await post<{ user?: { projects?: ProjectInterface[] } }>(
+      const result = await post<{ user?: { projects?: ProjectInterface[] }; shareToken?: unknown }>(
         "/api/public_project",
         { shareUrl, password },
       );
@@ -145,7 +180,8 @@ export const createApiClient = ({
         return SHARE_STATUS[result.status] ?? { kind: "error", msg: result.msg };
       const project = result.data.user?.projects?.[0];
       if (!project) return { kind: "error", msg: "Unexpected response from the server." };
-      return { kind: "ok", project };
+      const { shareToken } = result.data;
+      return { kind: "ok", project, ...(typeof shareToken === "string" && { shareToken }) };
     },
   };
 };

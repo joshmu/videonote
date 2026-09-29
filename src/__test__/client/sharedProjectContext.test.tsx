@@ -125,3 +125,55 @@ describe("sharedProjectContext open", () => {
     expect(mocks.push).toHaveBeenCalledWith("/");
   });
 });
+
+describe("sharedProjectContext Share token", () => {
+  const protectedShare = (token: string, title = "Rough cut") => ({
+    "/api/public_project": ({ password }: Record<string, any>) =>
+      password === "hunter2"
+        ? ok({ user: { projects: [{ ...sharedProject(true), title }] }, shareToken: token })
+        : { status: 403, body: { msg: "password incorrect" } },
+  });
+
+  it("holds no Share token for an open Share", () => {
+    const { result } = renderShared();
+
+    act(() => result.current.handleShareAccess({ kind: "ok", project: sharedProject(true) }));
+
+    expect(result.current.shareToken()).toBeUndefined();
+  });
+
+  it("keeps the Share token handed out with a protected Share", async () => {
+    const { result } = renderShared(protectedShare("share-1"));
+
+    act(() => result.current.handleShareAccess({ kind: "passwordRequired" }));
+    await act(async () => result.current.prompt.action({ password: "hunter2" }));
+
+    await waitFor(() => expect(result.current.project).toMatchObject({ _id: "p1" }));
+    expect(result.current.shareToken()).toBe("share-1");
+  });
+
+  it("asks for the password again and swaps in the new Share token, keeping the project on screen", async () => {
+    const replies = { token: "share-1", title: "Rough cut" };
+    const { result } = renderShared({
+      "/api/public_project": (body) =>
+        protectedShare(replies.token, replies.title)["/api/public_project"](body),
+    });
+    act(() => result.current.handleShareAccess({ kind: "passwordRequired" }));
+    await act(async () => result.current.prompt.action({ password: "hunter2" }));
+    await waitFor(() => expect(result.current.shareToken()).toBe("share-1"));
+    const shown = result.current.project;
+    Object.assign(replies, { token: "share-2", title: "Renamed" });
+
+    let renewed = false;
+    act(() => {
+      void result.current.renewShareAccess().then(() => (renewed = true));
+    });
+    await waitFor(() => expect(result.current.prompt.isOpen).toBe(true));
+    expect(result.current.prompt.passwordRequired).toBe(true);
+    await act(async () => result.current.prompt.action({ password: "hunter2" }));
+
+    await waitFor(() => expect(renewed).toBe(true));
+    expect(result.current.shareToken()).toBe("share-2");
+    expect(result.current.project).toBe(shown);
+  });
+});

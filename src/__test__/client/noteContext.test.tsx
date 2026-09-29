@@ -5,6 +5,7 @@ import { NoteApiAction, type NoteInterface } from "@/components/shared/types";
 import { AppProviders } from "@/context/appProviders";
 import { NoteProvider, useNoteContext } from "@/context/noteContext";
 import { NotificationProvider } from "@/context/notificationContext";
+import { useUiShellContext } from "@/context/uiShellContext";
 import { VideoProvider } from "@/context/videoContext";
 
 import { type Reply, type Routes, fakeTransport, ok } from "./providerHarness";
@@ -33,8 +34,10 @@ const signedIn = {
 };
 
 let ctx: ReturnType<typeof useNoteContext>;
+let prompt: ReturnType<typeof useUiShellContext>["promptState"];
 const Probe = () => {
   ctx = useNoteContext();
+  prompt = useUiShellContext().promptState;
   return null;
 };
 
@@ -163,5 +166,79 @@ describe("noteContext", () => {
 
     expect(sorted.map((n) => n._id)).toEqual(["b", "a"]);
     expect(notes.map((n) => n._id)).toEqual(["a", "b"]);
+  });
+});
+
+describe("noteContext on a password-protected Share", () => {
+  const shared = { ...project, share: { _id: "s1", url: "rough-cut", canEdit: true } };
+
+  const renderGuest = async (note: Routes[string]) => {
+    const tokens = ["share-1", "share-2"];
+    const transport = fakeTransport(
+      {
+        "/api/public_project": () =>
+          ok({ user: { projects: [shared] }, shareToken: tokens.shift() }),
+        "/api/note": note,
+      },
+      undefined,
+    );
+    await act(async () => {
+      render(
+        <NotificationProvider>
+          <AppProviders
+            serverData={{ share: { kind: "passwordRequired" } }}
+            api={transport.api}
+            sessionStore={transport.sessionStore}
+          >
+            <VideoProvider>
+              <NoteProvider>
+                <Probe />
+              </NoteProvider>
+            </VideoProvider>
+          </AppProviders>
+        </NotificationProvider>,
+      );
+    });
+    await act(async () => prompt.action({ password: "hunter2" }));
+    await waitFor(() => expect(ctx.notes).toHaveLength(2));
+    return transport;
+  };
+
+  beforeEach(() => {
+    window.history.pushState({}, "", "/vn/rough-cut");
+  });
+
+  it("sends the Share token with note writes", async () => {
+    const { requests } = await renderGuest(({ note }) => ok({ note }));
+
+    await act(async () => {
+      ctx.addNote({ content: "added", time: 30 });
+    });
+
+    expect(noteRequests(requests)[0]).toMatchObject({ shareToken: "share-1" });
+  });
+
+  it("keeps an unsent note, asks for the password again and resends it", async () => {
+    const replies: Reply[] = [{ status: 403, body: { msg: "Share password required." } }];
+    const { requests } = await renderGuest(({ note }) => replies.shift() ?? ok({ note }));
+
+    await act(async () => {
+      ctx.addNote({ content: "added", time: 30 });
+    });
+
+    await waitFor(() => expect(prompt.isOpen).toBe(true));
+    expect(prompt.passwordRequired).toBe(true);
+    expect(ctx.notes.map((n) => n.content)).toContain("added");
+
+    await act(async () => prompt.action({ password: "hunter2" }));
+
+    await waitFor(() => expect(noteRequests(requests)).toHaveLength(2));
+    expect(noteRequests(requests)[1]).toMatchObject({
+      shareToken: "share-2",
+      body: { note: expect.objectContaining({ content: "added" }) },
+    });
+    await waitFor(() => expect(ctx.notes.map((n) => n.content)).toContain("added"));
+    expect(ctx.notes).toHaveLength(3);
+    expect(mocks.push).not.toHaveBeenCalled();
   });
 });

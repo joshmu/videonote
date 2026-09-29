@@ -217,7 +217,10 @@ The one-line helper in `utils/auth/withAuthenticatedUser.ts` that pulls
 takes `fetch` as a parameter and exposes one typed call per route, each
 returning `ok` | `unauthorized` (401) | `error` (other failures, non-JSON
 bodies, network errors). `openShare` instead returns the Share access outcome
-read from the public route's status, and `removeAccount` adds `wrongPassword`
+read from the public route's status (its `ok` carries the **Share token**
+when there is one). `saveNote` and `removeDoneNotes` take an optional
+**Share token**, sent as `x-share-token`, and add `sharePasswordRequired`
+(a 403 whose msg is `Share password required.`), and `removeAccount` adds `wrongPassword`
 (a 401 whose msg is the wrong-password one) so an expired session still reads
 as `unauthorized`. The **SessionStore** it takes is the only
 code that touches the token cookie: `browserSession` reads, writes and removes
@@ -253,14 +256,19 @@ one, and the owner's create, load, update, remove, share and unshare calls.
 
 **Shared-project access context**:
 `src/context/sharedProjectContext.tsx`. Opens a public **Share**
-(prompting for its password and retrying), and `checkCanEdit`: a signed-in
-User on their own Projects may always edit, a guest only when the **Share**
-has `canEdit`.
+(prompting for its password and retrying), holds the **Share token** it
+hands out in memory (`shareToken()`), `renewShareAccess()` to ask for the
+password again when a Note write is refused for it (the project stays on
+screen), and `checkCanEdit`, the one canEdit source: a signed-in User on
+their own Projects may always edit, a guest only when the **Share** has
+`canEdit`.
 
 **Note context**:
 `src/context/noteContext.tsx`. The current Project's **Notes**, search and
 proximity, and the note transport: every **Note** write goes through the
-Session's API client from here.
+Session's API client from here, with the **Share token**. A write refused
+with `sharePasswordRequired` keeps its Note, waits on `renewShareAccess`
+and is sent again.
 
 `HINTS` and `SETTINGS_DEFAULTS` live in `src/components/shared/constants.ts`;
 `copyToClipboard` is in `utils/clientHelpers.ts`.

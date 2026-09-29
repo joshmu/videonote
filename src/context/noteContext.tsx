@@ -15,6 +15,7 @@ import { createContext, useContext, useEffect, useRef, useState } from "react";
 import { useIsMount } from "@/hooks/useIsMount";
 import { useNoteProximity } from "@/hooks/useNoteProximity";
 import { NoteInterface } from "@/root/src/components/shared/types";
+import type { ApiResult, NoteWriteResult } from "@/utils/apiClient";
 import { createObjectId } from "@/utils/clientHelpers";
 
 import { useProjectsContext } from "./projectsContext";
@@ -44,7 +45,7 @@ const noteContext = createContext<NoteContextInterface>(null!);
 
 export function NoteProvider(props: { [key: string]: any }) {
   const { project, projects, updateProjectsStateWithUpdatedNotes } = useProjectsContext();
-  const { checkCanEdit } = useSharedProjectContext();
+  const { checkCanEdit, shareToken, renewShareAccess } = useSharedProjectContext();
   const { api, user, reportFailure } = useSessionContext();
   const { progress } = useVideoContext();
   const [notes, setNotes] = useState<NoteInterface[]>([]);
@@ -55,8 +56,21 @@ export function NoteProvider(props: { [key: string]: any }) {
   const { currentNote, checkProximity } = useNoteProximity({ notes, progress });
   const isMount = useIsMount();
 
+  // A protected Share that rejects the Share token asks for its password
+  // again; the write waits, its note kept, and is resent with the new token.
+  const writeThroughShare = async <T,>(
+    send: (token: string | undefined) => Promise<NoteWriteResult<T>>,
+  ): Promise<ApiResult<T>> => {
+    let result = await send(shareToken());
+    while (result.kind === "sharePasswordRequired") {
+      await renewShareAccess();
+      result = await send(shareToken());
+    }
+    return result;
+  };
+
   const noteApi = async (noteData: Partial<NoteInterface>): Promise<NoteInterface | "error"> => {
-    const result = await api.saveNote(noteData);
+    const result = await writeThroughShare((token) => api.saveNote(noteData, token));
     if (result.kind !== "ok") {
       reportFailure(result);
       return "error";
@@ -65,7 +79,7 @@ export function NoteProvider(props: { [key: string]: any }) {
   };
 
   const noteApiRemoveDoneNotes = async (): Promise<NoteInterface[] | "error"> => {
-    const result = await api.removeDoneNotes(project._id);
+    const result = await writeThroughShare((token) => api.removeDoneNotes(project._id, token));
     if (result.kind !== "ok") {
       reportFailure(result);
       return "error";

@@ -152,8 +152,57 @@ describe("removeAccount", () => {
   });
 });
 
+describe("note writes through a Share", () => {
+  it("sends the Share token in its own header, beside the session", async () => {
+    const { fetch, api } = clientWith(reply(200, { note: {} }));
+
+    await api.saveNote({ content: "Trim", project: "p1" }, "share-t");
+    await api.removeDoneNotes("p1", "share-t");
+
+    for (const [, init] of fetch.mock.calls as unknown as [string, RequestInit][]) {
+      expect(init.headers).toMatchObject({
+        "x-share-token": "share-t",
+        Authorization: "Bearer t1",
+      });
+    }
+  });
+
+  it("sends no Share token header without one", async () => {
+    const { fetch, api } = clientWith(reply(200, { note: {} }));
+
+    await api.saveNote({ content: "Trim", project: "p1" });
+
+    const [, init] = fetch.mock.calls[0] as unknown as [string, RequestInit];
+    expect(init.headers).not.toHaveProperty("x-share-token");
+  });
+
+  it("tells a Share asking for its password apart from a forbidden write", async () => {
+    const asks = clientWith(reply(403, { msg: "Share password required." }));
+    const forbidden = clientWith(reply(403, { msg: "Not allowed to edit notes in this project." }));
+
+    expect(await asks.api.saveNote({ content: "Trim", project: "p1" })).toEqual({
+      kind: "sharePasswordRequired",
+      status: 403,
+      msg: "Share password required.",
+    });
+    expect(await forbidden.api.removeDoneNotes("p1")).toMatchObject({ kind: "error", status: 403 });
+  });
+});
+
 describe("openShare", () => {
   const project = { _id: "p1", title: "Rough cut", notes: [] };
+
+  it("returns the Share token a protected Share hands out", async () => {
+    const { api } = clientWith(
+      reply(200, { user: { projects: [project] }, shareToken: "share-t" }),
+    );
+
+    expect(await api.openShare("rough-cut", "hunter2")).toEqual({
+      kind: "ok",
+      project,
+      shareToken: "share-t",
+    });
+  });
 
   it.each([
     [200, { user: { projects: [project] } }, { kind: "ok", project }],
@@ -164,7 +213,7 @@ describe("openShare", () => {
   ])("maps a %i reply to its Share access outcome", async (status, body, expected) => {
     const { fetch, api } = clientWith(reply(status, body), memorySession());
 
-    expect(await api.openShare("rough-cut", "hunter2")).toEqual(expected);
+    expect(await api.openShare("rough-cut", "hunter2")).toStrictEqual(expected);
     const [url, init] = fetch.mock.calls[0] as unknown as [string, RequestInit];
     expect(url).toBe("/api/public_project");
     expect(JSON.parse(init.body as string)).toEqual({ shareUrl: "rough-cut", password: "hunter2" });
