@@ -7,7 +7,6 @@ vi.mock("@/context/notificationContext", () => ({
   useNotificationContext: () => ({ addAlert: vi.fn() }),
 }));
 vi.mock("next/router", () => ({ default: { push: vi.fn() } }));
-vi.mock("@/utils/clientHelpers", () => ({ fetcher: vi.fn() }));
 
 let ctx: ReturnType<typeof useGlobalContext>;
 const Probe = () => {

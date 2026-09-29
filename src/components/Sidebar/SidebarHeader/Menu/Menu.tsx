@@ -25,13 +25,13 @@ import {
   RiLogoutBoxLine as SignoutIcon,
 } from "react-icons/ri";
 import { VscSettings as SettingsIcon } from "react-icons/vsc";
-import Cookie from "universal-cookie";
 
 import { ModalType } from "@/components/Modals/Modals";
 import { useGlobalContext } from "@/context/globalContext";
 import { useThemeContext } from "@/context/themeContext";
 import { Select } from "@/shared/Select/Select";
 import { ThemeToggle } from "@/shared/ThemeToggle/ThemeToggle";
+import { browserSession } from "@/utils/apiClient";
 
 import { IconMenuItemWrapper } from "./IconMenuItemWrapper/IconMenuItemWrapper";
 
@@ -59,9 +59,7 @@ export const Menu = () => {
   };
 
   const handleSignOutClick = (): void => {
-    // remove JWT token cookie
-    const cookies = new Cookie();
-    cookies.remove("token");
+    browserSession.remove();
   };
 
   const handleThemeToggleClick = (): void => {

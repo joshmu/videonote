@@ -92,6 +92,19 @@ describe("noteContext", () => {
     expect(ctx.notes[0].done).toBe(true);
   });
 
+  it("gives a new note an ObjectId-shaped id and keeps it after the server accepts it", async () => {
+    mocks.global.noteApi.mockImplementation(async (note: NoteInterface) => note);
+    renderNotes();
+
+    await act(async () => {
+      ctx.addNote({ content: "added", time: 30 });
+    });
+
+    const sent = mocks.global.noteApi.mock.calls[0][0] as NoteInterface;
+    expect(sent._id).toMatch(/^[0-9a-f]{24}$/);
+    expect(ctx.notes.map((n) => n._id)).toContain(sent._id);
+  });
+
   it("sorts without reordering the notes state", () => {
     renderNotes();
     const notes = ctx.notes;

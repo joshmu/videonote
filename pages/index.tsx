@@ -10,10 +10,8 @@
  * @copyright © 2020 - 2020 MU
  */
 
-import { StatusCodes } from "http-status-codes";
 import { NextPage, NextPageContext } from "next";
 import absoluteUrl from "next-absolute-url";
-import Cookies from "universal-cookie";
 
 import { Layout } from "@/components/Layout/Layout";
 import { Modals } from "@/components/Modals/Modals";
@@ -26,7 +24,8 @@ import { NoteProvider } from "@/context/noteContext";
 import { VideoProvider } from "@/context/videoContext";
 import { AppContainer } from "@/layout/AppContainer/AppContainer";
 import { Overlay } from "@/shared/Modal/Overlay";
-import { fetcher } from "@/utils/clientHelpers";
+import { browserSession, createApiClient, requestSession } from "@/utils/apiClient";
+import { redirectFromInitialProps } from "@/utils/clientHelpers";
 
 interface Props {
   serverData?: {};
@@ -56,35 +55,25 @@ const IndexPage: NextPage<Props> = ({ serverData = {} }) => {
 };
 
 IndexPage.getInitialProps = async (ctx: NextPageContext) => {
-  const cookies = new Cookies(ctx?.req?.headers?.cookie ? ctx.req.headers.cookie : null);
-  const token = cookies.get("token");
+  // On the server the token comes from the request and no cookie is set;
+  // a client-side navigation reads the browser cookie.
+  const session = ctx.req ? requestSession(ctx.req.headers.cookie) : browserSession;
 
-  if (!token) {
-    console.log("no token, redirecting...");
-    // server
-    ctx.res.writeHead(StatusCodes.MOVED_TEMPORARILY, {
-      Location: `/hello`,
-    });
-    ctx.res.end();
-    return;
+  if (!session.read()) {
+    return redirectFromInitialProps(ctx, "/hello");
   }
 
   // request data with JWT token
   const { origin } = absoluteUrl(ctx.req);
-  const url = `${origin}/api/auth`;
-  const body = {};
-  const { res, data } = await fetcher(url, body, token);
+  const api = createApiClient({ fetch: (input, init) => fetch(input, init), session, origin });
+  const result = await api.auth();
 
   // if token is invalid
-  if (res.status !== StatusCodes.OK) {
-    ctx.res.writeHead(StatusCodes.MOVED_TEMPORARILY, {
-      Location: `/login`,
-    });
-    ctx.res.end();
-    return;
+  if (result.kind !== "ok") {
+    return redirectFromInitialProps(ctx, "/login");
   }
 
-  return { serverData: data };
+  return { serverData: result.data };
 };
 
 export default IndexPage;

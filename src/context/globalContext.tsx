@@ -10,27 +10,23 @@
  * @copyright © 2020 - 2020 MU
  */
 
-import { StatusCodes } from "http-status-codes";
 import Router from "next/router";
 import { createContext, useContext, useEffect, useRef, useState } from "react";
-import Cookie from "universal-cookie";
 
 import { usePrompt } from "@/hooks/usePrompt";
 import {
-  NoteApiAction,
   ProjectApiActions,
   ProjectInterface,
   SettingsInterface,
   ShareProjectInterface,
   UserInterface,
 } from "@/root/src/components/shared/types";
-import { fetcher } from "@/utils/clientHelpers";
+import { type ApiFailure, browserApi, browserSession, type ShareAccess } from "@/utils/apiClient";
 
 import { ModalType } from "../components/Modals/Modals";
 import {
   ActionInputFocusType,
   AlertProjectLoadedType,
-  BadResponseType,
   CancelModalsType,
   CheckCanEditType,
   CopyToClipboardType,
@@ -100,7 +96,14 @@ export const GlobalProvider = ({
   const [modalsOpen, setModalsOpen] = useState<ModalType[]>([]);
   const actionInputRef = useRef<HTMLInputElement | null>(null);
 
-  const [admin, setAdmin] = useState<boolean>(true);
+  // guest until the account is loaded; the ref lets actions started during
+  // hydration (e.g. updateSettings from loadProject) see the value just set
+  const [admin, setAdminState] = useState<boolean>(false);
+  const adminRef = useRef<boolean>(false);
+  const setAdmin = (value: boolean): void => {
+    adminRef.current = value;
+    setAdminState(value);
+  };
 
   const { addAlert } = useNotificationContext();
   const { promptState, createPrompt, confirmPrompt, cancelPrompt } = usePrompt();
@@ -138,45 +141,25 @@ export const GlobalProvider = ({
   }, [projects, settings]);
 
   const noteApi: NoteApiType = async (noteData) => {
-    console.log("note api request", noteData);
-    // merge note and user information together match 'user' mongo doc
-    const body = {
-      note: noteData,
-    };
-    // send updated note to server, token will hold user information required
-    const {
-      res,
-      // @ts-ignore
-      data: { note, msg },
-    } = await fetcher("/api/note", body);
-
-    if (badResponse(res, msg)) return "error";
-
-    return note;
+    const result = await browserApi.saveNote(noteData);
+    if (result.kind !== "ok") {
+      reportFailure(result);
+      return "error";
+    }
+    return result.data.note;
   };
 
   const noteApiRemoveDoneNotes: NoteApiRemoveDoneNotes = async () => {
-    console.log("remove completed notes");
-    // api request to delete 'done' notes in current project
-    // merge note and user information together match 'user' mongo doc
-    const body = {
-      action: NoteApiAction.REMOVE_DONE_NOTES,
-      projectId: currentProject._id,
-    };
-    // send updated note to server, token will hold user information required
-    const {
-      res,
-      // @ts-ignore
-      data: { notes, msg },
-    } = await fetcher("/api/note", body);
-
-    if (badResponse(res, msg)) return "error";
-
-    return notes;
+    const result = await browserApi.removeDoneNotes(currentProject._id);
+    if (result.kind !== "ok") {
+      reportFailure(result);
+      return "error";
+    }
+    return result.data.notes;
   };
 
   const updateProject: UpdateProjectType = async (projectData) => {
-    if (!admin) return;
+    if (!adminRef.current) return;
 
     // add _id for db processing
     projectData._id = currentProject._id;
@@ -199,27 +182,15 @@ export const GlobalProvider = ({
   };
 
   const shareProject: ShareProjectType = async (shareData) => {
-    const body = {
-      action: ProjectApiActions.SHARE,
-      project: { _id: currentProject._id },
-      share: shareData,
-    };
+    const response = await projectApi(
+      ProjectApiActions.SHARE,
+      { _id: currentProject._id },
+      shareData,
+    );
+    if (!response) return false;
 
-    const {
-      res,
-      data: { msg, ...data },
-    } = await fetcher("/api/project", body);
-
-    if (badResponse(res, msg)) return;
-
-    if (!data) {
-      console.error("api error");
-      return false;
-    }
-
-    console.log("share project api response...");
-    console.log(data);
-    const { project } = data;
+    const { project } = response;
+    const share = project.share as ShareProjectInterface;
 
     // update the relevant project 'share' prop
     setProjects((current) =>
@@ -232,28 +203,18 @@ export const GlobalProvider = ({
 
     // return true/false based on returned data matching data sent to server
     const valuesToCheck = ["canEdit", "url"];
-    return valuesToCheck.every((key) => project.share[key] === shareData[key]);
+    return valuesToCheck.every((key) => share[key] === shareData[key]);
   };
 
   const removeShareProject: RemoveShareProjectType = async () => {
-    const body = {
-      action: ProjectApiActions.REMOVE_SHARE,
-      project: { _id: currentProject._id },
-      share: { _id: (currentProject.share as ShareProjectInterface)._id },
-    };
-    const {
-      res,
-      data: { msg, ...data },
-    } = await fetcher("/api/project", body);
+    const response = await projectApi(
+      ProjectApiActions.REMOVE_SHARE,
+      { _id: currentProject._id },
+      { _id: (currentProject.share as ShareProjectInterface)._id },
+    );
+    if (!response) return false;
 
-    if (badResponse(res, msg)) return;
-
-    if (!data) {
-      console.error("api error");
-      return false;
-    }
-
-    const { project } = data;
+    const { project } = response;
 
     // update the relevant project
     setProjects((current) =>
@@ -264,25 +225,17 @@ export const GlobalProvider = ({
     // also update current project state
     setCurrentProject(project);
 
-    return res.status === 200;
+    return true;
   };
 
-  // to have access to general projects information (like note count) we need to update the projects list
-  // we do not alter the current project state with the notes change to avoid a potential update loop
+  // keep the projects list (note counts) and the current project (export, note-count guard,
+  // updateProject) in step with the note list
   const updateProjectsStateWithUpdatedNotes: UpdateProjectsStateWithUpdatedNotesType = async (
     notes,
   ) => {
-    console.log("update projects notes state");
-    // alter state of projects
-    setProjects((current) =>
-      current.map((p) => {
-        if (p._id === currentProject._id) {
-          p.notes = notes;
-        }
-        return p;
-        // return p._id === currentProject._id ? { ...currentProject, notes } : p
-      }),
-    );
+    const projectId = currentProject._id;
+    setProjects((current) => current.map((p) => (p._id === projectId ? { ...p, notes } : p)));
+    setCurrentProject((current) => (current?._id === projectId ? { ...current, notes } : current));
   };
 
   const loadProject: LoadProjectType = async (projectId) => {
@@ -314,55 +267,20 @@ export const GlobalProvider = ({
   };
 
   const updateUser: UpdateUserType = async (userData) => {
-    // respect format of user mongo object on server
-    // @ts-ignore
-    console.log("updating user...", userData);
-    // merge settings and user information together match 'user' mongo doc
-    const body = {
-      action: "update",
-      user: userData,
-    };
-    // send data to update to server, token will hold user information required to authenticate
-    const {
-      res,
-      // @ts-ignore
-      data: { user: account, msg },
-    } = await fetcher("/api/user", body);
-
-    // handle if we get a bad response
-    if (badResponse(res, msg)) return;
-
-    // api returns all projects for the user
-    if (!account) {
-      console.error("user from server is incorrect");
-      return;
-    }
-
-    const { settings, ...user } = account;
-
-    console.log({ settings, user });
-    if (settings) setSettings(settings);
-    setUser(user);
+    const result = await browserApi.updateUser(userData);
+    if (result.kind !== "ok") return reportFailure(result);
+    // the profile reply carries no settings; those change through updateSettings
+    setUser(result.data.user);
   };
 
   const updateSettings: UpdateSettingsType = async (newSettingsData) => {
-    if (!admin) return;
+    if (!adminRef.current) return;
 
-    console.log("updating settings...", newSettingsData);
-    // always make sure we include settings _id if we have one (this has been passed earlier)
-    const body = {
-      settings: newSettingsData,
-    };
-    // send updated settings to server, token will hold user information required
-    const {
-      res,
-      data: { settings, msg },
-    } = await fetcher("/api/settings", body);
-
-    if (badResponse(res, msg)) return;
+    const result = await browserApi.updateSettings(newSettingsData);
+    if (result.kind !== "ok") return reportFailure(result);
 
     // any settings which are not present from DB we fill with defaults
-    const fullSettings = { ...SETTINGS_DEFAULTS, ...settings };
+    const fullSettings = { ...SETTINGS_DEFAULTS, ...result.data.settings };
 
     setSettings(fullSettings);
   };
@@ -427,139 +345,106 @@ export const GlobalProvider = ({
     }
   };
 
-  const fetchWithPasswordPublicProject: FetchWithPasswordPublicProjectType = async (password) => {
+  const fetchWithPasswordPublicProject: FetchWithPasswordPublicProjectType = (password) => {
     // get id
     const shareUrl = window.location.pathname.split("/").slice(-1)[0];
+    return browserApi.openShare(shareUrl, password);
+  };
 
-    // fetch config
-    const origin = window.location.origin;
-    const url = `${origin}/api/public_project`;
-    const body = {
-      shareUrl,
-      password,
-    };
-
-    // request project
-    const res = await fetch(url, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
+  const promptForSharePassword = (message: React.ReactElement): void => {
+    createPrompt({
+      msg: (
+        <div>
+          <h2 className="mb-2 text-xl font-bold text-themeAccent">
+            <a href="/">VideoNote</a>
+          </h2>
+          {message}
+        </div>
+      ),
+      passwordRequired: true,
+      action: async (data: any) => {
+        cancelPrompt();
+        const { password } = data;
+        setTimeout(async () => {
+          // get password and send again
+          handleShareAccess(await fetchWithPasswordPublicProject(password));
+        }, 300);
       },
-      body: JSON.stringify(body),
     });
+  };
 
-    // if an error occurs, redirect to homepage for a guest
-    if (res.status !== StatusCodes.OK) {
-      Router.push("/");
+  // A guest reads a Share through the public route only; its reply is the whole project.
+  const handleShareAccess = (access: ShareAccess): void => {
+    switch (access.kind) {
+      case "passwordRequired":
+        return promptForSharePassword(
+          <span className="whitespace-pre">
+            A <span className="text-themeAccent">password </span>
+            is required to access this project
+          </span>,
+        );
+      case "incorrect":
+        return promptForSharePassword(
+          <span className="whitespace-pre">
+            The <span className="text-themeAccent">password </span>
+            is incorrect. Do you want to try again?
+          </span>,
+        );
+      case "ok":
+        setAdmin(false);
+        setProjects([access.project]);
+        setCurrentProject(access.project);
+        alertProjectLoaded(access.project);
+        return;
+      case "notFound":
+      case "error":
+        // redirect to homepage for a guest
+        addAlert({
+          type: "error",
+          msg: access.kind === "error" ? access.msg : "Share url does not exist.",
+        });
+        Router.push("/");
     }
-
-    // parse
-    const data = await res.json();
-
-    return data;
   };
 
   //-------------------------------
   const handleInitialServerData: HandleInitialServerDataType = (data) => {
-    // if password is required then lets exit early
-    // fetch data again providing password
-    // re-init 'handleInitialServerData'
-    if (data.msg === "shared project password required") {
-      createPrompt({
-        msg: (
-          <div>
-            <h2 className="mb-2 text-xl font-bold text-themeAccent">
-              <a href="/">VideoNote</a>
-            </h2>
-            <span className="whitespace-pre">
-              A <span className="text-themeAccent">password </span>
-              is required to access this project
-            </span>
-          </div>
-        ),
-        passwordRequired: true,
-        action: async (data: any) => {
-          cancelPrompt();
-          const { password } = data;
-          setTimeout(async () => {
-            // get password and send again
-            const serverData = await fetchWithPasswordPublicProject(password);
-            handleInitialServerData(serverData);
-          }, 300);
-        },
-      });
-      return;
-    } else if (data.msg === "password incorrect") {
-      createPrompt({
-        msg: (
-          <div>
-            <h2 className="mb-2 text-xl font-bold text-themeAccent">
-              <a href="/">VideoNote</a>
-            </h2>
-            <span className="whitespace-pre">
-              The <span className="text-themeAccent">password </span>
-              is incorrect. Do you want to try again?
-            </span>
-          </div>
-        ),
-        passwordRequired: true,
-        action: async (data: any) => {
-          cancelPrompt();
-          const { password } = data;
-
-          setTimeout(async () => {
-            // get password and send again
-            const serverData = await fetchWithPasswordPublicProject(password);
-            handleInitialServerData(serverData);
-          }, 300);
-        },
-      });
-      return;
-    }
-
-    console.log("handle initial server data", data);
-
-    // PARSE SERVER DATA
-    // user data and msg for server messages
-    const { user: serverData, msg } = data;
-    // grab user projects as seperate var and rest is the account
-    const { projects, ...userAccount } = serverData;
-    const { settings, ...user }: { settings: SettingsInterface } = userAccount;
+    if (data.share) return handleShareAccess(data.share);
 
     // ERROR
-    // if msg presume there is an error
-    if (msg) {
+    // a msg or a missing user means the server could not load the account
+    if (data.msg || !data.user) {
       Router.push("/login");
-      addAlert({ type: "error", msg });
+      addAlert({ type: "error", msg: data.msg ?? "Could not load your account." });
       return;
     }
+
+    // PARSE SERVER DATA
+    // grab user projects as seperate var and rest is the account
+    const { projects = [], ...userAccount } = data.user;
+    const { settings, ...user }: { settings: SettingsInterface } = userAccount;
 
     // HANDLE DATA
     // allocate server data to respective areas
     setProjects(projects);
 
-    if (Object.keys(userAccount).length > 0) {
-      setUser(user as UserInterface);
+    setAdmin(true);
+    setUser(user as UserInterface);
 
-      // avoid null values from mongo
-      // if we have any null property values in returned settings then replace with defaults
-      if (typeof settings === "object" && settings !== null) {
-        // if we have any null settings lets swap them to their defaults
-        Object.keys(settings).forEach((key) => {
-          if (settings[key] === null) settings[key] = SETTINGS_DEFAULTS[key];
-        });
-        setSettings({ ...SETTINGS_DEFAULTS, ...settings });
-      }
-
-      addAlert({
-        type: "success",
-        msg: `Logged in: ${(user as UserInterface).username}`,
+    // avoid null values from mongo
+    // if we have any null property values in returned settings then replace with defaults
+    if (typeof settings === "object" && settings !== null) {
+      // if we have any null settings lets swap them to their defaults
+      Object.keys(settings).forEach((key) => {
+        if (settings[key] === null) settings[key] = SETTINGS_DEFAULTS[key];
       });
-    } else {
-      // if there is no account data then admin is not present, client is guest
-      console.log("GUEST MODE");
-      setAdmin(false);
+      setSettings({ ...SETTINGS_DEFAULTS, ...settings });
     }
+
+    addAlert({
+      type: "success",
+      msg: `Logged in: ${(user as UserInterface).username}`,
+    });
 
     if (projects.length > 0) {
       let currentProject: ProjectInterface;
@@ -590,28 +475,10 @@ export const GlobalProvider = ({
     });
   };
 
-  const projectApi: ProjectApiType = async (action, project) => {
-    console.log(action, { project });
-    // api request to create project, assign user id to it
-    const body = {
-      action: action,
-      project,
-    };
-    // api sends all available projects back
-    const {
-      res,
-      data: { msg, ...data },
-    } = await fetcher("/api/project", body);
-
-    if (badResponse(res, msg)) return;
-
-    // api returns all projects for the user
-    if (!projects) {
-      console.error("projects from server is incorrect");
-      return;
-    }
-
-    return data;
+  const projectApi: ProjectApiType = async (action, project, share) => {
+    const result = await browserApi.project(action, project, share);
+    if (result.kind !== "ok") return reportFailure(result);
+    return result.data;
   };
 
   const copyToClipboard: CopyToClipboardType = (txt, alertMsg = "Copied to clipboard!") => {
@@ -630,43 +497,29 @@ export const GlobalProvider = ({
     );
   };
 
-  const badResponse: BadResponseType = (res, msg) => {
-    if (res.status !== StatusCodes.OK) {
-      if (msg.match(/invalid token/i)) {
-        console.log("invalid token, redirecting...");
-        const alertMsg = "Session expired, please re-enter your credentials";
-        addAlert({ type: "error", msg: alertMsg });
-        Router.push("/login");
-        return true;
-      }
-      addAlert({ type: "error", msg: msg });
-      return true;
+  const reportFailure = (failure: ApiFailure): void => {
+    if (failure.kind === "unauthorized") {
+      addAlert({ type: "error", msg: "Session expired, please re-enter your credentials" });
+      Router.push("/login");
+      return;
     }
-    return false;
+    addAlert({ type: "error", msg: failure.msg });
   };
 
   const removeAccount: RemoveAccountType = async (userData) => {
     console.log("removing account", userData.username);
 
-    // request account deletion
-    // api request to create project, assign user id to it
-    const body = {
-      action: "remove",
-      // use passed data otherwise use current user information in global state
-      user: userData || user,
-    };
+    // use passed data otherwise use current user information in global state
+    const result = await browserApi.removeAccount(userData || user);
+    if (result.kind === "wrongPassword") {
+      addAlert({ type: "error", msg: result.msg });
+      return;
+    }
+    if (result.kind !== "ok") return reportFailure(result);
 
-    // api sends all available projects back
-    const { res, data } = await fetcher("/api/user", body);
-
-    if (badResponse(res, data.msg)) return;
-
-    // presume status 200
     addAlert({ type: "success", msg: "Account removed. Goodbye! 👋" });
 
-    // remove JWT token cookie
-    const cookies = new Cookie();
-    cookies.remove("token");
+    browserSession.remove();
 
     // redirect to landing page
     Router.push("/hello");

@@ -10,7 +10,6 @@
  * @copyright © 2020 - 2020 MU
  */
 
-import { StatusCodes } from "http-status-codes";
 import { NextPage } from "next";
 import absoluteUrl from "next-absolute-url";
 
@@ -25,6 +24,8 @@ import { NoteProvider } from "@/context/noteContext";
 import { VideoProvider } from "@/context/videoContext";
 import { AppContainer } from "@/layout/AppContainer/AppContainer";
 import { Overlay } from "@/shared/Modal/Overlay";
+import { createApiClient, requestSession } from "@/utils/apiClient";
+import { redirectFromInitialProps } from "@/utils/clientHelpers";
 
 interface Props {
   serverData?: {};
@@ -54,39 +55,23 @@ const ShareProjectPage: NextPage<Props> = ({ serverData = {} }) => {
 };
 
 ShareProjectPage.getInitialProps = async (ctx) => {
-  // get id
-  const shareUrl = ctx.query.id;
+  const shareUrl = String(ctx.query.id);
 
-  // fetch config
+  // the public route needs no session token, so none is sent or stored
   const { origin } = absoluteUrl(ctx.req);
-  const url = `${origin}/api/public_project`;
-  const body = {
-    shareUrl,
-  };
-
-  // request project
-  const res = await fetch(url, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(body),
+  const api = createApiClient({
+    fetch: (input, init) => fetch(input, init),
+    session: requestSession(undefined),
+    origin,
   });
+  const share = await api.openShare(shareUrl);
 
-  // if an error occurs, redirect
-  if (res.status !== StatusCodes.OK) {
-    ctx.res.writeHead(StatusCodes.MOVED_TEMPORARILY, {
-      Location: `/hello`,
-    });
-    ctx.res.end();
-    return;
+  // a password-protected Share stays here so the page can prompt for it
+  if (share.kind === "notFound" || share.kind === "error") {
+    return redirectFromInitialProps(ctx, "/hello");
   }
 
-  // parse
-  const data = await res.json();
-
-  // pass to react
-  return { serverData: data };
+  return { serverData: { share } };
 };
 
 export default ShareProjectPage;

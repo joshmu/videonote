@@ -10,17 +10,15 @@
  * @copyright © 2020 - 2020 MU
  */
 
-import { nanoid } from "nanoid";
 import { createContext, useContext, useEffect, useRef, useState } from "react";
 
 import { useIsMount } from "@/hooks/useIsMount";
 import { useNoteProximity } from "@/hooks/useNoteProximity";
 import { NoteInterface } from "@/root/src/components/shared/types";
+import { createObjectId } from "@/utils/clientHelpers";
 
 import { useGlobalContext } from "./globalContext";
 import { useVideoContext } from "./videoContext";
-
-const createId = () => nanoid(24);
 
 type AddNoteType = (note: NoteInterface | { content: string; time: number }) => void;
 type UpdateNoteType = (note: NoteInterface) => void;
@@ -97,7 +95,7 @@ export function NoteProvider(props: { [key: string]: any }) {
     if (!checkCanEdit()) return;
 
     const newNote: NoteInterface = {
-      _id: createId(),
+      _id: createObjectId(),
       content: note.content,
       time: note.time,
       done: false,

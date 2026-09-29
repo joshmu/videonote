@@ -10,7 +10,9 @@
  * @copyright © 2020 - 2020 MU
  */
 
-import Cookies from "universal-cookie";
+import { StatusCodes } from "http-status-codes";
+import type { NextPageContext } from "next";
+import Router from "next/router";
 import isEmail from "validator/lib/isEmail";
 
 type IsValidCredentialsType = {
@@ -73,34 +75,27 @@ export const checkPasswordMatch = (password1: string, password2: string): boolea
   return password1 === password2;
 };
 
-export const handleJwtToken = (token: string): void => {
-  // save token in cookie for subsequent requests
-  const cookies = new Cookies();
-  cookies.set("token", token, { path: "/" });
+/** A MongoDB ObjectId-compatible id: 4-byte seconds timestamp + 8 random bytes, as hex. */
+export const createObjectId = (): string => {
+  const seconds = Math.floor(Date.now() / 1000)
+    .toString(16)
+    .padStart(8, "0");
+  const random = crypto.getRandomValues(new Uint8Array(8));
+  return seconds + Array.from(random, (byte) => byte.toString(16).padStart(2, "0")).join("");
 };
 
-export const fetcher = async (url: string, body: object, token: string | boolean = false) => {
-  if (!token) {
-    const cookies = new Cookies();
-    token = cookies.get("token");
+/**
+ * Redirect from getInitialProps: a 302 on the server, the router on a
+ * client-side navigation (no `ctx.res`). Returns the empty props Next expects.
+ */
+export const redirectFromInitialProps = (ctx: NextPageContext, location: string): {} => {
+  if (ctx.res) {
+    ctx.res.writeHead(StatusCodes.MOVED_TEMPORARILY, { Location: location });
+    ctx.res.end();
+  } else {
+    Router.replace(location);
   }
-
-  const headers: { [key: string]: string } = {
-    "Content-Type": "application/json",
-  };
-  // include 'token' in the header if we have one available
-  if (token) headers.Authorization = `Bearer ${token}`;
-
-  const res = await fetch(url, {
-    method: "POST",
-    headers,
-    body: JSON.stringify(body),
-  });
-  const data = await res.json();
-
-  if (data.token) handleJwtToken(data.token);
-
-  return { res, data };
+  return {};
 };
 
 export const formatDuration = (secs: number): string => {

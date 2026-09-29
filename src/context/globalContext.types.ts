@@ -27,6 +27,7 @@ import {
   ShareProjectInterface,
   UserInterface,
 } from "@/shared/types";
+import type { ProjectReply, ShareAccess } from "@/utils/apiClient";
 
 export interface GlobalContextInterface {
   user: UserInterface;
@@ -76,7 +77,7 @@ export type NoteApiType = (
       },
 ) => Promise<NoteInterface | "error">;
 
-export type NoteApiRemoveDoneNotes = () => Promise<NoteInterface[]>;
+export type NoteApiRemoveDoneNotes = () => Promise<NoteInterface[] | "error">;
 
 export type UpdateProjectType = (
   projectData: ProjectInterface | { _id?: string; src: string },
@@ -108,7 +109,7 @@ export type CreateProjectType = (
 
 export type RemoveProjectType = (_id: string) => Promise<void>;
 
-export type FetchWithPasswordPublicProjectType = (password: string) => Promise<ProjectInterface>;
+export type FetchWithPasswordPublicProjectType = (password: string) => Promise<ShareAccess>;
 
 export type HandleInitialServerDataType = (data: { [key: string]: any }) => void;
 
@@ -116,12 +117,11 @@ export type AlertProjectLoadedType = (project: ProjectInterface) => void;
 
 export type ProjectApiType = (
   action: ProjectApiActions,
-  project: ProjectInterface | { [key: string]: any },
-) => Promise<any | void>;
+  project: Partial<ProjectInterface>,
+  share?: Partial<ShareProjectInterface>,
+) => Promise<ProjectReply | void>;
 
 export type CopyToClipboardType = (txt: string, alertMsg?: string) => void;
-
-export type BadResponseType = (res: Response, msg: string) => boolean;
 
 export type RemoveAccountType = (userData: UserInterface) => Promise<void>;
 

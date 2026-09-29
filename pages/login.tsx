@@ -21,8 +21,6 @@ import { Notification } from "@/components/Notification/Notification";
 import { ThemeToggle } from "@/components/shared/ThemeToggle/ThemeToggle";
 import useTwConfig from "@/hooks/useTwConfig";
 
-import { handleJwtToken } from "../utils/clientHelpers";
-
 const Login: NextPage = () => {
   const [loginView, setLoginView] = useState<boolean>(true);
   const [email, setEmail] = useState<string>("");
@@ -34,8 +32,8 @@ const Login: NextPage = () => {
     setLoginView(isLoginViewShowing);
   };
 
-  const handleLogin = (data: { token: string }): void => {
-    handleJwtToken(data.token);
+  // the API client has already saved the session token from the reply
+  const handleLogin = (): void => {
     Router.push("/");
   };
 
