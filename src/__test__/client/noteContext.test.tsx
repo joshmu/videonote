@@ -1,42 +1,35 @@
-import { act, render } from "@testing-library/react";
+import { act, render, waitFor } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import type { NoteInterface } from "@/components/shared/types";
+import { NoteApiAction, type NoteInterface } from "@/components/shared/types";
+import { AppProviders } from "@/context/appProviders";
 import { NoteProvider, useNoteContext } from "@/context/noteContext";
+import { NotificationProvider } from "@/context/notificationContext";
+import { VideoProvider } from "@/context/videoContext";
 
-const mocks = vi.hoisted(() => {
-  const project = {
-    _id: "p1",
-    title: "Project",
-    user: "u1",
-    notes: [
-      { _id: "a", content: "first", time: 20, done: false },
-      { _id: "b", content: "second", time: 10, done: false },
-    ],
-  };
-  return {
-    global: {
-      project,
-      projects: [project],
-      user: { _id: "u1" },
-      noteApi: vi.fn(),
-      noteApiRemoveDoneNotes: vi.fn(),
-      updateProjectsStateWithUpdatedNotes: vi.fn(),
-      checkCanEdit: () => true,
-    },
-  };
-});
+import { type Reply, type Routes, fakeTransport, ok } from "./providerHarness";
 
-vi.mock("@/context/globalContext", () => ({
-  useGlobalContext: () => mocks.global,
-}));
-vi.mock("@/context/sessionContext", () => ({
-  useSessionContext: () => mocks.global,
-}));
+vi.mock("next/router", () => ({ default: { push: vi.fn() } }));
 
-vi.mock("@/context/videoContext", () => ({
-  useVideoContext: () => ({ progress: { playedSeconds: 0 } }),
-}));
+const project = {
+  _id: "p1",
+  title: "Project",
+  src: "https://example.com/v.mp4",
+  user: "u1",
+  notes: [
+    { _id: "a", content: "first", time: 20, done: false, project: "p1" },
+    { _id: "b", content: "second", time: 10, done: false, project: "p1" },
+  ],
+};
+
+const signedIn = {
+  user: {
+    _id: "u1",
+    username: "owner",
+    settings: { _id: "set1", currentProject: "p1" },
+    projects: [project],
+  },
+};
 
 let ctx: ReturnType<typeof useNoteContext>;
 const Probe = () => {
@@ -44,12 +37,35 @@ const Probe = () => {
   return null;
 };
 
-const renderNotes = () =>
-  render(
-    <NoteProvider>
-      <Probe />
-    </NoteProvider>,
-  );
+const renderNotes = async (note: Routes[string]) => {
+  const transport = fakeTransport({
+    "/api/project": () => ok({ project }),
+    "/api/settings": ({ settings }) => ok({ settings }),
+    "/api/note": note,
+  });
+  await act(async () => {
+    render(
+      <NotificationProvider>
+        <AppProviders
+          serverData={signedIn}
+          api={transport.api}
+          sessionStore={transport.sessionStore}
+        >
+          <VideoProvider>
+            <NoteProvider>
+              <Probe />
+            </NoteProvider>
+          </VideoProvider>
+        </AppProviders>
+      </NotificationProvider>,
+    );
+  });
+  await waitFor(() => expect(ctx.notes).toHaveLength(2));
+  return transport;
+};
+
+const noteRequests = (requests: ReturnType<typeof fakeTransport>["requests"]) =>
+  requests.filter((request) => request.path === "/api/note");
 
 const deferred = <T,>() => {
   let resolve!: (value: T) => void;
@@ -63,8 +79,7 @@ beforeEach(() => {
 
 describe("noteContext", () => {
   it("keeps the notes when removing done notes fails", async () => {
-    mocks.global.noteApiRemoveDoneNotes.mockResolvedValue("error");
-    renderNotes();
+    await renderNotes(() => ({ status: 500, body: { msg: "Database error" } }));
 
     await act(async () => {
       await ctx.removeCompleted();
@@ -74,12 +89,24 @@ describe("noteContext", () => {
     expect(ctx.notes.map((n) => n._id)).toEqual(["a", "b"]);
   });
 
+  it("removes done notes through the note route and keeps the survivors", async () => {
+    const { requests } = await renderNotes(() => ok({ notes: [project.notes[1]] }));
+
+    await act(async () => {
+      await ctx.removeCompleted();
+    });
+
+    expect(noteRequests(requests).at(-1).body).toEqual({
+      action: NoteApiAction.REMOVE_DONE_NOTES,
+      projectId: "p1",
+    });
+    expect(ctx.notes.map((n) => n._id)).toEqual(["b"]);
+  });
+
   it("keeps notes added while an update is in flight", async () => {
-    const update = deferred<NoteInterface | "error">();
-    mocks.global.noteApi
-      .mockReturnValueOnce(update.promise)
-      .mockReturnValueOnce(new Promise(() => {}));
-    renderNotes();
+    const update = deferred<Reply>();
+    const replies = [update.promise, new Promise<Reply>(() => {})];
+    await renderNotes(() => replies.shift());
 
     act(() => {
       ctx.updateNote({ ...ctx.notes[0], done: true });
@@ -88,7 +115,7 @@ describe("noteContext", () => {
       ctx.addNote({ content: "added", time: 30 });
     });
     await act(async () => {
-      update.resolve({ _id: "a", content: "first", time: 20, done: true });
+      update.resolve(ok({ note: { _id: "a", content: "first", time: 20, done: true } }));
     });
 
     expect(ctx.notes.map((n) => n.content)).toEqual(["first", "second", "added"]);
@@ -96,20 +123,29 @@ describe("noteContext", () => {
   });
 
   it("gives a new note an ObjectId-shaped id and keeps it after the server accepts it", async () => {
-    mocks.global.noteApi.mockImplementation(async (note: NoteInterface) => note);
-    renderNotes();
+    const { requests } = await renderNotes(({ note }) => ok({ note }));
 
     await act(async () => {
       ctx.addNote({ content: "added", time: 30 });
     });
 
-    const sent = mocks.global.noteApi.mock.calls[0][0] as NoteInterface;
+    const sent = noteRequests(requests)[0].body.note as NoteInterface;
     expect(sent._id).toMatch(/^[0-9a-f]{24}$/);
     expect(ctx.notes.map((n) => n._id)).toContain(sent._id);
   });
 
-  it("sorts without reordering the notes state", () => {
-    renderNotes();
+  it("drops a new note the server rejects", async () => {
+    await renderNotes(() => ({ status: 403, body: { msg: "Forbidden" } }));
+
+    await act(async () => {
+      ctx.addNote({ content: "added", time: 30 });
+    });
+
+    await waitFor(() => expect(ctx.notes.map((n) => n._id)).toEqual(["a", "b"]));
+  });
+
+  it("sorts without reordering the notes state", async () => {
+    await renderNotes(({ note }) => ok({ note }));
     const notes = ctx.notes;
 
     const sorted = ctx.sort(notes);

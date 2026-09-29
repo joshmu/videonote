@@ -29,8 +29,6 @@ import {
   GlobalContextInterface,
   HandleInitialServerDataType,
   LoadProjectType,
-  NoteApiRemoveDoneNotes,
-  NoteApiType,
   ProjectApiType,
   RemoveProjectType,
   RemoveShareProjectType,
@@ -94,24 +92,6 @@ export const GlobalProvider = ({
     if (projects.length === 0 && settings.currentProject)
       updateSettings({ currentProject: null, _id: settings._id });
   }, [projects, settings]);
-
-  const noteApi: NoteApiType = async (noteData) => {
-    const result = await api.saveNote(noteData);
-    if (result.kind !== "ok") {
-      reportFailure(result);
-      return "error";
-    }
-    return result.data.note;
-  };
-
-  const noteApiRemoveDoneNotes: NoteApiRemoveDoneNotes = async () => {
-    const result = await api.removeDoneNotes(currentProject._id);
-    if (result.kind !== "ok") {
-      reportFailure(result);
-      return "error";
-    }
-    return result.data.notes;
-  };
 
   const updateProject: UpdateProjectType = async (projectData) => {
     if (!admin) return;
@@ -394,8 +374,6 @@ export const GlobalProvider = ({
     loadProject,
     updateProject,
     handleInitialServerData,
-    noteApi,
-    noteApiRemoveDoneNotes,
     updateProjectsStateWithUpdatedNotes,
     shareProject,
     removeShareProject,

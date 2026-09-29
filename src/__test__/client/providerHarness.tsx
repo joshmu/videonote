@@ -3,7 +3,7 @@ import { vi } from "vitest";
 import { createApiClient, type SessionStore } from "@/utils/apiClient";
 
 export type Reply = { status: number; body: unknown };
-export type Routes = Record<string, (body: Record<string, any>) => Reply>;
+export type Routes = Record<string, (body: Record<string, any>) => Reply | Promise<Reply>>;
 
 export const ok = (body: unknown): Reply => ({ status: 200, body });
 
@@ -32,7 +32,7 @@ export const fakeTransport = (routes: Routes = {}, token = "t1") => {
     const body = JSON.parse(init.body as string);
     const headers = init.headers as Record<string, string>;
     requests.push({ path, body, authorization: headers.Authorization });
-    const reply = routes[path]?.(body) ?? { status: 404, body: { msg: "Not found" } };
+    const reply = (await routes[path]?.(body)) ?? { status: 404, body: { msg: "Not found" } };
     return new Response(JSON.stringify(reply.body), { status: reply.status });
   });
   return { api: createApiClient({ fetch, session: sessionStore }), sessionStore, requests };

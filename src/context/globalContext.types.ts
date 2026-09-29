@@ -26,8 +26,6 @@ export interface GlobalContextInterface {
   loadProject: LoadProjectType;
   updateProject: UpdateProjectType;
   handleInitialServerData: HandleInitialServerDataType;
-  noteApi: NoteApiType;
-  noteApiRemoveDoneNotes: NoteApiRemoveDoneNotes;
   updateProjectsStateWithUpdatedNotes: UpdateProjectsStateWithUpdatedNotesType;
   shareProject: ShareProjectType;
   removeShareProject: RemoveShareProjectType;
@@ -35,16 +33,6 @@ export interface GlobalContextInterface {
   warnLocalVideo: WarnLocalVideoType;
   projectsExist: boolean;
 }
-
-export type NoteApiType = (
-  noteData:
-    | NoteInterface
-    | {
-        [key: string]: any;
-      },
-) => Promise<NoteInterface | "error">;
-
-export type NoteApiRemoveDoneNotes = () => Promise<NoteInterface[] | "error">;
 
 export type UpdateProjectType = (
   projectData: ProjectInterface | { _id?: string; src: string },

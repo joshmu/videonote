@@ -42,15 +42,9 @@ interface NoteContextInterface {
 const noteContext = createContext<NoteContextInterface>(null!);
 
 export function NoteProvider(props: { [key: string]: any }) {
-  const {
-    project,
-    projects,
-    noteApi,
-    noteApiRemoveDoneNotes,
-    updateProjectsStateWithUpdatedNotes,
-    checkCanEdit,
-  } = useGlobalContext();
-  const { user } = useSessionContext();
+  const { project, projects, updateProjectsStateWithUpdatedNotes, checkCanEdit } =
+    useGlobalContext();
+  const { api, user, reportFailure } = useSessionContext();
   const { progress } = useVideoContext();
   const [notes, setNotes] = useState<NoteInterface[]>([]);
   const [search, setSearch] = useState<string>("");
@@ -59,6 +53,24 @@ export function NoteProvider(props: { [key: string]: any }) {
 
   const { currentNote, checkProximity } = useNoteProximity({ notes, progress });
   const isMount = useIsMount();
+
+  const noteApi = async (noteData: Partial<NoteInterface>): Promise<NoteInterface | "error"> => {
+    const result = await api.saveNote(noteData);
+    if (result.kind !== "ok") {
+      reportFailure(result);
+      return "error";
+    }
+    return result.data.note;
+  };
+
+  const noteApiRemoveDoneNotes = async (): Promise<NoteInterface[] | "error"> => {
+    const result = await api.removeDoneNotes(project._id);
+    if (result.kind !== "ok") {
+      reportFailure(result);
+      return "error";
+    }
+    return result.data.notes;
+  };
 
   // when a project is selected pre-fill the notes
   useEffect(() => {
