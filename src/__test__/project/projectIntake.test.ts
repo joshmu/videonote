@@ -194,7 +194,7 @@ describe("removeProject", () => {
   });
 
   it("reports notFound for a project the caller does not own and leaves it intact", async () => {
-    const { owner, project } = await seedShared();
+    const { project } = await seedShared();
     const other = await seedOwner("other@example.com");
 
     expect(await removeProject(other._id, project._id.toString())).toEqual({ kind: "notFound" });
