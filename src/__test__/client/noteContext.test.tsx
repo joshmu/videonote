@@ -219,7 +219,12 @@ describe("noteContext on a password-protected Share", () => {
   });
 
   it("keeps an unsent note, asks for the password again and resends it", async () => {
-    const replies: Reply[] = [{ status: 403, body: { msg: "Share password required." } }];
+    const replies: Reply[] = [
+      {
+        status: 403,
+        body: { msg: "Share password required.", code: "sharePasswordRequired" },
+      },
+    ];
     const { requests } = await renderGuest(({ note }) => replies.shift() ?? ok({ note }));
 
     await act(async () => {

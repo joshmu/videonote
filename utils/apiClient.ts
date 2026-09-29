@@ -34,7 +34,7 @@ export const requestSession = (cookieHeader: string | undefined): SessionStore =
 
 export type ApiFailure =
   | { kind: "unauthorized"; status: number; msg: string }
-  | { kind: "error"; status: number; msg: string };
+  | { kind: "error"; status: number; msg: string; code?: string };
 
 export type ApiResult<T> = { kind: "ok"; status: number; data: T } | ApiFailure;
 
@@ -78,8 +78,8 @@ const SHARE_STATUS: Record<number, ShareAccess> = {
 // /api/user answers a wrong password with 401 as well; only this msg tells it
 // apart from an expired session.
 const WRONG_PASSWORD_MSG = "Password is incorrect.";
-// /api/note answers 403 to a forbidden write too; only this msg asks for the Share password.
-const SHARE_PASSWORD_REQUIRED_MSG = "Share password required.";
+// /api/note answers 403 to a forbidden write too; only this code asks for the Share password.
+const SHARE_PASSWORD_REQUIRED = "sharePasswordRequired";
 
 type Credentials = { email: string; password: string; password2?: string };
 
@@ -119,7 +119,10 @@ export const createApiClient = ({
     const msg = typeof data?.msg === "string" ? data.msg : `Request failed (${res.status}).`;
     if (res.status === 401) return { kind: "unauthorized", status: res.status, msg };
     // Login answers 302 on success, so any status below 400 is ok.
-    if (res.status >= 400) return { kind: "error", status: res.status, msg };
+    if (res.status >= 400) {
+      const code = typeof data?.code === "string" ? data.code : undefined;
+      return { kind: "error", status: res.status, msg, ...(code && { code }) };
+    }
     if (!data) {
       return { kind: "error", status: res.status, msg: "Unexpected response from the server." };
     }
@@ -135,12 +138,8 @@ export const createApiClient = ({
       body,
       shareToken ? { "x-share-token": shareToken } : {},
     );
-    if (
-      result.kind === "error" &&
-      result.status === 403 &&
-      result.msg === SHARE_PASSWORD_REQUIRED_MSG
-    ) {
-      return { ...result, kind: "sharePasswordRequired" };
+    if (result.kind === "error" && result.code === SHARE_PASSWORD_REQUIRED) {
+      return { kind: "sharePasswordRequired", status: result.status, msg: result.msg };
     }
     return result;
   };

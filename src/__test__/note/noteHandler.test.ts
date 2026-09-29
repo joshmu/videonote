@@ -5,7 +5,7 @@ import { beforeAll, describe, expect, it, vi } from "vitest";
 import handler from "@/api/note";
 import publicProject from "@/api/public_project";
 import { NoteApiAction } from "@/shared/types";
-import { Note, Project, User } from "@/utils/mongoose";
+import { Note, Project, Share, User } from "@/utils/mongoose";
 import { attachOrUpdateShare, detachShare } from "@/utils/share/shareIntake";
 
 import { callApi, tokenFor } from "../api/http";
@@ -178,7 +178,10 @@ describe("POST /api/note", () => {
 });
 
 describe("POST /api/note through a password-protected Share", () => {
-  const PASSWORD_REQUIRED = { status: 403, body: { msg: "Share password required." } };
+  const PASSWORD_REQUIRED = {
+    status: 403,
+    body: { msg: "Share password required.", code: "sharePasswordRequired" },
+  };
 
   // The Share token the public route hands out for the right password.
   const openShare = async (password: string, shareUrl = "rough-cut") => {
@@ -251,16 +254,22 @@ describe("POST /api/note through a password-protected Share", () => {
     expect(await Note.countDocuments()).toBe(0);
   });
 
-  it("rejects a token for one Share on another Project", async () => {
+  it("rejects a token for one Share on another Project, even with the same password hash", async () => {
     const projectId = await seed({ canEdit: true, password: "hunter2" });
     const owner = await User.findOne({ email: "owner@example.com" });
     const other = await Project.create({ title: "Other cut", user: owner._id });
     await attachOrUpdateShare(other, { url: "other-cut", password: "hunter2", canEdit: true });
     const tokenForOther = await openShare("hunter2", "other-cut");
+    // Same stored hash on both Shares, so only the token's subject tells them apart.
+    const { password } = await Share.findOne({ url: "other-cut" });
+    await Share.updateOne({ url: "rough-cut" }, { password });
 
     expect(await post({ note: note(projectId) }, undefined, tokenForOther)).toEqual(
       PASSWORD_REQUIRED,
     );
+    expect(
+      (await post({ note: note(other._id.toString()) }, undefined, tokenForOther)).status,
+    ).toBe(200);
   });
 
   it("hands out no Share token for an open Share and needs none to write", async () => {

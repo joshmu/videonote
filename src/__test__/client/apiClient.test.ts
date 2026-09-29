@@ -177,7 +177,9 @@ describe("note writes through a Share", () => {
   });
 
   it("tells a Share asking for its password apart from a forbidden write", async () => {
-    const asks = clientWith(reply(403, { msg: "Share password required." }));
+    const asks = clientWith(
+      reply(403, { msg: "Share password required.", code: "sharePasswordRequired" }),
+    );
     const forbidden = clientWith(reply(403, { msg: "Not allowed to edit notes in this project." }));
 
     expect(await asks.api.saveNote({ content: "Trim", project: "p1" })).toEqual({
@@ -186,6 +188,8 @@ describe("note writes through a Share", () => {
       msg: "Share password required.",
     });
     expect(await forbidden.api.removeDoneNotes("p1")).toMatchObject({ kind: "error", status: 403 });
+    const msgOnly = clientWith(reply(403, { msg: "Share password required." }));
+    expect(await msgOnly.api.saveNote({ content: "Trim" })).toMatchObject({ kind: "error" });
   });
 });
 
