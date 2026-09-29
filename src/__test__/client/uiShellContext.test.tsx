@@ -90,4 +90,19 @@ describe("uiShellContext action input", () => {
 
     expect(document.activeElement).toBe(getByTestId("action-input"));
   });
+
+  it("actionInputFocus does nothing when no input is shown", () => {
+    let shell: ReturnType<typeof useUiShellContext>;
+    const NoInput = () => {
+      shell = useUiShellContext();
+      return null;
+    };
+    render(
+      <UiShellProvider>
+        <NoInput />
+      </UiShellProvider>,
+    );
+
+    expect(() => act(() => shell.actionInputFocus())).not.toThrow();
+  });
 });

@@ -261,7 +261,8 @@ hands out in memory (`shareToken()`), `renewShareAccess()` to ask for the
 password again when a Note write is refused for it (the project stays on
 screen), and `checkCanEdit`, the one canEdit source: a signed-in User on
 their own Projects may always edit, a guest only when the **Share** has
-`canEdit`.
+`canEdit`. A viewer who cannot edit gets a "View only" hint in place of the
+note input.
 
 **Note context**:
 `src/context/noteContext.tsx`. The current Project's **Notes**, search and

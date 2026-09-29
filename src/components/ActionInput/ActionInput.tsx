@@ -14,6 +14,7 @@ import { ChangeEvent, KeyboardEvent, useEffect, useState } from "react";
 
 import { useControlsContext } from "@/context/controlsContext";
 import { useNoteContext } from "@/context/noteContext";
+import { useProjectsContext } from "@/context/projectsContext";
 import { useSessionContext } from "@/context/sessionContext";
 import { useSharedProjectContext } from "@/context/sharedProjectContext";
 import { useUiShellContext } from "@/context/uiShellContext";
@@ -30,6 +31,7 @@ const PLACEHOLDER = "Add Note...";
 
 export const ActionInput = () => {
   const { checkCanEdit } = useSharedProjectContext();
+  const { project } = useProjectsContext();
   const { settings } = useSessionContext();
   const { sidebarOpen, actionInputRef, actionInputFocus } = useUiShellContext();
   const { progress } = useVideoContext();
@@ -118,25 +120,28 @@ export const ActionInput = () => {
         />
       </div>
 
-      <input
-        ref={actionInputRef}
-        className={`${
-          isActive ? "opacity-100" : "opacity-50"
-        } relative w-full h-full px-2 py-1 transition-colors duration-150 ease-in-out bg-transparent rounded-sm rounded-b-none rounded-l-none placeholder-themeText2 text-themeText text-md focus:outline-none`}
-        autoFocus={true}
-        id="actionInput"
-        name="addNote"
-        type="text"
-        placeholder={
-          isActive ? hint : checkCanEdit() ? PLACEHOLDER : "Guest mode. Add/Edit notes disabled."
-        }
-        value={note.content}
-        autoComplete="off"
-        onChange={handleChange}
-        onKeyDown={handleKeyDown}
-        onFocus={handleFocus}
-        onBlur={handleBlur}
-      />
+      {/* until a project is on screen the input stays, so an owner's never remounts */}
+      {project === null || checkCanEdit() ? (
+        <input
+          ref={actionInputRef}
+          className={`${
+            isActive ? "opacity-100" : "opacity-50"
+          } relative w-full h-full px-2 py-1 transition-colors duration-150 ease-in-out bg-transparent rounded-sm rounded-b-none rounded-l-none placeholder-themeText2 text-themeText text-md focus:outline-none`}
+          autoFocus={true}
+          id="actionInput"
+          name="addNote"
+          type="text"
+          placeholder={isActive ? hint : PLACEHOLDER}
+          value={note.content}
+          autoComplete="off"
+          onChange={handleChange}
+          onKeyDown={handleKeyDown}
+          onFocus={handleFocus}
+          onBlur={handleBlur}
+        />
+      ) : (
+        <p className="w-full px-2 py-1 text-sm opacity-50 text-themeText2">View only</p>
+      )}
 
       <ActionSymbols />
 
