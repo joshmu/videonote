@@ -11,17 +11,14 @@
  */
 
 import Router from "next/router";
-import { createContext, useContext, useEffect, useRef, useState } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 
-import { SETTINGS_DEFAULTS } from "@/shared/constants";
 import {
   ProjectApiActions,
   ProjectInterface,
-  SettingsInterface,
   ShareProjectInterface,
-  UserInterface,
 } from "@/root/src/components/shared/types";
-import { type ApiFailure, browserApi, browserSession, type ShareAccess } from "@/utils/apiClient";
+import type { ShareAccess } from "@/utils/apiClient";
 
 import { ModalType } from "../components/Modals/Modals";
 import {
@@ -35,17 +32,15 @@ import {
   NoteApiRemoveDoneNotes,
   NoteApiType,
   ProjectApiType,
-  RemoveAccountType,
   RemoveProjectType,
   RemoveShareProjectType,
   ShareProjectType,
   UpdateProjectType,
   UpdateProjectsStateWithUpdatedNotesType,
-  UpdateSettingsType,
-  UpdateUserType,
   WarnLocalVideoType,
 } from "./globalContext.types";
 import { useNotificationContext } from "./notificationContext";
+import { useSessionContext } from "./sessionContext";
 import { useUiShellContext } from "./uiShellContext";
 
 const globalContext = createContext<GlobalContextInterface>(null!);
@@ -59,22 +54,13 @@ export const GlobalProvider = ({
   serverData: {};
   props?: {};
 }) => {
-  const [user, setUser] = useState<UserInterface>(null!);
   const [projects, setProjects] = useState<ProjectInterface[]>([]);
-  const [settings, setSettings] = useState<SettingsInterface>(SETTINGS_DEFAULTS);
 
   const [currentProject, setCurrentProject] = useState<ProjectInterface>(null!);
 
-  // guest until the account is loaded; the ref lets actions started during
-  // hydration (e.g. updateSettings from loadProject) see the value just set
-  const [admin, setAdminState] = useState<boolean>(false);
-  const adminRef = useRef<boolean>(false);
-  const setAdmin = (value: boolean): void => {
-    adminRef.current = value;
-    setAdminState(value);
-  };
-
   const { addAlert } = useNotificationContext();
+  const { api, user, admin, settings, startSession, updateSettings, reportFailure } =
+    useSessionContext();
   const { modalsOpen, toggleModalOpen, createPrompt, cancelPrompt } = useUiShellContext();
 
   // initial load
@@ -110,7 +96,7 @@ export const GlobalProvider = ({
   }, [projects, settings]);
 
   const noteApi: NoteApiType = async (noteData) => {
-    const result = await browserApi.saveNote(noteData);
+    const result = await api.saveNote(noteData);
     if (result.kind !== "ok") {
       reportFailure(result);
       return "error";
@@ -119,7 +105,7 @@ export const GlobalProvider = ({
   };
 
   const noteApiRemoveDoneNotes: NoteApiRemoveDoneNotes = async () => {
-    const result = await browserApi.removeDoneNotes(currentProject._id);
+    const result = await api.removeDoneNotes(currentProject._id);
     if (result.kind !== "ok") {
       reportFailure(result);
       return "error";
@@ -128,7 +114,7 @@ export const GlobalProvider = ({
   };
 
   const updateProject: UpdateProjectType = async (projectData) => {
-    if (!adminRef.current) return;
+    if (!admin) return;
 
     // add _id for db processing
     projectData._id = currentProject._id;
@@ -235,25 +221,6 @@ export const GlobalProvider = ({
     if (project.src.length === 0) warnLocalVideo(project);
   };
 
-  const updateUser: UpdateUserType = async (userData) => {
-    const result = await browserApi.updateUser(userData);
-    if (result.kind !== "ok") return reportFailure(result);
-    // the profile reply carries no settings; those change through updateSettings
-    setUser(result.data.user);
-  };
-
-  const updateSettings: UpdateSettingsType = async (newSettingsData) => {
-    if (!adminRef.current) return;
-
-    const result = await browserApi.updateSettings(newSettingsData);
-    if (result.kind !== "ok") return reportFailure(result);
-
-    // any settings which are not present from DB we fill with defaults
-    const fullSettings = { ...SETTINGS_DEFAULTS, ...result.data.settings };
-
-    setSettings(fullSettings);
-  };
-
   const createProject: CreateProjectType = async (projectData) => {
     const response = await projectApi(ProjectApiActions.CREATE, projectData);
     if (!response) return console.error("api error");
@@ -297,7 +264,7 @@ export const GlobalProvider = ({
   const fetchWithPasswordPublicProject: FetchWithPasswordPublicProjectType = (password) => {
     // get id
     const shareUrl = window.location.pathname.split("/").slice(-1)[0];
-    return browserApi.openShare(shareUrl, password);
+    return api.openShare(shareUrl, password);
   };
 
   const promptForSharePassword = (message: React.ReactElement): void => {
@@ -340,7 +307,6 @@ export const GlobalProvider = ({
           </span>,
         );
       case "ok":
-        setAdmin(false);
         setProjects([access.project]);
         setCurrentProject(access.project);
         alertProjectLoaded(access.project);
@@ -360,40 +326,10 @@ export const GlobalProvider = ({
   const handleInitialServerData: HandleInitialServerDataType = (data) => {
     if (data.share) return handleShareAccess(data.share);
 
-    // ERROR
-    // a msg or a missing user means the server could not load the account
-    if (data.msg || !data.user) {
-      Router.push("/login");
-      addAlert({ type: "error", msg: data.msg ?? "Could not load your account." });
-      return;
-    }
-
-    // PARSE SERVER DATA
-    // grab user projects as seperate var and rest is the account
-    const { projects = [], ...userAccount } = data.user;
-    const { settings, ...user }: { settings: SettingsInterface } = userAccount;
-
-    // HANDLE DATA
-    // allocate server data to respective areas
+    const account = startSession(data);
+    if (!account) return;
+    const { projects, settings } = account;
     setProjects(projects);
-
-    setAdmin(true);
-    setUser(user as UserInterface);
-
-    // avoid null values from mongo
-    // if we have any null property values in returned settings then replace with defaults
-    if (typeof settings === "object" && settings !== null) {
-      // if we have any null settings lets swap them to their defaults
-      Object.keys(settings).forEach((key) => {
-        if (settings[key] === null) settings[key] = SETTINGS_DEFAULTS[key];
-      });
-      setSettings({ ...SETTINGS_DEFAULTS, ...settings });
-    }
-
-    addAlert({
-      type: "success",
-      msg: `Logged in: ${(user as UserInterface).username}`,
-    });
 
     if (projects.length > 0) {
       let currentProject: ProjectInterface;
@@ -425,37 +361,9 @@ export const GlobalProvider = ({
   };
 
   const projectApi: ProjectApiType = async (action, project, share) => {
-    const result = await browserApi.project(action, project, share);
+    const result = await api.project(action, project, share);
     if (result.kind !== "ok") return reportFailure(result);
     return result.data;
-  };
-
-  const reportFailure = (failure: ApiFailure): void => {
-    if (failure.kind === "unauthorized") {
-      addAlert({ type: "error", msg: "Session expired, please re-enter your credentials" });
-      Router.push("/login");
-      return;
-    }
-    addAlert({ type: "error", msg: failure.msg });
-  };
-
-  const removeAccount: RemoveAccountType = async (userData) => {
-    console.log("removing account", userData.username);
-
-    // use passed data otherwise use current user information in global state
-    const result = await browserApi.removeAccount(userData || user);
-    if (result.kind === "wrongPassword") {
-      addAlert({ type: "error", msg: result.msg });
-      return;
-    }
-    if (result.kind !== "ok") return reportFailure(result);
-
-    addAlert({ type: "success", msg: "Account removed. Goodbye! 👋" });
-
-    browserSession.remove();
-
-    // redirect to landing page
-    Router.push("/hello");
   };
 
   const checkCanEdit: CheckCanEditType = () => {
@@ -479,19 +387,13 @@ export const GlobalProvider = ({
   const projectsExist: boolean = projects.length > 0;
 
   const value: GlobalContextInterface = {
-    user,
-    updateUser,
     projects,
     removeProject,
     project: currentProject,
-    settings,
-    updateSettings,
     createProject,
     loadProject,
     updateProject,
     handleInitialServerData,
-    admin,
-    removeAccount,
     noteApi,
     noteApiRemoveDoneNotes,
     updateProjectsStateWithUpdatedNotes,

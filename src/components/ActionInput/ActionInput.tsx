@@ -15,6 +15,7 @@ import { ChangeEvent, KeyboardEvent, useEffect, useState } from "react";
 import { useControlsContext } from "@/context/controlsContext";
 import { useGlobalContext } from "@/context/globalContext";
 import { useNoteContext } from "@/context/noteContext";
+import { useSessionContext } from "@/context/sessionContext";
 import { useUiShellContext } from "@/context/uiShellContext";
 import { useVideoContext } from "@/context/videoContext";
 import { HINTS } from "@/shared/constants";
@@ -28,7 +29,8 @@ import { TimeMarkers } from "./TimeMarkers/TimeMarkers";
 const PLACEHOLDER = "Add Note...";
 
 export const ActionInput = () => {
-  const { settings, checkCanEdit } = useGlobalContext();
+  const { checkCanEdit } = useGlobalContext();
+  const { settings } = useSessionContext();
   const { sidebarOpen, actionInputRef, actionInputFocus } = useUiShellContext();
   const { progress } = useVideoContext();
   const { toggleSmartControls } = useControlsContext();

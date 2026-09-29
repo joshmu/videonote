@@ -17,6 +17,7 @@ import { useAnounceAction } from "@/hooks/useAnounceAction";
 
 import { useGlobalContext } from "./globalContext";
 import { useNotificationContext } from "./notificationContext";
+import { useSessionContext } from "./sessionContext";
 
 export enum PlayerAction {
   PLAY = "play",
@@ -52,7 +53,8 @@ interface VideoContextInterface {
 const videoContext = createContext<VideoContextInterface>(null!);
 
 export const VideoProvider = (props: { [key: string]: any }) => {
-  const { project, updateProject, settings, warnLocalVideo } = useGlobalContext();
+  const { project, updateProject, warnLocalVideo } = useGlobalContext();
+  const { settings } = useSessionContext();
   const { addAlert } = useNotificationContext();
   const playerRef = useRef<HTMLVideoElement>(null!);
   const [url, setUrl] = useState<string>(null!);

@@ -30,6 +30,9 @@ const mocks = vi.hoisted(() => {
 vi.mock("@/context/globalContext", () => ({
   useGlobalContext: () => mocks.global,
 }));
+vi.mock("@/context/sessionContext", () => ({
+  useSessionContext: () => mocks.global,
+}));
 
 vi.mock("@/context/videoContext", () => ({
   useVideoContext: () => ({ progress: { playedSeconds: 0 } }),

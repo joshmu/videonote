@@ -13,8 +13,8 @@
 import { ChangeEvent, MouseEvent, useEffect, useState } from "react";
 
 import { ModalPrimaryBtn } from "@/components/shared/Modal/ModalBtn";
-import { useGlobalContext } from "@/context/globalContext";
 import { useNotificationContext } from "@/context/notificationContext";
+import { useSessionContext } from "@/context/sessionContext";
 import { useUiShellContext } from "@/context/uiShellContext";
 import { ModalContainer } from "@/shared/Modal/ModalContainer";
 import { ModalForm } from "@/shared/Modal/ModalForm";
@@ -31,7 +31,7 @@ export const UserAccountModal = ({
   toggle: () => void;
   motionKey: string;
 }) => {
-  const { user, updateUser, removeAccount } = useGlobalContext();
+  const { user, updateUser, removeAccount } = useSessionContext();
   const { createPrompt } = useUiShellContext();
   const { addAlert } = useNotificationContext();
   const [userAccountState, setUserAccountState] = useState<

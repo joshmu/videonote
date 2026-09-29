@@ -14,26 +14,18 @@ import {
   NoteInterface,
   ProjectApiActions,
   ProjectInterface,
-  SettingsInterface,
   ShareProjectInterface,
-  UserInterface,
 } from "@/shared/types";
 import type { ProjectReply, ShareAccess } from "@/utils/apiClient";
 
 export interface GlobalContextInterface {
-  user: UserInterface;
-  updateUser: UpdateUserType;
   projects: ProjectInterface[];
   removeProject: RemoveProjectType;
   project: ProjectInterface;
-  settings: SettingsInterface;
-  updateSettings: UpdateSettingsType;
   createProject: CreateProjectType;
   loadProject: LoadProjectType;
   updateProject: UpdateProjectType;
   handleInitialServerData: HandleInitialServerDataType;
-  admin: boolean;
-  removeAccount: RemoveAccountType;
   noteApi: NoteApiType;
   noteApiRemoveDoneNotes: NoteApiRemoveDoneNotes;
   updateProjectsStateWithUpdatedNotes: UpdateProjectsStateWithUpdatedNotesType;
@@ -66,12 +58,6 @@ export type UpdateProjectsStateWithUpdatedNotesType = (notes: NoteInterface[]) =
 
 export type LoadProjectType = (projectId: string) => Promise<void>;
 
-export type UpdateUserType = (
-  userData: UserInterface | { username: string; email: string },
-) => Promise<void>;
-
-export type UpdateSettingsType = (newSettingsData: { [key: string]: any }) => Promise<void>;
-
 export type CreateProjectType = (
   projectData: ProjectInterface | { title: string; src: string },
 ) => Promise<void>;
@@ -89,8 +75,6 @@ export type ProjectApiType = (
   project: Partial<ProjectInterface>,
   share?: Partial<ShareProjectInterface>,
 ) => Promise<ProjectReply | void>;
-
-export type RemoveAccountType = (userData: UserInterface) => Promise<void>;
 
 export type CheckCanEditType = () => boolean;
 

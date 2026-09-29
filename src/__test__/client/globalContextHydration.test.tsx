@@ -4,6 +4,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { ProjectInterface } from "@/components/shared/types";
 import { AppProviders } from "@/context/appProviders";
 import { useGlobalContext } from "@/context/globalContext";
+import { useSessionContext } from "@/context/sessionContext";
 import { useUiShellContext } from "@/context/uiShellContext";
 import { NoteProvider, useNoteContext } from "@/context/noteContext";
 
@@ -27,9 +28,11 @@ const fetchStub = (routes: Record<string, Handler> = {}) =>
     return new Response(JSON.stringify(body), { status });
   });
 
-let ctx: ReturnType<typeof useGlobalContext> & ReturnType<typeof useUiShellContext>;
+let ctx: ReturnType<typeof useGlobalContext> &
+  ReturnType<typeof useSessionContext> &
+  ReturnType<typeof useUiShellContext>;
 const Probe = () => {
-  ctx = { ...useGlobalContext(), ...useUiShellContext() };
+  ctx = { ...useGlobalContext(), ...useSessionContext(), ...useUiShellContext() };
   return ctx.promptState.isOpen ? <div data-testid="prompt">{ctx.promptState.msg}</div> : null;
 };
 const promptText = () => screen.queryByTestId("prompt")?.textContent;
@@ -195,7 +198,7 @@ describe("globalContext admin", () => {
   it("starts as a guest until the account is loaded", async () => {
     const seen: boolean[] = [];
     const Recorder = () => {
-      seen.push(useGlobalContext().admin);
+      seen.push(useSessionContext().admin);
       return null;
     };
     vi.stubGlobal("fetch", fetchStub());

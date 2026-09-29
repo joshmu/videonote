@@ -4,6 +4,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { ProjectApiActions } from "@/components/shared/types";
 import { AppProviders } from "@/context/appProviders";
 import { useGlobalContext } from "@/context/globalContext";
+import { useSessionContext } from "@/context/sessionContext";
 import { useUiShellContext } from "@/context/uiShellContext";
 
 vi.mock("@/context/notificationContext", () => ({
@@ -14,9 +15,11 @@ vi.mock("next/router", () => ({ default: { push: vi.fn() } }));
 const project = { _id: "p1", title: "Rough cut", src: "v.mp4", user: "u1", notes: [] };
 const share = { _id: "s1", url: "rough-cut", canEdit: true };
 
-let ctx: ReturnType<typeof useGlobalContext> & ReturnType<typeof useUiShellContext>;
+let ctx: ReturnType<typeof useGlobalContext> &
+  ReturnType<typeof useSessionContext> &
+  ReturnType<typeof useUiShellContext>;
 const Probe = () => {
-  ctx = { ...useGlobalContext(), ...useUiShellContext() };
+  ctx = { ...useGlobalContext(), ...useSessionContext(), ...useUiShellContext() };
   return null;
 };
 

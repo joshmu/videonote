@@ -18,6 +18,7 @@ import { NoteInterface } from "@/root/src/components/shared/types";
 import { createObjectId } from "@/utils/clientHelpers";
 
 import { useGlobalContext } from "./globalContext";
+import { useSessionContext } from "./sessionContext";
 import { useVideoContext } from "./videoContext";
 
 type AddNoteType = (note: NoteInterface | { content: string; time: number }) => void;
@@ -48,8 +49,8 @@ export function NoteProvider(props: { [key: string]: any }) {
     noteApiRemoveDoneNotes,
     updateProjectsStateWithUpdatedNotes,
     checkCanEdit,
-    user,
   } = useGlobalContext();
+  const { user } = useSessionContext();
   const { progress } = useVideoContext();
   const [notes, setNotes] = useState<NoteInterface[]>([]);
   const [search, setSearch] = useState<string>("");
