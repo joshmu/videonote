@@ -261,7 +261,7 @@ describe("POST /api/note through a password-protected Share", () => {
     await attachOrUpdateShare(other, { url: "other-cut", password: "hunter2", canEdit: true });
     const tokenForOther = await openShare("hunter2", "other-cut");
     // Same stored hash on both Shares, so only the token's subject tells them apart.
-    const { password } = await Share.findOne({ url: "other-cut" });
+    const { password } = await Share.findOne({ url: "other-cut" }).select("+password");
     await Share.updateOne({ url: "rough-cut" }, { password });
 
     expect(await post({ note: note(projectId) }, undefined, tokenForOther)).toEqual(

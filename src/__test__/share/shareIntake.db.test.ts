@@ -29,19 +29,25 @@ describe("Share intake against the in-memory database", () => {
 
     const shared = await attachOrUpdateShare(project, { url: "rough-cut", password: "hunter2" });
 
-    const stored = await Share.findOne({ url: "rough-cut" });
+    const stored = await Share.findOne({ url: "rough-cut" }).select("+password");
     expect(stored.project).toEqual(project._id);
     expect(stored.user).toEqual(owner._id);
     expect(await verifySharePassword(stored.password, "hunter2")).toEqual({ kind: "ok" });
 
-    const hydrated = shared.toObject();
-    expect(hydrated.share).toMatchObject({ _id: stored._id, url: "rough-cut", canEdit: true });
-    expect(hydrated.notes).toEqual([
+    expect(shared.share).toEqual({
+      _id: stored._id.toString(),
+      url: "rough-cut",
+      canEdit: true,
+      hasPassword: true,
+    });
+    expect(shared.notes).toEqual([
       expect.objectContaining({
         content: "Trim the intro",
-        user: { _id: owner._id, username: "owner", email: "owner@example.com" },
+        user: { _id: owner._id.toString(), username: "owner", role: "owner" },
       }),
     ]);
+    expect(JSON.stringify(shared)).not.toContain(stored.password);
+    expect(JSON.stringify(shared)).not.toContain("owner@example.com");
   });
 
   it("rejects a url another Share already uses and leaves the project unshared", async () => {
@@ -61,7 +67,7 @@ describe("Share intake against the in-memory database", () => {
   it("detaches the Share, deleting it and clearing the project's reference", async () => {
     const { project } = await seedProject();
     const shared = await attachOrUpdateShare(project, { url: "rough-cut" });
-    const shareId = shared.share._id.toString();
+    const shareId = (shared.share as { _id: string })._id;
 
     const detached = await detachShare(project, { _id: shareId });
 
@@ -79,7 +85,7 @@ describe("Share intake password handling", () => {
     await attachOrUpdateShare(other, { url: "omitted" });
 
     for (const url of ["empty", "omitted"]) {
-      const stored = await Share.findOne({ url });
+      const stored = await Share.findOne({ url }).select("+password");
       expect(await verifySharePassword(stored.password, undefined)).toEqual({ kind: "open" });
     }
   });
@@ -95,20 +101,39 @@ describe("Share intake password handling", () => {
     });
 
     expect(await Share.countDocuments()).toBe(1);
-    const stored = await Share.findOne({ url: "final-cut" });
+    const stored = await Share.findOne({ url: "final-cut" }).select("+password");
     expect(stored.canEdit).toBe(false);
     expect(await verifySharePassword(stored.password, "rotated")).toEqual({ kind: "ok" });
-    expect(updated.share).toMatchObject({ _id: stored._id, url: "final-cut" });
+    expect(updated.share).toMatchObject({ _id: stored._id.toString(), url: "final-cut" });
   });
 
   it("keeps the existing password when an update omits it", async () => {
     const { project } = await seedProject();
     await attachOrUpdateShare(project, { url: "rough-cut", password: "hunter2" });
 
-    await attachOrUpdateShare(project, { url: "rough-cut", canEdit: false });
+    const updated = await attachOrUpdateShare(project, { url: "rough-cut", canEdit: false });
 
-    const stored = await Share.findOne({ url: "rough-cut" });
+    const stored = await Share.findOne({ url: "rough-cut" }).select("+password");
     expect(await verifySharePassword(stored.password, "hunter2")).toEqual({ kind: "ok" });
+    expect(updated.share).toMatchObject({ hasPassword: true });
+  });
+
+  it("removes the password when an update sends an empty one", async () => {
+    const { project } = await seedProject();
+    await attachOrUpdateShare(project, { url: "rough-cut", password: "hunter2" });
+
+    const updated = await attachOrUpdateShare(project, { url: "rough-cut", password: "" });
+
+    const stored = await Share.findOne({ url: "rough-cut" }).select("+password");
+    expect(await verifySharePassword(stored.password, undefined)).toEqual({ kind: "open" });
+    expect(updated.share).toMatchObject({ hasPassword: false });
+  });
+
+  it("does not load the password hash unless asked", async () => {
+    const { project } = await seedProject();
+    await attachOrUpdateShare(project, { url: "rough-cut", password: "hunter2" });
+
+    expect((await Share.findOne({ url: "rough-cut" })).password).toBeUndefined();
   });
 
   it("only detaches a Share that belongs to the project", async () => {
@@ -116,7 +141,7 @@ describe("Share intake password handling", () => {
     const other = await Project.create({ title: "Other", user: project.user });
     const otherShared = await attachOrUpdateShare(other, { url: "other" });
 
-    await detachShare(project, { _id: otherShared.share._id.toString() });
+    await detachShare(project, { _id: (otherShared.share as { _id: string })._id });
 
     expect(await Share.countDocuments({ url: "other" })).toBe(1);
   });
@@ -151,7 +176,7 @@ describe("Share intake writable fields", () => {
       ...foreign(),
     } as never);
 
-    const stored = await Share.findById(shared.share._id);
+    const stored = await Share.findById((shared.share as { _id: string })._id);
     expect(stored).toMatchObject({ url: "final-cut", canEdit: false });
     expect(stored.project).toEqual(project._id);
     expect(stored.user).toEqual(owner._id);

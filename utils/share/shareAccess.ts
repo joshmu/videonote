@@ -52,7 +52,7 @@ export const openSharedProject = async (
   password: unknown,
 ): Promise<OpenSharedProjectResult> => {
   if (typeof shareUrl !== "string") return { kind: "notFound" };
-  const shareDoc = await Share.findOne({ url: shareUrl });
+  const shareDoc = await Share.findOne({ url: shareUrl }).select("+password");
   if (!shareDoc?.project) return { kind: "notFound" };
 
   const access = await verifySharePassword(
@@ -86,7 +86,7 @@ export const mayEditViaShare = async (
   if (!project.share) return FORBIDDEN;
   const shareId = "_id" in project.share ? project.share._id : project.share;
   const share = await Share.findOne({ _id: shareId, project: project._id, canEdit: true })
-    .select("password")
+    .select("+password")
     .lean();
   if (!share) return FORBIDDEN;
   if (share.password && !verifyShareToken(shareToken, share)) return { kind: "passwordRequired" };

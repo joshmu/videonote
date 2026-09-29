@@ -2,6 +2,7 @@ import { Types } from "mongoose";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { Note, Project, Share, User } from "@/utils/mongoose";
+import type { OwnerShare } from "@/utils/project/ownerProject";
 import {
   createProject,
   getProject,
@@ -112,10 +113,10 @@ describe("getProject", () => {
 
     expect(outcome.kind).toBe("ok");
     if (outcome.kind !== "ok") return;
-    expect(outcome.project.toObject().notes).toEqual([
+    expect(outcome.project.notes).toEqual([
       expect.objectContaining({
         content: "Trim",
-        user: expect.objectContaining({ username: owner.username }),
+        user: { _id: owner._id.toString(), role: "owner" },
       }),
     ]);
   });
@@ -186,7 +187,7 @@ describe("shareProject / unshareProject", () => {
     if (shared.kind !== "ok") throw new Error("expected ok");
 
     const outcome = await unshareProject(owner._id, project._id.toString(), {
-      _id: shared.project.share._id.toString(),
+      _id: (shared.project.share as OwnerShare)._id,
     });
 
     expect(outcome.kind).toBe("ok");
@@ -215,7 +216,7 @@ describe("removeProject", () => {
     const outcome = await removeProject(owner._id, project._id.toString());
 
     expect(outcome.kind).toBe("ok");
-    if (outcome.kind === "ok") expect(outcome.project._id).toEqual(project._id);
+    if (outcome.kind === "ok") expect(outcome.project._id).toBe(project._id.toString());
     await expectGone(owner, project._id);
   });
 

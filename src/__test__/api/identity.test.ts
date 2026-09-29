@@ -201,13 +201,22 @@ describe("/api/user", () => {
 });
 
 describe("/api/auth", () => {
-  it("replies with the user, settings and each project with its relations", async () => {
+  it("replies with the user, settings and each project in the owner projection", async () => {
     const user = await seedUser();
+    const member = await seedUser("member@example.com");
     const settings = await Settings.create({ user: user._id, playOffset: 2 });
     const project = await Project.create({ title: "Cut", user: user._id });
-    const note = await Note.create({ content: "Trim", project: project._id, user: user._id });
-    const share = await Share.create({ url: "cut", user: user._id, project: project._id });
-    project.notes.push(note._id);
+    const own = await Note.create({ content: "Trim", project: project._id, user: user._id });
+    const theirs = await Note.create({ content: "Grade", project: project._id, user: member._id });
+    const guests = await Note.create({ content: "Louder", project: project._id });
+    const hash = await bcrypt.hash("letmein", 4);
+    const share = await Share.create({
+      url: "cut",
+      user: user._id,
+      project: project._id,
+      password: hash,
+    });
+    project.notes.push(own._id, theirs._id, guests._id);
     project.share = share._id;
     await project.save();
     user.settings = settings._id;
@@ -222,15 +231,24 @@ describe("/api/auth", () => {
     expect(body.user.projects).toEqual([
       expect.objectContaining({
         title: "Cut",
-        share: expect.objectContaining({ url: "cut" }),
+        share: { _id: share._id.toString(), url: "cut", canEdit: true, hasPassword: true },
         notes: [
           expect.objectContaining({
             content: "Trim",
-            user: { _id: user._id.toString(), username: EMAIL, email: EMAIL },
+            user: { _id: user._id.toString(), role: "owner" },
           }),
+          expect.objectContaining({
+            content: "Grade",
+            user: { _id: member._id.toString(), role: "member" },
+          }),
+          expect.not.objectContaining({ user: expect.anything() }),
         ],
       }),
     ]);
+    const wire = JSON.stringify(body.user.projects);
+    expect(wire).not.toContain(hash);
+    expect(wire).not.toContain("password");
+    expect(wire).not.toMatch(/@example\.com/);
   });
 
   it("loads the user's projects in one query, in the user's order, skipping projects they do not own", async () => {

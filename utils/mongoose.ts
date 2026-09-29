@@ -97,7 +97,8 @@ const ShareProjectSchema = Schema.create(
       required: true,
     },
     project: { type: Schema.Types.ObjectId, ref: "Project" },
-    password: { type: String, default: "" },
+    // Read with an explicit "+password"; never sent to a client.
+    password: { type: String, default: "", select: false },
     canEdit: { type: Boolean, default: true },
   },
   { timestamps: true },

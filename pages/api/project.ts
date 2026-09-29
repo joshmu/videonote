@@ -80,7 +80,7 @@ export default withAuthenticatedUser(async (req, res, { userDoc, newToken }) => 
       return res.status(StatusCodes.CONFLICT).json({ msg: outcome.message });
     case "ok":
       return res.status(StatusCodes.OK).json({
-        project: outcome.project.toObject(),
+        project: outcome.project,
         token: newToken,
       });
   }

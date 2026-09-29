@@ -109,12 +109,21 @@ are written only through `/api/settings`, which takes `currentProject`,
 `unshareProject` / `removeProject` / `removeUserProjects` in
 `utils/project/projectIntake.ts`. Every operation is scoped to the owning
 **User** and returns a discriminated outcome (`ok` / `notFound` /
-`urlTaken` / `invalid`) with no HTTP; `pages/api/project.ts` maps them to
+`urlTaken` / `invalid`) with no HTTP; an `ok` carries the
+**Owner projection**; `pages/api/project.ts` maps them to
 200, 404, 409 and 400. A malformed or missing project id is `notFound`.
 Create needs a non-empty `title` (`invalid`, reason `title`). Create and
 update write `title` and `src` only. Sharing needs a `share` object and
 unsharing one whose `_id` is a hex ObjectId string (`invalid`, reason
 `share`). Sharing delegates to the **Share intake**.
+
+**Owner projection**:
+`toOwnerProject` in `utils/project/ownerProject.ts`, the one shape an owner
+receives their **Project** in, from `/api/auth`, `/api/project` and the
+**Share intake**. Notes go through `toPublicNote` (authors with their
+**Author role**, never an email) and the **Share** is `{ _id, url, canEdit,
+hasPassword }`, never the password hash. Notes and Share not populated (the
+create, update and remove replies) are sent as ids.
 
 **Project cascade**:
 The one removal path, used by `removeProject` and (through
@@ -142,8 +151,11 @@ create-vs-update by `projectDoc.share`, writes only `url`, `password` and
 `canEdit` from the caller (`project` and `user` come from the Project), hashes
 the password (via
 `hashSharePassword`), and surfaces a duplicate `url` as `ShareUrlTakenError`.
+An absent `password` keeps the current one and an empty one removes it.
 Both operations return the project re-loaded through `findProjectWithRelations`
-so callers can hand it straight back to the client. Handlers no longer reach
+in the **Owner projection**. `Share.password` is not selected by default;
+the code that needs the hash (Share access, `mayEditViaShare`, the populate
+spec for `hasPassword`) asks for `+password`. Handlers no longer reach
 into `Share.findById` / `Share.create` / `Share.deleteOne` directly.
 
 **Share access**:
@@ -181,11 +193,14 @@ share again, even at the same url) revokes it. The client sends it in the
 **findProjectWithRelations / findProjectsWithRelations**:
 The one populate spec for a hydrated Project in
 `utils/project/findProjectWithRelations.ts`: Project + Notes (with each
-Note's author User) + Share, for one Project or every match of a query.
+Note's author User) + Share (with its password hash, for `hasPassword`),
+for one Project or every match of a query. Its result goes to a client only
+through a projection.
 The single form is used by the Project intake, the Share intake and the
 Share access module. `pages/api/auth.js` loads a User's Projects with the
 many form in one query, filtered to `_id` in `User.projects` and owned by
-the caller, and keeps the `User.projects` order.
+the caller, keeps the `User.projects` order and sends each in the
+**Owner projection**.
 
 ### Architecture (Note seam)
 

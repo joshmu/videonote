@@ -13,7 +13,8 @@ const RELATIONS = [
       select: "username email",
     },
   },
-  { path: "share", model: "Share" },
+  // The password only for the owner projection's `hasPassword`.
+  { path: "share", model: "Share", select: "+password" },
 ];
 
 /**
