@@ -208,8 +208,48 @@ read from the public route's status, and `removeAccount` adds `wrongPassword`
 as `unauthorized`. The **SessionStore** it takes is the only
 code that touches the token cookie: `browserSession` reads, writes and removes
 it; `requestSession(cookieHeader)` reads a request's cookie on the server and
-never writes. `browserApi` is the client the browser uses; `globalContext`,
-the login pages and `getInitialProps` call it instead of `fetch`.
+never writes. `browserApi` is the client the browser uses; the **Session
+context**, the login pages and `getInitialProps` call it instead of `fetch`.
+
+### Architecture (Client state)
+
+**AppProviders**:
+`src/context/appProviders.tsx`, the provider stack the app pages mount, in
+dependency order: UI shell, Session, Projects, Shared-project access. It
+hands the page's server data over once: a **Share** to the Shared-project
+access, otherwise the account to the Session and its **Projects** to the
+Projects context. It takes an optional `api` and `sessionStore`, which
+default to the browser's; tests pass an API client over a fake `fetch`.
+
+**UI shell context**:
+`src/context/uiShellContext.tsx`. Sidebar, menu, open modals, the confirm
+prompt and the action input ref. No server calls.
+
+**Session context**:
+`src/context/sessionContext.tsx`. The signed-in **User**, `admin` (false for
+a guest), **Settings** (missing or null keys fall back to
+`SETTINGS_DEFAULTS`), `updateUser`, `updateSettings` (signed-in only),
+`removeAccount`, and the **API client** the other contexts call through.
+`reportFailure` owns session expiry: an `unauthorized` result sends the
+user to `/login`, any other failure is shown as an alert.
+
+**Projects context**:
+`src/context/projectsContext.tsx`. The **Projects** on screen, the current
+one, and the owner's create, load, update, remove, share and unshare calls.
+
+**Shared-project access context**:
+`src/context/sharedProjectContext.tsx`. Opens a public **Share**
+(prompting for its password and retrying), and `checkCanEdit`: a signed-in
+User on their own Projects may always edit, a guest only when the **Share**
+has `canEdit`.
+
+**Note context**:
+`src/context/noteContext.tsx`. The current Project's **Notes**, search and
+proximity, and the note transport: every **Note** write goes through the
+Session's API client from here.
+
+`HINTS` and `SETTINGS_DEFAULTS` live in `src/components/shared/constants.ts`;
+`copyToClipboard` is in `utils/clientHelpers.ts`.
 
 ## Relationships
 
@@ -243,6 +283,3 @@ re-suggesting in a future architecture review:
 - **Share password on Note writes** (#115): the Note write policy checks
   only `canEdit`; the Share password gates reading. Any proof of the
   password on writes belongs in `mayEditViaShare`.
-- **`globalContext.tsx` god-object**: 792 LOC, 28 exposed properties; a
-  separate review should consider splitting it along the same seam lines
-  used for the API (Identity, Project, Note, Share).

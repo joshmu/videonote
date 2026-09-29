@@ -4,7 +4,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { ControlsProvider } from "@/context/controlsContext";
 
 const mocks = vi.hoisted(() => ({
-  global: {
+  uiShell: {
     toggleSidebar: vi.fn(),
     toggleMenuOpen: vi.fn(),
     cancelModals: vi.fn(),
@@ -22,7 +22,7 @@ const mocks = vi.hoisted(() => ({
   },
 }));
 
-vi.mock("@/context/globalContext", () => ({ useGlobalContext: () => mocks.global }));
+vi.mock("@/context/uiShellContext", () => ({ useUiShellContext: () => mocks.uiShell }));
 vi.mock("@/context/videoContext", () => ({ useVideoContext: () => mocks.video }));
 vi.mock("@/context/noteContext", () => ({ useNoteContext: () => mocks.note }));
 
@@ -48,7 +48,7 @@ describe("controlsContext", () => {
 
     fireEvent.keyDown(window, { key: "Escape" });
 
-    expect(mocks.global.cancelModals).toHaveBeenCalledTimes(1);
+    expect(mocks.uiShell.cancelModals).toHaveBeenCalledTimes(1);
   });
 
   it("ignores shift+arrow when there is no current note", () => {

@@ -14,8 +14,8 @@ import { createContext, useContext, useState } from "react";
 
 import { useGlobalKeydown } from "@/hooks/useGlobalKeydown";
 
-import { useGlobalContext } from "./globalContext";
 import { useNoteContext } from "./noteContext";
+import { useUiShellContext } from "./uiShellContext";
 import { useVideoContext } from "./videoContext";
 
 type ControlsType = (key: string, keypressed: string[]) => void;
@@ -40,7 +40,7 @@ export enum Keymap {
 const controlsContext = createContext<ControlsContextInterface>(null!);
 
 export function ControlsProvider(props: { [key: string]: any }) {
-  const { toggleSidebar, toggleMenuOpen, cancelModals } = useGlobalContext();
+  const { toggleSidebar, toggleMenuOpen, cancelModals } = useUiShellContext();
   const { togglePlay, jumpBack, jumpForward, changeVolume, seekTo } = useVideoContext();
   const { notes, currentNote } = useNoteContext();
 

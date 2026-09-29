@@ -14,13 +14,14 @@ import { ChangeEvent, useEffect, useState } from "react";
 
 import { ModalPrimaryBtn } from "@/components/shared/Modal/ModalBtn";
 import { ToggleInput } from "@/components/shared/Toggle/Toggle";
-import { useGlobalContext } from "@/context/globalContext";
 import { useNotificationContext } from "@/context/notificationContext";
+import { useSessionContext } from "@/context/sessionContext";
 import { ModalContainer } from "@/shared/Modal/ModalContainer";
 import { ModalForm } from "@/shared/Modal/ModalForm";
 import { ModalHeader } from "@/shared/Modal/ModalHeader";
 import { ModalInnerContainer } from "@/shared/Modal/ModalInnerContainer";
 import { ModalInput } from "@/shared/Modal/ModalInput";
+import { SETTINGS_DEFAULTS } from "@/shared/constants";
 import { SettingsInterface } from "@/shared/types";
 
 import { PlaybackRateSlider } from "./PlaybackRateSlider/PlaybackRateSlider";
@@ -33,7 +34,7 @@ export const SettingsModal = ({
   toggle: () => void;
   motionKey: string;
 }) => {
-  const { settings, updateSettings, SETTINGS_DEFAULTS } = useGlobalContext();
+  const { settings, updateSettings } = useSessionContext();
   const { addAlert } = useNotificationContext();
 
   const [state, setState] = useState<SettingsInterface>({

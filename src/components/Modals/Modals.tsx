@@ -14,7 +14,7 @@ import { AnimatePresence } from "motion/react";
 import { useEffect } from "react";
 
 import { useControlsContext } from "@/context/controlsContext";
-import { useGlobalContext } from "@/context/globalContext";
+import { useUiShellContext } from "@/context/uiShellContext";
 
 import { AboutModal } from "./AboutModal/AboutModal";
 import { ConfirmModal } from "./ConfirmModal/ConfirmModal";
@@ -40,7 +40,7 @@ export enum ModalType {
 }
 
 export const Modals = () => {
-  const { modalsOpen, toggleModalOpen, promptState, cancelPrompt } = useGlobalContext();
+  const { modalsOpen, toggleModalOpen, promptState, cancelPrompt } = useUiShellContext();
   const { toggleSmartControls } = useControlsContext();
 
   useEffect(() => {

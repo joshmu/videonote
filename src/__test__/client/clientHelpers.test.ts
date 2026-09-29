@@ -3,6 +3,7 @@ import { describe, expect, it, vi } from "vitest";
 import {
   checkPassword,
   checkUsername,
+  copyToClipboard,
   createObjectId,
   isValidCredentials,
 } from "@/utils/clientHelpers";
@@ -57,5 +58,44 @@ describe("createObjectId", () => {
 
   it("returns a different id on each call", () => {
     expect(createObjectId()).not.toBe(createObjectId());
+  });
+});
+
+describe("copyToClipboard", () => {
+  const stubClipboard = (writeText: (txt: string) => Promise<void>) =>
+    Object.defineProperty(navigator, "clipboard", { value: { writeText }, configurable: true });
+
+  it("copies the text and alerts with it", async () => {
+    const writeText = vi.fn(async () => {});
+    stubClipboard(writeText);
+    const addAlert = vi.fn();
+
+    await copyToClipboard("https://videonote.app/vn/cut", addAlert);
+
+    expect(writeText).toHaveBeenCalledWith("https://videonote.app/vn/cut");
+    expect(addAlert).toHaveBeenCalledWith({
+      type: "info",
+      msg: "Copied to clipboard! https://videonote.app/vn/cut",
+    });
+  });
+
+  it("does nothing without text", async () => {
+    const writeText = vi.fn(async () => {});
+    stubClipboard(writeText);
+    const addAlert = vi.fn();
+
+    await copyToClipboard("", addAlert);
+
+    expect(writeText).not.toHaveBeenCalled();
+    expect(addAlert).not.toHaveBeenCalled();
+  });
+
+  it("does not alert when the copy fails", async () => {
+    stubClipboard(vi.fn(async () => Promise.reject(new Error("denied"))));
+    const addAlert = vi.fn();
+
+    await copyToClipboard("text", addAlert);
+
+    expect(addAlert).not.toHaveBeenCalled();
   });
 });

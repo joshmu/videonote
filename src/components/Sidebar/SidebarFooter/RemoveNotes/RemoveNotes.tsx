@@ -14,13 +14,15 @@ import { AnimatePresence, motion } from "motion/react";
 import React, { useState } from "react";
 import { ImBin2 as TrashIcon } from "react-icons/im";
 
-import { useGlobalContext } from "@/context/globalContext";
+import { useProjectsContext } from "@/context/projectsContext";
 import { useNoteContext } from "@/context/noteContext";
+import { useUiShellContext } from "@/context/uiShellContext";
 
 import { NoteInterface } from "../../../shared/types";
 
 export const RemoveNotes = () => {
-  const { createPrompt, project } = useGlobalContext();
+  const { project } = useProjectsContext();
+  const { createPrompt } = useUiShellContext();
   const { removeCompleted, notes } = useNoteContext();
   const [showLabel, setShowLabel] = useState<boolean>(false);
 

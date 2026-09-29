@@ -13,7 +13,7 @@
 import { AnimatePresence, Variants, motion } from "motion/react";
 import { useEffect, useState } from "react";
 
-import { useGlobalContext } from "@/context/globalContext";
+import { useUiShellContext } from "@/context/uiShellContext";
 
 const variants: Variants = {
   initial: {
@@ -31,7 +31,7 @@ const variants: Variants = {
 
 export const Overlay = () => {
   const [open, setOpen] = useState<boolean>(false);
-  const { modalsOpen, toggleModalOpen, promptState, cancelPrompt } = useGlobalContext();
+  const { modalsOpen, toggleModalOpen, promptState, cancelPrompt } = useUiShellContext();
 
   useEffect(() => {
     if (modalsOpen.length > 0 || promptState.isOpen) setOpen(true);

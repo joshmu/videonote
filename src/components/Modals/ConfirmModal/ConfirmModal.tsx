@@ -14,7 +14,7 @@ import { ChangeEvent, useState } from "react";
 
 import { ModalPrimaryBtn } from "@/components/shared/Modal/ModalBtn";
 import { ModalInput } from "@/components/shared/Modal/ModalInput";
-import { useGlobalContext } from "@/context/globalContext";
+import { useUiShellContext } from "@/context/uiShellContext";
 import { ModalContainer } from "@/shared/Modal/ModalContainer";
 import { ModalForm } from "@/shared/Modal/ModalForm";
 import { ModalInnerContainer } from "@/shared/Modal/ModalInnerContainer";
@@ -26,7 +26,7 @@ export const ConfirmModal = ({
   toggle: () => void;
   motionKey: string;
 }) => {
-  const { promptState, confirmPrompt } = useGlobalContext();
+  const { promptState, confirmPrompt } = useUiShellContext();
   const [password, setPassword] = useState<string>("");
 
   const handleChange = (event: ChangeEvent<HTMLInputElement>) => {

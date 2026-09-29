@@ -12,12 +12,12 @@
 
 import { MdSettings as MenuIcon } from "react-icons/md";
 import { motion } from "motion/react";
-import { useGlobalContext } from "@/root/src/context/globalContext";
+import { useUiShellContext } from "@/context/uiShellContext";
 
 export const MenuButton = ({ drawAttention }: { drawAttention: boolean }) => {
   // * 'projectsExists' used to animate menu button on initial welcome
 
-  const { toggleMenuOpen } = useGlobalContext();
+  const { toggleMenuOpen } = useUiShellContext();
 
   const handleMenuClick = (): void => {
     toggleMenuOpen();

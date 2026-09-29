@@ -14,8 +14,10 @@ import { Variants, motion } from "motion/react";
 import { useEffect } from "react";
 
 import { NoteList } from "@/components/NoteList/NoteList";
-import { useGlobalContext } from "@/context/globalContext";
+import { useSessionContext } from "@/context/sessionContext";
+import { useUiShellContext } from "@/context/uiShellContext";
 import { useResizable } from "@/hooks/useResizable";
+import { SETTINGS_DEFAULTS } from "@/shared/constants";
 
 import { SidebarFooter } from "./SidebarFooter/SidebarFooter";
 import { SidebarHeader } from "./SidebarHeader/SidebarHeader";
@@ -36,7 +38,8 @@ const sidebarVariants: Variants = {
 };
 
 export const Sidebar = (props: { [key: string]: any }) => {
-  const { settings, updateSettings, sidebarOpen, SETTINGS_DEFAULTS } = useGlobalContext();
+  const { settings, updateSettings } = useSessionContext();
+  const { sidebarOpen } = useUiShellContext();
 
   const { state: resizeState, handleStartResize } = useResizable({
     initialSize: settings.sidebarWidth,

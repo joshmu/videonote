@@ -27,8 +27,10 @@ import {
 import { VscSettings as SettingsIcon } from "react-icons/vsc";
 
 import { ModalType } from "@/components/Modals/Modals";
-import { useGlobalContext } from "@/context/globalContext";
+import { useProjectsContext } from "@/context/projectsContext";
+import { useSessionContext } from "@/context/sessionContext";
 import { useThemeContext } from "@/context/themeContext";
+import { useUiShellContext } from "@/context/uiShellContext";
 import { Select } from "@/shared/Select/Select";
 import { ThemeToggle } from "@/shared/ThemeToggle/ThemeToggle";
 import { browserSession } from "@/utils/apiClient";
@@ -49,8 +51,9 @@ const variants: Variants = {
 };
 
 export const Menu = () => {
-  const { menuOpen } = useGlobalContext();
-  const { toggleMenuOpen, toggleModalOpen, project, admin, projects } = useGlobalContext();
+  const { menuOpen, toggleMenuOpen, toggleModalOpen } = useUiShellContext();
+  const { project, projects } = useProjectsContext();
+  const { admin } = useSessionContext();
   const { toggleTheme } = useThemeContext();
 
   const handleModalOpen = (modalId: ModalType): void => {
