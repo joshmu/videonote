@@ -192,7 +192,8 @@ describe("sharedProjectContext Share token", () => {
     });
     act(() => result.current.handleShareAccess({ kind: "passwordRequired" }));
     await act(async () => result.current.prompt.action({ password: "hunter2" }));
-    await waitFor(() => expect(result.current.shareToken()).toBe("share-1"));
+    await waitFor(() => expect(result.current.project).toMatchObject({ title: "Rough cut" }));
+    expect(result.current.shareToken()).toBe("share-1");
     const shown = result.current.project;
     Object.assign(replies, { token: "share-2", title: "Renamed" });
 
