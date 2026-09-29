@@ -47,10 +47,10 @@ export const ShareProjectModal = ({
 
   const [state, setState] = useState<ShareProjectInterface>(initialState);
 
-  // update state if project.share state is updated
+  // update state if project.share state is updated (not on note changes)
   useEffect(() => {
     if (project.share) setState({ ...(project.share as ShareProjectInterface) });
-  }, [project]);
+  }, [project._id, project.share]);
 
   const handleSubmit = async (event: FormEvent<HTMLButtonElement>): Promise<void> => {
     event.preventDefault();

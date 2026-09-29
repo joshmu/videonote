@@ -36,9 +36,10 @@ export const CurrentProjectModal = ({
   const { addAlert } = useNotificationContext();
   const [state, setState] = useState<ProjectInterface>(null);
 
+  // reset the form for another project or a saved title/src, not for note changes
   useEffect(() => {
     setState(project);
-  }, [project]);
+  }, [project?._id, project?.title, project?.src]);
 
   const handleUpdate = (event: ChangeEvent<HTMLInputElement>): void => {
     event.preventDefault();

@@ -52,6 +52,9 @@ vi.mock("motion/react", () => {
         <button {...attrsToLowerCase(props)}>{children}</button>
       ),
     ),
+    a: vi.fn(({ children, ...props }: { children?: React.ReactNode } & Record<string, unknown>) => (
+      <a {...attrsToLowerCase(props)}>{children}</a>
+    )),
     ul: vi.fn(
       ({ children, ...props }: { children?: React.ReactNode } & Record<string, unknown>) => (
         <ul {...attrsToLowerCase(props)}>{children}</ul>
