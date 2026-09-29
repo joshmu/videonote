@@ -3,13 +3,20 @@ import { StatusCodes } from "http-status-codes";
 import { withAuthenticatedUser } from "@/utils/auth/withAuthenticatedUser";
 import { Settings } from "@/utils/mongoose";
 
+// The Settings fields a client may write; `user` and `_id` are never taken from the body.
+const EDITABLE = ["currentProject", "playOffset", "showHints", "seekJump", "sidebarWidth"];
+
+const pickEditable = (settings) =>
+  Object.fromEntries(EDITABLE.filter((key) => key in settings).map((key) => [key, settings[key]]));
+
 export default withAuthenticatedUser(async (req, res, { userDoc, newToken }) => {
-  const { settings } = req.body;
+  const settings = req.body?.settings ?? {};
 
   let settingsDoc;
   try {
     // use _id to search for doc, the rest is data to add
-    const { _id, ...data } = settings;
+    const { _id } = settings;
+    const data = pickEditable(settings);
     // filter for settings _id otherwise if not avail try and use user settings id
     settingsDoc = await Settings.findOne({
       _id: _id ? _id : userDoc.settings,
@@ -23,7 +30,7 @@ export default withAuthenticatedUser(async (req, res, { userDoc, newToken }) => 
       settingsDoc = await Settings.findById(settingsDoc._id);
     } else {
       // if settings doc does not exist then create
-      settingsDoc = new Settings({ ...settings, user: userDoc._id });
+      settingsDoc = new Settings({ ...data, user: userDoc._id });
       await settingsDoc.save();
       // assign id to user
       userDoc.settings = settingsDoc._id;
