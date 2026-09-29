@@ -74,6 +74,7 @@
     "jsdom": "^29.1.1",
     "lint-staged": "^17.0.7",
     "markdownlint-cli2": "^0.23.0",
+    "mongodb-memory-server": "^11.3.0",
     "oxfmt": "^0.59.0",
     "oxlint": "^1.80.0",
     "plop": "^4.0.5",

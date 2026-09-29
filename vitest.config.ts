@@ -27,6 +27,7 @@ export default defineConfig({
           name: "server",
           environment: "node",
           include: SERVER_TESTS,
+          globalSetup: ["./src/__test__/db/globalSetup.ts"],
         },
       },
     ],
