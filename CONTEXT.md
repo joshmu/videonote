@@ -145,11 +145,14 @@ is the one "may edit via Share" check: the Project's own Share exists and has
 `canEdit`. `pages/api/public_project.ts` only maps outcomes to status codes:
 401 `passwordRequired`, 403 `incorrect`, 404 `notFound`, 200 `ok`.
 
-**findProjectWithRelations**:
-The populate spec for a hydrated Project in
+**findProjectWithRelations / findProjectsWithRelations**:
+The one populate spec for a hydrated Project in
 `utils/project/findProjectWithRelations.ts`: Project + Notes (with each
-Note's author User) + Share. Used by `pages/api/auth.js`, the Project
-intake, the Share intake and the Share access module.
+Note's author User) + Share, for one Project or every match of a query.
+The single form is used by the Project intake, the Share intake and the
+Share access module. `pages/api/auth.js` loads a User's Projects with the
+many form in one query, filtered to `_id` in `User.projects` and owned by
+the caller, and keeps the `User.projects` order.
 
 ### Architecture (Note seam)
 

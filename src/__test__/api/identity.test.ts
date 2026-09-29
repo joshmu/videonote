@@ -232,4 +232,23 @@ describe("/api/auth", () => {
       }),
     ]);
   });
+
+  it("loads the user's projects in one query, in the user's order, skipping projects they do not own", async () => {
+    const user = await seedUser();
+    const other = await seedUser("other@example.com");
+    const foreign = await Project.create({ title: "Theirs", user: other._id });
+    const later = await Project.create({ title: "Later", user: user._id });
+    const earlier = await Project.create({ title: "Earlier", user: user._id });
+    user.projects.push(earlier._id, foreign._id, later._id);
+    await user.save();
+    const find = vi.spyOn(Project, "find");
+    const findOne = vi.spyOn(Project, "findOne");
+
+    const { status, body } = await callApi(authHandler, {}, { email: EMAIL });
+
+    expect(status).toBe(StatusCodes.OK);
+    expect(body.user.projects.map((project) => project.title)).toEqual(["Earlier", "Later"]);
+    expect(find).toHaveBeenCalledTimes(1);
+    expect(findOne).not.toHaveBeenCalled();
+  });
 });
