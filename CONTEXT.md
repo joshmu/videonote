@@ -141,7 +141,8 @@ gone (or no longer points back at it) is `notFound`. The `ok` project is the
 whose author appears as `{ _id, username }` only (`toPublicAuthor`). No Share password, no email; an
 author whose username is missing or is their email appears as `{ _id }`. `mayEditViaShare(project)`
 is the one "may edit via Share" check: the Project's own Share exists and has
-`canEdit`. `pages/api/public_project.ts` only maps outcomes to responses.
+`canEdit`. `pages/api/public_project.ts` only maps outcomes to status codes:
+401 `passwordRequired`, 403 `incorrect`, 404 `notFound`, 200 `ok`.
 
 **findProjectWithRelations**:
 The populate spec for a hydrated Project in
@@ -174,6 +175,19 @@ Project is the stored Note's, never the payload's. A missing Project is
 The one-line helper in `utils/auth/withAuthenticatedUser.ts` that pulls
 `User._id` as a string (or `null`) out of an `OptionalAuthContext`.
 
+### Architecture (Client transport)
+
+**API client**:
+`utils/apiClient.ts`, no React. `createApiClient({ fetch, session, origin })`
+takes `fetch` as a parameter and exposes one typed call per route, each
+returning `ok` | `unauthorized` (401) | `error` (other failures, non-JSON
+bodies, network errors). `openShare` instead returns the Share access outcome
+read from the public route's status. The **SessionStore** it takes is the only
+code that touches the token cookie: `browserSession` reads, writes and removes
+it; `requestSession(cookieHeader)` reads a request's cookie on the server and
+never writes. `browserApi` is the client the browser uses; `globalContext`,
+the login pages and `getInitialProps` call it instead of `fetch`.
+
 ## Relationships
 
 - A **User** owns many **Projects**; a **Project** has one **User**.
@@ -203,11 +217,6 @@ The one-line helper in `utils/auth/withAuthenticatedUser.ts` that pulls
 These are deliberately out of scope for the current change but worth
 re-suggesting in a future architecture review:
 
-- **public_project status codes**: `passwordRequired` and `incorrect`
-  currently respond with HTTP 200 + `msg` because the existing client at
-  `src/context/globalContext.tsx` keys off `data.msg` rather than
-  `res.status`. Migrating both server and client to 401/403 would let
-  generic HTTP middleware handle these cases.
 - **Share password on Note writes** (#115): the Note write policy checks
   only `canEdit`; the Share password gates reading. Any proof of the
   password on writes belongs in `mayEditViaShare`.
