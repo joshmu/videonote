@@ -70,7 +70,11 @@ export const mayEditViaShare = async (project: {
   return editable !== null;
 };
 
-const toPublicAuthor = (user: unknown): PublicAuthor | undefined => {
+/**
+ * The public view of a populated note author: `{ _id, username }`, or
+ * `undefined` when there is no author or the username is the email.
+ */
+export const toPublicAuthor = (user: unknown): PublicAuthor | undefined => {
   const author = user as Pick<UserDoc, "_id" | "username" | "email"> | null | undefined;
   // Registration defaults username to the email, which must stay private.
   if (!author?.username || author.username === author.email) return undefined;
@@ -88,7 +92,7 @@ const toPublicProject = (projectDoc: ProjectDoc): PublicProject => {
     content: string;
     time: number;
     done: boolean;
-    project: Types.ObjectId;
+    project?: Types.ObjectId | null;
     user?: unknown;
   }>;
   return {
@@ -103,7 +107,8 @@ const toPublicProject = (projectDoc: ProjectDoc): PublicProject => {
         content: note.content,
         time: note.time,
         done: note.done,
-        project: note.project.toString(),
+        // Legacy Notes may lack `project`; they belong to the Project listing them.
+        project: (note.project ?? projectDoc._id).toString(),
         ...(user && { user }),
       };
     }),

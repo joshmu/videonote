@@ -44,6 +44,27 @@ describe("openSharedProject", () => {
     expect(await openSharedProject("rough-cut", undefined)).toEqual({ kind: "notFound" });
   });
 
+  it("returns notFound for a Share the Project no longer points at", async () => {
+    const { owner, project } = await seedSharedProject();
+    await Share.create({ url: "stale", user: owner._id, project: project._id });
+
+    expect(await openSharedProject("stale", undefined)).toEqual({ kind: "notFound" });
+  });
+
+  it("serves a legacy Note that has no project field", async () => {
+    const { project } = await seedSharedProject();
+    const legacy = await Note.create({ content: "Legacy" });
+    await Project.updateOne({ _id: project._id }, { $push: { notes: legacy._id } });
+
+    const result = await openSharedProject("rough-cut", undefined);
+
+    if (result.kind !== "ok") throw new Error(`expected ok, got ${result.kind}`);
+    expect(result.project.notes[2]).toMatchObject({
+      content: "Legacy",
+      project: project._id.toString(),
+    });
+  });
+
   it("returns passwordRequired when the Share is protected and no password is given", async () => {
     await seedSharedProject({ password: "hunter2" });
 
