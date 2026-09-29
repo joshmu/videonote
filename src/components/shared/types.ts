@@ -10,8 +10,6 @@
  * @copyright © 2020 - 2020 MU
  */
 
-import type { Document } from "mongoose";
-
 export interface UserInterface {
   _id?: string;
   email: string;
@@ -80,27 +78,4 @@ export enum ProjectApiActions {
 export enum NoteApiAction {
   REMOVE_DONE_NOTES = "REMOVE DONE NOTES",
   REMOVE = "remove",
-}
-
-export interface ProjectDocInterface extends Document {
-  user: string | UserInterface;
-  share?: string | ShareProjectInterface | null;
-}
-
-export interface ShareDocInterface extends Document {
-  password: string;
-  project: string | ProjectInterface;
-}
-
-export interface UserDocInterface extends Document {
-  email: string;
-  username?: string;
-  password?: string;
-  role?: string;
-  projects: any;
-  settings?: any;
-}
-export interface NoteDocInterface extends Document {
-  user: string | UserInterface;
-  project: string | ProjectInterface;
 }

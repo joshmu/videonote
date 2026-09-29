@@ -1,5 +1,4 @@
-import type { ProjectDocInterface } from "@/shared/types";
-import { Project } from "@/utils/mongoose";
+import { Project, type ProjectDoc } from "@/utils/mongoose";
 
 /**
  * Canonical "hydrated Project" lookup: a Project plus its Notes (with each
@@ -7,9 +6,9 @@ import { Project } from "@/utils/mongoose";
  * client should funnel through here so that the populate spec lives in one
  * place.
  */
-export const findProjectWithRelations = (query: {
+export const findProjectWithRelations = async (query: {
   [key: string]: unknown;
-}): Promise<ProjectDocInterface> =>
+}): Promise<ProjectDoc> =>
   Project.findOne(query).populate([
     {
       path: "notes",
@@ -21,4 +20,4 @@ export const findProjectWithRelations = (query: {
       },
     },
     { path: "share", model: "Share" },
-  ]) as unknown as Promise<ProjectDocInterface>;
+  ]);

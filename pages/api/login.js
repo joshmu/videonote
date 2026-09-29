@@ -5,12 +5,13 @@ import normalizeEmail from "validator/lib/normalizeEmail";
 
 import { extractUser } from "@/utils/apiHelpers";
 import { generateAccessToken } from "@/utils/jwt";
-import { User } from "@/utils/mongoose";
+import { connectDb, User } from "@/utils/mongoose";
 
 export default async (req, res) => {
+  await connectDb();
   // get user data
   const { password } = req.body;
-  const email = normalizeEmail(req.body.email);
+  const email = /** @type {string} */ (normalizeEmail(req.body.email));
 
   // validate
   const globalResponseMsg = "Your Email and/or Password is incorrect.";

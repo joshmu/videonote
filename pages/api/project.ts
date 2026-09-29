@@ -12,16 +12,16 @@
 
 import { StatusCodes } from "http-status-codes";
 
-import { ProjectApiActions, ProjectDocInterface } from "@/shared/types";
+import { ProjectApiActions } from "@/shared/types";
 import { withAuthenticatedUser } from "@/utils/auth/withAuthenticatedUser";
-import { Note, Project, Share } from "@/utils/mongoose";
+import { Note, Project, type ProjectDoc, Share } from "@/utils/mongoose";
 import { findProjectWithRelations } from "@/utils/project/findProjectWithRelations";
 import { attachOrUpdateShare, detachShare, ShareUrlTakenError } from "@/utils/share/shareIntake";
 
 export default withAuthenticatedUser(async (req, res, { userDoc, newToken }) => {
   const { action, project } = req.body;
 
-  let projectDoc: ProjectDocInterface;
+  let projectDoc: ProjectDoc;
   try {
     switch (action) {
       case ProjectApiActions.GET:
