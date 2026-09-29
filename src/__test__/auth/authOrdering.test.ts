@@ -2,8 +2,6 @@ import { StatusCodes } from "http-status-codes";
 import mongoose from "mongoose";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import { generateAccessToken } from "@/utils/jwt";
-
 import { callApi } from "../api/http";
 
 // A fresh model module per test, so connectDb holds no cached connection.
