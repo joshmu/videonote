@@ -6,7 +6,7 @@ import { extractAuthorId, withOptionalUser } from "@/utils/auth/withAuthenticate
 import { removeDoneProjectNotes, upsertNote } from "@/utils/note/noteIntake";
 
 const DENIED = {
-  invalid: { status: StatusCodes.BAD_REQUEST, msg: "Malformed id." },
+  invalid: { status: StatusCodes.BAD_REQUEST, msg: "Invalid note." },
   notFound: { status: StatusCodes.NOT_FOUND, msg: "Project not found." },
   forbidden: { status: StatusCodes.FORBIDDEN, msg: "Not allowed to edit notes in this project." },
 } as const;

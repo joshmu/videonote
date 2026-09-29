@@ -134,8 +134,29 @@ describe("POST /api/note", () => {
       "owner@example.com",
     );
 
-    expect(malformedNote).toEqual({ status: 400, body: { msg: "Malformed id." } });
-    expect(malformedProject).toEqual({ status: 400, body: { msg: "Malformed id." } });
+    const bsonLookalike = await post(
+      {
+        action: NoteApiAction.REMOVE_DONE_NOTES,
+        projectId: { _bsontype: "ObjectId", $ne: null },
+      },
+      "owner@example.com",
+    );
+
+    for (const result of [malformedNote, malformedProject, bsonLookalike]) {
+      expect(result).toEqual({ status: 400, body: { msg: "Invalid note." } });
+    }
+  });
+
+  it("answers 400 for a note without content", async () => {
+    const projectId = await seed();
+
+    const { status } = await post(
+      { note: { ...note(projectId), content: undefined } },
+      "owner@example.com",
+    );
+
+    expect(status).toBe(400);
+    expect(await Note.countDocuments()).toBe(0);
   });
 
   it("answers 500 with only a msg when the write fails", async () => {

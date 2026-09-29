@@ -115,7 +115,7 @@ describe("upsertNote on create", () => {
     expect(await Note.countDocuments()).toBe(0);
   });
 
-  it.each([["not-an-id"], [{ $ne: null }], [undefined]])(
+  it.each([["not-an-id"], [{ $ne: null }], [{ _bsontype: "ObjectId", $ne: null }], [undefined]])(
     "returns invalid for the malformed Project id %j and saves nothing",
     async (project) => {
       const { ownerId, projectId } = await seed();
@@ -127,7 +127,7 @@ describe("upsertNote on create", () => {
     },
   );
 
-  it.each([["not-an-id"], [{ $ne: null }], [42], [null]])(
+  it.each([["not-an-id"], [{ $ne: null }], [{ _bsontype: "ObjectId", $ne: null }], [42], [null]])(
     "returns invalid for the malformed Note id %j and saves nothing",
     async (_id) => {
       const { ownerId, projectId } = await seed();
@@ -139,6 +139,53 @@ describe("upsertNote on create", () => {
       expect((await Note.find()).map((note) => note.content)).toEqual(["Original"]);
     },
   );
+});
+
+describe("upsertNote field validation", () => {
+  it.each([
+    ["no content", { content: undefined }],
+    ["empty content", { content: "" }],
+    ["non-string content", { content: { $gt: "" } }],
+    ["a non-number time", { time: "soon" }],
+    ["a non-finite time", { time: Number.NaN }],
+    ["a non-boolean done", { done: "yes" }],
+  ])("returns invalid on create with %s and saves nothing", async (_label, overrides) => {
+    const { ownerId, projectId } = await seed();
+
+    expect(await upsertNote(noteInput(projectId, overrides), ownerId)).toEqual({
+      kind: "invalid",
+    });
+    expect(await Note.countDocuments()).toBe(0);
+  });
+
+  it.each([
+    ["empty content", { content: "" }],
+    ["a non-number time", { time: "soon" }],
+  ])("returns invalid on update with %s and leaves the Note unchanged", async (_label, fields) => {
+    const { ownerId, projectId } = await seed();
+    const note = await seedNote(projectId, { user: ownerId, time: 3 });
+
+    const result = await upsertNote(
+      { _id: note._id.toString(), project: projectId, ...fields } as never,
+      ownerId,
+    );
+
+    expect(result).toEqual({ kind: "invalid" });
+    expect(await Note.findById(note._id)).toMatchObject({ content: "Original", time: 3 });
+  });
+
+  it("lets an update omit content", async () => {
+    const { ownerId, projectId } = await seed();
+    const note = await seedNote(projectId, { user: ownerId });
+
+    const result = await upsertNote(
+      { _id: note._id.toString(), project: projectId, done: true } as never,
+      ownerId,
+    );
+
+    expect(result.kind).toBe("ok");
+    expect(await Note.findById(note._id)).toMatchObject({ content: "Original", done: true });
+  });
 });
 
 describe("upsertNote on update", () => {
@@ -267,7 +314,7 @@ describe("removeDoneProjectNotes", () => {
     });
   });
 
-  it.each([["not-an-id"], [{ $ne: null }], [undefined]])(
+  it.each([["not-an-id"], [{ $ne: null }], [{ _bsontype: "ObjectId", $ne: null }], [undefined]])(
     "returns invalid for the malformed project id %j",
     async (projectId) => {
       const { ownerId } = await seed();

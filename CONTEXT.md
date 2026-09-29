@@ -170,9 +170,12 @@ The pair `upsertNote` / `removeDoneProjectNotes` in
 **Note write policy** on the write path. Both take the caller's
 `User._id` as a string, or `null` for a guest, and return `ok` |
 `invalid` | `notFound` | `forbidden`, which `pages/api/note.ts` maps to HTTP
-200, 400, 404 and 403. `invalid` is a malformed Note id, or a malformed or
-missing Project id, caught before any lookup. `upsertNote` decides
-create-vs-update by `Note.findById(input._id)`; a missing id creates.
+200, 400, 404 and 403. `invalid` is a Note or Project id that is not a hex
+ObjectId string (a missing Project id too), or a field the Note schema would
+reject: `content` must be a non-empty string (required on create), `time` a
+finite number, `done` a boolean. It is checked before the permission check.
+`upsertNote` decides create-vs-update by `Note.findById(input._id)`; a
+missing id creates.
 On update only `content`, `time` and `done` change; `project` and `user`
 are fixed. On create the caller becomes the author and the new id is pushed
 onto `Project.notes`. The returned Note's author goes through

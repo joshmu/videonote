@@ -4,7 +4,7 @@ import type { NoteInterface } from "@/shared/types";
 import { Note, type NoteDoc, Project, type ProjectDoc } from "@/utils/mongoose";
 import { mayEditViaShare, type PublicAuthor, toPublicAuthor } from "@/utils/share/shareAccess";
 
-/** A malformed Note or Project id. */
+/** A malformed Note or Project id, or a Note field the schema would reject. */
 type Invalid = { kind: "invalid" };
 type Denied = Invalid | { kind: "notFound" } | { kind: "forbidden" };
 /** A written Note as returned to the caller: the author is the public view only. */
@@ -21,18 +21,20 @@ export type RemoveDoneNotesResult =
  * stored Note's Project on update and from `input.project` on create. A new
  * Note is authored by the caller and pushed onto `Project.notes`. Returns
  * the Note with its author as the public view (never an email). A malformed
- * Note id, or Project id on create, is `invalid`; a missing Note id creates.
+ * Note id, Project id on create, or field is `invalid`; a missing Note id
+ * creates, and a new Note needs non-empty `content`.
  */
 export const upsertNote = async (
   input: NoteInterface,
   callerId: string | null,
 ): Promise<UpsertNoteResult> => {
-  if (input._id !== undefined && !isObjectIdOrHexString(input._id)) return INVALID;
+  if (input._id !== undefined && !isIdString(input._id)) return INVALID;
+  const editable = pickDefined({ content: input.content, time: input.time, done: input.done });
   const existing = await Note.findById(input._id);
+  if (!existing && !isIdString(input.project)) return INVALID;
+  if (!isValidEdit(editable, !existing)) return INVALID;
   const access = await checkWriteAccess(existing ? existing.project : input.project, callerId);
   if (access.kind !== "allowed") return access;
-
-  const editable = pickDefined({ content: input.content, time: input.time, done: input.done });
 
   if (existing) {
     existing.set(editable);
@@ -59,6 +61,7 @@ export const removeDoneProjectNotes = async (
   projectId: unknown,
   callerId: string | null,
 ): Promise<RemoveDoneNotesResult> => {
+  if (!isIdString(projectId)) return INVALID;
   const access = await checkWriteAccess(projectId, callerId);
   if (access.kind !== "allowed") return access;
 
@@ -72,13 +75,25 @@ export const removeDoneProjectNotes = async (
 
 const INVALID: Invalid = { kind: "invalid" };
 
+// Only a hex string: isObjectIdOrHexString also passes objects that claim to be ObjectIds.
+const isIdString = (value: unknown): value is string =>
+  typeof value === "string" && isObjectIdOrHexString(value);
+
+// Mirrors the Note schema, so a bad field is `invalid` rather than a failed save.
+const isValidEdit = (
+  { content, time, done }: { content?: unknown; time?: unknown; done?: unknown },
+  creating: boolean,
+): boolean =>
+  (content === undefined ? !creating : typeof content === "string" && content !== "") &&
+  (time === undefined || (typeof time === "number" && Number.isFinite(time))) &&
+  (done === undefined || typeof done === "boolean");
+
 // Note write policy: the Project owner always; anyone else only through the
-// Project's Share with canEdit.
+// Project's Share with canEdit. `projectId` is already checked.
 const checkWriteAccess = async (
   projectId: unknown,
   callerId: string | null,
 ): Promise<{ kind: "allowed"; projectDoc: ProjectDoc } | Denied> => {
-  if (!isObjectIdOrHexString(projectId)) return INVALID;
   const projectDoc = await Project.findById(projectId);
   if (!projectDoc) return { kind: "notFound" };
   if (isOwner(projectDoc, callerId) || (await mayEditViaShare(projectDoc))) {
