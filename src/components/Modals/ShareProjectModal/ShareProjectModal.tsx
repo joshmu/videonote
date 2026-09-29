@@ -28,6 +28,22 @@ import { copyToClipboard } from "@/utils/clientHelpers";
 // todo: remove bad characters from url path entry
 const formatUrl = (txt: string): string => txt.replace(" ", "-").toLowerCase();
 
+type ShareForm = { url: string; canEdit: boolean; password: string; removePassword: boolean };
+
+const toForm = (share: ShareProjectInterface): ShareForm => ({
+  url: share.url,
+  canEdit: share.canEdit,
+  password: "",
+  removePassword: false,
+});
+
+// An empty password field keeps the current password; only the remove control clears it.
+const toShareData = ({ url, canEdit, password, removePassword }: ShareForm) => ({
+  url,
+  canEdit,
+  ...(password ? { password } : removePassword && { password: "" }),
+});
+
 export const ShareProjectModal = ({
   toggle: toggleModal,
   motionKey,
@@ -37,20 +53,16 @@ export const ShareProjectModal = ({
 }) => {
   const { project, shareProject, removeShareProject } = useProjectsContext();
   const { addAlert } = useNotificationContext();
-  const defaults = {
-    url: `${formatUrl(project.title)}`,
-    password: "",
-    canEdit: true,
-  };
-  const initialState: ShareProjectInterface = project.share
-    ? { ...(project.share as ShareProjectInterface) }
-    : defaults;
+  const share = project.share as ShareProjectInterface | undefined;
+  const initialState: ShareForm = share
+    ? toForm(share)
+    : { url: formatUrl(project.title), canEdit: true, password: "", removePassword: false };
 
-  const [state, setState] = useState<ShareProjectInterface>(initialState);
+  const [state, setState] = useState<ShareForm>(initialState);
 
   // update state if project.share state is updated (not on note changes)
   useEffect(() => {
-    if (project.share) setState({ ...(project.share as ShareProjectInterface) });
+    if (project.share) setState(toForm(project.share as ShareProjectInterface));
   }, [project._id, project.share]);
 
   const handleSubmit = async (event: FormEvent<HTMLButtonElement>): Promise<void> => {
@@ -64,12 +76,7 @@ export const ShareProjectModal = ({
       return;
     }
 
-    const shareData = { ...state };
-    // if password hasn't been altered then don't provide it as we currently have a hashed version
-    if (shareData.password === (project.share as ShareProjectInterface)?.password)
-      delete shareData.password;
-
-    const apiSuccess = await shareProject(shareData);
+    const apiSuccess = await shareProject(toShareData(state));
     if (apiSuccess) {
       addAlert({ type: "success", msg: "Shared project updated." });
       copyToClipboard(`https://videonote.app/vn/${state.url}`, addAlert);
@@ -91,18 +98,20 @@ export const ShareProjectModal = ({
 
   const handleChange = (event: ChangeEvent<HTMLInputElement>): void => {
     const { id, value } = event.target;
-    // Only the url is formatted; every other field is kept as typed.
-    setState((current) => ({ ...current, [id]: id === "url" ? formatUrl(value) : value }));
+    setState((current) =>
+      id === "url"
+        ? { ...current, url: formatUrl(value) }
+        : // A typed password replaces the current one instead of removing it.
+          { ...current, password: value, removePassword: false },
+    );
   };
 
   const handleCanEditToggle = (): void => {
-    setState((current) => {
-      const updatedState: ShareProjectInterface = {
-        ...current,
-        canEdit: !state.canEdit,
-      };
-      return updatedState;
-    });
+    setState((current) => ({ ...current, canEdit: !current.canEdit }));
+  };
+
+  const handleRemovePasswordToggle = (): void => {
+    setState((current) => ({ ...current, password: "", removePassword: !current.removePassword }));
   };
 
   return (
@@ -121,12 +130,24 @@ export const ShareProjectModal = ({
           />
           <ModalInput
             title="Password protect?"
-            placeholder="Empty for no password"
+            placeholder={
+              share?.hasPassword ? "Empty to keep the current password" : "Empty for no password"
+            }
             id="password"
             type="password"
             value={state.password}
             onChange={handleChange}
           />
+
+          {share?.hasPassword && (
+            <div className="relative mt-2">
+              <ToggleInput
+                title="Remove the password"
+                state={state.removePassword}
+                onClick={handleRemovePasswordToggle}
+              />
+            </div>
+          )}
 
           <div className="relative mt-2">
             <ToggleInput

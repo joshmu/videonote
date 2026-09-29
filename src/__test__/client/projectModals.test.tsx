@@ -89,6 +89,13 @@ describe("ShareProjectModal fields", () => {
     render(<ShareProjectModal toggle={vi.fn()} motionKey="share" />).container;
   const type = (container: HTMLElement, id: string, value: string) =>
     fireEvent.change(input(container, id), { target: { id, value } });
+  const submit = (label: "Share" | "Update") =>
+    fireEvent.click(screen.getByRole("button", { name: label }));
+  const sent = () => mocks.projects.shareProject.mock.calls[0][0];
+
+  beforeEach(() => {
+    mocks.projects.shareProject = vi.fn().mockResolvedValue(false);
+  });
 
   it("keeps the url when the password is typed after it", () => {
     mocks.projects.project = { ...project, share: undefined };
@@ -98,7 +105,8 @@ describe("ShareProjectModal fields", () => {
     type(container, "password", "hunter2");
 
     expect(input(container, "url").value).toBe("final-cut");
-    expect(input(container, "password").value).toBe("hunter2");
+    submit("Share");
+    expect(sent()).toEqual({ url: "final-cut", canEdit: true, password: "hunter2" });
   });
 
   it("keeps the url when edit access is toggled", () => {
@@ -109,5 +117,42 @@ describe("ShareProjectModal fields", () => {
     fireEvent.click(screen.getByText("Users can edit notes."));
 
     expect(input(container, "url").value).toBe("final");
+  });
+
+  const protectedShare = { ...project.share, hasPassword: true };
+
+  it("never shows the stored password and keeps it when the field is left empty", () => {
+    mocks.projects.project = { ...project, share: protectedShare };
+    const container = renderShare();
+
+    expect(input(container, "password").value).toBe("");
+    submit("Update");
+    expect(sent()).toEqual({ url: "rough-cut", canEdit: true });
+  });
+
+  it("sets a typed password on a protected Share", () => {
+    mocks.projects.project = { ...project, share: protectedShare };
+    const container = renderShare();
+
+    type(container, "password", "swordfish");
+    submit("Update");
+
+    expect(sent()).toEqual({ url: "rough-cut", canEdit: true, password: "swordfish" });
+  });
+
+  it("removes the password only through the remove control", () => {
+    mocks.projects.project = { ...project, share: protectedShare };
+    renderShare();
+
+    fireEvent.click(screen.getByText("Remove the password"));
+    submit("Update");
+
+    expect(sent()).toEqual({ url: "rough-cut", canEdit: true, password: "" });
+  });
+
+  it("offers no remove control when the Share has no password", () => {
+    renderShare();
+
+    expect(screen.queryByText("Remove the password")).not.toBeInTheDocument();
   });
 });

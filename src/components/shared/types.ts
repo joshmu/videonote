@@ -55,7 +55,10 @@ export interface ShareProjectInterface {
   url: string;
   user?: string | UserInterface;
   project?: string | ProjectInterface;
+  /** Sent to set (non-empty) or remove ("") the password; never received. */
   password?: string;
+  /** Whether the Share is password protected, as the owner receives it. */
+  hasPassword?: boolean;
   canEdit?: boolean;
 }
 
