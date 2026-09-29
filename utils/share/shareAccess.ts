@@ -4,8 +4,8 @@ import { type ProjectDoc, Share, type UserDoc } from "@/utils/mongoose";
 import { findProjectWithRelations } from "@/utils/project/findProjectWithRelations";
 import { verifySharePassword } from "@/utils/share/sharePassword";
 
-/** A note author as the public sees them: id and username, never contact details. */
-export type PublicAuthor = { _id: string; username: string };
+/** A note author as the public sees them: id, plus username when it is public. */
+export type PublicAuthor = { _id: string; username?: string };
 
 export type PublicNote = {
   _id: string;
@@ -72,13 +72,16 @@ export const mayEditViaShare = async (project: {
 
 /**
  * The public view of a populated note author: `{ _id, username }`, or
- * `undefined` when there is no author or the username is the email.
+ * `{ _id }` when the username is missing or is the email; `undefined` when
+ * the Note has no author.
  */
 export const toPublicAuthor = (user: unknown): PublicAuthor | undefined => {
   const author = user as Pick<UserDoc, "_id" | "username" | "email"> | null | undefined;
+  if (!author?._id) return undefined;
+  const _id = author._id.toString();
   // Registration defaults username to the email, which must stay private.
-  if (!author?.username || author.username === author.email) return undefined;
-  return { _id: author._id.toString(), username: author.username };
+  if (!author.username || author.username === author.email) return { _id };
+  return { _id, username: author.username };
 };
 
 const toPublicProject = (projectDoc: ProjectDoc): PublicProject => {

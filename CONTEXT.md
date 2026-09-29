@@ -102,7 +102,7 @@ into `Share.findById` / `Share.create` / `Share.deleteOne` directly.
 gone (or no longer points back at it) is `notFound`. The `ok` project is the
 **public projection**: title, src, Share `_id`/`url`/`canEdit`, and Notes
 whose author appears as `{ _id, username }` only (`toPublicAuthor`). No Share password, no email; an
-author whose username is their email is left out. `mayEditViaShare(project)`
+author whose username is missing or is their email appears as `{ _id }`. `mayEditViaShare(project)`
 is the one "may edit via Share" check: the Project's own Share exists and has
 `canEdit`. `pages/api/public_project.ts` only maps outcomes to responses.
 

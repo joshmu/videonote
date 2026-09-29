@@ -92,6 +92,21 @@ describe("POST /api/note", () => {
     expect(JSON.stringify(body)).not.toContain("owner@example.com");
   });
 
+  it("returns the author id, without the email, to an owner whose username is their email", async () => {
+    const owner = await User.create({ email: "solo@example.com", username: "solo@example.com" });
+    const project = await Project.create({ title: "Solo", user: owner._id });
+    const own = await Note.create({ content: "Mine", project: project._id, user: owner._id });
+
+    const { status, body } = await post(
+      { note: { ...note(project._id.toString()), _id: own._id.toString(), content: "Edited" } },
+      "solo@example.com",
+    );
+
+    expect(status).toBe(200);
+    expect(body.note.user).toEqual({ _id: owner._id.toString() });
+    expect(JSON.stringify(body.note)).not.toContain("solo@example.com");
+  });
+
   it("answers 404 for a missing Project", async () => {
     await seed();
 

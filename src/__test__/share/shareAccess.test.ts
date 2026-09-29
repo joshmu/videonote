@@ -113,7 +113,7 @@ describe("openSharedProject", () => {
     expect(wire).not.toContain("owner@example.com");
   });
 
-  it("drops a note author whose username is their email address", async () => {
+  it("shows a note author whose username is their email address by id only", async () => {
     const { project } = await seedSharedProject();
     const author = await User.create({ email: "casey@example.com", username: "casey@example.com" });
     await Note.updateMany({ project: project._id }, { $set: { user: author._id } });
@@ -121,7 +121,8 @@ describe("openSharedProject", () => {
     const result = await openSharedProject("rough-cut", undefined);
 
     if (result.kind !== "ok") throw new Error(`expected ok, got ${result.kind}`);
-    expect(result.project.notes.map((note) => note.user)).toEqual([undefined, undefined]);
+    const authorOnly = { _id: author._id.toString() };
+    expect(result.project.notes.map((note) => note.user)).toEqual([authorOnly, authorOnly]);
     expect(JSON.stringify(result.project)).not.toContain("casey@example.com");
   });
 });
