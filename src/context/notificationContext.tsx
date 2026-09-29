@@ -11,7 +11,7 @@
  */
 
 import { nanoid } from "nanoid";
-import React, { ReactNode, createContext, useContext, useState } from "react";
+import React, { ReactNode, createContext, useContext, useEffect, useRef, useState } from "react";
 
 type AddAlertType = (alert: AlertInterface) => string;
 type RemoveAlertType = (id: string) => void;
@@ -32,6 +32,12 @@ const notificationContext = createContext<NotificationContextInterface>(null!);
 
 export const NotificationProvider = ({ children }: { children: ReactNode }) => {
   const [alerts, setAlerts] = useState<AlertInterface[]>([]);
+  const expiryTimers = useRef(new Set<ReturnType<typeof setTimeout>>());
+
+  useEffect(() => {
+    const pending = expiryTimers.current;
+    return () => pending.forEach(clearTimeout);
+  }, []);
 
   const addAlert: AddAlertType = ({ msg, type = "info", duration = 8000, persistent = false }) => {
     const id = nanoid(12);
@@ -51,9 +57,11 @@ export const NotificationProvider = ({ children }: { children: ReactNode }) => {
 
     // if we won't close manually then use timer
     if (!persistent) {
-      setTimeout(() => {
+      const timer = setTimeout(() => {
+        expiryTimers.current.delete(timer);
         setAlerts((currentAlerts) => currentAlerts.filter((alert) => alert.id !== newAlert.id));
       }, duration);
+      expiryTimers.current.add(timer);
     }
 
     return id;

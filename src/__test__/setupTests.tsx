@@ -4,12 +4,18 @@ import React from "react";
 import { vi } from "vitest";
 
 // INTERSECTION OBSERVER MOCK
-const intersectionObserverMock = () => ({
-  observe: () => null,
-  disconnect: () => null,
-  unobserve: () => null,
-});
-window.IntersectionObserver = vi.fn().mockImplementation(intersectionObserverMock);
+class IntersectionObserverMock {
+  readonly root = null;
+  readonly rootMargin = "";
+  readonly thresholds: number[] = [];
+  observe() {}
+  unobserve() {}
+  disconnect() {}
+  takeRecords() {
+    return [];
+  }
+}
+window.IntersectionObserver = IntersectionObserverMock as unknown as typeof IntersectionObserver;
 
 // MOTION MOCK
 vi.mock("motion/react", () => {
