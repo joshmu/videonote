@@ -21,9 +21,10 @@ export const useAnounceAction = (initialState: PlayerAction | "" = ""): UseAnoun
   // we want to capture action events and reset so we can receive multiple of the same events elsewhere
   // so we quickly reset to base state
   useEffect(() => {
-    setTimeout(() => {
+    const timer = setTimeout(() => {
       setAction(initialState);
     }, 10);
+    return () => clearTimeout(timer);
   }, [action]);
 
   return [action, setAction];
