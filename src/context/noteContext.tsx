@@ -138,11 +138,9 @@ export function NoteProvider(props: { [key: string]: any }) {
   };
 
   const updateNoteState = (updatedNote: NoteInterface): void => {
-    setNotes(() => {
-      return notes.map((note) => {
-        return updatedNote._id === note._id ? updatedNote : note;
-      });
-    });
+    setNotes((current) =>
+      current.map((note) => (updatedNote._id === note._id ? updatedNote : note)),
+    );
   };
 
   const updateSearch: UpdateSearchType = (txt) => {
@@ -151,7 +149,7 @@ export function NoteProvider(props: { [key: string]: any }) {
 
   const sort: SortType = (notes) => {
     // default is to sort chronologically
-    let sorted = notes.sort((p, c) => p.time - c.time);
+    let sorted = [...notes].sort((p, c) => p.time - c.time);
 
     // search
     if (search !== "") {
@@ -164,6 +162,8 @@ export function NoteProvider(props: { [key: string]: any }) {
   const removeCompleted: RemoveCompletedType = async () => {
     // * we wait for server response before setting state, this is different to standard single note crud operations
     const updatedNotes = await noteApiRemoveDoneNotes();
+    // the api resolves "error" on failure; keep the current notes
+    if (!Array.isArray(updatedNotes)) return;
     setNotes(updatedNotes);
   };
 

@@ -97,7 +97,7 @@ export const ExportNotes = ({ dynamicLabel = true }: { dynamicLabel?: boolean })
   ) : null;
 };
 
-const createTxtFile = (project: ProjectInterface, includeDate: boolean = false): string => {
+export const createTxtFile = (project: ProjectInterface, includeDate: boolean = false): string => {
   if (project?.notes.length === 0) return;
 
   let txtContent = `VIDEONOTE\n\n`;
@@ -105,7 +105,8 @@ const createTxtFile = (project: ProjectInterface, includeDate: boolean = false):
   if (includeDate) txtContent += `${printDate()}\n`;
   txtContent += `---\n\n`;
   // content
-  txtContent += project.notes
+  txtContent += [...project.notes]
+    .sort((a, b) => a.time - b.time)
     .map((msg) => `${msg.done ? "✓" : " "} ${formatDuration(msg.time)} ${msg.content}`)
     .join("\n");
 
