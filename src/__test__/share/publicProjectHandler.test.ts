@@ -77,6 +77,7 @@ describe("POST /api/public_project", () => {
     expect(body.user.projects[0].notes[0].user).toEqual({
       _id: project.user.toString(),
       username: "owner",
+      role: "owner",
     });
     expect(body.shareToken).toEqual(expect.any(String));
     const wire = JSON.stringify(body);

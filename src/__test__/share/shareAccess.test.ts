@@ -104,7 +104,7 @@ describe("openSharedProject", () => {
           time: 12,
           done: false,
           project: project._id.toString(),
-          user: { _id: owner._id.toString(), username: "owner" },
+          user: { _id: owner._id.toString(), username: "owner", role: "owner" },
         }),
         expect.objectContaining({ content: "Louder", time: 30 }),
       ],
@@ -115,7 +115,7 @@ describe("openSharedProject", () => {
     expect(wire).not.toContain("owner@example.com");
   });
 
-  it("shows a note author whose username is their email address by id only", async () => {
+  it("shows a note author whose username is their email address by id and role only", async () => {
     const { project } = await seedSharedProject();
     const author = await User.create({ email: "casey@example.com", username: "casey@example.com" });
     await Note.updateMany({ project: project._id }, { $set: { user: author._id } });
@@ -123,9 +123,32 @@ describe("openSharedProject", () => {
     const result = await openSharedProject("rough-cut", undefined);
 
     if (result.kind !== "ok") throw new Error(`expected ok, got ${result.kind}`);
-    const authorOnly = { _id: author._id.toString() };
+    const authorOnly = { _id: author._id.toString(), role: "member" };
     expect(result.project.notes.map((note) => note.user)).toEqual([authorOnly, authorOnly]);
     expect(JSON.stringify(result.project)).not.toContain("casey@example.com");
+  });
+
+  it("labels the owner's notes owner, other signed-in authors member and guest notes with no author", async () => {
+    const { owner, project } = await seedSharedProject();
+    // Registration defaults the username to the email, which stays private.
+    await User.updateOne({ _id: owner._id }, { username: "owner@example.com" });
+    const member = await User.create({ email: "member@example.com" });
+    const memberNote = await Note.create({
+      content: "Grade",
+      project: project._id,
+      user: member._id,
+    });
+    await Project.updateOne({ _id: project._id }, { $push: { notes: memberNote._id } });
+
+    const result = await openSharedProject("rough-cut", undefined);
+
+    if (result.kind !== "ok") throw new Error(`expected ok, got ${result.kind}`);
+    expect(result.project.notes.map((note) => note.user)).toEqual([
+      { _id: owner._id.toString(), role: "owner" },
+      undefined,
+      { _id: member._id.toString(), role: "member" },
+    ]);
+    expect(JSON.stringify(result.project)).not.toMatch(/@example\.com/);
   });
 });
 

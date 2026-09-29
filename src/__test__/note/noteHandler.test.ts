@@ -91,7 +91,7 @@ describe("POST /api/note", () => {
     });
 
     expect(status).toBe(200);
-    expect(body.note.user).toEqual({ _id: owner._id.toString(), username: "owner" });
+    expect(body.note.user).toEqual({ _id: owner._id.toString(), username: "owner", role: "owner" });
     expect(JSON.stringify(body)).not.toContain("owner@example.com");
   });
 
@@ -106,7 +106,7 @@ describe("POST /api/note", () => {
     );
 
     expect(status).toBe(200);
-    expect(body.note.user).toEqual({ _id: owner._id.toString() });
+    expect(body.note.user).toEqual({ _id: owner._id.toString(), role: "owner" });
     expect(JSON.stringify(body.note)).not.toContain("solo@example.com");
   });
 

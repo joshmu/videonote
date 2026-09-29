@@ -153,14 +153,22 @@ into `Share.findById` / `Share.create` / `Share.deleteOne` directly.
 **Share token** only for a password-protected Share; a Share whose Project is
 gone (or no longer points back at it) is `notFound`. The `ok` project is the
 **public projection**: title, src, Share `_id`/`url`/`canEdit`, and Notes
-whose author appears as `{ _id, username }` only (`toPublicAuthor`). No Share password, no email; an
-author whose username is missing or is their email appears as `{ _id }`. `mayEditViaShare(project, shareToken)`
+whose author appears as `{ _id, username, role }` only (`toPublicNote` /
+`toPublicAuthor`). No Share password, no email; an author whose username is
+missing or is their email appears without it. `mayEditViaShare(project, shareToken)`
 is the one "may edit via Share" check, returning `allowed` | `forbidden` |
 `passwordRequired`: the Project's own Share exists and has `canEdit` (read
 live on every write), and a password-protected Share also needs a valid
 **Share token**; an open Share needs none. `pages/api/public_project.ts` only
 maps outcomes to status codes: 401 `passwordRequired`, 403 `incorrect`, 404
 `notFound`, 200 `ok` (the reply carries `shareToken` when there is one).
+
+**Author role**:
+Computed in one place, `toPublicAuthor(user, ownerId)`: `owner` for the
+Project's **User**, `member` for any other **User**. A **Note** with no
+author is a guest's and carries no `user`. Public reads, Note write
+responses and the **Owner projection** all use it; the client only reads
+the role.
 
 **Share token**:
 `utils/share/shareToken.ts`. A 12 hour JWT proving the caller gave a
@@ -198,7 +206,7 @@ On update only `content`, `time` and `done` change; `project` and `user`
 are fixed. On create the caller becomes the author and the new id is pushed
 onto `Project.notes`. The returned Note's author goes through
 `toPublicAuthor`, so a write never returns an email. `removeDoneProjectNotes` deletes the done Notes, pulls
-their ids from `Project.notes` and returns the survivors.
+their ids from `Project.notes` and returns the survivors, authors the same way.
 
 **Note write policy**:
 The Project owner may always write Notes, with no **Share token**; anyone
