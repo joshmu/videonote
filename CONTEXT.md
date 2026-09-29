@@ -151,7 +151,8 @@ that owns the Project↔Share lifecycle. `attachOrUpdateShare` decides
 create-vs-update by `projectDoc.share`, writes only `url`, `password` and
 `canEdit` from the caller (`project` and `user` come from the Project), hashes
 the password (via
-`hashSharePassword`), and surfaces a duplicate `url` as `ShareUrlTakenError`.
+`hashSharePassword`), and surfaces a duplicate `url` as `ShareUrlTakenError`
+on create and update alike.
 An absent `password` keeps the current one and an empty one removes it.
 Both operations return the project re-loaded through `findProjectWithRelations`
 in the **Owner projection**. `Share.password` is not selected by default;

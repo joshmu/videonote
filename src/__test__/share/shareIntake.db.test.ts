@@ -64,6 +64,20 @@ describe("Share intake against the in-memory database", () => {
     expect(await Share.countDocuments({ url: "taken" })).toBe(1);
   });
 
+  it("rejects updating the Share to a url another Share uses and keeps its url", async () => {
+    const { project } = await seedProject();
+    const other = await Project.create({ title: "Other", user: project.user });
+    await Share.init();
+    await attachOrUpdateShare(other, { url: "taken" });
+    await attachOrUpdateShare(project, { url: "rough-cut" });
+
+    await expect(attachOrUpdateShare(project, { url: "taken" })).rejects.toBeInstanceOf(
+      ShareUrlTakenError,
+    );
+
+    expect((await Share.findById(project.share)).url).toBe("rough-cut");
+  });
+
   it("detaches the Share, deleting it and clearing the project's reference", async () => {
     const { project } = await seedProject();
     const shared = await attachOrUpdateShare(project, { url: "rough-cut" });

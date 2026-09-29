@@ -1,5 +1,3 @@
-import type { Types } from "mongoose";
-
 import type { ShareProjectInterface } from "@/shared/types";
 import { type ProjectDoc, Share } from "@/utils/mongoose";
 import { findProjectWithRelations } from "@/utils/project/findProjectWithRelations";
@@ -7,7 +5,8 @@ import { type OwnerProject, toOwnerProject } from "@/utils/project/ownerProject"
 import { hashSharePassword } from "@/utils/share/sharePassword";
 
 /**
- * Thrown when a Share cannot be created because its `url` is already in use.
+ * Thrown when a Share cannot be created or updated because its `url` is
+ * already in use.
  * Maps to the unique-index violation on `Share.url` so callers can return a
  * useful HTTP error instead of a generic 500.
  */
@@ -23,6 +22,16 @@ const isDuplicateKey = (err: unknown): boolean =>
   typeof err === "object" &&
   err !== null &&
   (err as { code?: number }).code === MONGO_DUPLICATE_KEY;
+
+// Run a Share write, surfacing a duplicate `url` as ShareUrlTakenError.
+const withUrlTaken = async <T>(write: () => Promise<T>): Promise<T> => {
+  try {
+    return await write();
+  } catch (err) {
+    if (isDuplicateKey(err)) throw new ShareUrlTakenError();
+    throw err;
+  }
+};
 
 /** The Share fields an owner may write; `project` and `user` come from the server. */
 const EDITABLE = ["url", "password", "canEdit"] as const;
@@ -52,23 +61,14 @@ export const attachOrUpdateShare = async (
   const persisted = await toPersisted(shareData);
 
   if (projectDoc.share) {
-    await Share.findByIdAndUpdate(projectDoc.share, { $set: persisted });
+    await withUrlTaken(() => Share.findByIdAndUpdate(projectDoc.share, { $set: persisted }));
     return reload(projectDoc);
   }
 
-  let createdId: Types.ObjectId;
-  try {
-    const created = await Share.create({
-      ...persisted,
-      project: projectDoc._id,
-      user: projectDoc.user,
-    });
-    createdId = created._id;
-  } catch (err) {
-    if (isDuplicateKey(err)) throw new ShareUrlTakenError();
-    throw err;
-  }
-  projectDoc.share = createdId;
+  const created = await withUrlTaken(() =>
+    Share.create({ ...persisted, project: projectDoc._id, user: projectDoc.user }),
+  );
+  projectDoc.share = created._id;
   await projectDoc.save();
   return reload(projectDoc);
 };
