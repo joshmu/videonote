@@ -188,7 +188,7 @@ The pair `upsertNote` / `removeDoneProjectNotes` in
 `User._id` as a string, or `null` for a guest, plus the `x-share-token`
 header, and return `ok` | `invalid` | `notFound` | `forbidden` |
 `sharePasswordRequired`, which `pages/api/note.ts` maps to HTTP 200, 400,
-404, 403 and 403 with the msg `Share password required.`. `invalid` is a Note or Project id that is not a hex
+404, 403 and 403 with `code: "sharePasswordRequired"`. `invalid` is a Note or Project id that is not a hex
 ObjectId string (a missing Project id too), or a field the Note schema would
 reject: `content` must be a non-empty string (required on create), `time` a
 finite number, `done` a boolean. It is checked before the permission check.
@@ -220,7 +220,7 @@ bodies, network errors). `openShare` instead returns the Share access outcome
 read from the public route's status (its `ok` carries the **Share token**
 when there is one). `saveNote` and `removeDoneNotes` take an optional
 **Share token**, sent as `x-share-token`, and add `sharePasswordRequired`
-(a 403 whose msg is `Share password required.`), and `removeAccount` adds `wrongPassword`
+(a 403 whose body has `code: "sharePasswordRequired"`), and `removeAccount` adds `wrongPassword`
 (a 401 whose msg is the wrong-password one) so an expired session still reads
 as `unauthorized`. The **SessionStore** it takes is the only
 code that touches the token cookie: `browserSession` reads, writes and removes
@@ -259,7 +259,7 @@ one, and the owner's create, load, update, remove, share and unshare calls.
 (prompting for its password and retrying), holds the **Share token** it
 hands out in memory (`shareToken()`), `renewShareAccess()` to ask for the
 password again when a Note write is refused for it (the project stays on
-screen), and `checkCanEdit`, the one canEdit source: a signed-in User on
+screen; it resolves `false` if the prompt is dismissed), and `checkCanEdit`, the one canEdit source: a signed-in User on
 their own Projects may always edit, a guest only when the **Share** has
 `canEdit`. A viewer who cannot edit gets a "View only" hint in place of the
 note input.
@@ -269,7 +269,9 @@ note input.
 proximity, and the note transport: every **Note** write goes through the
 Session's API client from here, with the **Share token**. A write refused
 with `sharePasswordRequired` keeps its Note, waits on `renewShareAccess`
-and is sent again.
+and is sent again; a dismissed prompt fails it with an alert. Writes to one
+Note go out one at a time, so its create lands before its updates, and a
+Note whose create failed sends nothing more.
 
 `HINTS` and `SETTINGS_DEFAULTS` live in `src/components/shared/constants.ts`;
 `copyToClipboard` is in `utils/clientHelpers.ts`.

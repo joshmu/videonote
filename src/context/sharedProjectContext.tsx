@@ -17,8 +17,11 @@ interface SharedProjectContextInterface {
   checkCanEdit: CheckCanEditType;
   /** The Share token for Note writes; none for an open Share or the owner's own Projects. */
   shareToken: () => string | undefined;
-  /** Ask for the Share password again; resolves once a new Share token is held. */
-  renewShareAccess: () => Promise<void>;
+  /**
+   * Ask for the Share password again: true once a new Share token is held,
+   * false when the prompt is dismissed.
+   */
+  renewShareAccess: () => Promise<boolean>;
 }
 
 const sharedProjectContext = createContext<SharedProjectContextInterface>(null!);
@@ -31,12 +34,21 @@ export const SharedProjectProvider = ({ children }: { children: React.ReactNode 
   const { addAlert } = useNotificationContext();
   const { api, admin } = useSessionContext();
   const { project: currentProject, showSharedProject } = useProjectsContext();
-  const { createPrompt, cancelPrompt } = useUiShellContext();
+  const { createPrompt } = useUiShellContext();
 
   // In memory only, for this page session.
   const shareTokenRef = useRef<string | undefined>(undefined);
   // Note writes waiting on a renewed Share token.
-  const renewalRef = useRef<{ promise: Promise<void>; resolve: () => void } | null>(null);
+  const renewalRef = useRef<{
+    promise: Promise<boolean>;
+    resolve: (renewed: boolean) => void;
+  } | null>(null);
+
+  const settleRenewal = (renewed: boolean): void => {
+    const renewal = renewalRef.current;
+    renewalRef.current = null;
+    renewal?.resolve(renewed);
+  };
 
   const fetchWithPasswordPublicProject: FetchWithPasswordPublicProjectType = (password) => {
     // get id
@@ -55,8 +67,10 @@ export const SharedProjectProvider = ({ children }: { children: React.ReactNode 
         </div>
       ),
       passwordRequired: true,
+      // Dismissing a renewal prompt gives up on the waiting note writes.
+      onCancel: renewalRef.current ? () => settleRenewal(false) : undefined,
+      // confirmPrompt closes the prompt after this runs.
       action: async (data: any) => {
-        cancelPrompt();
         const { password } = data;
         setTimeout(async () => {
           // get password and send again
@@ -88,8 +102,7 @@ export const SharedProjectProvider = ({ children }: { children: React.ReactNode 
         const renewal = renewalRef.current;
         if (!renewal) return showSharedProject(access.project);
         // A renewal keeps the project on screen, with any unsent notes.
-        renewalRef.current = null;
-        renewal.resolve();
+        settleRenewal(true);
         return;
       }
       case "notFound":
@@ -103,10 +116,10 @@ export const SharedProjectProvider = ({ children }: { children: React.ReactNode 
     }
   };
 
-  const renewShareAccess = (): Promise<void> => {
+  const renewShareAccess = (): Promise<boolean> => {
     if (!renewalRef.current) {
-      let resolve!: () => void;
-      const promise = new Promise<void>((done) => (resolve = done));
+      let resolve!: (renewed: boolean) => void;
+      const promise = new Promise<boolean>((done) => (resolve = done));
       renewalRef.current = { promise, resolve };
     }
     promptForSharePassword(

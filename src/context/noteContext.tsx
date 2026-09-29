@@ -41,6 +41,8 @@ interface NoteContextInterface {
   notesExist: boolean;
 }
 
+const SHARE_PASSWORD_DISMISSED_MSG = "Not saved: the Share password is needed to edit notes.";
+
 const noteContext = createContext<NoteContextInterface>(null!);
 
 export function NoteProvider(props: { [key: string]: any }) {
@@ -58,18 +60,39 @@ export function NoteProvider(props: { [key: string]: any }) {
 
   // A protected Share that rejects the Share token asks for its password
   // again; the write waits, its note kept, and is resent with the new token.
+  // Dismissing the prompt fails the write.
   const writeThroughShare = async <T,>(
     send: (token: string | undefined) => Promise<NoteWriteResult<T>>,
   ): Promise<ApiResult<T>> => {
     let result = await send(shareToken());
     while (result.kind === "sharePasswordRequired") {
-      await renewShareAccess();
+      if (!(await renewShareAccess())) {
+        return { kind: "error", status: result.status, msg: SHARE_PASSWORD_DISMISSED_MSG };
+      }
       result = await send(shareToken());
     }
     return result;
   };
 
-  const noteApi = async (noteData: Partial<NoteInterface>): Promise<NoteInterface | "error"> => {
+  // Writes to one Note go out one at a time, so its create lands before its
+  // updates. Once a create fails the Note is dropped and its queued writes are not sent.
+  const noteWritesRef = useRef(new Map<string, Promise<unknown>>());
+  const droppedNotesRef = useRef(new Set<string>());
+
+  const noteApi = (noteData: Partial<NoteInterface>): Promise<NoteInterface | "error"> => {
+    const id = noteData._id;
+    const previous = noteWritesRef.current.get(id) ?? Promise.resolve();
+    const write = previous.then(() =>
+      droppedNotesRef.current.has(id) ? ("error" as const) : sendNote(noteData),
+    );
+    noteWritesRef.current.set(id, write);
+    void write.then(() => {
+      if (noteWritesRef.current.get(id) === write) noteWritesRef.current.delete(id);
+    });
+    return write;
+  };
+
+  const sendNote = async (noteData: Partial<NoteInterface>): Promise<NoteInterface | "error"> => {
     const result = await writeThroughShare((token) => api.saveNote(noteData, token));
     if (result.kind !== "ok") {
       reportFailure(result);
@@ -140,6 +163,7 @@ export function NoteProvider(props: { [key: string]: any }) {
     setNotes([...notes, newNote]);
     noteApi(newNote).then((responseNote: NoteInterface | "error") => {
       if (responseNote === "error") {
+        droppedNotesRef.current.add(newNote._id);
         // remove newly added note
         setNotes((current) => {
           return current.filter((note) => note._id !== newNote._id);

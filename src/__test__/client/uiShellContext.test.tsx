@@ -1,5 +1,5 @@
 import { act, render } from "@testing-library/react";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 
 import { ModalType } from "@/components/Modals/Modals";
 import { UiShellProvider, useUiShellContext } from "@/context/uiShellContext";
@@ -104,5 +104,22 @@ describe("uiShellContext action input", () => {
     );
 
     expect(() => act(() => shell.actionInputFocus())).not.toThrow();
+  });
+});
+
+describe("uiShellContext prompt", () => {
+  it("calls onCancel when the prompt is dismissed, not when it is confirmed", () => {
+    renderShell();
+    const onCancel = vi.fn();
+    const action = vi.fn();
+
+    act(() => ctx.createPrompt({ msg: "Sure?", action, onCancel }));
+    act(() => ctx.confirmPrompt({}));
+    expect(action).toHaveBeenCalledTimes(1);
+    expect(onCancel).not.toHaveBeenCalled();
+
+    act(() => ctx.createPrompt({ msg: "Sure?", action, onCancel }));
+    act(() => ctx.cancelPrompt());
+    expect(onCancel).toHaveBeenCalledTimes(1);
   });
 });

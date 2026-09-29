@@ -4,7 +4,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { NoteApiAction, type NoteInterface } from "@/components/shared/types";
 import { AppProviders } from "@/context/appProviders";
 import { NoteProvider, useNoteContext } from "@/context/noteContext";
-import { NotificationProvider } from "@/context/notificationContext";
+import { NotificationProvider, useNotificationContext } from "@/context/notificationContext";
 import { useUiShellContext } from "@/context/uiShellContext";
 import { VideoProvider } from "@/context/videoContext";
 
@@ -34,10 +34,14 @@ const signedIn = {
 };
 
 let ctx: ReturnType<typeof useNoteContext>;
+let shell: ReturnType<typeof useUiShellContext>;
 let prompt: ReturnType<typeof useUiShellContext>["promptState"];
+let alerts: string[];
 const Probe = () => {
   ctx = useNoteContext();
-  prompt = useUiShellContext().promptState;
+  shell = useUiShellContext();
+  prompt = shell.promptState;
+  alerts = useNotificationContext().alerts.map((alert) => String(alert.msg));
   return null;
 };
 
@@ -235,7 +239,7 @@ describe("noteContext on a password-protected Share", () => {
     expect(prompt.passwordRequired).toBe(true);
     expect(ctx.notes.map((n) => n.content)).toContain("added");
 
-    await act(async () => prompt.action({ password: "hunter2" }));
+    await act(async () => shell.confirmPrompt({ password: "hunter2" }));
 
     await waitFor(() => expect(noteRequests(requests)).toHaveLength(2));
     expect(noteRequests(requests)[1]).toMatchObject({
@@ -245,5 +249,60 @@ describe("noteContext on a password-protected Share", () => {
     await waitFor(() => expect(ctx.notes.map((n) => n.content)).toContain("added"));
     expect(ctx.notes).toHaveLength(3);
     expect(mocks.push).not.toHaveBeenCalled();
+  });
+
+  it("drops the unsent note and says so when the password prompt is dismissed", async () => {
+    const { requests } = await renderGuest(() => ({
+      status: 403,
+      body: { msg: "Share password required.", code: "sharePasswordRequired" },
+    }));
+
+    await act(async () => {
+      ctx.addNote({ content: "added", time: 30 });
+    });
+    await waitFor(() => expect(prompt.isOpen).toBe(true));
+    act(() => shell.cancelPrompt());
+
+    await waitFor(() => expect(ctx.notes.map((n) => n.content)).toEqual(["first", "second"]));
+    expect(alerts).toContain("Not saved: the Share password is needed to edit notes.");
+    expect(noteRequests(requests)).toHaveLength(1);
+  });
+
+  it("resends a note's create before its update once the password is given again", async () => {
+    const resentCreate = deferred<Reply>();
+    let first = true;
+    const { requests } = await renderGuest(({ note }) => {
+      if (first) {
+        first = false;
+        return {
+          status: 403,
+          body: { msg: "Share password required.", code: "sharePasswordRequired" },
+        };
+      }
+      return note.done ? ok({ note }) : resentCreate.promise;
+    });
+
+    await act(async () => {
+      ctx.addNote({ content: "added", time: 30 });
+    });
+    await waitFor(() => expect(prompt.isOpen).toBe(true));
+    const added = ctx.notes.find((n) => n.content === "added");
+    act(() => {
+      ctx.updateNote({ ...added, done: true });
+    });
+    await act(async () => shell.confirmPrompt({ password: "hunter2" }));
+    await waitFor(() => expect(noteRequests(requests)).toHaveLength(2));
+    await new Promise((resolve) => setTimeout(resolve, 50));
+
+    expect(noteRequests(requests)).toHaveLength(2);
+    expect(noteRequests(requests)[1].body.note).toMatchObject({ _id: added._id, done: false });
+
+    await act(async () => {
+      resentCreate.resolve(ok({ note: { ...added, currentSession: undefined } }));
+    });
+
+    await waitFor(() => expect(noteRequests(requests)).toHaveLength(3));
+    expect(noteRequests(requests)[2].body.note).toMatchObject({ _id: added._id, done: true });
+    await waitFor(() => expect(ctx.notes.find((n) => n._id === added._id)?.done).toBe(true));
   });
 });
