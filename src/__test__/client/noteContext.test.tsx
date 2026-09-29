@@ -6,7 +6,7 @@ import { AppProviders } from "@/context/appProviders";
 import { NoteProvider, useNoteContext } from "@/context/noteContext";
 import { NotificationProvider, useNotificationContext } from "@/context/notificationContext";
 import { useUiShellContext } from "@/context/uiShellContext";
-import { VideoProvider } from "@/context/videoContext";
+import { VideoProvider, useVideoContext } from "@/context/videoContext";
 
 import { type Reply, type Routes, fakeTransport, ok } from "./providerHarness";
 
@@ -37,11 +37,13 @@ let ctx: ReturnType<typeof useNoteContext>;
 let shell: ReturnType<typeof useUiShellContext>;
 let prompt: ReturnType<typeof useUiShellContext>["promptState"];
 let alerts: string[];
+let video: ReturnType<typeof useVideoContext>;
 const Probe = () => {
   ctx = useNoteContext();
   shell = useUiShellContext();
   prompt = shell.promptState;
   alerts = useNotificationContext().alerts.map((alert) => String(alert.msg));
+  video = useVideoContext();
   return null;
 };
 
@@ -128,6 +130,39 @@ describe("noteContext", () => {
 
     expect(ctx.notes.map((n) => n.content)).toEqual(["first", "second", "added"]);
     expect(ctx.notes[0].done).toBe(true);
+  });
+
+  it.each([
+    ["a null time", null],
+    ["a non-finite time", Number.NaN],
+    ["no time", undefined],
+  ])("sends time 0 for a note with %s before the player reports progress", async (_l, time) => {
+    const { requests } = await renderNotes(({ note }) =>
+      typeof note.time === "number"
+        ? ok({ note })
+        : { status: 400, body: { msg: "Invalid note." } },
+    );
+
+    await act(async () => {
+      ctx.addNote({ content: "added", time });
+    });
+
+    expect(noteRequests(requests)[0].body.note.time).toBe(0);
+    await new Promise((resolve) => setTimeout(resolve, 0));
+    expect(ctx.notes.map((n) => n.content)).toEqual(["first", "second", "added"]);
+  });
+
+  it("sends the player position for a note with no time of its own", async () => {
+    const { requests } = await renderNotes(({ note }) => ok({ note }));
+    act(() => {
+      video.handleProgress({ playedSeconds: 7, played: 0.1, loadedSeconds: 7, loaded: 0.1 });
+    });
+
+    await act(async () => {
+      ctx.addNote({ content: "added", time: null });
+    });
+
+    expect(noteRequests(requests)[0].body.note.time).toBe(7);
   });
 
   it("gives a new note an ObjectId-shaped id and keeps it after the server accepts it", async () => {

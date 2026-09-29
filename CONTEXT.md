@@ -310,7 +310,8 @@ Session's API client from here, with the **Share token**. A write refused
 with `sharePasswordRequired` keeps its Note, waits on `renewShareAccess`
 and is sent again; a dismissed prompt fails it with an alert. Writes to one
 Note go out one at a time, so its create lands before its updates, and a
-Note whose create failed sends nothing more.
+Note whose create failed sends nothing more. A new Note always has a
+numeric `time`: its own, else the player position, else 0.
 
 `HINTS` and `SETTINGS_DEFAULTS` live in `src/components/shared/constants.ts`;
 `copyToClipboard` is in `utils/clientHelpers.ts`.

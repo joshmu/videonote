@@ -148,7 +148,8 @@ export function NoteProvider(props: { [key: string]: any }) {
     const newNote: NoteInterface = {
       _id: createObjectId(),
       content: note.content,
-      time: note.time,
+      // Always a number: the note's time, else the player position, else 0.
+      time: [note.time, progress.playedSeconds].find(Number.isFinite) ?? 0,
       done: false,
       project: project._id,
     };
