@@ -138,6 +138,16 @@ describe("ShareProjectModal fields", () => {
     expect(input(container, "url").value).toBe("rough-");
   });
 
+  it("links to a Share stored with a space through its encoded url", () => {
+    mocks.projects.project = { ...project, share: { ...project.share, url: "rough cut" } };
+    renderShare();
+
+    expect(screen.getByRole("link")).toHaveAttribute(
+      "href",
+      "https://videonote.app/vn/rough%20cut",
+    );
+  });
+
   it("keeps the url when edit access is toggled", () => {
     mocks.projects.project = { ...project, share: undefined };
     const container = renderShare();
