@@ -1,18 +1,35 @@
 import react from "@vitejs/plugin-react";
 import path from "path";
-import { defineConfig } from "vitest/config";
+import { configDefaults, defineConfig } from "vitest/config";
+
+const SERVER_TESTS = ["src/__test__/{auth,db,note,project,share}/**/*.test.ts"];
 
 export default defineConfig({
   plugins: [react()],
   test: {
-    environment: "jsdom",
     globals: true,
-    setupFiles: ["./src/__test__/setupTests.tsx"],
     css: {
       modules: {
         classNameStrategy: "non-scoped",
       },
     },
+    projects: [
+      {
+        test: {
+          name: "client",
+          environment: "jsdom",
+          setupFiles: ["./src/__test__/setupTests.tsx"],
+          exclude: [...configDefaults.exclude, ...SERVER_TESTS],
+        },
+      },
+      {
+        test: {
+          name: "server",
+          environment: "node",
+          include: SERVER_TESTS,
+        },
+      },
+    ],
   },
   resolve: {
     alias: {
