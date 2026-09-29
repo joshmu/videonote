@@ -106,15 +106,39 @@ describe("upsertNote on create", () => {
     expect((await Note.findOne()).user.toString()).toBe(visitorId);
   });
 
-  it("returns notFound for a missing or malformed Project and saves nothing", async () => {
+  it("returns notFound for a missing Project and saves nothing", async () => {
     const { ownerId } = await seed();
 
     expect(await upsertNote(noteInput(new Types.ObjectId().toString()), ownerId)).toEqual({
       kind: "notFound",
     });
-    expect(await upsertNote(noteInput("not-an-id"), ownerId)).toEqual({ kind: "notFound" });
     expect(await Note.countDocuments()).toBe(0);
   });
+
+  it.each([["not-an-id"], [{ $ne: null }], [undefined]])(
+    "returns invalid for the malformed Project id %j and saves nothing",
+    async (project) => {
+      const { ownerId, projectId } = await seed();
+
+      expect(await upsertNote(noteInput(projectId, { project }), ownerId)).toEqual({
+        kind: "invalid",
+      });
+      expect(await Note.countDocuments()).toBe(0);
+    },
+  );
+
+  it.each([["not-an-id"], [{ $ne: null }], [42], [null]])(
+    "returns invalid for the malformed Note id %j and saves nothing",
+    async (_id) => {
+      const { ownerId, projectId } = await seed();
+      await seedNote(projectId, { user: ownerId });
+
+      expect(await upsertNote(noteInput(projectId, { _id }), ownerId)).toEqual({
+        kind: "invalid",
+      });
+      expect((await Note.find()).map((note) => note.content)).toEqual(["Original"]);
+    },
+  );
 });
 
 describe("upsertNote on update", () => {
@@ -235,12 +259,20 @@ describe("removeDoneProjectNotes", () => {
     expect(await Note.countDocuments()).toBe(1);
   });
 
-  it("returns notFound for a missing or malformed project id", async () => {
+  it("returns notFound for a missing Project", async () => {
     const { ownerId } = await seed();
 
     expect(await removeDoneProjectNotes(new Types.ObjectId().toString(), ownerId)).toEqual({
       kind: "notFound",
     });
-    expect(await removeDoneProjectNotes({ $ne: null }, ownerId)).toEqual({ kind: "notFound" });
   });
+
+  it.each([["not-an-id"], [{ $ne: null }], [undefined]])(
+    "returns invalid for the malformed project id %j",
+    async (projectId) => {
+      const { ownerId } = await seed();
+
+      expect(await removeDoneProjectNotes(projectId, ownerId)).toEqual({ kind: "invalid" });
+    },
+  );
 });

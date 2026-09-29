@@ -122,11 +122,28 @@ describe("POST /api/note", () => {
     ).toBe(404);
   });
 
+  it("answers 400 for a malformed note id or project id", async () => {
+    const projectId = await seed();
+
+    const malformedNote = await post(
+      { note: { ...note(projectId), _id: "not-an-object-id" } },
+      "owner@example.com",
+    );
+    const malformedProject = await post(
+      { action: NoteApiAction.REMOVE_DONE_NOTES, projectId: "not-an-object-id" },
+      "owner@example.com",
+    );
+
+    expect(malformedNote).toEqual({ status: 400, body: { msg: "Malformed id." } });
+    expect(malformedProject).toEqual({ status: 400, body: { msg: "Malformed id." } });
+  });
+
   it("answers 500 with only a msg when the write fails", async () => {
     const projectId = await seed();
     vi.spyOn(console, "error").mockImplementation(() => {});
+    vi.spyOn(Note, "create").mockRejectedValueOnce(new Error("write failed"));
 
-    const result = await post({ note: { ...note(projectId), _id: "not-an-object-id" } });
+    const result = await post({ note: note(projectId) }, "owner@example.com");
 
     expect(result).toEqual({ status: 500, body: { msg: "Database error" } });
   });

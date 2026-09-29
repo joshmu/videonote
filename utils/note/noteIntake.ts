@@ -1,10 +1,12 @@
-import { isValidObjectId, type Types } from "mongoose";
+import { isObjectIdOrHexString, type Types } from "mongoose";
 
 import type { NoteInterface } from "@/shared/types";
 import { Note, type NoteDoc, Project, type ProjectDoc } from "@/utils/mongoose";
 import { mayEditViaShare, type PublicAuthor, toPublicAuthor } from "@/utils/share/shareAccess";
 
-type Denied = { kind: "notFound" } | { kind: "forbidden" };
+/** A malformed Note or Project id. */
+type Invalid = { kind: "invalid" };
+type Denied = Invalid | { kind: "notFound" } | { kind: "forbidden" };
 /** A written Note as returned to the caller: the author is the public view only. */
 export type WrittenNote = Omit<ReturnType<NoteDoc["toObject"]>, "user"> & { user?: PublicAuthor };
 export type UpsertNoteResult = { kind: "ok"; note: WrittenNote } | Denied;
@@ -18,12 +20,14 @@ export type RemoveDoneNotesResult =
  * `project` and `user` never change on update. Permission comes from the
  * stored Note's Project on update and from `input.project` on create. A new
  * Note is authored by the caller and pushed onto `Project.notes`. Returns
- * the Note with its author as the public view (never an email).
+ * the Note with its author as the public view (never an email). A malformed
+ * Note id, or Project id on create, is `invalid`; a missing Note id creates.
  */
 export const upsertNote = async (
   input: NoteInterface,
   callerId: string | null,
 ): Promise<UpsertNoteResult> => {
+  if (input._id !== undefined && !isObjectIdOrHexString(input._id)) return INVALID;
   const existing = await Note.findById(input._id);
   const access = await checkWriteAccess(existing ? existing.project : input.project, callerId);
   if (access.kind !== "allowed") return access;
@@ -48,7 +52,8 @@ export const upsertNote = async (
 
 /**
  * Delete every done Note in the Project, pull them from `Project.notes` and
- * return the survivors (lean). Same write policy as {@link upsertNote}.
+ * return the survivors (lean). Same write policy as {@link upsertNote}; a
+ * malformed or missing project id is `invalid`.
  */
 export const removeDoneProjectNotes = async (
   projectId: unknown,
@@ -65,13 +70,16 @@ export const removeDoneProjectNotes = async (
   return { kind: "ok", notes: await findProjectNotes(_id) };
 };
 
+const INVALID: Invalid = { kind: "invalid" };
+
 // Note write policy: the Project owner always; anyone else only through the
 // Project's Share with canEdit.
 const checkWriteAccess = async (
   projectId: unknown,
   callerId: string | null,
 ): Promise<{ kind: "allowed"; projectDoc: ProjectDoc } | Denied> => {
-  const projectDoc = isValidObjectId(projectId) ? await Project.findById(projectId) : null;
+  if (!isObjectIdOrHexString(projectId)) return INVALID;
+  const projectDoc = await Project.findById(projectId);
   if (!projectDoc) return { kind: "notFound" };
   if (isOwner(projectDoc, callerId) || (await mayEditViaShare(projectDoc))) {
     return { kind: "allowed", projectDoc };
