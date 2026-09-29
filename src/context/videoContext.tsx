@@ -14,6 +14,7 @@ import { type RefObject, createContext, useContext, useEffect, useRef, useState 
 
 import { ProgressInterface } from "@/components/shared/types";
 import { useAnounceAction } from "@/hooks/useAnounceAction";
+import { LocalVideoLoader } from "@/shared/LocalVideoForm/LocalVideoLoader";
 
 import { useNotificationContext } from "./notificationContext";
 import { useProjectsContext } from "./projectsContext";
@@ -55,7 +56,7 @@ const videoContext = createContext<VideoContextInterface>(null!);
 export const VideoProvider = (props: { [key: string]: any }) => {
   const { project, updateProject, warnLocalVideo } = useProjectsContext();
   const { settings } = useSessionContext();
-  const { addAlert } = useNotificationContext();
+  const { addAlert, removeAlert } = useNotificationContext();
   const playerRef = useRef<HTMLVideoElement>(null!);
   const [url, setUrl] = useState<string>(null!);
   const [playing, setPlaying] = useState<boolean>(false);
@@ -65,18 +66,25 @@ export const VideoProvider = (props: { [key: string]: any }) => {
   // todo: this type cast is incorrect and null conditionals need to be checked in useNoteProximity
   const [progress, setProgress] = useState<ProgressInterface>({} as ProgressInterface);
 
+  // a local file played instead of the project's stored src, this session only
+  const [localVideo, setLocalVideo] = useState<{ projectId: string; src: string; url: string }>(
+    null,
+  );
+
   const [action, setAction] = useAnounceAction("");
 
   useEffect(() => {
     if (project !== null && project.src !== null) {
-      if (project.src !== url) {
+      const isLocal = localVideo?.projectId === project._id && localVideo.src === project.src;
+      const nextUrl = isLocal ? localVideo.url : project.src;
+      if (nextUrl !== url) {
         console.log("project changed, setting url");
-        setUrl(project.src);
+        setUrl(nextUrl);
       }
     } else {
       setUrl(null);
     }
-  }, [project]);
+  }, [project, localVideo]);
 
   const handleReady = (): void => {
     // player ref is now assigned via the ref prop on ReactPlayer
@@ -143,15 +151,32 @@ export const VideoProvider = (props: { [key: string]: any }) => {
   const handlePlayerError = (error: any): void => {
     console.log("vn player error", error);
 
-    if (error.target && error.target.error.message.includes("Format error")) {
+    // a local file saved in an earlier session: its blob url can never play again
+    if (project && url === project.src && project.src.startsWith("blob:")) {
       updateProject({ src: "" });
-
       warnLocalVideo(project);
-
       return;
     }
 
-    addAlert({ type: "error", msg: "Player unable to load video." });
+    // keep the stored url (other browsers may play it) and offer a local copy instead
+    const { _id: projectId, src } = project ?? {};
+    const alertId = addAlert({
+      type: "warning",
+      persistent: true,
+      msg: (
+        <span>
+          This browser can't play this video. Check the URL, or if its codec is the problem, try
+          another browser or re-encode it to H.264/AAC.
+          <LocalVideoLoader
+            id="unplayableVideoFile"
+            handleVideoSrc={(localUrl) => {
+              setLocalVideo({ projectId, src, url: localUrl });
+              removeAlert(alertId);
+            }}
+          />
+        </span>
+      ),
+    });
   };
 
   const handleDuration = (secs: number): void => {
