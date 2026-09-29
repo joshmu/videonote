@@ -29,23 +29,16 @@ import { MotionFadeInOut } from "@/shared/ux/MotionFadeInOut";
 export default function ActionSymbols() {
   const { action: playerAction } = useVideoContext();
   const [action, setAction] = useState("");
-  const timers = useRef(new Set<ReturnType<typeof setTimeout>>());
+  const timer = useRef<ReturnType<typeof setTimeout>>(undefined);
 
-  // clear pending hides on unmount
-  useEffect(() => {
-    const pending = timers.current;
-    return () => pending.forEach(clearTimeout);
-  }, []);
+  useEffect(() => () => clearTimeout(timer.current), []);
 
-  // when we receive a player action we allow the state to exist temporarily
+  // show each player action for a second, restarting on a new one
   useEffect(() => {
     if (playerAction === "") return;
     setAction(playerAction);
-    const timer = setTimeout(() => {
-      timers.current.delete(timer);
-      setAction("");
-    }, 1000);
-    timers.current.add(timer);
+    clearTimeout(timer.current);
+    timer.current = setTimeout(() => setAction(""), 1000);
   }, [playerAction]);
 
   return (
