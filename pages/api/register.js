@@ -10,59 +10,29 @@
  * @copyright © 2020 - 2020 MU
  */
 
-import bcrypt from "bcryptjs";
 import { StatusCodes } from "http-status-codes";
-import isEmail from "validator/lib/isEmail";
-import normalizeEmail from "validator/lib/normalizeEmail";
 
 import { extractUser } from "@/utils/apiHelpers";
-import { generateAccessToken } from "@/utils/jwt";
-import { connectDb, User } from "@/utils/mongoose";
+import { connectDb } from "@/utils/mongoose";
+import { register } from "@/utils/user/identityIntake";
 
 export default async (req, res) => {
   await connectDb();
-  // get user data
-  const { password } = req.body;
-  const email = /** @type {string} */ (normalizeEmail(req.body.email));
+  const outcome = await register(req.body ?? {});
 
-  // validate
-  if (email && !isEmail(email)) {
-    res.status(StatusCodes.BAD_REQUEST).json({ msg: "The email you entered is invalid." });
-    return;
+  switch (outcome.kind) {
+    case "invalid":
+      return res.status(StatusCodes.BAD_REQUEST).json({
+        msg:
+          outcome.reason === "missing" ? "Missing field(s)" : "The email you entered is invalid.",
+      });
+    case "emailTaken":
+      return res.status(StatusCodes.CONFLICT).json({ msg: "The email has already been used." });
+    case "ok":
+      // 201 - created
+      return res.status(StatusCodes.CREATED).json({
+        user: extractUser(outcome.user.toObject()),
+        token: outcome.token,
+      });
   }
-  if (!password) {
-    res.status(StatusCodes.BAD_REQUEST).json({ msg: "Missing field(s)" });
-    return;
-  }
-  if ((await User.countDocuments({ email })) > 0) {
-    res.status(StatusCodes.FORBIDDEN).json({ msg: "The email has already been used." });
-    return;
-  }
-
-  // hash password
-  const hashedPassword = await bcrypt.hash(password, 10);
-
-  // insert
-  const userDoc = new User({
-    email: email,
-    username: email,
-    password: hashedPassword,
-  });
-
-  try {
-    await userDoc.save();
-  } catch (err) {
-    console.error(err);
-    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ msg: "Database Error" });
-    return;
-  }
-
-  // token
-  const token = generateAccessToken(userDoc.email);
-
-  // 201 - created
-  res.status(StatusCodes.CREATED).json({
-    user: extractUser(await userDoc.toObject()),
-    token,
-  });
 };

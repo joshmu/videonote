@@ -12,34 +12,12 @@
 
 // take only needed user fields to avoid sensitive ones (such as password)
 
-export const extractUser = <T extends { password?: string; created?: unknown }>(
+export const extractUser = <
+  T extends { password?: unknown; createdAt?: unknown; updatedAt?: unknown },
+>(
   user: T,
 ): { [key: string]: any } => {
   if (!user) return null;
-  const { password: _password, created: _created, ...data } = user;
-  return {
-    ...data,
-  };
-};
-
-export const extractProject = <T extends { created: string; updated: string }>(
-  project: T,
-): { [key: string]: any } => {
-  if (!project) return null;
-  const { created: _created, updated: _updated, ...data } = project;
-  return {
-    ...data,
-  };
-};
-
-export const extractPublicProject = <
-  T extends { created: string; updated: string; userIds: string[] },
->(
-  project: T,
-): { [key: string]: any } => {
-  if (!project) return null;
-  const { created: _created, updated: _updated, userIds: _userIds, ...data } = project;
-  return {
-    ...data,
-  };
+  const { password: _password, createdAt: _createdAt, updatedAt: _updatedAt, ...data } = user;
+  return data;
 };
