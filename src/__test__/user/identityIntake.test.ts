@@ -31,7 +31,7 @@ describe("register", () => {
     const stored = await User.findOne({ email: "new@example.com" });
     expect(stored.username).toBe("new@example.com");
     expect(await bcrypt.compare("hunter2", stored.password)).toBe(true);
-    expect(authenticateToken(outcome.token)).toBe("new@example.com");
+    expect(authenticateToken(outcome.token)).toBe(stored._id.toString());
   });
 
   it("reports emailTaken when the email is already registered", async () => {
@@ -65,7 +65,7 @@ describe("authenticate", () => {
     expect(outcome.kind).toBe("ok");
     if (outcome.kind !== "ok") return;
     expect(outcome.user._id).toEqual(user._id);
-    expect(authenticateToken(outcome.token)).toBe("owner@example.com");
+    expect(authenticateToken(outcome.token)).toBe(user._id.toString());
   });
 
   it("distinguishes an unknown email from a wrong password", async () => {
@@ -120,13 +120,13 @@ describe("updateProfile", () => {
     expect(stored.settings).toBeUndefined();
   });
 
-  it("returns a token minted for the new email", async () => {
+  it("returns a token for the same user after an email change", async () => {
     const user = await seedUser();
 
     const outcome = await updateProfile(user, { email: "renamed@example.com" });
 
     if (outcome.kind !== "ok") throw new Error(`expected ok, got ${outcome.kind}`);
-    expect(authenticateToken(outcome.token)).toBe("renamed@example.com");
+    expect(authenticateToken(outcome.token)).toBe(user._id.toString());
   });
 
   it("reports emailTaken for another user's email and leaves the profile unchanged", async () => {

@@ -33,7 +33,7 @@ describe("/api/register", () => {
     const { status, body } = await callApi(registerHandler, { email: EMAIL, password: "hunter2" });
 
     expect(status).toBe(StatusCodes.CREATED);
-    expect(authenticateToken(body.token)).toBe(EMAIL);
+    expect(authenticateToken(body.token)).toBe(body.user._id);
     expect(body.user.password).toBeUndefined();
   });
 
@@ -60,7 +60,7 @@ describe("/api/login", () => {
     const { status, body } = await callApi(loginHandler, { email: EMAIL, password: "hunter2" });
 
     expect(status).toBe(StatusCodes.MOVED_TEMPORARILY);
-    expect(authenticateToken(body.token)).toBe(EMAIL);
+    expect(authenticateToken(body.token)).toBe(body.user._id);
     expect(body.user.email).toBe(EMAIL);
     expect(body.user.password).toBeUndefined();
     expect(body.user.createdAt).toBeUndefined();
@@ -103,7 +103,7 @@ describe("/api/user", () => {
     expect(body.user).toMatchObject({ username: "Owner", email: "new@example.com", role: "free" });
     expect(body.user.password).toBeUndefined();
     expect(body.user.settings).toBeUndefined();
-    expect(authenticateToken(body.token)).toBe("new@example.com");
+    expect(authenticateToken(body.token)).toBe(body.user._id);
   });
 
   it("does not write settings", async () => {

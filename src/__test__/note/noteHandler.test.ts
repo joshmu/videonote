@@ -4,10 +4,10 @@ import { beforeAll, describe, expect, it, vi } from "vitest";
 
 import handler from "@/api/note";
 import { NoteApiAction } from "@/shared/types";
-import { generateAccessToken } from "@/utils/jwt";
 import { Note, Project, User } from "@/utils/mongoose";
 import { attachOrUpdateShare } from "@/utils/share/shareIntake";
 
+import { tokenFor } from "../api/http";
 import { useTestDb } from "../db/testDb";
 
 useTestDb();
@@ -17,7 +17,7 @@ beforeAll(() => {
 });
 
 const post = async (body: Record<string, unknown>, email?: string) => {
-  const headers = email ? { authorization: `Bearer ${generateAccessToken(email)}` } : {};
+  const headers = email ? { authorization: `Bearer ${await tokenFor(email)}` } : {};
   const res = { status: vi.fn(), json: vi.fn() };
   res.status.mockReturnValue(res);
   res.json.mockReturnValue(res);

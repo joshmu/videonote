@@ -39,7 +39,7 @@ const parseCredentials = ({ email, password }: Credentials = {}): ParsedCredenti
 const session = (user: UserDoc): Session => ({
   kind: "ok",
   user,
-  token: generateAccessToken(user.email),
+  token: generateAccessToken(user._id.toString()),
 });
 
 const passwordMatches = async (user: UserDoc, password: unknown): Promise<boolean> =>
@@ -75,8 +75,8 @@ export const authenticate = async (
 
 /**
  * Change the profile fields a user may edit: `username` and `email`. Every
- * other field is ignored. The returned token is minted for the saved email so
- * the caller's session survives an email change.
+ * other field is ignored. The session token's subject is the User._id, so an
+ * email change keeps the session; a fresh token is still returned.
  */
 export const updateProfile = async (
   user: UserDoc,

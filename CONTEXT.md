@@ -65,9 +65,17 @@ The discriminated bag for `withOptionalUser`. Either `{ isGuest: true,
 userDoc: null, email: null, newToken: null }` or the same shape as
 `AuthContext` with `isGuest: false`.
 
+**Session token**:
+A 30 minute JWT whose subject (`sub`) is the `User._id` as a string, minted
+by `generateAccessToken` in `utils/jwt.ts` and only through the **Identity
+intake** and the auth wrappers. `authenticateToken` rejects a payload
+without a non-empty string `sub`, so a token without one is a 401 and the
+user logs in again. The client never decodes it.
+
 **withAuthenticatedUser**:
 The wrapper that owns the JWT-extraction → verify → user-lookup contract.
-Lives in `utils/auth/withAuthenticatedUser.ts`. Handlers never read
+Lives in `utils/auth/withAuthenticatedUser.ts`. The **User** is looked up by
+the **Session token** subject. Handlers never read
 `req.headers["authorization"]` directly. A missing or invalid token is
 answered with 401 before `connectDb` runs, so a database outage cannot
 turn it into a 500.
@@ -85,8 +93,8 @@ Each returns a discriminated outcome (`ok` / `invalid` / `emailTaken` /
 `register.js` and `user.js` map outcomes to status codes. Credentials must
 be non-empty strings. A taken email is detected from the unique index
 (E11000), never by check-then-save. `updateProfile` writes `username` and
-`email` only and returns a token minted for the saved email, so an email
-change keeps the session. `removeAccount` checks the password, removes owned
+`email` only and returns a fresh **Session token**; its subject is the
+`User._id`, so an email change keeps the session. `removeAccount` checks the password, removes owned
 **Projects** through the **Project intake**, unsets the author on the user's
 **Notes** on other owners' **Projects** (they read as a guest's), removes
 **Shares** and **Settings**, and the **User** last. **Settings**
