@@ -10,6 +10,8 @@ type Id = Types.ObjectId | string;
 export type ProjectOk = { kind: "ok"; project: ProjectDoc };
 export type ProjectNotFound = { kind: "notFound" };
 export type ProjectUrlTaken = { kind: "urlTaken"; message: string };
+/** A new Project needs a non-empty string title. */
+export type ProjectInvalid = { kind: "invalid" };
 
 /** The only Project fields a client may write. */
 export type ProjectInput = { title?: unknown; src?: unknown; [key: string]: unknown };
@@ -29,8 +31,13 @@ const findOwned = async (userId: Id, projectId: unknown): Promise<ProjectDoc | n
   return Project.findOne({ _id: projectId, user: userId });
 };
 
-export const createProject = async (userId: Id, input: ProjectInput): Promise<ProjectOk> => {
-  const project = await Project.create({ ...pickEditable(input), user: userId });
+export const createProject = async (
+  userId: Id,
+  input: ProjectInput,
+): Promise<ProjectOk | ProjectInvalid> => {
+  const fields = pickEditable(input);
+  if (!fields.title?.trim()) return { kind: "invalid" };
+  const project = await Project.create({ ...fields, user: userId });
   await User.updateOne({ _id: userId }, { $push: { projects: project._id } });
   return { kind: "ok", project };
 };

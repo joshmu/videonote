@@ -57,6 +57,18 @@ describe("createProject", () => {
   });
 });
 
+describe("createProject validation", () => {
+  it("reports invalid without a non-empty string title and creates nothing", async () => {
+    const owner = await seedOwner();
+
+    for (const input of [{}, { title: "" }, { title: "   " }, { title: 7 }]) {
+      expect(await createProject(owner._id, input)).toEqual({ kind: "invalid" });
+    }
+    expect(await Project.countDocuments()).toBe(0);
+    expect((await User.findById(owner._id)).projects).toEqual([]);
+  });
+});
+
 describe("updateProject", () => {
   it("changes title and src only, ignoring owner, notes and share ids", async () => {
     const owner = await seedOwner();

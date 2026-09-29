@@ -1,16 +1,20 @@
 import { StatusCodes } from "http-status-codes";
 import { Types } from "mongoose";
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 
 import handler from "@/api/project";
 import { ProjectApiActions } from "@/shared/types";
-import { Project, Share, User } from "@/utils/mongoose";
+import { Note, Project, Share, User } from "@/utils/mongoose";
 
 import { useTestDb } from "../db/testDb";
 import { callApi, useTestJwtSecret } from "./http";
 
 useTestDb();
 useTestJwtSecret();
+
+afterEach(() => {
+  vi.restoreAllMocks();
+});
 
 const OWNER = "owner@example.com";
 const OTHER = "other@example.com";
@@ -62,12 +66,59 @@ describe("/api/project", () => {
     expect(await Project.findById(project._id)).toMatchObject({ title: "Rough cut" });
   });
 
-  it("replies 404 when the request names no project", async () => {
+  it("replies 404 when the project names no id", async () => {
     await seed();
 
-    const { status } = await callApi(handler, { action: ProjectApiActions.GET }, { email: OWNER });
+    const { status } = await callApi(
+      handler,
+      { action: ProjectApiActions.GET, project: {} },
+      { email: OWNER },
+    );
 
     expect(status).toBe(StatusCodes.NOT_FOUND);
+  });
+
+  it.each([ProjectApiActions.GET, ProjectApiActions.CREATE, ProjectApiActions.REMOVE])(
+    "replies 400 to %s without a project",
+    async (action) => {
+      await seed();
+
+      const { status } = await callApi(handler, { action, project: null }, { email: OWNER });
+
+      expect(status).toBe(StatusCodes.BAD_REQUEST);
+    },
+  );
+
+  it.each([{}, { title: "" }, { title: "  " }, { title: 42 }])(
+    "replies 400 to CREATE with %j",
+    async (project) => {
+      await seed();
+
+      const { status } = await callApi(
+        handler,
+        { action: ProjectApiActions.CREATE, project },
+        { email: OWNER },
+      );
+
+      expect(status).toBe(StatusCodes.BAD_REQUEST);
+      expect(await Project.countDocuments()).toBe(1);
+    },
+  );
+
+  it("replies 500 with only a message when the database fails", async () => {
+    const { project } = await seed();
+    vi.spyOn(Note, "deleteMany").mockRejectedValueOnce(new Error("note store down"));
+    vi.spyOn(console, "error").mockImplementation(() => undefined);
+
+    const { status, body } = await callApi(
+      handler,
+      { action: ProjectApiActions.REMOVE, project: { _id: project._id.toString() } },
+      { email: OWNER },
+    );
+
+    expect(status).toBe(StatusCodes.INTERNAL_SERVER_ERROR);
+    expect(body).toEqual({ msg: "Database error" });
+    expect(console.error).toHaveBeenCalled();
   });
 
   it("replies 409 when the share url is taken", async () => {

@@ -17,6 +17,7 @@ import { withAuthenticatedUser } from "@/utils/auth/withAuthenticatedUser";
 import {
   createProject,
   getProject,
+  type ProjectInvalid,
   type ProjectNotFound,
   type ProjectOk,
   type ProjectUrlTaken,
@@ -26,12 +27,15 @@ import {
   updateProject,
 } from "@/utils/project/projectIntake";
 
-type Outcome = ProjectOk | ProjectNotFound | ProjectUrlTaken;
+type Outcome = ProjectOk | ProjectNotFound | ProjectUrlTaken | ProjectInvalid;
 
 export default withAuthenticatedUser(async (req, res, { userDoc, newToken }) => {
   const { action, project, share } = req.body;
+  if (typeof project !== "object" || project === null) {
+    return res.status(StatusCodes.BAD_REQUEST).json({ msg: "Project not specified" });
+  }
   const userId = userDoc._id;
-  const projectId = project?._id;
+  const projectId = project._id;
 
   let outcome: Outcome;
   try {
@@ -59,10 +63,12 @@ export default withAuthenticatedUser(async (req, res, { userDoc, newToken }) => 
     }
   } catch (error) {
     console.error(error);
-    return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ msg: "Database error", error });
+    return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ msg: "Database error" });
   }
 
   switch (outcome.kind) {
+    case "invalid":
+      return res.status(StatusCodes.BAD_REQUEST).json({ msg: "Project title required." });
     case "notFound":
       return res.status(StatusCodes.NOT_FOUND).json({ msg: "Project not found." });
     case "urlTaken":
