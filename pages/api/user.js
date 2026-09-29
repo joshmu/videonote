@@ -27,8 +27,8 @@ export default withAuthenticatedUser(async (req, res, { userDoc, email, newToken
       for (let projectDoc of projectDocs) {
         // delete all notes which reference any of these projects
         await Note.deleteMany({ project: projectDoc._id });
-        // delete the project
-        await projectDoc.remove();
+        // delete the project (legacy Mongoose API; see CONTEXT.md follow-ups)
+        await /** @type {any} */ (projectDoc).remove();
       }
       // await Project.deleteMany({ _id: { $in: userDoc.projectIds } })
 

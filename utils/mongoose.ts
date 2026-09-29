@@ -10,8 +10,7 @@
  * @copyright © 2020 - 2020 MU
  */
 
-import mongoose from "mongoose";
-const { Schema } = mongoose;
+import mongoose, { type HydratedDocFromModel, Schema } from "mongoose";
 
 let connecting: Promise<typeof mongoose> | null = null;
 
@@ -27,7 +26,7 @@ export const connectDb = (): Promise<typeof mongoose> => {
   return connecting;
 };
 
-const UserSchema = new Schema(
+const UserSchema = Schema.create(
   {
     email: { type: String, required: true, unique: true },
     username: { type: String },
@@ -39,7 +38,7 @@ const UserSchema = new Schema(
   { timestamps: true },
 );
 
-const ProjectSchema = new Schema(
+const ProjectSchema = Schema.create(
   {
     title: { type: String, required: true },
     src: String,
@@ -58,7 +57,7 @@ const ProjectSchema = new Schema(
   { timestamps: true },
 );
 
-const NoteSchema = new Schema(
+const NoteSchema = Schema.create(
   {
     content: { type: String, required: true },
     time: { type: Number, default: 0 },
@@ -72,7 +71,7 @@ const NoteSchema = new Schema(
   { timestamps: true },
 );
 
-const SettingsSchema = new Schema(
+const SettingsSchema = Schema.create(
   {
     user: {
       type: Schema.Types.ObjectId,
@@ -89,7 +88,7 @@ const SettingsSchema = new Schema(
   { timestamps: true },
 );
 
-const ShareProjectSchema = new Schema(
+const ShareProjectSchema = Schema.create(
   {
     url: { type: String, required: true, unique: true },
     user: {
@@ -104,36 +103,18 @@ const ShareProjectSchema = new Schema(
   { timestamps: true },
 );
 
-// prevent overwrite model error
-let User;
-try {
-  User = mongoose.model("User");
-} catch {
-  User = mongoose.model("User", UserSchema);
-}
-let Project;
-try {
-  Project = mongoose.model("Project");
-} catch {
-  Project = mongoose.model("Project", ProjectSchema);
-}
-let Note;
-try {
-  Note = mongoose.model("Note");
-} catch {
-  Note = mongoose.model("Note", NoteSchema);
-}
-let Settings;
-try {
-  Settings = mongoose.model("Settings");
-} catch {
-  Settings = mongoose.model("Settings", SettingsSchema);
-}
-let Share;
-try {
-  Share = mongoose.model("Share");
-} catch {
-  Share = mongoose.model("Share", ShareProjectSchema);
-}
+// Next.js re-evaluates this module on reload; recompiling replaces the model.
+const defineModel = <TSchema extends Schema>(name: string, schema: TSchema) =>
+  mongoose.model(name, schema, undefined, { overwriteModels: true });
 
-export { User, Project, Note, Settings, Share };
+export const User = defineModel("User", UserSchema);
+export const Project = defineModel("Project", ProjectSchema);
+export const Note = defineModel("Note", NoteSchema);
+export const Settings = defineModel("Settings", SettingsSchema);
+export const Share = defineModel("Share", ShareProjectSchema);
+
+export type UserDoc = HydratedDocFromModel<typeof User>;
+export type ProjectDoc = HydratedDocFromModel<typeof Project>;
+export type NoteDoc = HydratedDocFromModel<typeof Note>;
+export type SettingsDoc = HydratedDocFromModel<typeof Settings>;
+export type ShareDoc = HydratedDocFromModel<typeof Share>;

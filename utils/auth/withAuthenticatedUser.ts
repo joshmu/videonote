@@ -1,9 +1,8 @@
 import { StatusCodes } from "http-status-codes";
 import type { NextApiHandler, NextApiRequest, NextApiResponse } from "next";
 
-import type { UserDocInterface } from "@/shared/types";
 import { authenticateToken, generateAccessToken } from "@/utils/jwt";
-import { connectDb, User } from "@/utils/mongoose";
+import { connectDb, User, type UserDoc } from "@/utils/mongoose";
 
 /**
  * Context passed to handlers wrapped by {@link withAuthenticatedUser}.
@@ -14,7 +13,7 @@ import { connectDb, User } from "@/utils/mongoose";
  *   caller's session is refreshed
  */
 export type AuthContext = {
-  userDoc: UserDocInterface;
+  userDoc: UserDoc;
   email: string;
   newToken: string;
 };
@@ -29,15 +28,14 @@ export type AuthContext = {
  */
 export type OptionalAuthContext =
   | { isGuest: true; userDoc: null; email: null; newToken: null }
-  | { isGuest: false; userDoc: UserDocInterface; email: string; newToken: string };
+  | { isGuest: false; userDoc: UserDoc; email: string; newToken: string };
 
 /**
- * Pull the caller's User._id out of an {@link OptionalAuthContext}, or `null`
- * for guests. Centralises the `_id` cast that Mongoose's untyped `Document`
- * forces on every consumer of `OptionalAuthContext`.
+ * Pull the caller's User._id out of an {@link OptionalAuthContext} as a
+ * string, or `null` for guests.
  */
 export const extractAuthorId = (ctx: OptionalAuthContext): string | null =>
-  ctx.isGuest ? null : (ctx.userDoc._id as unknown as string);
+  ctx.isGuest ? null : ctx.userDoc._id.toString();
 
 export type AuthenticatedHandler = (
   req: NextApiRequest,
@@ -72,7 +70,7 @@ const resolveAuthenticatedUser = async (token: string): Promise<ResolveResult> =
     return { ctx: null, status: StatusCodes.UNAUTHORIZED, body: { msg: "Invalid token" } };
   }
 
-  const userDoc = (await User.findOne({ email })) as UserDocInterface | null;
+  const userDoc = await User.findOne({ email });
   if (!userDoc) {
     return { ctx: null, status: StatusCodes.UNAUTHORIZED, body: { msg: "No user found." } };
   }

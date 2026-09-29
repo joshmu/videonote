@@ -12,7 +12,7 @@
 
 // take only needed user fields to avoid sensitive ones (such as password)
 
-export const extractUser = <T extends { password: string; created: string }>(
+export const extractUser = <T extends { password?: string; created?: unknown }>(
   user: T,
 ): { [key: string]: any } => {
   if (!user) return null;
