@@ -89,7 +89,8 @@ be non-empty strings. A taken email is detected from the unique index
 change keeps the session. `removeAccount` checks the password, removes owned
 **Projects** through the **Project intake**, then the user's other
 **Notes**, **Shares** and **Settings**, and the **User** last. **Settings**
-are written only through `/api/settings`.
+are written only through `/api/settings`, which takes `currentProject`,
+`playOffset`, `showHints`, `seekJump` and `sidebarWidth` from the body.
 
 ### Architecture (Project seam)
 
@@ -98,9 +99,10 @@ are written only through `/api/settings`.
 `unshareProject` / `removeProject` / `removeUserProjects` in
 `utils/project/projectIntake.ts`. Every operation is scoped to the owning
 **User** and returns a discriminated outcome (`ok` / `notFound` /
-`urlTaken`) with no HTTP; `pages/api/project.ts` maps them to 200, 404
-and 409. A malformed or missing project id is `notFound`. Create and
-update write `title` and `src` only. Sharing delegates to the **Share intake**.
+`urlTaken` / `invalid`) with no HTTP; `pages/api/project.ts` maps them to
+200, 404, 409 and 400. A malformed or missing project id is `notFound`.
+Create needs a non-empty `title`. Create and update write `title` and
+`src` only. Sharing delegates to the **Share intake**.
 
 **Project cascade**:
 The one removal path, used by `removeProject` and (through
