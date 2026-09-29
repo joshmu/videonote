@@ -37,7 +37,6 @@ import {
   CreateProjectType,
   FetchWithPasswordPublicProjectType,
   GlobalContextInterface,
-  GuestUpdatingProjectType,
   HandleInitialServerDataType,
   LoadProjectType,
   NoteApiRemoveDoneNotes,
@@ -312,29 +311,6 @@ export const GlobalProvider = ({
 
     alertProjectLoaded(project);
     if (project.src.length === 0) warnLocalVideo(project);
-  };
-
-  const _guestUpdatingProject: GuestUpdatingProjectType = async (project) => {
-    console.log("guest is updating project", project);
-    const body = {
-      project,
-    };
-    const res = await fetch("/api/public_project_update", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(body),
-    });
-    const data = await res.json();
-
-    const { msg } = data;
-
-    // handle if we get a bad response
-    if (badResponse(res, msg)) return;
-
-    // success
-    console.log(data.msg);
   };
 
   const updateUser: UpdateUserType = async (userData) => {
