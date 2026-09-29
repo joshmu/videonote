@@ -25,8 +25,12 @@ import { ModalInput } from "@/shared/Modal/ModalInput";
 import { ShareProjectInterface } from "@/shared/types";
 import { copyToClipboard } from "@/utils/clientHelpers";
 
-// todo: remove bad characters from url path entry
-const formatUrl = (txt: string): string => txt.replace(" ", "-").toLowerCase();
+// Lowercase, each run of whitespace a dash, and only url-safe characters kept.
+const formatUrl = (txt: string): string =>
+  txt
+    .toLowerCase()
+    .replace(/\s+/g, "-")
+    .replace(/[^a-z0-9_-]/g, "");
 
 type ShareForm = { url: string; canEdit: boolean; password: string; removePassword: boolean };
 

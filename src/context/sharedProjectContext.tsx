@@ -24,6 +24,16 @@ interface SharedProjectContextInterface {
   renewShareAccess: () => Promise<boolean>;
 }
 
+// The last path segment, decoded as the page's route param is; kept raw if malformed.
+const shareUrlFromPath = (pathname: string): string => {
+  const segment = pathname.split("/").slice(-1)[0];
+  try {
+    return decodeURIComponent(segment);
+  } catch {
+    return segment;
+  }
+};
+
 const sharedProjectContext = createContext<SharedProjectContextInterface>(null!);
 
 /**
@@ -54,11 +64,8 @@ export const SharedProjectProvider = ({ children }: { children: React.ReactNode 
     renewal?.resolve(renewed);
   };
 
-  const fetchWithPasswordPublicProject: FetchWithPasswordPublicProjectType = (password) => {
-    // get id
-    const shareUrl = window.location.pathname.split("/").slice(-1)[0];
-    return api.openShare(shareUrl, password);
-  };
+  const fetchWithPasswordPublicProject: FetchWithPasswordPublicProjectType = (password) =>
+    api.openShare(shareUrlFromPath(window.location.pathname), password);
 
   const promptForSharePassword = (message: React.ReactElement): void => {
     createPrompt({

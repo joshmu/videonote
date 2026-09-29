@@ -105,6 +105,19 @@ describe("sharedProjectContext open", () => {
     expect(mocks.push).not.toHaveBeenCalled();
   });
 
+  it("unlocks a Share whose url has an encoded character", async () => {
+    window.history.pushState({}, "", "/vn/rough%20cut");
+    const { result, requests } = renderShared({
+      "/api/public_project": () => ok({ user: { projects: [sharedProject(false)] } }),
+    });
+
+    act(() => result.current.handleShareAccess({ kind: "passwordRequired" }));
+    await act(async () => result.current.prompt.action({ password: "hunter2" }));
+
+    await waitFor(() => expect(requests).toHaveLength(1));
+    expect(requests[0].body).toEqual({ shareUrl: "rough cut", password: "hunter2" });
+  });
+
   it("sends no password retry once the page has unmounted", async () => {
     vi.useFakeTimers();
     try {

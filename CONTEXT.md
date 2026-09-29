@@ -286,11 +286,13 @@ An update takes only `title` and `src` from its reply, keeping the loaded
 Notes and Share.
 The Share modal reads `hasPassword`: an empty password field sends no
 `password` (kept), its remove control sends `""`, a typed value sets it.
+A typed url is lowercased, each run of whitespace becomes `-` and any other
+character outside `a-z0-9_-` is dropped.
 
 **Shared-project access context**:
 `src/context/sharedProjectContext.tsx`. Opens a public **Share**
-(prompting for its password and retrying; a pending retry is cancelled on
-unmount), holds the **Share token** it
+(prompting for its password and retrying with the decoded url from the page
+path; a pending retry is cancelled on unmount), holds the **Share token** it
 hands out in memory (`shareToken()`), `renewShareAccess()` to ask for the
 password again when a Note write is refused for it (the project stays on
 screen; it resolves `false` if the prompt is dismissed), and `checkCanEdit`, the one canEdit source: a signed-in User on
