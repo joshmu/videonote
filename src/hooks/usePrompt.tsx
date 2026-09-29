@@ -10,7 +10,7 @@
  * @copyright © 2020 - 2020 MU
  */
 
-import { ReactElement, useState } from "react";
+import { ReactElement, useEffect, useRef, useState } from "react";
 
 const DEFAULTS = {
   isOpen: false,
@@ -38,6 +38,9 @@ export const usePrompt = (): {
   cancelPrompt: CancelPromptType;
 } => {
   const [state, setState] = useState<PromptInterface>(DEFAULTS);
+  const resetTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
+
+  useEffect(() => () => clearTimeout(resetTimer.current), []);
 
   const createPrompt: CreatePromptType = ({
     msg,
@@ -45,6 +48,8 @@ export const usePrompt = (): {
     passwordRequired = false,
     onCancel = undefined,
   }) => {
+    // a pending reset from the last prompt must not wipe this one
+    clearTimeout(resetTimer.current);
     // open prompt modal with custom msg
     setState((current) => ({
       ...current,
@@ -71,7 +76,8 @@ export const usePrompt = (): {
     // close prompt first so we don't see data change
     setState((current) => ({ ...current, isOpen: false }));
     // apply slight delay to account for animations
-    setTimeout(() => {
+    clearTimeout(resetTimer.current);
+    resetTimer.current = setTimeout(() => {
       setState(DEFAULTS);
     }, 300);
   };
