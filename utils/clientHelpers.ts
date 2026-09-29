@@ -33,13 +33,13 @@ export const isValidCredentials = ({
   let isValid = true;
 
   if (!checkEmail(email)) {
-    addAlert({ type: "error", msg: "Email in invalid." });
+    addAlert({ type: "error", msg: "Email is invalid." });
     isValid = false;
   }
   if (!checkUsername(username)) {
     addAlert({
       type: "error",
-      msg: "Username must be at least 3 characters long",
+      msg: "Username must be at least 6 characters long.",
     });
     isValid = false;
   }
@@ -47,7 +47,7 @@ export const isValidCredentials = ({
     if (!checkPassword(password)) {
       addAlert({
         type: "error",
-        msg: "Password needs to be at least 5 characters long.",
+        msg: "Password needs to be at least 6 characters long.",
       });
       isValid = false;
     }
