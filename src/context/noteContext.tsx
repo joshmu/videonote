@@ -24,7 +24,8 @@ import { useSharedProjectContext } from "./sharedProjectContext";
 import { useVideoContext } from "./videoContext";
 
 type AddNoteType = (note: { content: string; time?: number }) => void;
-type UpdateNoteType = (note: NoteInterface) => void;
+/** Resolves once the reply (or the rollback) is in the notes. */
+type UpdateNoteType = (note: NoteInterface) => Promise<void>;
 type UpdateSearchType = (txt: string) => void;
 type SortType = (notes: NoteInterface[]) => NoteInterface[];
 type RemoveCompletedType = () => void;
@@ -176,7 +177,7 @@ export function NoteProvider(props: { [key: string]: any }) {
 
   const updateNote: UpdateNoteType = (note) => {
     console.log("update the note", note);
-    noteApi(note).then((res) => {
+    return noteApi(note).then((res) => {
       if (res === "error") {
         // A fresh copy of the last saved note, so its row drops the rejected edit.
         return setNotes((current) =>

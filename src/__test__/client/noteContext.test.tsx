@@ -253,6 +253,25 @@ describe("noteContext", () => {
     expect(screen.getByText("renamed")).toBeInTheDocument();
   });
 
+  it("keeps the second of two done toggles made while the first is saving", async () => {
+    const firstSave = deferred<Reply>();
+    let saves = 0;
+    const { requests } = await renderNotes(
+      ({ note }) => (saves++ === 0 ? firstSave.promise : ok({ note })),
+      true,
+    );
+    const doneToggle = () => screen.getByText("first").parentElement!.previousElementSibling!;
+
+    await act(async () => fireEvent.click(doneToggle()));
+    await act(async () => fireEvent.click(doneToggle()));
+    await act(async () => firstSave.resolve(ok({ note: { ...project.notes[0], done: true } })));
+
+    await waitFor(() => expect(noteRequests(requests)).toHaveLength(2));
+    expect(noteRequests(requests)[1].body.note.done).toBe(false);
+    await waitFor(() => expect(ctx.notes[0].done).toBe(false));
+    expect(doneToggle().className).not.toContain("line-through");
+  });
+
   it("sorts without reordering the notes state", async () => {
     await renderNotes(({ note }) => ok({ note }));
     const notes = ctx.notes;
