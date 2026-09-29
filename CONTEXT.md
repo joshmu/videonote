@@ -31,6 +31,28 @@ _Avoid_: link, public link.
 Per-user playback and UI preferences (e.g. `playOffset`, `seekJump`,
 `sidebarWidth`, `currentProject`).
 
+### Architecture (Database)
+
+**Model module**:
+`utils/mongoose.ts`. Holds the schemas, the models (`User`, `Project`,
+`Note`, `Settings`, `Share`) and the Doc types inferred from them
+(`UserDoc`, `ProjectDoc`, `NoteDoc`, `SettingsDoc`, `ShareDoc`). Importing it
+opens no connection. Server code takes Doc types from here;
+`src/components/shared/types.ts` holds only client/wire types.
+
+**connectDb**:
+The one way to open the database, exported by the model module. Reuses the
+pending or open connection and retries after a failed attempt. Called by
+`withAuthenticatedUser` / `withOptionalUser` and by each unwrapped
+`pages/api` handler that touches the database.
+
+**Test database harness**:
+Server tests (the `server` vitest project, `node` environment) share one
+in-memory mongod started by `src/__test__/db/globalSetup.ts`, which pins
+`MONGOMS_VERSION`. A test file calls `useTestDb()` (`src/__test__/db/testDb.ts`)
+to get its own database, opened through `connectDb`, emptied after each test.
+The mongod download is the only network access.
+
 ### Architecture (Identity / Auth seam)
 
 **AuthContext**:
@@ -98,9 +120,7 @@ in a project and returns the survivors. Handlers no longer reach into
 
 **extractAuthorId**:
 The one-line helper in `utils/auth/withAuthenticatedUser.ts` that pulls
-`User._id` (or `null`) out of an `OptionalAuthContext`. Centralises the
-Mongoose `Document._id` cast so consumers of the optional-auth seam
-don't repeat it.
+`User._id` as a string (or `null`) out of an `OptionalAuthContext`.
 
 ## Relationships
 

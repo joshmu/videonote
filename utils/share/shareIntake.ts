@@ -1,5 +1,7 @@
-import type { ProjectDocInterface, ShareProjectInterface } from "@/shared/types";
-import { Share } from "@/utils/mongoose";
+import type { Types } from "mongoose";
+
+import type { ShareProjectInterface } from "@/shared/types";
+import { type ProjectDoc, Share } from "@/utils/mongoose";
 import { findProjectWithRelations } from "@/utils/project/findProjectWithRelations";
 import { hashSharePassword } from "@/utils/share/sharePassword";
 
@@ -38,9 +40,9 @@ const withHashedPassword = async (
  * back to the client.
  */
 export const attachOrUpdateShare = async (
-  projectDoc: ProjectDocInterface,
+  projectDoc: ProjectDoc,
   shareData: Partial<ShareProjectInterface>,
-): Promise<ProjectDocInterface> => {
+): Promise<ProjectDoc> => {
   const persisted = await withHashedPassword(shareData);
 
   if (projectDoc.share) {
@@ -48,7 +50,7 @@ export const attachOrUpdateShare = async (
     return findProjectWithRelations({ _id: projectDoc._id });
   }
 
-  let createdId: unknown;
+  let createdId: Types.ObjectId;
   try {
     const created = await Share.create({
       ...persisted,
@@ -60,7 +62,7 @@ export const attachOrUpdateShare = async (
     if (isDuplicateKey(err)) throw new ShareUrlTakenError();
     throw err;
   }
-  projectDoc.share = createdId as string;
+  projectDoc.share = createdId;
   await projectDoc.save();
   return findProjectWithRelations({ _id: projectDoc._id });
 };
@@ -71,9 +73,9 @@ export const attachOrUpdateShare = async (
  * project re-loaded with notes and share populated.
  */
 export const detachShare = async (
-  projectDoc: ProjectDocInterface,
+  projectDoc: ProjectDoc,
   shareInfo: { _id: string },
-): Promise<ProjectDocInterface> => {
+): Promise<ProjectDoc> => {
   await Share.deleteOne({
     _id: shareInfo._id,
     project: projectDoc._id,

@@ -8,12 +8,13 @@ vi.mock("@/utils/jwt", () => ({
 }));
 
 vi.mock("@/utils/mongoose", () => ({
+  connectDb: vi.fn(),
   User: { findOne: vi.fn() },
 }));
 
 import { withOptionalUser } from "@/utils/auth/withAuthenticatedUser";
 import { authenticateToken, generateAccessToken } from "@/utils/jwt";
-import { User } from "@/utils/mongoose";
+import { connectDb, User } from "@/utils/mongoose";
 
 type MockResponse = {
   status: ReturnType<typeof vi.fn>;
@@ -47,6 +48,7 @@ describe("withOptionalUser", () => {
     const res = buildRes();
     await wrapped(req, res);
 
+    expect(connectDb).toHaveBeenCalled();
     expect(handler).toHaveBeenCalledTimes(1);
     expect(handler).toHaveBeenCalledWith(req, res, {
       isGuest: true,

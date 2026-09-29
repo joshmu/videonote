@@ -13,19 +13,19 @@
 import { StatusCodes } from "http-status-codes";
 import { NextApiRequest, NextApiResponse } from "next";
 
-import { ProjectDocInterface, ShareDocInterface } from "@/shared/types";
-import { Project, Share } from "@/utils/mongoose";
+import { connectDb, Project, Share } from "@/utils/mongoose";
 import { verifySharePassword } from "@/utils/share/sharePassword";
 
 // GET 1 PROJECT
 export default async (req: NextApiRequest, res: NextApiResponse) => {
+  await connectDb();
   // project share id
   const { shareUrl, password } = req.body;
 
   // get project
-  let projectDoc: ProjectDocInterface;
+  let projectDoc: unknown;
   try {
-    const shareDoc: ShareDocInterface = await Share.findOne({ url: shareUrl });
+    const shareDoc = await Share.findOne({ url: shareUrl });
     if (!shareDoc) {
       return res.status(StatusCodes.BAD_REQUEST).json({ msg: "Share url does not exist." });
     }

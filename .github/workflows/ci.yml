@@ -85,6 +85,12 @@ jobs:
           node-version-file: ".nvmrc"
           cache: pnpm
       - run: pnpm install --frozen-lockfile
+      - name: Cache mongod binary
+        uses: actions/cache@v6
+        with:
+          path: ~/.cache/mongodb-binaries
+          # globalSetup pins MONGOMS_VERSION
+          key: mongodb-binaries-${{ runner.os }}-${{ hashFiles('src/__test__/db/globalSetup.ts') }}
       - run: pnpm test:run
 
   gitleaks:

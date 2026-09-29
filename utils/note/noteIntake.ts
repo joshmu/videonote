@@ -1,5 +1,5 @@
-import type { NoteDocInterface, NoteInterface } from "@/shared/types";
-import { Note, Project } from "@/utils/mongoose";
+import type { NoteInterface } from "@/shared/types";
+import { Note, type NoteDoc, Project } from "@/utils/mongoose";
 
 /**
  * Upsert a Note. Creates when no doc with `input._id` exists, updates
@@ -13,7 +13,7 @@ import { Note, Project } from "@/utils/mongoose";
 export const upsertNote = async (
   input: NoteInterface,
   authorId: string | null,
-): Promise<NoteDocInterface> => {
+): Promise<NoteDoc> => {
   const { _id, ...rest } = input;
   const data: Partial<NoteInterface> = { ...rest };
   if (authorId !== null) data.user = authorId;
@@ -39,10 +39,10 @@ export const upsertNote = async (
  * Delete every done Note in `projectId`; return the surviving notes
  * (lean). Caller owns any guest/auth policy.
  */
-export const removeDoneProjectNotes = async (projectId: string): Promise<NoteInterface[]> => {
+export const removeDoneProjectNotes = async (projectId: string) => {
   await Note.deleteMany({ project: projectId, done: true });
-  return Note.find({ project: projectId }).lean() as unknown as Promise<NoteInterface[]>;
+  return Note.find({ project: projectId }).lean();
 };
 
-const reloadWithAuthor = (noteId: unknown): Promise<NoteDocInterface> =>
-  Note.findById(noteId).populate("user", "username email") as unknown as Promise<NoteDocInterface>;
+const reloadWithAuthor = async (noteId: unknown): Promise<NoteDoc> =>
+  Note.findById(noteId).populate("user", "username email");
