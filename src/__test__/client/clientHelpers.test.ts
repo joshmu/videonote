@@ -1,6 +1,11 @@
 import { describe, expect, it, vi } from "vitest";
 
-import { checkPassword, checkUsername, isValidCredentials } from "@/utils/clientHelpers";
+import {
+  checkPassword,
+  checkUsername,
+  createObjectId,
+  isValidCredentials,
+} from "@/utils/clientHelpers";
 
 const alertsFor = (input: { email: string; username?: string; password?: string }): string[] => {
   const addAlert = vi.fn();
@@ -35,5 +40,22 @@ describe("isValidCredentials messages", () => {
     expect(alertsFor({ email: "nope", username: "valid-name", password: "secret" })).toEqual([
       "Email is invalid.",
     ]);
+  });
+});
+
+describe("createObjectId", () => {
+  it("returns 24 hex characters led by the current time in seconds", () => {
+    const before = Math.floor(Date.now() / 1000);
+    const id = createObjectId();
+    const after = Math.floor(Date.now() / 1000);
+
+    expect(id).toMatch(/^[0-9a-f]{24}$/);
+    const seconds = parseInt(id.slice(0, 8), 16);
+    expect(seconds).toBeGreaterThanOrEqual(before);
+    expect(seconds).toBeLessThanOrEqual(after);
+  });
+
+  it("returns a different id on each call", () => {
+    expect(createObjectId()).not.toBe(createObjectId());
   });
 });

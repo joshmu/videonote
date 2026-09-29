@@ -103,6 +103,15 @@ export const fetcher = async (url: string, body: object, token: string | boolean
   return { res, data };
 };
 
+/** A MongoDB ObjectId-compatible id: 4-byte seconds timestamp + 8 random bytes, as hex. */
+export const createObjectId = (): string => {
+  const seconds = Math.floor(Date.now() / 1000)
+    .toString(16)
+    .padStart(8, "0");
+  const random = crypto.getRandomValues(new Uint8Array(8));
+  return seconds + Array.from(random, (byte) => byte.toString(16).padStart(2, "0")).join("");
+};
+
 export const formatDuration = (secs: number): string => {
   const totalSecs = +secs;
   const sec = Math.floor(totalSecs % 60);
