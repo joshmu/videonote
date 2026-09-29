@@ -67,7 +67,8 @@ export const UiShellProvider = ({ children }: { children: React.ReactNode }) => 
 
   const actionInputFocus = (): void => {
     console.log("autoFocus");
-    actionInputRef.current.focus();
+    // A viewer who cannot edit has no note input.
+    actionInputRef.current?.focus();
   };
 
   const value: UiShellContextInterface = {

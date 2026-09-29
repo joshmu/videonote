@@ -1,5 +1,5 @@
 import Router from "next/router";
-import { createContext, useContext } from "react";
+import { createContext, useContext, useRef } from "react";
 
 import type { ShareProjectInterface } from "@/shared/types";
 import type { ShareAccess } from "@/utils/apiClient";
@@ -15,16 +15,40 @@ type CheckCanEditType = () => boolean;
 interface SharedProjectContextInterface {
   handleShareAccess: (access: ShareAccess) => void;
   checkCanEdit: CheckCanEditType;
+  /** The Share token for Note writes; none for an open Share or the owner's own Projects. */
+  shareToken: () => string | undefined;
+  /**
+   * Ask for the Share password again: true once a new Share token is held,
+   * false when the prompt is dismissed.
+   */
+  renewShareAccess: () => Promise<boolean>;
 }
 
 const sharedProjectContext = createContext<SharedProjectContextInterface>(null!);
 
-/** Opening a public Share (with its password prompt) and whether the viewer may edit its Notes. */
+/**
+ * Opening a public Share (with its password prompt), the Share token it hands
+ * out, and whether the viewer may edit its Notes.
+ */
 export const SharedProjectProvider = ({ children }: { children: React.ReactNode }) => {
   const { addAlert } = useNotificationContext();
   const { api, admin } = useSessionContext();
   const { project: currentProject, showSharedProject } = useProjectsContext();
-  const { createPrompt, cancelPrompt } = useUiShellContext();
+  const { createPrompt } = useUiShellContext();
+
+  // In memory only, for this page session.
+  const shareTokenRef = useRef<string | undefined>(undefined);
+  // Note writes waiting on a renewed Share token.
+  const renewalRef = useRef<{
+    promise: Promise<boolean>;
+    resolve: (renewed: boolean) => void;
+  } | null>(null);
+
+  const settleRenewal = (renewed: boolean): void => {
+    const renewal = renewalRef.current;
+    renewalRef.current = null;
+    renewal?.resolve(renewed);
+  };
 
   const fetchWithPasswordPublicProject: FetchWithPasswordPublicProjectType = (password) => {
     // get id
@@ -43,8 +67,10 @@ export const SharedProjectProvider = ({ children }: { children: React.ReactNode 
         </div>
       ),
       passwordRequired: true,
+      // Dismissing a renewal prompt gives up on the waiting note writes.
+      onCancel: renewalRef.current ? () => settleRenewal(false) : undefined,
+      // confirmPrompt closes the prompt after this runs.
       action: async (data: any) => {
-        cancelPrompt();
         const { password } = data;
         setTimeout(async () => {
           // get password and send again
@@ -71,9 +97,14 @@ export const SharedProjectProvider = ({ children }: { children: React.ReactNode 
             is incorrect. Do you want to try again?
           </span>,
         );
-      case "ok":
-        showSharedProject(access.project);
+      case "ok": {
+        shareTokenRef.current = access.shareToken;
+        const renewal = renewalRef.current;
+        if (!renewal) return showSharedProject(access.project);
+        // A renewal keeps the project on screen, with any unsent notes.
+        settleRenewal(true);
         return;
+      }
       case "notFound":
       case "error":
         // redirect to homepage for a guest
@@ -85,6 +116,21 @@ export const SharedProjectProvider = ({ children }: { children: React.ReactNode 
     }
   };
 
+  const renewShareAccess = (): Promise<boolean> => {
+    if (!renewalRef.current) {
+      let resolve!: (renewed: boolean) => void;
+      const promise = new Promise<boolean>((done) => (resolve = done));
+      renewalRef.current = { promise, resolve };
+    }
+    promptForSharePassword(
+      <span className="whitespace-pre">
+        Enter the <span className="text-themeAccent">password </span>
+        again to save your notes
+      </span>,
+    );
+    return renewalRef.current.promise;
+  };
+
   const checkCanEdit: CheckCanEditType = () => {
     return admin || ((currentProject?.share ?? {}) as ShareProjectInterface).canEdit;
   };
@@ -92,6 +138,8 @@ export const SharedProjectProvider = ({ children }: { children: React.ReactNode 
   const value: SharedProjectContextInterface = {
     handleShareAccess,
     checkCanEdit,
+    shareToken: () => shareTokenRef.current,
+    renewShareAccess,
   };
 
   return <sharedProjectContext.Provider value={value}>{children}</sharedProjectContext.Provider>;

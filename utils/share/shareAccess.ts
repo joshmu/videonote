@@ -3,6 +3,7 @@ import type { Types } from "mongoose";
 import { type ProjectDoc, Share, type UserDoc } from "@/utils/mongoose";
 import { findProjectWithRelations } from "@/utils/project/findProjectWithRelations";
 import { verifySharePassword } from "@/utils/share/sharePassword";
+import { issueShareToken, verifyShareToken } from "@/utils/share/shareToken";
 
 /** A note author as the public sees them: id, plus username when it is public. */
 export type PublicAuthor = { _id: string; username?: string };
@@ -29,12 +30,19 @@ export type OpenSharedProjectResult =
   | { kind: "notFound" }
   | { kind: "passwordRequired" }
   | { kind: "incorrect" }
-  | { kind: "ok"; project: PublicProject };
+  | { kind: "ok"; project: PublicProject; shareToken?: string };
+
+/** Whether a non-owner may write Notes through the Project's Share. */
+export type ShareEditAccess =
+  | { kind: "allowed" }
+  | { kind: "forbidden" }
+  | { kind: "passwordRequired" };
 
 /**
  * Open the Project published at `shareUrl`, checking `password` against the
  * Share. A Share whose Project is gone, or no longer points back at it, is
- * `notFound`. Database errors propagate.
+ * `notFound`. A password-protected Share also hands out a Share token for
+ * Note writes. Database errors propagate.
  */
 export const openSharedProject = async (
   shareUrl: unknown,
@@ -53,22 +61,36 @@ export const openSharedProject = async (
   const projectDoc = await findProjectWithRelations({ _id: shareDoc.project });
   if (!projectDoc?.share?._id.equals(shareDoc._id)) return { kind: "notFound" };
 
-  return { kind: "ok", project: toPublicProject(projectDoc) };
+  const project = toPublicProject(projectDoc);
+  if (access.kind === "open") return { kind: "ok", project };
+  const shareToken = issueShareToken({ _id: shareDoc._id, password: shareDoc.password! });
+  return { kind: "ok", project, shareToken };
 };
 
 /**
- * The one "may edit via Share" check: true only when the Project's own Share
- * exists and has `canEdit`. Callers decide ownership separately.
+ * The one "may edit via Share" check: the Project's own Share exists and has
+ * `canEdit`, both read live, and a password-protected Share also needs a
+ * Share token for its current password (`passwordRequired` otherwise).
+ * Callers decide ownership separately.
  */
-export const mayEditViaShare = async (project: {
-  _id: Types.ObjectId;
-  share?: Types.ObjectId | { _id: Types.ObjectId } | null;
-}): Promise<boolean> => {
-  if (!project.share) return false;
+export const mayEditViaShare = async (
+  project: {
+    _id: Types.ObjectId;
+    share?: Types.ObjectId | { _id: Types.ObjectId } | null;
+  },
+  shareToken: unknown,
+): Promise<ShareEditAccess> => {
+  if (!project.share) return FORBIDDEN;
   const shareId = "_id" in project.share ? project.share._id : project.share;
-  const editable = await Share.exists({ _id: shareId, project: project._id, canEdit: true });
-  return editable !== null;
+  const share = await Share.findOne({ _id: shareId, project: project._id, canEdit: true })
+    .select("password")
+    .lean();
+  if (!share) return FORBIDDEN;
+  if (share.password && !verifyShareToken(shareToken, share)) return { kind: "passwordRequired" };
+  return { kind: "allowed" };
 };
+
+const FORBIDDEN: ShareEditAccess = { kind: "forbidden" };
 
 /**
  * The public view of a populated note author: `{ _id, username }`, or

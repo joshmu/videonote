@@ -59,6 +59,21 @@ describe("withAuthenticatedUser", () => {
   });
 
   it.each([
+    ["another audience", { audience: "share" }],
+    ["no audience", {}],
+  ])("replies 401 for a token for a real user with %s", async (_label, options) => {
+    const user = await User.create({ email: EMAIL });
+    const handler = vi.fn();
+    const token = jwt.sign({}, "test-secret", { subject: user._id.toString(), ...options });
+
+    const { status, body } = await call(withAuthenticatedUser(handler), `Bearer ${token}`);
+
+    expect(status).toBe(StatusCodes.UNAUTHORIZED);
+    expect(body).toEqual({ msg: "Invalid token" });
+    expect(handler).not.toHaveBeenCalled();
+  });
+
+  it.each([
     ["an unknown user id", () => new Types.ObjectId().toString()],
     ["a subject that is not a user id", () => EMAIL],
   ])("replies 401 when the token's subject is %s", async (_label, subject) => {

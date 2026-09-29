@@ -27,11 +27,21 @@ export const memorySession = (token?: string): SessionStore & { token?: string }
  */
 export const fakeTransport = (routes: Routes = {}, token = "t1") => {
   const sessionStore = memorySession(token);
-  const requests: { path: string; body: Record<string, any>; authorization?: string }[] = [];
+  const requests: {
+    path: string;
+    body: Record<string, any>;
+    authorization?: string;
+    shareToken?: string;
+  }[] = [];
   const fetch = vi.fn(async (path: string, init: RequestInit) => {
     const body = JSON.parse(init.body as string);
     const headers = init.headers as Record<string, string>;
-    requests.push({ path, body, authorization: headers.Authorization });
+    requests.push({
+      path,
+      body,
+      authorization: headers.Authorization,
+      shareToken: headers["x-share-token"],
+    });
     const reply = (await routes[path]?.(body)) ?? { status: 404, body: { msg: "Not found" } };
     return new Response(JSON.stringify(reply.body), { status: reply.status });
   });

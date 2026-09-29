@@ -24,6 +24,8 @@ export interface PromptInterface {
   msg: string | ReactElement;
   action: (callbackData: { [key: string]: string | number }) => void;
   passwordRequired?: boolean;
+  /** Called when the prompt is dismissed without confirming. */
+  onCancel?: () => void;
 }
 export type CreatePromptType = (promptData: PromptInterface) => void;
 export type ConfirmPromptType = (confirmPromptData: { password?: string }) => void;
@@ -37,7 +39,12 @@ export const usePrompt = (): {
 } => {
   const [state, setState] = useState<PromptInterface>(DEFAULTS);
 
-  const createPrompt: CreatePromptType = ({ msg, action, passwordRequired = false }) => {
+  const createPrompt: CreatePromptType = ({
+    msg,
+    action,
+    passwordRequired = false,
+    onCancel = undefined,
+  }) => {
     // open prompt modal with custom msg
     setState((current) => ({
       ...current,
@@ -45,16 +52,22 @@ export const usePrompt = (): {
       msg,
       passwordRequired,
       action,
+      onCancel,
     }));
   };
 
   const confirmPrompt: ConfirmPromptType = (callbackData) => {
     // when user confirms, fire callback action
     state.action(callbackData);
-    cancelPrompt();
+    closePrompt();
   };
 
   const cancelPrompt: CancelPromptType = () => {
+    if (state.isOpen) state.onCancel?.();
+    closePrompt();
+  };
+
+  const closePrompt = (): void => {
     // close prompt first so we don't see data change
     setState((current) => ({ ...current, isOpen: false }));
     // apply slight delay to account for animations
