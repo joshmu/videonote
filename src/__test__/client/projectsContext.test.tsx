@@ -170,6 +170,31 @@ describe("projectsContext changes", () => {
     expect(result.current.projects[0]).toMatchObject({ title: "Final", notes });
   });
 
+  it("keeps the Share after an update whose reply carries only its id", async () => {
+    const { result, projectRequests } = renderProjects({
+      "/api/project": ({ action, project: sent }) =>
+        action === ProjectApiActions.UPDATE
+          ? ok({ project: { ...project("p1"), ...sent, notes: [], share: "s1" } })
+          : projectRoute({ action, project: sent }),
+    });
+    await signIn(result, [project("p1")]);
+    await waitFor(() => expect(result.current.project?._id).toBe("p1"));
+    await act(async () => {
+      await result.current.shareProject({ url: "rough-cut", canEdit: true });
+    });
+
+    await act(async () => {
+      await result.current.updateProject({ ...project("p1"), title: "Final" });
+    });
+
+    expect(result.current.project).toMatchObject({ title: "Final", share });
+    expect(result.current.projects[0]).toMatchObject({ title: "Final", share });
+    await act(async () => {
+      await result.current.removeShareProject();
+    });
+    expect(projectRequests().at(-1).body).toMatchObject({ share: { _id: "s1" } });
+  });
+
   it("updates from a closure made before the session started, as hydration does", async () => {
     const { result, projectRequests } = renderProjects({ "/api/project": projectRoute });
     act(() => result.current.showSharedProject(project("p1")));

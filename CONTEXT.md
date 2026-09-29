@@ -277,6 +277,8 @@ user to `/login`, any other failure is shown as an alert.
 **Projects context**:
 `src/context/projectsContext.tsx`. The **Projects** on screen, the current
 one, and the owner's create, load, update, remove, share and unshare calls.
+An update takes only `title` and `src` from its reply, keeping the loaded
+Notes and Share.
 The Share modal reads `hasPassword`: an empty password field sends no
 `password` (kept), its remove control sends `""`, a typed value sets it.
 

@@ -123,18 +123,10 @@ export const ProjectsProvider = ({ children }: { children: React.ReactNode }) =>
     const response = await projectApi(ProjectApiActions.UPDATE, projectData);
     if (!response) return console.error("api error");
 
-    const { project } = response;
-
-    // update the relevant project
-    // ! avoid updating the 'notes' as this was previously populated by mongoose converting the _id references to data
-    setProjects((current) =>
-      current.map((p) => {
-        return p._id === project._id ? { ...project, notes: p.notes } : p;
-      }),
-    );
-    // also update current project state
-    // ! avoid updating the 'notes' as this was previously populated by mongoose converting the _id references to data
-    setCurrentProject((current) => ({ ...project, notes: current.notes }));
+    // Take only the edited fields: the reply carries notes and Share as ids.
+    const { _id, title, src } = response.project;
+    setProjects((current) => current.map((p) => (p._id === _id ? { ...p, title, src } : p)));
+    setCurrentProject((current) => ({ ...current, title, src }));
   };
 
   const shareProject: ShareProjectType = async (shareData) => {
