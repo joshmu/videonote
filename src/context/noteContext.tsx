@@ -23,7 +23,7 @@ import { useSessionContext } from "./sessionContext";
 import { useSharedProjectContext } from "./sharedProjectContext";
 import { useVideoContext } from "./videoContext";
 
-type AddNoteType = (note: NoteInterface | { content: string; time: number }) => void;
+type AddNoteType = (note: { content: string; time?: number }) => void;
 type UpdateNoteType = (note: NoteInterface) => void;
 type UpdateSearchType = (txt: string) => void;
 type SortType = (notes: NoteInterface[]) => NoteInterface[];

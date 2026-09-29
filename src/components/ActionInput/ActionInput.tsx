@@ -22,7 +22,6 @@ import { useVideoContext } from "@/context/videoContext";
 import { HINTS } from "@/shared/constants";
 
 import TimeDisplay from "../shared/TimeDisplay/TimeDisplay";
-import { NoteInterface } from "../shared/types";
 import ActionSymbols from "./ActionSymbols/ActionSymbols";
 import { ProgressBar } from "./ProgressBar/ProgressBar";
 import { TimeMarkers } from "./TimeMarkers/TimeMarkers";
@@ -38,10 +37,8 @@ export const ActionInput = () => {
   const { toggleSmartControls } = useControlsContext();
   const { addNote } = useNoteContext();
 
-  const [note, setNote] = useState<NoteInterface | { content: string; time: number }>({
-    content: "",
-    time: null,
-  });
+  // `time` stays unset until the player reports a finite position.
+  const [note, setNote] = useState<{ content: string; time?: number }>({ content: "" });
   const [isActive, setIsActive] = useState<boolean>(false);
   const [hint, setHint] = useState<string>(getHint(HINTS, settings.showHints));
 
@@ -68,7 +65,7 @@ export const ActionInput = () => {
   const handleSubmit = () => {
     addNote(note);
     // reset note state
-    setNote({ content: "", time: null });
+    setNote({ content: "" });
 
     // remove hints after adding note and while still in focus
     setHint(getHint(HINTS, false));
@@ -86,10 +83,14 @@ export const ActionInput = () => {
   // alter note timestamp based on whether we have txt data or not
   useEffect(() => {
     // if we have data then add timestamp
-    if (note.content.length > 0 && note.time === null)
+    if (
+      note.content.length > 0 &&
+      note.time === undefined &&
+      Number.isFinite(progress.playedSeconds)
+    )
       setNote({ ...note, time: progress.playedSeconds });
     // if we delete data and have a timestamp then reset
-    if (note.content.length === 0 && note.time !== null) setNote({ ...note, time: null });
+    if (note.content.length === 0 && note.time !== undefined) setNote({ content: "" });
   }, [note.content, note.time, progress.playedSeconds]);
 
   const handleFocus = (): void => {
@@ -115,7 +116,7 @@ export const ActionInput = () => {
       <div className="flex items-center self-center justify-center h-full transition-all duration-150 ease-in-out bg-transparent rounded-r-none text-themeText2">
         <TimeDisplay
           seconds={note.time ? note.time : progress.playedSeconds}
-          lock={note.time !== null}
+          lock={note.time !== undefined}
           active={isActive}
         />
       </div>
