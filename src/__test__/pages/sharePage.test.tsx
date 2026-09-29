@@ -3,6 +3,9 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 
 import ShareProjectPage from "@/pages/vn/[id]";
 
+const router = vi.hoisted(() => ({ replace: vi.fn() }));
+vi.mock("next/router", () => ({ default: router }));
+
 // Only getInitialProps is under test; the page's components are not rendered.
 vi.mock("@/components/Layout/Layout", () => ({}));
 vi.mock("@/components/Modals/Modals", () => ({}));
@@ -60,5 +63,19 @@ describe("ShareProjectPage.getInitialProps", () => {
     const { res } = await loadShare(status, body);
 
     expect(res.writeHead).toHaveBeenCalledWith(302, { Location: "/hello" });
+  });
+
+  it("redirects with the router on a client-side navigation to a missing Share", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async () => Response.json({ msg: "Share url does not exist." }, { status: 404 })),
+    );
+
+    const props = await ShareProjectPage.getInitialProps({
+      query: { id: "gone" },
+    } as unknown as NextPageContext);
+
+    expect(router.replace).toHaveBeenCalledWith("/hello");
+    expect(props).toEqual({});
   });
 });

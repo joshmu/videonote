@@ -3,6 +3,9 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 
 import IndexPage from "@/pages/index";
 
+const router = vi.hoisted(() => ({ replace: vi.fn() }));
+vi.mock("next/router", () => ({ default: router }));
+
 // Only getInitialProps is under test; the page's components are not rendered.
 vi.mock("@/components/Layout/Layout", () => ({}));
 vi.mock("@/components/Modals/Modals", () => ({}));
@@ -66,5 +69,16 @@ describe("IndexPage.getInitialProps on the server", () => {
     await IndexPage.getInitialProps(ctx);
 
     expect(res.writeHead).toHaveBeenCalledWith(302, { Location: "/login" });
+  });
+
+  it("redirects with the router on a client-side navigation without a token", async () => {
+    const fetch = vi.fn();
+    vi.stubGlobal("fetch", fetch);
+
+    const props = await IndexPage.getInitialProps({} as NextPageContext);
+
+    expect(router.replace).toHaveBeenCalledWith("/hello");
+    expect(props).toEqual({});
+    expect(fetch).not.toHaveBeenCalled();
   });
 });

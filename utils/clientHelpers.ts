@@ -10,6 +10,9 @@
  * @copyright © 2020 - 2020 MU
  */
 
+import { StatusCodes } from "http-status-codes";
+import type { NextPageContext } from "next";
+import Router from "next/router";
 import isEmail from "validator/lib/isEmail";
 
 type IsValidCredentialsType = {
@@ -79,6 +82,20 @@ export const createObjectId = (): string => {
     .padStart(8, "0");
   const random = crypto.getRandomValues(new Uint8Array(8));
   return seconds + Array.from(random, (byte) => byte.toString(16).padStart(2, "0")).join("");
+};
+
+/**
+ * Redirect from getInitialProps: a 302 on the server, the router on a
+ * client-side navigation (no `ctx.res`). Returns the empty props Next expects.
+ */
+export const redirectFromInitialProps = (ctx: NextPageContext, location: string): {} => {
+  if (ctx.res) {
+    ctx.res.writeHead(StatusCodes.MOVED_TEMPORARILY, { Location: location });
+    ctx.res.end();
+  } else {
+    Router.replace(location);
+  }
+  return {};
 };
 
 export const formatDuration = (secs: number): string => {

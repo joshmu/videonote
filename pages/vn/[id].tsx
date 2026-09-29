@@ -10,7 +10,6 @@
  * @copyright © 2020 - 2020 MU
  */
 
-import { StatusCodes } from "http-status-codes";
 import { NextPage } from "next";
 import absoluteUrl from "next-absolute-url";
 
@@ -26,6 +25,7 @@ import { VideoProvider } from "@/context/videoContext";
 import { AppContainer } from "@/layout/AppContainer/AppContainer";
 import { Overlay } from "@/shared/Modal/Overlay";
 import { createApiClient, requestSession } from "@/utils/apiClient";
+import { redirectFromInitialProps } from "@/utils/clientHelpers";
 
 interface Props {
   serverData?: {};
@@ -68,11 +68,7 @@ ShareProjectPage.getInitialProps = async (ctx) => {
 
   // a password-protected Share stays here so the page can prompt for it
   if (share.kind === "notFound" || share.kind === "error") {
-    ctx.res.writeHead(StatusCodes.MOVED_TEMPORARILY, {
-      Location: `/hello`,
-    });
-    ctx.res.end();
-    return;
+    return redirectFromInitialProps(ctx, "/hello");
   }
 
   return { serverData: { share } };

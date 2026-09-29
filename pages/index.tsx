@@ -10,7 +10,6 @@
  * @copyright © 2020 - 2020 MU
  */
 
-import { StatusCodes } from "http-status-codes";
 import { NextPage, NextPageContext } from "next";
 import absoluteUrl from "next-absolute-url";
 
@@ -26,6 +25,7 @@ import { VideoProvider } from "@/context/videoContext";
 import { AppContainer } from "@/layout/AppContainer/AppContainer";
 import { Overlay } from "@/shared/Modal/Overlay";
 import { browserSession, createApiClient, requestSession } from "@/utils/apiClient";
+import { redirectFromInitialProps } from "@/utils/clientHelpers";
 
 interface Props {
   serverData?: {};
@@ -60,13 +60,7 @@ IndexPage.getInitialProps = async (ctx: NextPageContext) => {
   const session = ctx.req ? requestSession(ctx.req.headers.cookie) : browserSession;
 
   if (!session.read()) {
-    console.log("no token, redirecting...");
-    // server
-    ctx.res.writeHead(StatusCodes.MOVED_TEMPORARILY, {
-      Location: `/hello`,
-    });
-    ctx.res.end();
-    return;
+    return redirectFromInitialProps(ctx, "/hello");
   }
 
   // request data with JWT token
@@ -76,11 +70,7 @@ IndexPage.getInitialProps = async (ctx: NextPageContext) => {
 
   // if token is invalid
   if (result.kind !== "ok") {
-    ctx.res.writeHead(StatusCodes.MOVED_TEMPORARILY, {
-      Location: `/login`,
-    });
-    ctx.res.end();
-    return;
+    return redirectFromInitialProps(ctx, "/login");
   }
 
   return { serverData: result.data };
