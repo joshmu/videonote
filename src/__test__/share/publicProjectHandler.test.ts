@@ -5,9 +5,11 @@ import handler from "@/api/public_project";
 import { Note, Project, User } from "@/utils/mongoose";
 import { attachOrUpdateShare } from "@/utils/share/shareIntake";
 
+import { useTestJwtSecret } from "../api/http";
 import { useTestDb } from "../db/testDb";
 
 useTestDb();
+useTestJwtSecret();
 
 const post = async (body: Record<string, unknown>) => {
   const res = { status: vi.fn(), json: vi.fn() };
@@ -76,6 +78,7 @@ describe("POST /api/public_project", () => {
       _id: project.user.toString(),
       username: "owner",
     });
+    expect(body.shareToken).toEqual(expect.any(String));
     const wire = JSON.stringify(body);
     expect(wire).not.toContain("password");
     expect(wire).not.toContain("owner@example.com");

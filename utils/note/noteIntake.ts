@@ -6,7 +6,11 @@ import { mayEditViaShare, type PublicAuthor, toPublicAuthor } from "@/utils/shar
 
 /** A malformed Note or Project id, or a Note field the schema would reject. */
 type Invalid = { kind: "invalid" };
-type Denied = Invalid | { kind: "notFound" } | { kind: "forbidden" };
+type Denied =
+  | Invalid
+  | { kind: "notFound" }
+  | { kind: "forbidden" }
+  | { kind: "sharePasswordRequired" };
 /** A written Note as returned to the caller: the author is the public view only. */
 export type WrittenNote = Omit<ReturnType<NoteDoc["toObject"]>, "user"> & { user?: PublicAuthor };
 export type UpsertNoteResult = { kind: "ok"; note: WrittenNote } | Denied;
@@ -15,7 +19,8 @@ export type RemoveDoneNotesResult =
   | Denied;
 
 /**
- * Upsert a Note for `callerId` (a User._id, or `null` for a guest). Creates
+ * Upsert a Note for `callerId` (a User._id, or `null` for a guest), who may
+ * send the `shareToken` a password-protected Share needs. Creates
  * when no Note has `input._id`, else updates `content`, `time` and `done`;
  * `project` and `user` never change on update. Permission comes from the
  * stored Note's Project on update and from `input.project` on create. A new
@@ -27,13 +32,18 @@ export type RemoveDoneNotesResult =
 export const upsertNote = async (
   input: NoteInterface,
   callerId: string | null,
+  shareToken?: unknown,
 ): Promise<UpsertNoteResult> => {
   if (input._id !== undefined && !isIdString(input._id)) return INVALID;
   const editable = pickDefined({ content: input.content, time: input.time, done: input.done });
   const existing = await Note.findById(input._id);
   if (!existing && !isIdString(input.project)) return INVALID;
   if (!isValidEdit(editable, !existing)) return INVALID;
-  const access = await checkWriteAccess(existing ? existing.project : input.project, callerId);
+  const access = await checkWriteAccess(
+    existing ? existing.project : input.project,
+    callerId,
+    shareToken,
+  );
   if (access.kind !== "allowed") return access;
 
   if (existing) {
@@ -60,9 +70,10 @@ export const upsertNote = async (
 export const removeDoneProjectNotes = async (
   projectId: unknown,
   callerId: string | null,
+  shareToken?: unknown,
 ): Promise<RemoveDoneNotesResult> => {
   if (!isIdString(projectId)) return INVALID;
-  const access = await checkWriteAccess(projectId, callerId);
+  const access = await checkWriteAccess(projectId, callerId, shareToken);
   if (access.kind !== "allowed") return access;
 
   const { _id } = access.projectDoc;
@@ -89,17 +100,18 @@ const isValidEdit = (
   (done === undefined || typeof done === "boolean");
 
 // Note write policy: the Project owner always; anyone else only through the
-// Project's Share with canEdit. `projectId` is already checked.
+// Project's Share (see mayEditViaShare). `projectId` is already checked.
 const checkWriteAccess = async (
   projectId: unknown,
   callerId: string | null,
+  shareToken: unknown,
 ): Promise<{ kind: "allowed"; projectDoc: ProjectDoc } | Denied> => {
   const projectDoc = await Project.findById(projectId);
   if (!projectDoc) return { kind: "notFound" };
-  if (isOwner(projectDoc, callerId) || (await mayEditViaShare(projectDoc))) {
-    return { kind: "allowed", projectDoc };
-  }
-  return { kind: "forbidden" };
+  if (isOwner(projectDoc, callerId)) return { kind: "allowed", projectDoc };
+  const viaShare = await mayEditViaShare(projectDoc, shareToken);
+  if (viaShare.kind === "allowed") return { kind: "allowed", projectDoc };
+  return viaShare.kind === "passwordRequired" ? { kind: "sharePasswordRequired" } : viaShare;
 };
 
 const isOwner = (projectDoc: ProjectDoc, callerId: string | null) =>

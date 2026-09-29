@@ -4,9 +4,11 @@ import { Note, Project, Share, User } from "@/utils/mongoose";
 import { mayEditViaShare, openSharedProject } from "@/utils/share/shareAccess";
 import { attachOrUpdateShare } from "@/utils/share/shareIntake";
 
+import { useTestJwtSecret } from "../api/http";
 import { useTestDb } from "../db/testDb";
 
 useTestDb();
+useTestJwtSecret();
 
 const seedSharedProject = async (share: { password?: string; canEdit?: boolean } = {}) => {
   const owner = await User.create({ email: "owner@example.com", username: "owner" });
@@ -131,20 +133,30 @@ describe("mayEditViaShare", () => {
   it("allows edits when the Project's Share has canEdit", async () => {
     const { project } = await seedSharedProject({ canEdit: true });
 
-    expect(await mayEditViaShare(project)).toBe(true);
+    expect(await mayEditViaShare(project, undefined)).toEqual({ kind: "allowed" });
+  });
+
+  it("asks for the password on a protected Share without a valid Share token", async () => {
+    const { project } = await seedSharedProject({ canEdit: true, password: "hunter2" });
+    const opened = await openSharedProject("rough-cut", "hunter2");
+    if (opened.kind !== "ok") throw new Error(`expected ok, got ${opened.kind}`);
+
+    expect(await mayEditViaShare(project, undefined)).toEqual({ kind: "passwordRequired" });
+    expect(await mayEditViaShare(project, "not-a-token")).toEqual({ kind: "passwordRequired" });
+    expect(await mayEditViaShare(project, opened.shareToken)).toEqual({ kind: "allowed" });
   });
 
   it("denies edits when the Project's Share has canEdit false", async () => {
     const { project } = await seedSharedProject({ canEdit: false });
 
-    expect(await mayEditViaShare(project)).toBe(false);
+    expect(await mayEditViaShare(project, undefined)).toEqual({ kind: "forbidden" });
   });
 
   it("denies edits when the Project has no Share", async () => {
     const owner = await User.create({ email: "solo@example.com", username: "solo" });
     const project = await Project.create({ title: "Private", user: owner._id });
 
-    expect(await mayEditViaShare(project)).toBe(false);
+    expect(await mayEditViaShare(project, undefined)).toEqual({ kind: "forbidden" });
   });
 
   it("denies edits through a Share that belongs to another Project", async () => {
@@ -155,7 +167,7 @@ describe("mayEditViaShare", () => {
       share: project.share,
     });
 
-    expect(await mayEditViaShare(other)).toBe(false);
+    expect(await mayEditViaShare(other, undefined)).toEqual({ kind: "forbidden" });
     expect(await Share.countDocuments()).toBe(1);
   });
 });
