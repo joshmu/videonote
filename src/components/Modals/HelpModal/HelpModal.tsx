@@ -10,7 +10,7 @@
  * @copyright © 2020 - 2020 MU
  */
 
-import { useGlobalContext } from "@/context/globalContext";
+import { HINTS } from "@/shared/constants";
 import { ModalContainer } from "@/shared/Modal/ModalContainer";
 import { ModalHeader } from "@/shared/Modal/ModalHeader";
 import { ModalInnerContainer } from "@/shared/Modal/ModalInnerContainer";
@@ -22,8 +22,6 @@ export const HelpModal = ({
   toggle: () => void;
   motionKey: string;
 }) => {
-  const { HINTS } = useGlobalContext();
-
   return (
     <ModalContainer toggle={toggleModal} motionKey={motionKey}>
       <ModalHeader>Cheatsheet</ModalHeader>

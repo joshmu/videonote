@@ -47,10 +47,7 @@ export interface GlobalContextInterface {
   toggleSidebar: ToggleSidebarType;
   updateProject: UpdateProjectType;
   handleInitialServerData: HandleInitialServerDataType;
-  SETTINGS_DEFAULTS: SettingsInterface;
-  HINTS: string[];
   admin: boolean;
-  copyToClipboard: CopyToClipboardType;
   removeAccount: RemoveAccountType;
   promptState: PromptInterface;
   createPrompt: CreatePromptType;
@@ -120,8 +117,6 @@ export type ProjectApiType = (
   project: Partial<ProjectInterface>,
   share?: Partial<ShareProjectInterface>,
 ) => Promise<ProjectReply | void>;
-
-export type CopyToClipboardType = (txt: string, alertMsg?: string) => void;
 
 export type RemoveAccountType = (userData: UserInterface) => Promise<void>;
 

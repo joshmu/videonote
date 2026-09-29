@@ -14,6 +14,7 @@ import Router from "next/router";
 import { createContext, useContext, useEffect, useRef, useState } from "react";
 
 import { usePrompt } from "@/hooks/usePrompt";
+import { SETTINGS_DEFAULTS } from "@/shared/constants";
 import {
   ProjectApiActions,
   ProjectInterface,
@@ -29,7 +30,6 @@ import {
   AlertProjectLoadedType,
   CancelModalsType,
   CheckCanEditType,
-  CopyToClipboardType,
   CreateProjectType,
   FetchWithPasswordPublicProjectType,
   GlobalContextInterface,
@@ -52,27 +52,6 @@ import {
   WarnLocalVideoType,
 } from "./globalContext.types";
 import { useNotificationContext } from "./notificationContext";
-
-const SETTINGS_DEFAULTS: SettingsInterface = {
-  playOffset: -4,
-  showHints: true,
-  seekJump: 10,
-  sidebarWidth: 400,
-  currentProject: null,
-};
-
-const HINTS: string[] = [
-  "Spacebar = Play/Pause",
-  "Left/Right = Seek",
-  "Up/Down = Volume",
-  "Shift + Spacebar = show/hide notes",
-  "Click note to jump to time",
-  "Mark notes done by clicking their time",
-  "Double click note = Edit",
-  "Shift + Left/Right = Prev/Next note",
-  "Click video timeline to jump",
-  "Drag list edge to resize",
-];
 
 const globalContext = createContext<GlobalContextInterface>(null!);
 
@@ -481,22 +460,6 @@ export const GlobalProvider = ({
     return result.data;
   };
 
-  const copyToClipboard: CopyToClipboardType = (txt, alertMsg = "Copied to clipboard!") => {
-    if (!txt) return;
-
-    // copy to clipboard
-    navigator.clipboard.writeText(txt).then(
-      function () {
-        /* clipboard successfully set */
-        addAlert({ type: "info", msg: `${alertMsg} ${txt}` });
-      },
-      function () {
-        /* clipboard write failed */
-        console.log("clipboard copy failed");
-      },
-    );
-  };
-
   const reportFailure = (failure: ApiFailure): void => {
     if (failure.kind === "unauthorized") {
       addAlert({ type: "error", msg: "Session expired, please re-enter your credentials" });
@@ -575,10 +538,7 @@ export const GlobalProvider = ({
     toggleSidebar,
     updateProject,
     handleInitialServerData,
-    SETTINGS_DEFAULTS,
-    HINTS,
     admin,
-    copyToClipboard,
     removeAccount,
     promptState,
     createPrompt,

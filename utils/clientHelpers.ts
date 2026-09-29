@@ -104,3 +104,20 @@ export const formatDuration = (secs: number): string => {
   const min = Math.floor(totalSecs / 60);
   return `${min}:${sec < 10 ? "0" + sec : sec}`;
 };
+
+export const copyToClipboard = (
+  txt: string,
+  addAlert: (alert: { type: "info"; msg: string }) => unknown,
+  alertMsg = "Copied to clipboard!",
+): Promise<void> => {
+  if (!txt) return Promise.resolve();
+
+  return navigator.clipboard.writeText(txt).then(
+    () => {
+      addAlert({ type: "info", msg: `${alertMsg} ${txt}` });
+    },
+    () => {
+      console.log("clipboard copy failed");
+    },
+  );
+};

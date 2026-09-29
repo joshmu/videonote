@@ -16,6 +16,7 @@ import { useControlsContext } from "@/context/controlsContext";
 import { useGlobalContext } from "@/context/globalContext";
 import { useNoteContext } from "@/context/noteContext";
 import { useVideoContext } from "@/context/videoContext";
+import { HINTS } from "@/shared/constants";
 
 import TimeDisplay from "../shared/TimeDisplay/TimeDisplay";
 import { NoteInterface } from "../shared/types";
@@ -26,7 +27,7 @@ import { TimeMarkers } from "./TimeMarkers/TimeMarkers";
 const PLACEHOLDER = "Add Note...";
 
 export const ActionInput = () => {
-  const { settings, sidebarOpen, HINTS, checkCanEdit, actionInputRef, actionInputFocus } =
+  const { settings, sidebarOpen, checkCanEdit, actionInputRef, actionInputFocus } =
     useGlobalContext();
   const { progress } = useVideoContext();
   const { toggleSmartControls } = useControlsContext();

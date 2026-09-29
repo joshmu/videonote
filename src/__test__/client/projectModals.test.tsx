@@ -33,7 +33,6 @@ beforeEach(() => {
   mocks.global = {
     project,
     updateProject: vi.fn(),
-    copyToClipboard: vi.fn(),
     shareProject: vi.fn(),
     removeShareProject: vi.fn(),
   };

@@ -23,6 +23,7 @@ import { ModalHeader } from "@/shared/Modal/ModalHeader";
 import { ModalInnerContainer } from "@/shared/Modal/ModalInnerContainer";
 import { ModalInput } from "@/shared/Modal/ModalInput";
 import { ShareProjectInterface } from "@/shared/types";
+import { copyToClipboard } from "@/utils/clientHelpers";
 
 // todo: remove bad characters from url path entry
 const formatUrl = (txt: string): string => txt.replace(" ", "-").toLowerCase();
@@ -34,7 +35,7 @@ export const ShareProjectModal = ({
   toggle: () => void;
   motionKey: string;
 }) => {
-  const { project, copyToClipboard, shareProject, removeShareProject } = useGlobalContext();
+  const { project, shareProject, removeShareProject } = useGlobalContext();
   const { addAlert } = useNotificationContext();
   const defaults = {
     url: `${formatUrl(project.title)}`,
@@ -71,7 +72,7 @@ export const ShareProjectModal = ({
     const apiSuccess = await shareProject(shareData);
     if (apiSuccess) {
       addAlert({ type: "success", msg: "Shared project updated." });
-      copyToClipboard(`https://videonote.app/vn/${state.url}`);
+      copyToClipboard(`https://videonote.app/vn/${state.url}`, addAlert);
     } else {
       addAlert({ type: "error", msg: "An error occurred..." });
     }
@@ -156,6 +157,7 @@ export const ShareProjectModal = ({
                   onClick={() =>
                     copyToClipboard(
                       `https://videonote.app/vn/${(project.share as ShareProjectInterface).url}`,
+                      addAlert,
                     )
                   }
                   className="italic cursor-pointer top-8 text-themeAccent"

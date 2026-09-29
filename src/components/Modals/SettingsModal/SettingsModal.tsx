@@ -21,6 +21,7 @@ import { ModalForm } from "@/shared/Modal/ModalForm";
 import { ModalHeader } from "@/shared/Modal/ModalHeader";
 import { ModalInnerContainer } from "@/shared/Modal/ModalInnerContainer";
 import { ModalInput } from "@/shared/Modal/ModalInput";
+import { SETTINGS_DEFAULTS } from "@/shared/constants";
 import { SettingsInterface } from "@/shared/types";
 
 import { PlaybackRateSlider } from "./PlaybackRateSlider/PlaybackRateSlider";
@@ -33,7 +34,7 @@ export const SettingsModal = ({
   toggle: () => void;
   motionKey: string;
 }) => {
-  const { settings, updateSettings, SETTINGS_DEFAULTS } = useGlobalContext();
+  const { settings, updateSettings } = useGlobalContext();
   const { addAlert } = useNotificationContext();
 
   const [state, setState] = useState<SettingsInterface>({
