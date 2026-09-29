@@ -288,7 +288,7 @@ password again when a Note write is refused for it (the project stays on
 screen; it resolves `false` if the prompt is dismissed), and `checkCanEdit`, the one canEdit source: a signed-in User on
 their own Projects may always edit, a guest only when the **Share** has
 `canEdit`. A viewer who cannot edit gets a "View only" hint in place of the
-note input.
+note input and cannot open a Note for editing.
 
 **Video context**:
 `src/context/videoContext.tsx`. The player state and the URL it plays. A

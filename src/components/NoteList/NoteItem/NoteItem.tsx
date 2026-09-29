@@ -14,14 +14,14 @@ import { Variants, motion } from "motion/react";
 import { ChangeEvent, KeyboardEvent, useEffect, useState } from "react";
 
 import { useControlsContext } from "@/context/controlsContext";
-import { useProjectsContext } from "@/context/projectsContext";
 import { useNoteContext } from "@/context/noteContext";
 import { useSessionContext } from "@/context/sessionContext";
+import { useSharedProjectContext } from "@/context/sharedProjectContext";
 import { useVideoContext } from "@/context/videoContext";
 import { useIsMount } from "@/hooks/useIsMount";
 import { Select } from "@/shared/Select/Select";
 import TimeDisplay from "@/shared/TimeDisplay/TimeDisplay";
-import { NoteInterface, ShareProjectInterface } from "@/shared/types";
+import { NoteInterface } from "@/shared/types";
 
 import DisplayUser from "./DisplayUser/DisplayUser";
 
@@ -39,8 +39,8 @@ interface NoteItemInterface {
 }
 
 export const NoteItem = ({ note, closestProximity, childVariants }: NoteItemInterface) => {
-  const { project } = useProjectsContext();
-  const { admin, user } = useSessionContext();
+  const { user } = useSessionContext();
+  const { checkCanEdit } = useSharedProjectContext();
   const { seekTo } = useVideoContext();
   const { toggleSmartControls } = useControlsContext();
   const { updateNote } = useNoteContext();
@@ -97,7 +97,7 @@ export const NoteItem = ({ note, closestProximity, childVariants }: NoteItemInte
   };
 
   const handleDoubleClick = (): void => {
-    if (!admin && !((project?.share ?? {}) as ShareProjectInterface).canEdit) return;
+    if (!checkCanEdit()) return;
     toggleEdit(true);
   };
 
