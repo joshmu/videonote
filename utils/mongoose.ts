@@ -13,7 +13,19 @@
 import mongoose from "mongoose";
 const { Schema } = mongoose;
 
-mongoose.connect(process.env.MONGODB_URI, {});
+let connecting: Promise<typeof mongoose> | null = null;
+
+/**
+ * The one way server entry paths open the database. Reuses the pending or
+ * open connection; a failed attempt is retried on the next call.
+ */
+export const connectDb = (): Promise<typeof mongoose> => {
+  connecting ??= mongoose.connect(process.env.MONGODB_URI).catch((error) => {
+    connecting = null;
+    throw error;
+  });
+  return connecting;
+};
 
 const UserSchema = new Schema(
   {

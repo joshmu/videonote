@@ -3,7 +3,7 @@ import type { NextApiHandler, NextApiRequest, NextApiResponse } from "next";
 
 import type { UserDocInterface } from "@/shared/types";
 import { authenticateToken, generateAccessToken } from "@/utils/jwt";
-import { User } from "@/utils/mongoose";
+import { connectDb, User } from "@/utils/mongoose";
 
 /**
  * Context passed to handlers wrapped by {@link withAuthenticatedUser}.
@@ -87,15 +87,16 @@ const resolveAuthenticatedUser = async (token: string): Promise<ResolveResult> =
 /**
  * Wrap a Next.js API handler so it only runs for authenticated users.
  *
- * The wrapper performs token extraction, JWT verification, and user lookup,
- * then invokes `handler(req, res, ctx)` with a populated {@link AuthContext}.
- * On any failure it responds with 401 and a `msg` body and the inner handler
- * is not called. Handler errors propagate so the framework's error handling
+ * The wrapper opens the database (`connectDb`), verifies the token, and looks
+ * up the user, then invokes `handler(req, res, ctx)` with a populated
+ * {@link AuthContext}. On any auth failure it responds with 401 and a `msg`
+ * body and the inner handler is not called. Handler errors propagate so the framework's error handling
  * can run.
  */
 export const withAuthenticatedUser =
   (handler: AuthenticatedHandler): NextApiHandler =>
   async (req, res) => {
+    await connectDb();
     const token = extractBearer(req.headers["authorization"]);
     if (!token) {
       res.status(StatusCodes.UNAUTHORIZED).json({ msg: "No token. Authorization denied." });
@@ -119,6 +120,7 @@ export const withAuthenticatedUser =
 export const withOptionalUser =
   (handler: OptionalAuthHandler): NextApiHandler =>
   async (req, res) => {
+    await connectDb();
     const token = extractBearer(req.headers["authorization"]);
     if (!token) {
       await handler(req, res, { isGuest: true, userDoc: null, email: null, newToken: null });
