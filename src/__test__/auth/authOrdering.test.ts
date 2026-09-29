@@ -2,6 +2,8 @@ import { StatusCodes } from "http-status-codes";
 import mongoose from "mongoose";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
+import { generateAccessToken } from "@/utils/jwt";
+
 import { callApi } from "../api/http";
 
 // A fresh model module per test, so connectDb holds no cached connection.
@@ -44,6 +46,30 @@ describe("auth wrappers reject a bad token before opening the database", () => {
 
     expect(status).toBe(StatusCodes.UNAUTHORIZED);
     expect(connect).not.toHaveBeenCalled();
+    expect(handler).not.toHaveBeenCalled();
+  });
+});
+
+describe("auth wrappers open the database when the request needs it", () => {
+  it("withAuthenticatedUser connects for a valid token", async () => {
+    const { withAuthenticatedUser } = await loadWrappers();
+    const handler = vi.fn();
+
+    await expect(
+      callApi(withAuthenticatedUser(handler), {}, { email: "user@example.com" }),
+    ).rejects.toThrow("unreachable");
+
+    expect(connect).toHaveBeenCalledTimes(1);
+    expect(handler).not.toHaveBeenCalled();
+  });
+
+  it("withOptionalUser connects before serving a guest", async () => {
+    const { withOptionalUser } = await loadWrappers();
+    const handler = vi.fn();
+
+    await expect(callApi(withOptionalUser(handler), {})).rejects.toThrow("unreachable");
+
+    expect(connect).toHaveBeenCalledTimes(1);
     expect(handler).not.toHaveBeenCalled();
   });
 });
