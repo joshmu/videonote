@@ -1,8 +1,10 @@
-import { act, render, waitFor } from "@testing-library/react";
+import { act, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
+import { NoteItem } from "@/components/NoteList/NoteItem/NoteItem";
 import { NoteApiAction, type NoteInterface } from "@/components/shared/types";
 import { AppProviders } from "@/context/appProviders";
+import { ControlsProvider } from "@/context/controlsContext";
 import { NoteProvider, useNoteContext } from "@/context/noteContext";
 import { NotificationProvider, useNotificationContext } from "@/context/notificationContext";
 import { useUiShellContext } from "@/context/uiShellContext";
@@ -12,6 +14,8 @@ import { type Reply, type Routes, fakeTransport, ok } from "./providerHarness";
 
 const mocks = vi.hoisted(() => ({ push: vi.fn() }));
 vi.mock("next/router", () => ({ default: { push: mocks.push } }));
+// A .js file with JSX, which the test transform does not parse.
+vi.mock("@/shared/TimeDisplay/TimeDisplay", () => ({ default: () => null }));
 
 const project = {
   _id: "p1",
@@ -47,7 +51,16 @@ const Probe = () => {
   return null;
 };
 
-const renderNotes = async (note: Routes[string]) => {
+// The note rows as the sidebar renders them.
+const Rows = () => (
+  <>
+    {useNoteContext().notes.map((note) => (
+      <NoteItem key={note._id} note={note} closestProximity={false} childVariants={{}} />
+    ))}
+  </>
+);
+
+const renderNotes = async (note: Routes[string], rows = false) => {
   const transport = fakeTransport({
     "/api/project": () => ok({ project }),
     "/api/settings": ({ settings }) => ok({ settings }),
@@ -64,6 +77,11 @@ const renderNotes = async (note: Routes[string]) => {
           <VideoProvider>
             <NoteProvider>
               <Probe />
+              {rows && (
+                <ControlsProvider>
+                  <Rows />
+                </ControlsProvider>
+              )}
             </NoteProvider>
           </VideoProvider>
         </AppProviders>
@@ -72,6 +90,13 @@ const renderNotes = async (note: Routes[string]) => {
   });
   await waitFor(() => expect(ctx.notes).toHaveLength(2));
   return transport;
+};
+
+const editRow = async (from: string, to: string) => {
+  fireEvent.doubleClick(screen.getByText(from));
+  const input = screen.getByRole("textbox");
+  fireEvent.change(input, { target: { value: to } });
+  await act(async () => fireEvent.blur(input));
 };
 
 const noteRequests = (requests: ReturnType<typeof fakeTransport>["requests"]) =>
@@ -195,6 +220,37 @@ describe("noteContext", () => {
     });
 
     await waitFor(() => expect(mocks.push).toHaveBeenCalledWith("/login"));
+  });
+
+  it("restores the saved content when the server rejects an edit", async () => {
+    await renderNotes(() => ({ status: 400, body: { msg: "Invalid note." } }), true);
+
+    await editRow("first", "renamed");
+
+    await waitFor(() => expect(screen.getByText("first")).toBeInTheDocument());
+    expect(screen.queryByText("renamed")).not.toBeInTheDocument();
+  });
+
+  it.each([
+    ["empty", ""],
+    ["blank", "   "],
+  ])("does not submit %s content from the editor and keeps the saved content", async (_l, to) => {
+    const { requests } = await renderNotes(({ note }) => ok({ note }), true);
+
+    await editRow("first", to);
+
+    expect(noteRequests(requests)).toHaveLength(0);
+    expect(screen.getByText("first")).toBeInTheDocument();
+  });
+
+  it("shows the saved content after the server accepts an edit", async () => {
+    const { requests } = await renderNotes(({ note }) => ok({ note }), true);
+
+    await editRow("first", "renamed");
+
+    await waitFor(() => expect(ctx.notes[0].content).toBe("renamed"));
+    expect(noteRequests(requests)).toHaveLength(1);
+    expect(screen.getByText("renamed")).toBeInTheDocument();
   });
 
   it("sorts without reordering the notes state", async () => {

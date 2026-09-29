@@ -175,16 +175,16 @@ export function NoteProvider(props: { [key: string]: any }) {
   };
 
   const updateNote: UpdateNoteType = (note) => {
-    const oldNote = notes.find((n) => n._id === note._id);
     console.log("update the note", note);
-    noteApi(note).then((res: "error") => {
+    noteApi(note).then((res) => {
       if (res === "error") {
-        // if we have server error return original note
-        return updateNoteState(oldNote);
-      } else {
-        // otherwise the response will be the updated note
-        updateNoteState(res);
+        // A fresh copy of the last saved note, so its row drops the rejected edit.
+        return setNotes((current) =>
+          current.map((saved) => (saved._id === note._id ? { ...saved } : saved)),
+        );
       }
+      // otherwise the response will be the updated note
+      updateNoteState(res);
     });
   };
 

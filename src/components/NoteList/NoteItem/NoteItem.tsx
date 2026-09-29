@@ -56,12 +56,23 @@ export const NoteItem = ({ note, closestProximity, childVariants }: NoteItemInte
     toggleSmartControls(enableSmartControls);
   }, [isEditing]);
 
+  // Show the saved note whenever it changes, e.g. after a rejected edit.
+  useEffect(() => {
+    if (isMount || isEditing) return;
+    setState(note);
+  }, [note]);
+
   // update note whenever their is a change
   useEffect(() => {
     // do not update on initial load
     if (isMount) return;
     // do not update whilst editing content
     if (isEditing) return;
+    // Emptied content is never sent: the saved content comes back.
+    if (!state.content.trim()) {
+      if (state.content !== note.content) setState({ ...state, content: note.content });
+      return;
+    }
     // do not update if state has not been modified from the initially loaded note
     if (Object.entries(state).every(([key, val]) => note[key] === val)) return;
 
