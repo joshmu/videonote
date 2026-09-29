@@ -26,7 +26,8 @@ export type RemoveDoneNotesResult = { kind: "ok"; notes: WrittenNote[] } | Denie
  * the Note with its author as the public view (never an email). A malformed
  * Note id, Project id on create, or field is `invalid`; a missing Note id
  * creates, and a new Note needs non-empty `content`. A missing or null
- * `time` is 0 on create and leaves the time unchanged on update.
+ * `time` is 0 on create, a missing or null `done` false, and either is left
+ * unchanged on update.
  */
 export const upsertNote = async (
   input: NoteInterface,
@@ -34,9 +35,10 @@ export const upsertNote = async (
   shareToken?: unknown,
 ): Promise<UpsertNoteResult> => {
   if (input._id !== undefined && !isIdString(input._id)) return INVALID;
-  // A null time counts as absent: 0 (the schema default) on create, unchanged on update.
+  // A null time or done counts as absent: the schema default on create, unchanged on update.
   const time = input.time ?? undefined;
-  const editable = pickDefined({ content: input.content, time, done: input.done });
+  const done = input.done ?? undefined;
+  const editable = pickDefined({ content: input.content, time, done });
   const existing = await Note.findById(input._id);
   if (!existing && !isIdString(input.project)) return INVALID;
   if (!isValidEdit(editable, !existing)) return INVALID;
