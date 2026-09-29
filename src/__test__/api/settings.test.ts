@@ -1,5 +1,5 @@
 import { StatusCodes } from "http-status-codes";
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 
 import handler from "@/api/settings";
 import { Settings, User } from "@/utils/mongoose";
@@ -11,6 +11,10 @@ useTestDb();
 useTestJwtSecret();
 
 const EMAIL = "owner@example.com";
+
+afterEach(() => {
+  vi.restoreAllMocks();
+});
 
 describe("/api/settings", () => {
   it("creates settings from the editable fields only, owned by the caller", async () => {
@@ -58,5 +62,17 @@ describe("/api/settings", () => {
     const stored = await Settings.findById(settings._id).lean();
     expect(stored.user).toEqual(owner._id);
     expect(stored).toMatchObject({ playOffset: 3, showHints: false, sidebarWidth: 300 });
+  });
+
+  it("replies 500 with only a message when the database fails, logging the error", async () => {
+    await User.create({ email: EMAIL });
+    vi.spyOn(Settings, "findOne").mockRejectedValueOnce(new Error("settings store down"));
+    vi.spyOn(console, "error").mockImplementation(() => undefined);
+
+    const { status, body } = await callApi(handler, { settings: {} }, { email: EMAIL });
+
+    expect(status).toBe(StatusCodes.INTERNAL_SERVER_ERROR);
+    expect(body).toEqual({ msg: "Database error" });
+    expect(console.error).toHaveBeenCalled();
   });
 });

@@ -1,4 +1,5 @@
 import { StatusCodes } from "http-status-codes";
+import { isObjectIdOrHexString } from "mongoose";
 import type { NextApiHandler, NextApiRequest, NextApiResponse } from "next";
 
 import { authenticateToken, generateAccessToken } from "@/utils/jwt";
@@ -8,7 +9,7 @@ import { connectDb, User, type UserDoc } from "@/utils/mongoose";
  * Context passed to handlers wrapped by {@link withAuthenticatedUser}.
  *
  * - `userDoc`: the Mongoose user document for the verified caller
- * - `email`: the email extracted from the JWT (matches `userDoc.email`)
+ * - `email`: the caller's stored email (`userDoc.email`)
  * - `newToken`: a freshly rotated JWT the handler should return so the
  *   caller's session is refreshed
  */
@@ -62,22 +63,23 @@ type ResolveResult = {
   body: { msg: string } | null;
 };
 
+// The token's subject is the User._id; the user is looked up by it.
 const resolveAuthenticatedUser = async (token: string): Promise<ResolveResult> => {
-  let email: string;
+  let userId: string;
   try {
-    email = authenticateToken(token);
+    userId = authenticateToken(token);
   } catch {
     return { ctx: null, status: StatusCodes.UNAUTHORIZED, body: { msg: "Invalid token" } };
   }
 
   await connectDb();
-  const userDoc = await User.findOne({ email });
+  const userDoc = isObjectIdOrHexString(userId) ? await User.findById(userId) : null;
   if (!userDoc) {
     return { ctx: null, status: StatusCodes.UNAUTHORIZED, body: { msg: "No user found." } };
   }
 
   return {
-    ctx: { userDoc, email, newToken: generateAccessToken(email) },
+    ctx: { userDoc, email: userDoc.email, newToken: generateAccessToken(userId) },
     status: StatusCodes.OK,
     body: null,
   };

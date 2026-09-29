@@ -31,7 +31,7 @@ describe("register", () => {
     const stored = await User.findOne({ email: "new@example.com" });
     expect(stored.username).toBe("new@example.com");
     expect(await bcrypt.compare("hunter2", stored.password)).toBe(true);
-    expect(authenticateToken(outcome.token)).toBe("new@example.com");
+    expect(authenticateToken(outcome.token)).toBe(stored._id.toString());
   });
 
   it("reports emailTaken when the email is already registered", async () => {
@@ -65,7 +65,7 @@ describe("authenticate", () => {
     expect(outcome.kind).toBe("ok");
     if (outcome.kind !== "ok") return;
     expect(outcome.user._id).toEqual(user._id);
-    expect(authenticateToken(outcome.token)).toBe("owner@example.com");
+    expect(authenticateToken(outcome.token)).toBe(user._id.toString());
   });
 
   it("distinguishes an unknown email from a wrong password", async () => {
@@ -120,13 +120,13 @@ describe("updateProfile", () => {
     expect(stored.settings).toBeUndefined();
   });
 
-  it("returns a token minted for the new email", async () => {
+  it("returns a token for the same user after an email change", async () => {
     const user = await seedUser();
 
     const outcome = await updateProfile(user, { email: "renamed@example.com" });
 
     if (outcome.kind !== "ok") throw new Error(`expected ok, got ${outcome.kind}`);
-    expect(authenticateToken(outcome.token)).toBe("renamed@example.com");
+    expect(authenticateToken(outcome.token)).toBe(user._id.toString());
   });
 
   it("reports emailTaken for another user's email and leaves the profile unchanged", async () => {
@@ -168,12 +168,18 @@ describe("removeAccount", () => {
 
     const other = await seedUser("other@example.com");
     const othersProject = await Project.create({ title: "Theirs", user: other._id });
-    await Note.create({ content: "Mine on theirs", project: othersProject._id, user: user._id });
+    const mineOnTheirs = await Note.create({
+      content: "Mine on theirs",
+      project: othersProject._id,
+      user: user._id,
+    });
     const othersNote = await Note.create({ content: "Theirs", project: othersProject._id });
-    return { user, other, othersProject, othersNote };
+    othersProject.notes.push(mineOnTheirs._id, othersNote._id);
+    await othersProject.save();
+    return { user, other, othersProject, othersNote, mineOnTheirs };
   };
 
-  const expectOnlyOthersLeft = async ({ user, other, othersProject, othersNote }) => {
+  const expectOnlyOthersLeft = async ({ user, other, othersProject, othersNote, mineOnTheirs }) => {
     expect(await User.findById(user._id)).toBeNull();
     expect(await Project.countDocuments({ user: user._id })).toBe(0);
     expect(await Note.countDocuments({ user: user._id })).toBe(0);
@@ -182,14 +188,32 @@ describe("removeAccount", () => {
     expect(await User.findById(other._id)).not.toBeNull();
     expect(await Project.findById(othersProject._id)).not.toBeNull();
     expect(await Note.findById(othersNote._id)).not.toBeNull();
+    const kept = await Note.findById(mineOnTheirs._id);
+    expect(kept.content).toBe("Mine on theirs");
+    expect(kept.user).toBeUndefined();
+    const { notes } = await Project.findById(othersProject._id);
+    expect(await Note.countDocuments({ _id: { $in: notes } })).toBe(notes.length);
   };
 
-  it("removes the user's projects, notes, share and settings, then the user", async () => {
+  it("removes the user's projects, share and settings, keeps their notes on other owners' projects without an author, then removes the user", async () => {
     const seeded = await seedAccount();
 
     expect(await removeAccount(seeded.user, "hunter2")).toEqual({ kind: "ok" });
 
     await expectOnlyOthersLeft(seeded);
+    expect(await Note.countDocuments()).toBe(2);
+  });
+
+  it("keeps the user when unsetting the author fails, and a re-run completes", async () => {
+    const seeded = await seedAccount();
+    vi.spyOn(Note, "updateMany").mockRejectedValueOnce(new Error("notes store down"));
+
+    await expect(removeAccount(seeded.user, "hunter2")).rejects.toThrow("notes store down");
+    expect(await User.findById(seeded.user._id)).not.toBeNull();
+
+    expect(await removeAccount(seeded.user, "hunter2")).toEqual({ kind: "ok" });
+    await expectOnlyOthersLeft(seeded);
+    expect(await Note.countDocuments()).toBe(2);
   });
 
   it("reports wrongPassword and removes nothing", async () => {

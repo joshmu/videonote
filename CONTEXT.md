@@ -65,9 +65,17 @@ The discriminated bag for `withOptionalUser`. Either `{ isGuest: true,
 userDoc: null, email: null, newToken: null }` or the same shape as
 `AuthContext` with `isGuest: false`.
 
+**Session token**:
+A 30 minute JWT whose subject (`sub`) is the `User._id` as a string, minted
+by `generateAccessToken` in `utils/jwt.ts` and only through the **Identity
+intake** and the auth wrappers. `authenticateToken` rejects a payload
+without a non-empty string `sub`, so a token without one is a 401 and the
+user logs in again. The client never decodes it.
+
 **withAuthenticatedUser**:
 The wrapper that owns the JWT-extraction → verify → user-lookup contract.
-Lives in `utils/auth/withAuthenticatedUser.ts`. Handlers never read
+Lives in `utils/auth/withAuthenticatedUser.ts`. The **User** is looked up by
+the **Session token** subject. Handlers never read
 `req.headers["authorization"]` directly. A missing or invalid token is
 answered with 401 before `connectDb` runs, so a database outage cannot
 turn it into a 500.
@@ -85,10 +93,11 @@ Each returns a discriminated outcome (`ok` / `invalid` / `emailTaken` /
 `register.js` and `user.js` map outcomes to status codes. Credentials must
 be non-empty strings. A taken email is detected from the unique index
 (E11000), never by check-then-save. `updateProfile` writes `username` and
-`email` only and returns a token minted for the saved email, so an email
-change keeps the session. `removeAccount` checks the password, removes owned
-**Projects** through the **Project intake**, then the user's other
-**Notes**, **Shares** and **Settings**, and the **User** last. **Settings**
+`email` only and returns a fresh **Session token**; its subject is the
+`User._id`, so an email change keeps the session. `removeAccount` checks the password, removes owned
+**Projects** through the **Project intake**, unsets the author on the user's
+**Notes** on other owners' **Projects** (they read as a guest's), removes
+**Shares** and **Settings**, and the **User** last. **Settings**
 are written only through `/api/settings`, which takes `currentProject`,
 `playOffset`, `showHints`, `seekJump` and `sidebarWidth` from the body.
 
@@ -101,8 +110,10 @@ are written only through `/api/settings`, which takes `currentProject`,
 **User** and returns a discriminated outcome (`ok` / `notFound` /
 `urlTaken` / `invalid`) with no HTTP; `pages/api/project.ts` maps them to
 200, 404, 409 and 400. A malformed or missing project id is `notFound`.
-Create needs a non-empty `title`. Create and update write `title` and
-`src` only. Sharing delegates to the **Share intake**.
+Create needs a non-empty `title` (`invalid`, reason `title`). Create and
+update write `title` and `src` only. Sharing needs a `share` object and
+unsharing one whose `_id` is a hex ObjectId string (`invalid`, reason
+`share`). Sharing delegates to the **Share intake**.
 
 **Project cascade**:
 The one removal path, used by `removeProject` and (through
@@ -126,7 +137,9 @@ contract for shares. Both treat empty/null as "no password protection".
 **Share intake**:
 The pair `attachOrUpdateShare` / `detachShare` in `utils/share/shareIntake.ts`
 that owns the Project↔Share lifecycle. `attachOrUpdateShare` decides
-create-vs-update by `projectDoc.share`, hashes the password (via
+create-vs-update by `projectDoc.share`, writes only `url`, `password` and
+`canEdit` from the caller (`project` and `user` come from the Project), hashes
+the password (via
 `hashSharePassword`), and surfaces a duplicate `url` as `ShareUrlTakenError`.
 Both operations return the project re-loaded through `findProjectWithRelations`
 so callers can hand it straight back to the client. Handlers no longer reach
@@ -144,11 +157,14 @@ is the one "may edit via Share" check: the Project's own Share exists and has
 `canEdit`. `pages/api/public_project.ts` only maps outcomes to status codes:
 401 `passwordRequired`, 403 `incorrect`, 404 `notFound`, 200 `ok`.
 
-**findProjectWithRelations**:
-The populate spec for a hydrated Project in
+**findProjectWithRelations / findProjectsWithRelations**:
+The one populate spec for a hydrated Project in
 `utils/project/findProjectWithRelations.ts`: Project + Notes (with each
-Note's author User) + Share. Used by `pages/api/auth.js`, the Project
-intake, the Share intake and the Share access module.
+Note's author User) + Share, for one Project or every match of a query.
+The single form is used by the Project intake, the Share intake and the
+Share access module. `pages/api/auth.js` loads a User's Projects with the
+many form in one query, filtered to `_id` in `User.projects` and owned by
+the caller, and keeps the `User.projects` order.
 
 ### Architecture (Note seam)
 
@@ -157,8 +173,13 @@ The pair `upsertNote` / `removeDoneProjectNotes` in
 `utils/note/noteIntake.ts` that owns the Project↔Note lifecycle and the
 **Note write policy** on the write path. Both take the caller's
 `User._id` as a string, or `null` for a guest, and return `ok` |
-`notFound` | `forbidden`, which `pages/api/note.ts` maps to HTTP 200,
-404 and 403. `upsertNote` decides create-vs-update by `Note.findById(input._id)`.
+`invalid` | `notFound` | `forbidden`, which `pages/api/note.ts` maps to HTTP
+200, 400, 404 and 403. `invalid` is a Note or Project id that is not a hex
+ObjectId string (a missing Project id too), or a field the Note schema would
+reject: `content` must be a non-empty string (required on create), `time` a
+finite number, `done` a boolean. It is checked before the permission check.
+`upsertNote` decides create-vs-update by `Note.findById(input._id)`; a
+missing id creates.
 On update only `content`, `time` and `done` change; `project` and `user`
 are fixed. On create the caller becomes the author and the new id is pushed
 onto `Project.notes`. The returned Note's author goes through

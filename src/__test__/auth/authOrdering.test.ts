@@ -1,6 +1,8 @@
 import { StatusCodes } from "http-status-codes";
-import mongoose from "mongoose";
+import mongoose, { Types } from "mongoose";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+
+import { generateAccessToken } from "@/utils/jwt";
 
 import { callApi } from "../api/http";
 
@@ -53,9 +55,11 @@ describe("auth wrappers open the database when the request needs it", () => {
     const { withAuthenticatedUser } = await loadWrappers();
     const handler = vi.fn();
 
-    await expect(
-      callApi(withAuthenticatedUser(handler), {}, { email: "user@example.com" }),
-    ).rejects.toThrow("unreachable");
+    const authorization = `Bearer ${generateAccessToken(new Types.ObjectId().toString())}`;
+
+    await expect(callApi(withAuthenticatedUser(handler), {}, { authorization })).rejects.toThrow(
+      "unreachable",
+    );
 
     expect(connect).toHaveBeenCalledTimes(1);
     expect(handler).not.toHaveBeenCalled();

@@ -4,10 +4,10 @@ import { beforeAll, describe, expect, it, vi } from "vitest";
 
 import handler from "@/api/note";
 import { NoteApiAction } from "@/shared/types";
-import { generateAccessToken } from "@/utils/jwt";
 import { Note, Project, User } from "@/utils/mongoose";
 import { attachOrUpdateShare } from "@/utils/share/shareIntake";
 
+import { tokenFor } from "../api/http";
 import { useTestDb } from "../db/testDb";
 
 useTestDb();
@@ -17,7 +17,7 @@ beforeAll(() => {
 });
 
 const post = async (body: Record<string, unknown>, email?: string) => {
-  const headers = email ? { authorization: `Bearer ${generateAccessToken(email)}` } : {};
+  const headers = email ? { authorization: `Bearer ${await tokenFor(email)}` } : {};
   const res = { status: vi.fn(), json: vi.fn() };
   res.status.mockReturnValue(res);
   res.json.mockReturnValue(res);
@@ -122,11 +122,49 @@ describe("POST /api/note", () => {
     ).toBe(404);
   });
 
+  it("answers 400 for a malformed note id or project id", async () => {
+    const projectId = await seed();
+
+    const malformedNote = await post(
+      { note: { ...note(projectId), _id: "not-an-object-id" } },
+      "owner@example.com",
+    );
+    const malformedProject = await post(
+      { action: NoteApiAction.REMOVE_DONE_NOTES, projectId: "not-an-object-id" },
+      "owner@example.com",
+    );
+
+    const bsonLookalike = await post(
+      {
+        action: NoteApiAction.REMOVE_DONE_NOTES,
+        projectId: { _bsontype: "ObjectId", $ne: null },
+      },
+      "owner@example.com",
+    );
+
+    for (const result of [malformedNote, malformedProject, bsonLookalike]) {
+      expect(result).toEqual({ status: 400, body: { msg: "Invalid note." } });
+    }
+  });
+
+  it("answers 400 for a note without content", async () => {
+    const projectId = await seed();
+
+    const { status } = await post(
+      { note: { ...note(projectId), content: undefined } },
+      "owner@example.com",
+    );
+
+    expect(status).toBe(400);
+    expect(await Note.countDocuments()).toBe(0);
+  });
+
   it("answers 500 with only a msg when the write fails", async () => {
     const projectId = await seed();
     vi.spyOn(console, "error").mockImplementation(() => {});
+    vi.spyOn(Note, "create").mockRejectedValueOnce(new Error("write failed"));
 
-    const result = await post({ note: { ...note(projectId), _id: "not-an-object-id" } });
+    const result = await post({ note: note(projectId) }, "owner@example.com");
 
     expect(result).toEqual({ status: 500, body: { msg: "Database error" } });
   });

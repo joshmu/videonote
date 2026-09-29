@@ -62,7 +62,7 @@ describe("createProject validation", () => {
     const owner = await seedOwner();
 
     for (const input of [{}, { title: "" }, { title: "   " }, { title: 7 }]) {
-      expect(await createProject(owner._id, input)).toEqual({ kind: "invalid" });
+      expect(await createProject(owner._id, input)).toEqual({ kind: "invalid", reason: "title" });
     }
     expect(await Project.countDocuments()).toBe(0);
     expect((await User.findById(owner._id)).projects).toEqual([]);
@@ -163,6 +163,20 @@ describe("shareProject / unshareProject", () => {
       }),
     ).toEqual({ kind: "notFound" });
     expect(await Share.countDocuments()).toBe(0);
+  });
+
+  it("reports invalid for a missing share or a malformed share id", async () => {
+    const owner = await seedOwner();
+    const project = await seedProject(owner);
+    const invalid = { kind: "invalid", reason: "share" };
+
+    expect(await shareProject(owner._id, project._id.toString(), undefined)).toEqual(invalid);
+    expect(await unshareProject(owner._id, project._id.toString(), undefined)).toEqual(invalid);
+    expect(
+      await unshareProject(owner._id, project._id.toString(), {
+        _id: { _bsontype: "ObjectId" } as never,
+      }),
+    ).toEqual(invalid);
   });
 
   it("unshares an owned project", async () => {

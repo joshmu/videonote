@@ -1,3 +1,4 @@
+import { Types } from "mongoose";
 import { describe, expect, it } from "vitest";
 
 import { Note, Project, Share, User } from "@/utils/mongoose";
@@ -118,5 +119,41 @@ describe("Share intake password handling", () => {
     await detachShare(project, { _id: otherShared.share._id.toString() });
 
     expect(await Share.countDocuments({ url: "other" })).toBe(1);
+  });
+});
+
+describe("Share intake writable fields", () => {
+  const foreign = () => ({
+    _id: new Types.ObjectId(),
+    project: new Types.ObjectId(),
+    user: new Types.ObjectId(),
+  });
+
+  it("ignores _id, project and user from the caller on create", async () => {
+    const { owner, project } = await seedProject();
+    const injected = foreign();
+
+    await attachOrUpdateShare(project, { url: "rough-cut", ...injected } as never);
+
+    const stored = await Share.findOne({ url: "rough-cut" });
+    expect(stored._id).not.toEqual(injected._id);
+    expect(stored.project).toEqual(project._id);
+    expect(stored.user).toEqual(owner._id);
+  });
+
+  it("ignores _id, project and user from the caller on update", async () => {
+    const { owner, project } = await seedProject();
+    const shared = await attachOrUpdateShare(project, { url: "rough-cut" });
+
+    await attachOrUpdateShare(project, {
+      url: "final-cut",
+      canEdit: false,
+      ...foreign(),
+    } as never);
+
+    const stored = await Share.findById(shared.share._id);
+    expect(stored).toMatchObject({ url: "final-cut", canEdit: false });
+    expect(stored.project).toEqual(project._id);
+    expect(stored.user).toEqual(owner._id);
   });
 });

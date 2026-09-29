@@ -25,7 +25,7 @@ Create a `.env.local` based on the `.env.example` for local development.
 
 ### Run it
 
-`npm i && npm run dev`
+`pnpm install && pnpm dev`
 
 ## API conventions
 

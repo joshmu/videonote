@@ -39,7 +39,7 @@ const parseCredentials = ({ email, password }: Credentials = {}): ParsedCredenti
 const session = (user: UserDoc): Session => ({
   kind: "ok",
   user,
-  token: generateAccessToken(user.email),
+  token: generateAccessToken(user._id.toString()),
 });
 
 const passwordMatches = async (user: UserDoc, password: unknown): Promise<boolean> =>
@@ -75,8 +75,8 @@ export const authenticate = async (
 
 /**
  * Change the profile fields a user may edit: `username` and `email`. Every
- * other field is ignored. The returned token is minted for the saved email so
- * the caller's session survives an email change.
+ * other field is ignored. The session token's subject is the User._id, so an
+ * email change keeps the session; a fresh token is still returned.
  */
 export const updateProfile = async (
   user: UserDoc,
@@ -101,9 +101,10 @@ export const updateProfile = async (
 
 /**
  * Delete the account after checking its password: owned Projects (via the
- * Project intake cascade), Notes the user wrote elsewhere, Shares, Settings,
- * then the User. Any failed step throws with the User still in place, so the
- * removal can be re-run.
+ * Project intake cascade, which takes their Notes), Shares, Settings, then
+ * the User. Notes the user wrote on other owners' Projects are kept with no
+ * author. Any failed step throws with the User still in place, so the removal
+ * can be re-run.
  */
 export const removeAccount = async (
   user: UserDoc,
@@ -111,7 +112,8 @@ export const removeAccount = async (
 ): Promise<{ kind: "ok" } | WrongPassword> => {
   if (!(await passwordMatches(user, password))) return { kind: "wrongPassword" };
   await removeUserProjects(user._id);
-  await Note.deleteMany({ user: user._id });
+  // Only Notes on other owners' Projects are left after the cascade.
+  await Note.updateMany({ user: user._id }, { $unset: { user: 1 } });
   await Share.deleteMany({ user: user._id });
   await Settings.deleteMany({ user: user._id });
   await User.deleteOne({ _id: user._id });
