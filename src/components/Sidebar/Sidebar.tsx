@@ -15,6 +15,7 @@ import { useEffect } from "react";
 
 import { NoteList } from "@/components/NoteList/NoteList";
 import { useGlobalContext } from "@/context/globalContext";
+import { useUiShellContext } from "@/context/uiShellContext";
 import { useResizable } from "@/hooks/useResizable";
 import { SETTINGS_DEFAULTS } from "@/shared/constants";
 
@@ -37,7 +38,8 @@ const sidebarVariants: Variants = {
 };
 
 export const Sidebar = (props: { [key: string]: any }) => {
-  const { settings, updateSettings, sidebarOpen } = useGlobalContext();
+  const { settings, updateSettings } = useGlobalContext();
+  const { sidebarOpen } = useUiShellContext();
 
   const { state: resizeState, handleStartResize } = useResizable({
     initialSize: settings.sidebarWidth,

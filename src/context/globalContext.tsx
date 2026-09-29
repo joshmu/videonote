@@ -13,7 +13,6 @@
 import Router from "next/router";
 import { createContext, useContext, useEffect, useRef, useState } from "react";
 
-import { usePrompt } from "@/hooks/usePrompt";
 import { SETTINGS_DEFAULTS } from "@/shared/constants";
 import {
   ProjectApiActions,
@@ -26,9 +25,7 @@ import { type ApiFailure, browserApi, browserSession, type ShareAccess } from "@
 
 import { ModalType } from "../components/Modals/Modals";
 import {
-  ActionInputFocusType,
   AlertProjectLoadedType,
-  CancelModalsType,
   CheckCanEditType,
   CreateProjectType,
   FetchWithPasswordPublicProjectType,
@@ -42,9 +39,6 @@ import {
   RemoveProjectType,
   RemoveShareProjectType,
   ShareProjectType,
-  ToggleMenuOpenType,
-  ToggleModalOpenType,
-  ToggleSidebarType,
   UpdateProjectType,
   UpdateProjectsStateWithUpdatedNotesType,
   UpdateSettingsType,
@@ -52,6 +46,7 @@ import {
   WarnLocalVideoType,
 } from "./globalContext.types";
 import { useNotificationContext } from "./notificationContext";
+import { useUiShellContext } from "./uiShellContext";
 
 const globalContext = createContext<GlobalContextInterface>(null!);
 
@@ -70,11 +65,6 @@ export const GlobalProvider = ({
 
   const [currentProject, setCurrentProject] = useState<ProjectInterface>(null!);
 
-  const [sidebarOpen, setSidebarOpen] = useState<boolean>(true);
-  const [menuOpen, setMenuOpen] = useState<boolean>(false);
-  const [modalsOpen, setModalsOpen] = useState<ModalType[]>([]);
-  const actionInputRef = useRef<HTMLInputElement | null>(null);
-
   // guest until the account is loaded; the ref lets actions started during
   // hydration (e.g. updateSettings from loadProject) see the value just set
   const [admin, setAdminState] = useState<boolean>(false);
@@ -85,7 +75,7 @@ export const GlobalProvider = ({
   };
 
   const { addAlert } = useNotificationContext();
-  const { promptState, createPrompt, confirmPrompt, cancelPrompt } = usePrompt();
+  const { modalsOpen, toggleModalOpen, createPrompt, cancelPrompt } = useUiShellContext();
 
   // initial load
   useEffect(() => {
@@ -262,26 +252,6 @@ export const GlobalProvider = ({
     const fullSettings = { ...SETTINGS_DEFAULTS, ...result.data.settings };
 
     setSettings(fullSettings);
-  };
-
-  const toggleMenuOpen: ToggleMenuOpenType = (state = undefined) => {
-    setMenuOpen(state ?? !menuOpen);
-  };
-
-  const toggleSidebar: ToggleSidebarType = (state = undefined) => {
-    setSidebarOpen((currentState) => state ?? !currentState);
-  };
-
-  const toggleModalOpen: ToggleModalOpenType = (modalName = undefined) => {
-    console.log("opening modal", modalName);
-    // if no param then turn off modals
-    if (!modalName) return setModalsOpen([]);
-    // if modal name exists then find it and remove from modals open list
-    if (modalsOpen.includes(modalName))
-      return setModalsOpen((currentModals) => currentModals.filter((modal) => modal !== modalName));
-    // otherwise add modal to list of open modals
-    setModalsOpen((currentModals) => [...currentModals, modalName]);
-    // setModalsOpen(modalsOpen === modalName ? null : modalName)
   };
 
   const createProject: CreateProjectType = async (projectData) => {
@@ -488,20 +458,8 @@ export const GlobalProvider = ({
     Router.push("/hello");
   };
 
-  const cancelModals: CancelModalsType = () => {
-    console.log("cancel modals");
-    if (modalsOpen.length > 0) setModalsOpen([]);
-    if (promptState.isOpen) cancelPrompt();
-    if (menuOpen) setMenuOpen(false);
-  };
-
   const checkCanEdit: CheckCanEditType = () => {
     return admin || ((currentProject?.share ?? {}) as ShareProjectInterface).canEdit;
-  };
-
-  const actionInputFocus: ActionInputFocusType = () => {
-    console.log("autoFocus");
-    actionInputRef.current.focus();
   };
 
   const warnLocalVideo: WarnLocalVideoType = (project) => {
@@ -528,31 +486,18 @@ export const GlobalProvider = ({
     project: currentProject,
     settings,
     updateSettings,
-    menuOpen,
-    toggleMenuOpen,
-    modalsOpen,
-    toggleModalOpen,
     createProject,
     loadProject,
-    sidebarOpen,
-    toggleSidebar,
     updateProject,
     handleInitialServerData,
     admin,
     removeAccount,
-    promptState,
-    createPrompt,
-    confirmPrompt,
-    cancelPrompt,
-    cancelModals,
     noteApi,
     noteApiRemoveDoneNotes,
     updateProjectsStateWithUpdatedNotes,
     shareProject,
     removeShareProject,
     checkCanEdit,
-    actionInputRef,
-    actionInputFocus,
     warnLocalVideo,
     projectsExist,
   };

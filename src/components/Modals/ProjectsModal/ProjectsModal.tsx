@@ -16,6 +16,7 @@ import { ImBin2 as TrashIcon } from "react-icons/im";
 
 import { Select } from "@/components/shared/Select/Select";
 import { useGlobalContext } from "@/context/globalContext";
+import { useUiShellContext } from "@/context/uiShellContext";
 import { ModalContainer } from "@/shared/Modal/ModalContainer";
 import { ModalHeader } from "@/shared/Modal/ModalHeader";
 import { ModalInnerContainer } from "@/shared/Modal/ModalInnerContainer";
@@ -29,13 +30,8 @@ export const ProjectsModal = ({
   toggle: () => void;
   motionKey: string;
 }) => {
-  const {
-    projects,
-    project: currentProject,
-    loadProject,
-    removeProject,
-    createPrompt,
-  } = useGlobalContext();
+  const { projects, project: currentProject, loadProject, removeProject } = useGlobalContext();
+  const { createPrompt } = useUiShellContext();
   const [mousingOverProjectItem, setMousingOverProjectItem] = useState<string>(null);
 
   const handleSelection = (_id: string): void => {

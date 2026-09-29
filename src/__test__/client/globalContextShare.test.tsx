@@ -2,7 +2,9 @@ import { act, render, waitFor } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { ProjectApiActions } from "@/components/shared/types";
-import { GlobalProvider, useGlobalContext } from "@/context/globalContext";
+import { AppProviders } from "@/context/appProviders";
+import { useGlobalContext } from "@/context/globalContext";
+import { useUiShellContext } from "@/context/uiShellContext";
 
 vi.mock("@/context/notificationContext", () => ({
   useNotificationContext: () => ({ addAlert: vi.fn() }),
@@ -12,9 +14,9 @@ vi.mock("next/router", () => ({ default: { push: vi.fn() } }));
 const project = { _id: "p1", title: "Rough cut", src: "v.mp4", user: "u1", notes: [] };
 const share = { _id: "s1", url: "rough-cut", canEdit: true };
 
-let ctx: ReturnType<typeof useGlobalContext>;
+let ctx: ReturnType<typeof useGlobalContext> & ReturnType<typeof useUiShellContext>;
 const Probe = () => {
-  ctx = useGlobalContext();
+  ctx = { ...useGlobalContext(), ...useUiShellContext() };
   return null;
 };
 
@@ -34,7 +36,7 @@ const stubFetch = () =>
 const renderSignedIn = async () => {
   await act(async () => {
     render(
-      <GlobalProvider
+      <AppProviders
         serverData={{
           user: {
             _id: "u1",
@@ -45,7 +47,7 @@ const renderSignedIn = async () => {
         }}
       >
         <Probe />
-      </GlobalProvider>,
+      </AppProviders>,
     );
   });
   await waitFor(() => expect(ctx.project?._id).toBe("p1"));

@@ -2,7 +2,9 @@ import { act, render, screen, waitFor } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import type { ProjectInterface } from "@/components/shared/types";
-import { GlobalProvider, useGlobalContext } from "@/context/globalContext";
+import { AppProviders } from "@/context/appProviders";
+import { useGlobalContext } from "@/context/globalContext";
+import { useUiShellContext } from "@/context/uiShellContext";
 import { NoteProvider, useNoteContext } from "@/context/noteContext";
 
 const mocks = vi.hoisted(() => ({ addAlert: vi.fn(), push: vi.fn() }));
@@ -25,18 +27,18 @@ const fetchStub = (routes: Record<string, Handler> = {}) =>
     return new Response(JSON.stringify(body), { status });
   });
 
-let ctx: ReturnType<typeof useGlobalContext>;
+let ctx: ReturnType<typeof useGlobalContext> & ReturnType<typeof useUiShellContext>;
 const Probe = () => {
-  ctx = useGlobalContext();
+  ctx = { ...useGlobalContext(), ...useUiShellContext() };
   return ctx.promptState.isOpen ? <div data-testid="prompt">{ctx.promptState.msg}</div> : null;
 };
 const promptText = () => screen.queryByTestId("prompt")?.textContent;
 
 const renderGlobal = (serverData: Record<string, unknown>) =>
   render(
-    <GlobalProvider serverData={serverData}>
+    <AppProviders serverData={serverData}>
       <Probe />
-    </GlobalProvider>,
+    </AppProviders>,
   );
 
 const sharedProject: ProjectInterface = {
@@ -200,9 +202,9 @@ describe("globalContext admin", () => {
 
     await act(async () => {
       render(
-        <GlobalProvider serverData={{ share: { kind: "ok", project: sharedProject } }}>
+        <AppProviders serverData={{ share: { kind: "ok", project: sharedProject } }}>
           <Recorder />
-        </GlobalProvider>,
+        </AppProviders>,
       );
     });
 
@@ -277,12 +279,12 @@ describe("globalContext project notes", () => {
     };
     await act(async () => {
       render(
-        <GlobalProvider serverData={signedInData({ _id: "set1", currentProject: "p1" })}>
+        <AppProviders serverData={signedInData({ _id: "set1", currentProject: "p1" })}>
           <NoteProvider>
             <Probe />
             <NotesProbe />
           </NoteProvider>
-        </GlobalProvider>,
+        </AppProviders>,
       );
     });
     await waitFor(() => expect(notesCtx.notes).toHaveLength(1));

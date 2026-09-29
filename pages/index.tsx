@@ -18,8 +18,8 @@ import { Modals } from "@/components/Modals/Modals";
 import { Notification } from "@/components/Notification/Notification";
 import { Sidebar } from "@/components/Sidebar/Sidebar";
 import { VideoPlayer } from "@/components/VideoPlayer/VideoPlayer";
+import { AppProviders } from "@/context/appProviders";
 import { ControlsProvider } from "@/context/controlsContext";
-import { GlobalProvider } from "@/context/globalContext";
 import { NoteProvider } from "@/context/noteContext";
 import { VideoProvider } from "@/context/videoContext";
 import { AppContainer } from "@/layout/AppContainer/AppContainer";
@@ -33,7 +33,7 @@ interface Props {
 
 const IndexPage: NextPage<Props> = ({ serverData = {} }) => {
   return (
-    <GlobalProvider serverData={serverData}>
+    <AppProviders serverData={serverData}>
       <VideoProvider>
         <NoteProvider>
           <ControlsProvider>
@@ -50,7 +50,7 @@ const IndexPage: NextPage<Props> = ({ serverData = {} }) => {
           </ControlsProvider>
         </NoteProvider>
       </VideoProvider>
-    </GlobalProvider>
+    </AppProviders>
   );
 };
 

@@ -13,6 +13,7 @@
 import React from "react";
 
 import { useGlobalContext } from "@/context/globalContext";
+import { useUiShellContext } from "@/context/uiShellContext";
 import { useNoteContext } from "@/root/src/context/noteContext";
 
 import { Menu } from "./Menu/Menu";
@@ -22,7 +23,8 @@ import { SidebarOpenIcon } from "./SidebarOpenIcon/SidebarOpenIcon";
 import { SidebarTitle } from "./SidebarTitle/SidebarTitle";
 
 export const SidebarHeader = () => {
-  const { sidebarOpen, toggleSidebar, projectsExist, project } = useGlobalContext();
+  const { projectsExist, project } = useGlobalContext();
+  const { sidebarOpen, toggleSidebar } = useUiShellContext();
   const { notesExist } = useNoteContext();
 
   const toggleOpen = (): void => {
