@@ -123,7 +123,8 @@ receives their **Project** in, from `/api/auth`, `/api/project` and the
 **Share intake**. Notes go through `toPublicNote` (authors with their
 **Author role**, never an email) and the **Share** is `{ _id, url, canEdit,
 hasPassword }`, never the password hash. Notes and Share not populated (the
-create, update and remove replies) are sent as ids.
+create, update and remove replies) are sent as ids. `src` is `""` when the
+Project has no video yet.
 
 **Project cascade**:
 The one removal path, used by `removeProject` and (through

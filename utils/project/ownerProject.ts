@@ -13,7 +13,8 @@ export type OwnerShare = { _id: string; url: string; canEdit: boolean; hasPasswo
 export type OwnerProject = {
   _id: string;
   title: string;
-  src?: string;
+  /** Empty when the Project has no video yet. */
+  src: string;
   user: string;
   notes: Array<PublicNote | string>;
   share: OwnerShare | string | null;
@@ -36,7 +37,7 @@ const toOwnerShare = (share: unknown): OwnerShare | string | null => {
 export const toOwnerProject = (projectDoc: ProjectDoc): OwnerProject => ({
   _id: projectDoc._id.toString(),
   title: projectDoc.title,
-  src: projectDoc.src ?? undefined,
+  src: projectDoc.src ?? "",
   user: projectDoc.user.toString(),
   notes: (projectDoc.notes as unknown[]).map((note) =>
     note instanceof Types.ObjectId

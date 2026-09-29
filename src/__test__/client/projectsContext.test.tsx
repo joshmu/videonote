@@ -122,6 +122,15 @@ describe("projectsContext open", () => {
     await waitFor(() => expect(result.current.modalsOpen).toEqual([ModalType.CURRENT_PROJECT]));
   });
 
+  it("asks for a video source when the loaded project has no src at all", async () => {
+    const { src: _src, ...noSrc } = project("p1");
+    const { result } = renderProjects({ "/api/project": () => ok({ project: noSrc }) });
+
+    await signIn(result, [noSrc as ProjectInterface]);
+
+    await waitFor(() => expect(result.current.modalsOpen).toEqual([ModalType.CURRENT_PROJECT]));
+  });
+
   it("shows a shared project on its own", () => {
     const { result } = renderProjects();
 

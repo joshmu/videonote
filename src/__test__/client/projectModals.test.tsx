@@ -50,6 +50,16 @@ describe("project modals keep edits across note changes", () => {
     expect(input(container, "title").value).toBe("Final cut");
   });
 
+  it("CurrentProjectModal offers a local video for a project with no src", () => {
+    const { src: _src, ...noSrc } = project;
+    mocks.projects.project = noSrc;
+
+    const { container } = render(<CurrentProjectModal toggle={vi.fn()} motionKey="current" />);
+
+    expect(input(container, "title").value).toBe("Rough cut");
+    expect(input(container, "src").value).toBe("");
+  });
+
   it("CurrentProjectModal picks up a different project", () => {
     const modal = () => <CurrentProjectModal toggle={vi.fn()} motionKey="current" />;
     const { container, rerender } = render(modal());

@@ -211,7 +211,7 @@ export const ProjectsProvider = ({ children }: { children: React.ReactNode }) =>
     }
 
     alertProjectLoaded(project);
-    if (project.src.length === 0) warnLocalVideo(project);
+    if (!project.src) warnLocalVideo(project);
   };
 
   const createProject: CreateProjectType = async (projectData) => {
