@@ -1,5 +1,5 @@
-import { fireEvent, render } from "@testing-library/react";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { act, fireEvent, render } from "@testing-library/react";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { ControlsProvider } from "@/context/controlsContext";
 
@@ -32,6 +32,36 @@ const pressShiftArrow = (key: "ArrowLeft" | "ArrowRight") => {
   fireEvent.keyDown(window, { key: "Shift" });
   fireEvent.keyDown(window, { key });
 };
+
+/**
+ * Dispatches a keydown the way a browser does: microtasks run after each
+ * listener, so React commits (and runs effects) between listeners. A listener
+ * removed mid-dispatch is skipped; one added mid-dispatch waits for the next event.
+ */
+const trackKeydownListeners = () => {
+  const listeners: EventListener[] = [];
+  const add = window.addEventListener.bind(window);
+  const remove = window.removeEventListener.bind(window);
+  vi.spyOn(window, "addEventListener").mockImplementation((type, listener, options) => {
+    if (type === "keydown") listeners.push(listener as EventListener);
+    add(type, listener, options);
+  });
+  vi.spyOn(window, "removeEventListener").mockImplementation((type, listener, options) => {
+    if (type === "keydown") listeners.splice(listeners.indexOf(listener as EventListener), 1);
+    remove(type, listener, options);
+  });
+  return async (key: string) => {
+    const event = new KeyboardEvent("keydown", { key });
+    for (const listener of listeners.slice()) {
+      if (!listeners.includes(listener)) continue;
+      await act(async () => listener(event));
+    }
+  };
+};
+
+afterEach(() => {
+  vi.restoreAllMocks();
+});
 
 beforeEach(() => {
   vi.clearAllMocks();
@@ -75,5 +105,23 @@ describe("controlsContext", () => {
 
     expect(mocks.video.seekTo).toHaveBeenCalledWith(30, { offset: false });
     expect(mocks.note.notes.map((n) => n._id)).toEqual(["a", "b"]);
+  });
+
+  it("opens the menu on Alt when the browser commits between keydown listeners", async () => {
+    const pressInBrowser = trackKeydownListeners();
+    renderControls();
+
+    await pressInBrowser("Alt");
+
+    expect(mocks.uiShell.toggleMenuOpen).toHaveBeenCalledTimes(1);
+  });
+
+  it("plays on space when the browser commits between keydown listeners", async () => {
+    const pressInBrowser = trackKeydownListeners();
+    renderControls();
+
+    await pressInBrowser(" ");
+
+    expect(mocks.video.togglePlay).toHaveBeenCalledTimes(1);
   });
 });

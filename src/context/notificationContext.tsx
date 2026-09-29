@@ -60,8 +60,7 @@ export const NotificationProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const removeAlert: RemoveAlertType = (id) => {
-    const updatedAlerts = alerts.filter((alert) => alert.id !== id);
-    setAlerts(updatedAlerts);
+    setAlerts((currentAlerts) => currentAlerts.filter((alert) => alert.id !== id));
   };
 
   const value: NotificationContextInterface = {

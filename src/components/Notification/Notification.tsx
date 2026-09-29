@@ -127,6 +127,7 @@ const AlertTitle = ({ children }: { children: ReactNode }) => (
   <span className="font-semibold text-themeAccent">{children}</span>
 );
 
+// a div: a message may hold block content (the local file picker)
 const AlertMsg = ({ children }: { children: ReactNode }) => (
-  <p className="text-sm text-themeText">{children}</p>
+  <div className="text-sm text-themeText">{children}</div>
 );
