@@ -15,7 +15,7 @@ import { useState } from "react";
 import { ImBin2 as TrashIcon } from "react-icons/im";
 
 import { Select } from "@/components/shared/Select/Select";
-import { useGlobalContext } from "@/context/globalContext";
+import { useProjectsContext } from "@/context/projectsContext";
 import { useUiShellContext } from "@/context/uiShellContext";
 import { ModalContainer } from "@/shared/Modal/ModalContainer";
 import { ModalHeader } from "@/shared/Modal/ModalHeader";
@@ -30,7 +30,7 @@ export const ProjectsModal = ({
   toggle: () => void;
   motionKey: string;
 }) => {
-  const { projects, project: currentProject, loadProject, removeProject } = useGlobalContext();
+  const { projects, project: currentProject, loadProject, removeProject } = useProjectsContext();
   const { createPrompt } = useUiShellContext();
   const [mousingOverProjectItem, setMousingOverProjectItem] = useState<string>(null);
 

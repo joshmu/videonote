@@ -1,71 +1,63 @@
-/**
- * @path /src/context/globalContext.tsx
- *
- * @project videonote
- * @file globalContext.tsx
- *
- * @author Josh Mu <hello@joshmu.dev>
- * @created Tuesday, 6th October 2020
- * @modified Tuesday, 1st December 2020 12:27:56 pm
- * @copyright © 2020 - 2020 MU
- */
-
-import Router from "next/router";
 import { createContext, useContext, useEffect, useState } from "react";
 
+import { ModalType } from "@/components/Modals/Modals";
 import {
+  type NoteInterface,
   ProjectApiActions,
-  ProjectInterface,
-  ShareProjectInterface,
-} from "@/root/src/components/shared/types";
-import type { ShareAccess } from "@/utils/apiClient";
+  type ProjectInterface,
+  type ShareProjectInterface,
+} from "@/shared/types";
+import type { ProjectReply } from "@/utils/apiClient";
 
-import { ModalType } from "../components/Modals/Modals";
-import {
-  AlertProjectLoadedType,
-  CheckCanEditType,
-  CreateProjectType,
-  FetchWithPasswordPublicProjectType,
-  GlobalContextInterface,
-  HandleInitialServerDataType,
-  LoadProjectType,
-  ProjectApiType,
-  RemoveProjectType,
-  RemoveShareProjectType,
-  ShareProjectType,
-  UpdateProjectType,
-  UpdateProjectsStateWithUpdatedNotesType,
-  WarnLocalVideoType,
-} from "./globalContext.types";
 import { useNotificationContext } from "./notificationContext";
-import { useSessionContext } from "./sessionContext";
+import { type SessionAccount, useSessionContext } from "./sessionContext";
 import { useUiShellContext } from "./uiShellContext";
 
-const globalContext = createContext<GlobalContextInterface>(null!);
+export type UpdateProjectType = (
+  projectData: ProjectInterface | { _id?: string; src: string },
+) => Promise<void>;
+export type ShareProjectType = (shareData: ShareProjectInterface) => Promise<boolean>;
+export type RemoveShareProjectType = () => Promise<boolean>;
+export type UpdateProjectsStateWithUpdatedNotesType = (notes: NoteInterface[]) => Promise<void>;
+export type LoadProjectType = (projectId: string) => Promise<void>;
+export type CreateProjectType = (
+  projectData: ProjectInterface | { title: string; src: string },
+) => Promise<void>;
+export type RemoveProjectType = (_id: string) => Promise<void>;
+type AlertProjectLoadedType = (project: ProjectInterface) => void;
+type WarnLocalVideoType = (project: ProjectInterface) => void;
+type ProjectApiType = (
+  action: ProjectApiActions,
+  project: Partial<ProjectInterface>,
+  share?: Partial<ShareProjectInterface>,
+) => Promise<ProjectReply | void>;
 
-export const GlobalProvider = ({
-  children,
-  serverData,
-  ...props
-}: {
-  children: React.ReactElement;
-  serverData: {};
-  props?: {};
-}) => {
+interface ProjectsContextInterface {
+  projects: ProjectInterface[];
+  project: ProjectInterface;
+  projectsExist: boolean;
+  openProjects: (account: SessionAccount) => void;
+  showSharedProject: (project: ProjectInterface) => void;
+  createProject: CreateProjectType;
+  loadProject: LoadProjectType;
+  updateProject: UpdateProjectType;
+  removeProject: RemoveProjectType;
+  shareProject: ShareProjectType;
+  removeShareProject: RemoveShareProjectType;
+  updateProjectsStateWithUpdatedNotes: UpdateProjectsStateWithUpdatedNotesType;
+  warnLocalVideo: WarnLocalVideoType;
+}
+
+const projectsContext = createContext<ProjectsContextInterface>(null!);
+
+/** The Projects on screen and the current one, with the owner's project and Share changes. */
+export const ProjectsProvider = ({ children }: { children: React.ReactNode }) => {
   const [projects, setProjects] = useState<ProjectInterface[]>([]);
-
   const [currentProject, setCurrentProject] = useState<ProjectInterface>(null!);
 
   const { addAlert } = useNotificationContext();
-  const { api, user, admin, settings, startSession, updateSettings, reportFailure } =
-    useSessionContext();
-  const { modalsOpen, toggleModalOpen, createPrompt, cancelPrompt } = useUiShellContext();
-
-  // initial load
-  useEffect(() => {
-    // initial response from server
-    handleInitialServerData(serverData);
-  }, []);
+  const { api, user, admin, settings, updateSettings, reportFailure } = useSessionContext();
+  const { modalsOpen, toggleModalOpen } = useUiShellContext();
 
   // notification recommend creating a project if there are no projects and we have loaded the user
   useEffect(() => {
@@ -92,6 +84,35 @@ export const GlobalProvider = ({
     if (projects.length === 0 && settings.currentProject)
       updateSettings({ currentProject: null, _id: settings._id });
   }, [projects, settings]);
+
+  // the signed-in account's projects: load the stored current one, else the last
+  const openProjects = ({ projects, settings }: SessionAccount): void => {
+    setProjects(projects);
+
+    if (projects.length > 0) {
+      let currentProject: ProjectInterface;
+
+      // if settings data is passed back and we have a currentProject Id
+      // stored then lets find the project and assign
+      if (settings && settings.currentProject) {
+        currentProject = (projects as ProjectInterface[]).find(
+          (project) => project._id === settings.currentProject,
+        );
+      }
+      // if we still don't have anything then just grab last project entry in the list
+      if (!currentProject) {
+        currentProject = projects.slice(-1)[0];
+      }
+
+      loadProject(currentProject._id);
+    }
+  };
+
+  const showSharedProject = (project: ProjectInterface): void => {
+    setProjects([project]);
+    setCurrentProject(project);
+    alertProjectLoaded(project);
+  };
 
   const updateProject: UpdateProjectType = async (projectData) => {
     if (!admin) return;
@@ -241,97 +262,6 @@ export const GlobalProvider = ({
     }
   };
 
-  const fetchWithPasswordPublicProject: FetchWithPasswordPublicProjectType = (password) => {
-    // get id
-    const shareUrl = window.location.pathname.split("/").slice(-1)[0];
-    return api.openShare(shareUrl, password);
-  };
-
-  const promptForSharePassword = (message: React.ReactElement): void => {
-    createPrompt({
-      msg: (
-        <div>
-          <h2 className="mb-2 text-xl font-bold text-themeAccent">
-            <a href="/">VideoNote</a>
-          </h2>
-          {message}
-        </div>
-      ),
-      passwordRequired: true,
-      action: async (data: any) => {
-        cancelPrompt();
-        const { password } = data;
-        setTimeout(async () => {
-          // get password and send again
-          handleShareAccess(await fetchWithPasswordPublicProject(password));
-        }, 300);
-      },
-    });
-  };
-
-  // A guest reads a Share through the public route only; its reply is the whole project.
-  const handleShareAccess = (access: ShareAccess): void => {
-    switch (access.kind) {
-      case "passwordRequired":
-        return promptForSharePassword(
-          <span className="whitespace-pre">
-            A <span className="text-themeAccent">password </span>
-            is required to access this project
-          </span>,
-        );
-      case "incorrect":
-        return promptForSharePassword(
-          <span className="whitespace-pre">
-            The <span className="text-themeAccent">password </span>
-            is incorrect. Do you want to try again?
-          </span>,
-        );
-      case "ok":
-        setProjects([access.project]);
-        setCurrentProject(access.project);
-        alertProjectLoaded(access.project);
-        return;
-      case "notFound":
-      case "error":
-        // redirect to homepage for a guest
-        addAlert({
-          type: "error",
-          msg: access.kind === "error" ? access.msg : "Share url does not exist.",
-        });
-        Router.push("/");
-    }
-  };
-
-  //-------------------------------
-  const handleInitialServerData: HandleInitialServerDataType = (data) => {
-    if (data.share) return handleShareAccess(data.share);
-
-    const account = startSession(data);
-    if (!account) return;
-    const { projects, settings } = account;
-    setProjects(projects);
-
-    if (projects.length > 0) {
-      let currentProject: ProjectInterface;
-
-      // if settings data is passed back and we have a currentProject Id
-      // stored then lets find the project and assign
-      if (settings && settings.currentProject) {
-        currentProject = (projects as ProjectInterface[]).find(
-          (project) => project._id === settings.currentProject,
-        );
-      }
-      // if we still don't have anything then just grab last project entry in the list
-      if (!currentProject) {
-        currentProject = projects.slice(-1)[0];
-      }
-
-      loadProject(currentProject._id);
-      // setCurrentProject(currentProject)
-      // alertProjectLoaded(currentProject)
-    }
-  };
-
   const alertProjectLoaded: AlertProjectLoadedType = (project) => {
     // notification when we load a project
     addAlert({
@@ -344,10 +274,6 @@ export const GlobalProvider = ({
     const result = await api.project(action, project, share);
     if (result.kind !== "ok") return reportFailure(result);
     return result.data;
-  };
-
-  const checkCanEdit: CheckCanEditType = () => {
-    return admin || ((currentProject?.share ?? {}) as ShareProjectInterface).canEdit;
   };
 
   const warnLocalVideo: WarnLocalVideoType = (project) => {
@@ -366,29 +292,23 @@ export const GlobalProvider = ({
 
   const projectsExist: boolean = projects.length > 0;
 
-  const value: GlobalContextInterface = {
+  const value: ProjectsContextInterface = {
     projects,
-    removeProject,
     project: currentProject,
+    projectsExist,
+    openProjects,
+    showSharedProject,
     createProject,
     loadProject,
     updateProject,
-    handleInitialServerData,
-    updateProjectsStateWithUpdatedNotes,
+    removeProject,
     shareProject,
     removeShareProject,
-    checkCanEdit,
+    updateProjectsStateWithUpdatedNotes,
     warnLocalVideo,
-    projectsExist,
   };
 
-  return (
-    <globalContext.Provider value={value} {...props}>
-      {children}
-    </globalContext.Provider>
-  );
+  return <projectsContext.Provider value={value}>{children}</projectsContext.Provider>;
 };
 
-export const useGlobalContext = (): GlobalContextInterface => {
-  return useContext(globalContext);
-};
+export const useProjectsContext = (): ProjectsContextInterface => useContext(projectsContext);

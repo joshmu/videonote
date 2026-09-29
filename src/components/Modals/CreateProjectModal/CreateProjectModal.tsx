@@ -13,7 +13,7 @@
 import { ChangeEvent, useState } from "react";
 
 import { ModalPrimaryBtn } from "@/components/shared/Modal/ModalBtn";
-import { useGlobalContext } from "@/context/globalContext";
+import { useProjectsContext } from "@/context/projectsContext";
 import { useNotificationContext } from "@/context/notificationContext";
 import { LocalVideoForm } from "@/shared/LocalVideoForm/LocalVideoForm";
 import { ModalContainer } from "@/shared/Modal/ModalContainer";
@@ -29,7 +29,7 @@ export const CreateProjectModal = ({
   toggle: () => void;
   motionKey: string;
 }) => {
-  const { createProject } = useGlobalContext();
+  const { createProject } = useProjectsContext();
   const { addAlert } = useNotificationContext();
 
   const [project, setProject] = useState<{ title: string; src: string }>({

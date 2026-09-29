@@ -16,14 +16,14 @@ import { AnimatePresence, motion } from "motion/react";
 import React, { useEffect, useState } from "react";
 import { BsCloudDownload as DownloadIcon } from "react-icons/bs";
 
-import { useGlobalContext } from "@/context/globalContext";
+import { useProjectsContext } from "@/context/projectsContext";
 import { useNotificationContext } from "@/context/notificationContext";
 import { ProjectInterface } from "@/shared/types";
 import { formatDuration } from "@/utils/clientHelpers";
 import { useNoteContext } from "@/root/src/context/noteContext";
 
 export const ExportNotes = ({ dynamicLabel = true }: { dynamicLabel?: boolean }) => {
-  const { project } = useGlobalContext();
+  const { project } = useProjectsContext();
   const { notesExist } = useNoteContext();
   const { addAlert } = useNotificationContext();
 

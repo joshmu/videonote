@@ -15,7 +15,7 @@ import { ChangeEvent, FormEvent, MouseEvent, useEffect, useState } from "react";
 
 import { ModalPrimaryBtn } from "@/components/shared/Modal/ModalBtn";
 import { ToggleInput } from "@/components/shared/Toggle/Toggle";
-import { useGlobalContext } from "@/context/globalContext";
+import { useProjectsContext } from "@/context/projectsContext";
 import { useNotificationContext } from "@/context/notificationContext";
 import { ModalContainer } from "@/shared/Modal/ModalContainer";
 import { ModalForm } from "@/shared/Modal/ModalForm";
@@ -35,7 +35,7 @@ export const ShareProjectModal = ({
   toggle: () => void;
   motionKey: string;
 }) => {
-  const { project, shareProject, removeShareProject } = useGlobalContext();
+  const { project, shareProject, removeShareProject } = useProjectsContext();
   const { addAlert } = useNotificationContext();
   const defaults = {
     url: `${formatUrl(project.title)}`,

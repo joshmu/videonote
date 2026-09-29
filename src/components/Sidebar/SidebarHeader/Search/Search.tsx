@@ -13,11 +13,11 @@
 import { ChangeEvent, useEffect } from "react";
 
 import { useControlsContext } from "@/context/controlsContext";
-import { useGlobalContext } from "@/context/globalContext";
+import { useProjectsContext } from "@/context/projectsContext";
 import { useNoteContext } from "@/context/noteContext";
 
 export const Search = () => {
-  const { project } = useGlobalContext();
+  const { project } = useProjectsContext();
   const { search, updateSearch } = useNoteContext();
   const { toggleSmartControls } = useControlsContext();
 

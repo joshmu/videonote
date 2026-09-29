@@ -3,10 +3,10 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import type { ProjectInterface } from "@/components/shared/types";
 import { AppProviders } from "@/context/appProviders";
-import { useGlobalContext } from "@/context/globalContext";
 import { useSessionContext } from "@/context/sessionContext";
 import { useUiShellContext } from "@/context/uiShellContext";
 import { NoteProvider, useNoteContext } from "@/context/noteContext";
+import { useProjectsContext } from "@/context/projectsContext";
 
 const mocks = vi.hoisted(() => ({ addAlert: vi.fn(), push: vi.fn() }));
 
@@ -28,16 +28,16 @@ const fetchStub = (routes: Record<string, Handler> = {}) =>
     return new Response(JSON.stringify(body), { status });
   });
 
-let ctx: ReturnType<typeof useGlobalContext> &
+let ctx: ReturnType<typeof useProjectsContext> &
   ReturnType<typeof useSessionContext> &
   ReturnType<typeof useUiShellContext>;
 const Probe = () => {
-  ctx = { ...useGlobalContext(), ...useSessionContext(), ...useUiShellContext() };
+  ctx = { ...useProjectsContext(), ...useSessionContext(), ...useUiShellContext() };
   return ctx.promptState.isOpen ? <div data-testid="prompt">{ctx.promptState.msg}</div> : null;
 };
 const promptText = () => screen.queryByTestId("prompt")?.textContent;
 
-const renderGlobal = (serverData: Record<string, unknown>) =>
+const renderApp = (serverData: Record<string, unknown>) =>
   render(
     <AppProviders serverData={serverData}>
       <Probe />
@@ -61,13 +61,13 @@ afterEach(() => {
   vi.unstubAllGlobals();
 });
 
-describe("globalContext hydration", () => {
+describe("AppProviders hydration", () => {
   it("shows a guest the shared project and its notes from the public payload", async () => {
     const fetch = fetchStub();
     vi.stubGlobal("fetch", fetch);
 
     await act(async () => {
-      renderGlobal({ share: { kind: "ok", project: sharedProject } });
+      renderApp({ share: { kind: "ok", project: sharedProject } });
     });
 
     expect(ctx.admin).toBe(false);
@@ -85,7 +85,7 @@ describe("globalContext hydration", () => {
     vi.stubGlobal("fetch", fetch);
 
     await act(async () => {
-      renderGlobal({
+      renderApp({
         user: {
           _id: "u1",
           username: "owner",
@@ -114,7 +114,7 @@ describe("globalContext hydration", () => {
     vi.stubGlobal("fetch", fetch);
 
     await act(async () => {
-      renderGlobal({ share: { kind: "passwordRequired" } });
+      renderApp({ share: { kind: "passwordRequired" } });
     });
     expect(ctx.promptState.passwordRequired).toBe(true);
     expect(promptText()).toMatch(/password is required/);
@@ -133,7 +133,7 @@ describe("globalContext hydration", () => {
     vi.stubGlobal("fetch", fetchStub());
 
     await act(async () => {
-      renderGlobal({ msg: "Database error" });
+      renderApp({ msg: "Database error" });
     });
 
     expect(mocks.push).toHaveBeenCalledWith("/login");
@@ -144,7 +144,7 @@ describe("globalContext hydration", () => {
     vi.stubGlobal("fetch", fetchStub());
 
     await act(async () => {
-      renderGlobal({
+      renderApp({
         user: { _id: "u1", username: "owner", email: "owner@example.com", projects: [] },
       });
     });
@@ -166,11 +166,11 @@ const signedInData = (settings: Record<string, unknown>) => ({
   },
 });
 
-describe("globalContext removeAccount", () => {
+describe("AppProviders removeAccount", () => {
   const renderSignedIn = async (reply: { status: number; body: unknown }) => {
     vi.stubGlobal("fetch", fetchStub({ "/api/user": () => reply }));
     await act(async () => {
-      renderGlobal({
+      renderApp({
         user: { _id: "u1", username: "owner", email: "owner@example.com", projects: [] },
       });
     });
@@ -194,7 +194,7 @@ describe("globalContext removeAccount", () => {
   });
 });
 
-describe("globalContext admin", () => {
+describe("AppProviders admin", () => {
   it("starts as a guest until the account is loaded", async () => {
     const seen: boolean[] = [];
     const Recorder = () => {
@@ -226,7 +226,7 @@ describe("globalContext admin", () => {
     vi.stubGlobal("fetch", fetch);
 
     await act(async () => {
-      renderGlobal(signedInData({ _id: "set1", currentProject: null }));
+      renderApp(signedInData({ _id: "set1", currentProject: null }));
     });
 
     await waitFor(() => expect(ctx.settings.currentProject).toBe("p1"));
@@ -234,7 +234,7 @@ describe("globalContext admin", () => {
   });
 });
 
-describe("globalContext project notes", () => {
+describe("AppProviders project notes", () => {
   it("replaces the current project's notes without mutating the previous project", async () => {
     vi.stubGlobal(
       "fetch",
@@ -247,7 +247,7 @@ describe("globalContext project notes", () => {
       }),
     );
     await act(async () => {
-      renderGlobal(signedInData({ _id: "set1", currentProject: "p1" }));
+      renderApp(signedInData({ _id: "set1", currentProject: "p1" }));
     });
     await waitFor(() => expect(ctx.project?._id).toBe("p1"));
     const previous = ctx.projects[0];

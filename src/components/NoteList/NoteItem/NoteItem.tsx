@@ -14,7 +14,7 @@ import { Variants, motion } from "motion/react";
 import { ChangeEvent, KeyboardEvent, useEffect, useState } from "react";
 
 import { useControlsContext } from "@/context/controlsContext";
-import { useGlobalContext } from "@/context/globalContext";
+import { useProjectsContext } from "@/context/projectsContext";
 import { useNoteContext } from "@/context/noteContext";
 import { useSessionContext } from "@/context/sessionContext";
 import { useVideoContext } from "@/context/videoContext";
@@ -32,7 +32,7 @@ interface NoteItemInterface {
 }
 
 export const NoteItem = ({ note, closestProximity, childVariants }: NoteItemInterface) => {
-  const { project } = useGlobalContext();
+  const { project } = useProjectsContext();
   const { admin, user } = useSessionContext();
   const { seekTo } = useVideoContext();
   const { toggleSmartControls } = useControlsContext();

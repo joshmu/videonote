@@ -17,8 +17,9 @@ import { useNoteProximity } from "@/hooks/useNoteProximity";
 import { NoteInterface } from "@/root/src/components/shared/types";
 import { createObjectId } from "@/utils/clientHelpers";
 
-import { useGlobalContext } from "./globalContext";
+import { useProjectsContext } from "./projectsContext";
 import { useSessionContext } from "./sessionContext";
+import { useSharedProjectContext } from "./sharedProjectContext";
 import { useVideoContext } from "./videoContext";
 
 type AddNoteType = (note: NoteInterface | { content: string; time: number }) => void;
@@ -42,8 +43,8 @@ interface NoteContextInterface {
 const noteContext = createContext<NoteContextInterface>(null!);
 
 export function NoteProvider(props: { [key: string]: any }) {
-  const { project, projects, updateProjectsStateWithUpdatedNotes, checkCanEdit } =
-    useGlobalContext();
+  const { project, projects, updateProjectsStateWithUpdatedNotes } = useProjectsContext();
+  const { checkCanEdit } = useSharedProjectContext();
   const { api, user, reportFailure } = useSessionContext();
   const { progress } = useVideoContext();
   const [notes, setNotes] = useState<NoteInterface[]>([]);

@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 // Bugs 1 & 2 (share actions sent in lowercase) are covered by behaviour tests
-// in `client/globalContextShare.test.tsx`, which assert the request body.
+// in `client/projectsContext.test.tsx`, which assert the request body.
 
 // ============================================================
 // Bug 3: ShareProjectModal passes `state` instead of `shareData`

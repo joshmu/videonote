@@ -4,9 +4,9 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { CurrentProjectModal } from "@/components/Modals/CurrentProjectModal/CurrentProjectModal";
 import { ShareProjectModal } from "@/components/Modals/ShareProjectModal/ShareProjectModal";
 
-const mocks = vi.hoisted(() => ({ global: {} as Record<string, any> }));
+const mocks = vi.hoisted(() => ({ projects: {} as Record<string, any> }));
 
-vi.mock("@/context/globalContext", () => ({ useGlobalContext: () => mocks.global }));
+vi.mock("@/context/projectsContext", () => ({ useProjectsContext: () => mocks.projects }));
 vi.mock("@/context/notificationContext", () => ({
   useNotificationContext: () => ({ addAlert: vi.fn() }),
 }));
@@ -22,15 +22,15 @@ const project = {
 
 // the same project after a note was added: a new object with the same _id and share
 const withAnotherNote = () => ({
-  ...mocks.global.project,
-  notes: [...mocks.global.project.notes, { _id: "n2", content: "Grade", project: "p1" }],
+  ...mocks.projects.project,
+  notes: [...mocks.projects.project.notes, { _id: "n2", content: "Grade", project: "p1" }],
 });
 
 const input = (container: HTMLElement, id: string) =>
   container.querySelector<HTMLInputElement>(`#${id}`)!;
 
 beforeEach(() => {
-  mocks.global = {
+  mocks.projects = {
     project,
     updateProject: vi.fn(),
     shareProject: vi.fn(),
@@ -44,7 +44,7 @@ describe("project modals keep edits across note changes", () => {
     const { container, rerender } = render(modal());
     fireEvent.change(input(container, "title"), { target: { id: "title", value: "Final cut" } });
 
-    mocks.global.project = withAnotherNote();
+    mocks.projects.project = withAnotherNote();
     rerender(modal());
 
     expect(input(container, "title").value).toBe("Final cut");
@@ -55,7 +55,7 @@ describe("project modals keep edits across note changes", () => {
     const { container, rerender } = render(modal());
     fireEvent.change(input(container, "title"), { target: { id: "title", value: "Final cut" } });
 
-    mocks.global.project = { ...project, _id: "p2", title: "Other" };
+    mocks.projects.project = { ...project, _id: "p2", title: "Other" };
     rerender(modal());
 
     expect(input(container, "title").value).toBe("Other");
@@ -66,7 +66,7 @@ describe("project modals keep edits across note changes", () => {
     const { container, rerender } = render(modal());
     fireEvent.change(input(container, "url"), { target: { id: "url", value: "final" } });
 
-    mocks.global.project = withAnotherNote();
+    mocks.projects.project = withAnotherNote();
     rerender(modal());
 
     expect(input(container, "url").value).toBe("final");
@@ -77,7 +77,7 @@ describe("project modals keep edits across note changes", () => {
     const { container, rerender } = render(modal());
     fireEvent.change(input(container, "url"), { target: { id: "url", value: "final" } });
 
-    mocks.global.project = { ...project, share: { ...project.share, url: "saved" } };
+    mocks.projects.project = { ...project, share: { ...project.share, url: "saved" } };
     rerender(modal());
 
     expect(input(container, "url").value).toBe("saved");

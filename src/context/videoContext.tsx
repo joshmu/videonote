@@ -15,8 +15,8 @@ import { type RefObject, createContext, useContext, useEffect, useRef, useState 
 import { ProgressInterface } from "@/components/shared/types";
 import { useAnounceAction } from "@/hooks/useAnounceAction";
 
-import { useGlobalContext } from "./globalContext";
 import { useNotificationContext } from "./notificationContext";
+import { useProjectsContext } from "./projectsContext";
 import { useSessionContext } from "./sessionContext";
 
 export enum PlayerAction {
@@ -53,7 +53,7 @@ interface VideoContextInterface {
 const videoContext = createContext<VideoContextInterface>(null!);
 
 export const VideoProvider = (props: { [key: string]: any }) => {
-  const { project, updateProject, warnLocalVideo } = useGlobalContext();
+  const { project, updateProject, warnLocalVideo } = useProjectsContext();
   const { settings } = useSessionContext();
   const { addAlert } = useNotificationContext();
   const playerRef = useRef<HTMLVideoElement>(null!);
