@@ -68,12 +68,47 @@ userDoc: null, email: null, newToken: null }` or the same shape as
 **withAuthenticatedUser**:
 The wrapper that owns the JWT-extraction → verify → user-lookup contract.
 Lives in `utils/auth/withAuthenticatedUser.ts`. Handlers never read
-`req.headers["authorization"]` directly.
+`req.headers["authorization"]` directly. A missing or invalid token is
+answered with 401 before `connectDb` runs, so a database outage cannot
+turn it into a 500.
 
 **withOptionalUser**:
 Same wrapper for routes that allow guests (currently only `pages/api/note.ts`).
 A _missing_ token routes to the guest branch; a _present-but-invalid_ token
 still 401s — there is no silent fallback.
+
+**Identity intake**:
+`register` / `authenticate` / `updateProfile` / `removeAccount` in
+`utils/user/identityIntake.ts`, the only writer of **User** documents.
+Each returns a discriminated outcome (`ok` / `invalid` / `emailTaken` /
+`notFound` / `wrongPassword`) and does no HTTP; `pages/api/login.js`,
+`register.js` and `user.js` map outcomes to status codes. Credentials must
+be non-empty strings. A taken email is detected from the unique index
+(E11000), never by check-then-save. `updateProfile` writes `username` and
+`email` only and returns a token minted for the saved email, so an email
+change keeps the session. `removeAccount` checks the password, removes owned
+**Projects** through the **Project intake**, then the user's other
+**Notes**, **Shares** and **Settings**, and the **User** last. **Settings**
+are written only through `/api/settings`.
+
+### Architecture (Project seam)
+
+**Project intake**:
+`createProject` / `getProject` / `updateProject` / `shareProject` /
+`unshareProject` / `removeProject` / `removeUserProjects` in
+`utils/project/projectIntake.ts`. Every operation is scoped to the owning
+**User** and returns a discriminated outcome (`ok` / `notFound` /
+`urlTaken`) with no HTTP; `pages/api/project.ts` maps them to 200, 404
+and 409. A malformed or missing project id is `notFound`. Create and
+update write `title` and `src` only. Sharing delegates to the **Share intake**.
+
+**Project cascade**:
+The one removal path, used by `removeProject` and (through
+`removeUserProjects`) by account removal: the Project's **Notes** (via the
+`Note` model), its **Share**, the owner's `User.projects` ref, then the
+**Project**. Every step is a no-op when already done and the Project goes
+last, so a failed cascade throws with the Project still findable and a
+re-run finishes it.
 
 ### Architecture (Share seam)
 
@@ -154,13 +189,6 @@ re-suggesting in a future architecture review:
   `src/context/globalContext.tsx` keys off `data.msg` rather than
   `res.status`. Migrating both server and client to 401/403 would let
   generic HTTP middleware handle these cases.
-- **Mongoose `Document.remove()` deprecation**: `pages/api/user.js` calls
-  `userDoc.remove()` (legacy API) and `projectDoc.remove()` for project
-  cleanup. Both should be replaced with `deleteOne()` to align with the
-  bundled Mongoose version.
-- **`utils/apiHelpers.ts` field names**: the helpers strip `created` and
-  `updated` from documents but the Mongoose schemas use `createdAt` /
-  `updatedAt` (timestamps option). The strip currently does nothing.
 - **`globalContext.tsx` god-object**: 792 LOC, 28 exposed properties; a
   separate review should consider splitting it along the same seam lines
   used for the API (Identity, Project, Note, Share).
