@@ -216,7 +216,9 @@ header, and return `ok` | `invalid` | `notFound` | `forbidden` |
 404, 403 and 403 with `code: "sharePasswordRequired"`. `invalid` is a Note or Project id that is not a hex
 ObjectId string (a missing Project id too), or a field the Note schema would
 reject: `content` must be a non-empty string (required on create), `time` a
-finite number, `done` a boolean. It is checked before the permission check.
+finite number, `done` a boolean. A missing or null `time` is not `invalid`:
+it is 0 on create and left unchanged on update. It is checked before the
+permission check.
 `upsertNote` decides create-vs-update by `Note.findById(input._id)`; a
 missing id creates.
 On update only `content`, `time` and `done` change; `project` and `user`
