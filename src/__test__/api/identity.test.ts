@@ -89,7 +89,9 @@ describe("/api/login", () => {
 
 describe("/api/user", () => {
   it("updates the profile and replies with a token for the new email", async () => {
-    await seedUser();
+    const user = await seedUser();
+    user.settings = (await Settings.create({ user: user._id, playOffset: 1 }))._id;
+    await user.save();
 
     const { status, body } = await callApi(
       userHandler,
@@ -100,6 +102,7 @@ describe("/api/user", () => {
     expect(status).toBe(StatusCodes.OK);
     expect(body.user).toMatchObject({ username: "Owner", email: "new@example.com", role: "free" });
     expect(body.user.password).toBeUndefined();
+    expect(body.user.settings).toBeUndefined();
     expect(authenticateToken(body.token)).toBe("new@example.com");
   });
 
