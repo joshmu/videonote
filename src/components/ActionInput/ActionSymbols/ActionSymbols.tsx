@@ -11,7 +11,7 @@
  */
 
 import { AnimatePresence } from "motion/react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   BsVolumeDownFill as VolumeDownIcon,
   BsFillVolumeUpFill as VolumeUpIcon,
@@ -29,19 +29,23 @@ import { MotionFadeInOut } from "@/shared/ux/MotionFadeInOut";
 export default function ActionSymbols() {
   const { action: playerAction } = useVideoContext();
   const [action, setAction] = useState("");
-  let timer: ReturnType<typeof setTimeout>;
+  const timers = useRef(new Set<ReturnType<typeof setTimeout>>());
+
+  // clear pending hides on unmount
+  useEffect(() => {
+    const pending = timers.current;
+    return () => pending.forEach(clearTimeout);
+  }, []);
 
   // when we receive a player action we allow the state to exist temporarily
   useEffect(() => {
     if (playerAction === "") return;
-    // clear timeout if there is one
-    if (timer) clearTimeout(timer);
-    // set action
     setAction(playerAction);
-    // start timeout
-    timer = setTimeout(() => {
+    const timer = setTimeout(() => {
+      timers.current.delete(timer);
       setAction("");
     }, 1000);
+    timers.current.add(timer);
   }, [playerAction]);
 
   return (
