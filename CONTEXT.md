@@ -282,7 +282,8 @@ The Share modal reads `hasPassword`: an empty password field sends no
 
 **Shared-project access context**:
 `src/context/sharedProjectContext.tsx`. Opens a public **Share**
-(prompting for its password and retrying), holds the **Share token** it
+(prompting for its password and retrying; a pending retry is cancelled on
+unmount), holds the **Share token** it
 hands out in memory (`shareToken()`), `renewShareAccess()` to ask for the
 password again when a Note write is refused for it (the project stays on
 screen; it resolves `false` if the prompt is dismissed), and `checkCanEdit`, the one canEdit source: a signed-in User on
