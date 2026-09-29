@@ -1,197 +1,235 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { Types } from "mongoose";
+import { describe, expect, it } from "vitest";
 
-vi.mock("@/utils/mongoose", () => {
-  // `new Note(doc)` returns an object with the doc fields plus a stubbed
-  // save(). The constructor itself is a vi.fn so we can assert what it
-  // was called with.
-  const NoteCtor = vi.fn(function (this: Record<string, unknown>, doc: Record<string, unknown>) {
-    Object.assign(this, doc);
-    (this as { save: () => Promise<void> }).save = vi.fn().mockResolvedValue(undefined);
-  });
-  return {
-    Note: Object.assign(NoteCtor, {
-      findById: vi.fn(),
-      find: vi.fn(),
-      deleteMany: vi.fn(),
-    }),
-    Project: { findById: vi.fn() },
-  };
-});
-
-import { Note, Project } from "@/utils/mongoose";
+import { Note, Project, User } from "@/utils/mongoose";
 import { removeDoneProjectNotes, upsertNote } from "@/utils/note/noteIntake";
+import { attachOrUpdateShare } from "@/utils/share/shareIntake";
 
-type FakeProjectDoc = {
-  _id: string;
-  notes: string[];
-  save: ReturnType<typeof vi.fn>;
+import { useTestDb } from "../db/testDb";
+
+useTestDb();
+
+const seed = async (share?: { canEdit: boolean }) => {
+  const owner = await User.create({ email: "owner@example.com", username: "owner" });
+  const visitor = await User.create({ email: "visitor@example.com", username: "visitor" });
+  const project = await Project.create({ title: "Rough cut", user: owner._id });
+  if (share) await attachOrUpdateShare(project, { url: "rough-cut", ...share });
+  return {
+    ownerId: owner._id.toString(),
+    visitorId: visitor._id.toString(),
+    projectId: project._id.toString(),
+  };
 };
 
-const buildNoteInput = (overrides: Record<string, unknown> = {}) => ({
-  _id: "n1",
-  content: "hello",
+const noteInput = (projectId: string, overrides: Record<string, unknown> = {}) => ({
+  _id: new Types.ObjectId().toString(),
+  content: "Trim the intro",
   time: 12,
   done: false,
-  project: "p1",
+  project: projectId,
   ...overrides,
 });
 
-const buildProjectDoc = (overrides: Partial<FakeProjectDoc> = {}): FakeProjectDoc => ({
-  _id: "p1",
-  notes: [],
-  save: vi.fn().mockResolvedValue(undefined),
-  ...overrides,
-});
-
-const populatedNote = {
-  _id: "n1",
-  content: "hello",
-  time: 12,
-  done: false,
-  project: "p1",
-  user: { _id: "u1", username: "alice", email: "a@a" },
+const seedNote = async (projectId: string, fields: Record<string, unknown> = {}) => {
+  const note = await Note.create({ content: "Original", project: projectId, ...fields });
+  await Project.updateOne({ _id: projectId }, { $push: { notes: note._id } });
+  return note;
 };
 
-// upsertNote calls Note.findById twice: first for the existing-doc lookup
-// (returns null on the create path, the doc on the update path), then for
-// the populated reload. Tests prime the first call via `lookup`; the second
-// always resolves to `populatedNote`.
-const primeFindById = (lookup: unknown) => {
-  vi.mocked(Note.findById).mockReset();
-  vi.mocked(Note.findById)
-    .mockReturnValueOnce(lookup as never)
-    .mockReturnValue({
-      populate: vi.fn().mockResolvedValue(populatedNote),
-    } as never);
-};
+const guest = () => null;
+const visitor = (ids: { visitorId: string }) => ids.visitorId;
 
-beforeEach(() => {
-  primeFindById(null);
-  vi.mocked(Project.findById).mockResolvedValue(buildProjectDoc() as never);
+describe("upsertNote on create", () => {
+  it("lets the owner create a Note, linking it to the Project with its author", async () => {
+    const { ownerId, projectId } = await seed();
+    const input = noteInput(projectId);
+
+    const result = await upsertNote(input, ownerId);
+
+    if (result.kind !== "ok") throw new Error(`expected ok, got ${result.kind}`);
+    expect(result.note).toMatchObject({
+      content: "Trim the intro",
+      user: { _id: ownerId, username: "owner" },
+    });
+    expect(JSON.stringify(result.note)).not.toContain("owner@example.com");
+    expect((await Project.findById(projectId)).notes.map(String)).toEqual([input._id]);
+  });
+
+  it.each([
+    ["a guest", guest],
+    ["another user", visitor],
+  ])("forbids %s without a Share", async (_label, caller) => {
+    const ids = await seed();
+
+    expect(await upsertNote(noteInput(ids.projectId), caller(ids))).toEqual({ kind: "forbidden" });
+    expect(await Note.countDocuments()).toBe(0);
+    expect((await Project.findById(ids.projectId)).notes).toHaveLength(0);
+  });
+
+  it.each([
+    ["a guest", guest],
+    ["another user", visitor],
+  ])("forbids %s when the Share has canEdit false", async (_label, caller) => {
+    const ids = await seed({ canEdit: false });
+
+    expect(await upsertNote(noteInput(ids.projectId), caller(ids))).toEqual({ kind: "forbidden" });
+    expect(await Note.countDocuments()).toBe(0);
+  });
+
+  it("lets a guest create through an editable Share, without an author", async () => {
+    const { ownerId, projectId } = await seed({ canEdit: true });
+
+    const result = await upsertNote(noteInput(projectId, { user: ownerId }), null);
+
+    expect(result.kind).toBe("ok");
+    const stored = await Note.findOne();
+    expect(stored.user).toBeUndefined();
+    expect((await Project.findById(projectId)).notes).toHaveLength(1);
+  });
+
+  it("lets another user create through an editable Share as themselves", async () => {
+    const { ownerId, visitorId, projectId } = await seed({ canEdit: true });
+
+    await upsertNote(noteInput(projectId, { user: ownerId }), visitorId);
+
+    expect((await Note.findOne()).user.toString()).toBe(visitorId);
+  });
+
+  it("returns notFound for a missing or malformed Project and saves nothing", async () => {
+    const { ownerId } = await seed();
+
+    expect(await upsertNote(noteInput(new Types.ObjectId().toString()), ownerId)).toEqual({
+      kind: "notFound",
+    });
+    expect(await upsertNote(noteInput("not-an-id"), ownerId)).toEqual({ kind: "notFound" });
+    expect(await Note.countDocuments()).toBe(0);
+  });
 });
 
-afterEach(() => {
-  vi.clearAllMocks();
-});
+describe("upsertNote on update", () => {
+  it("lets the owner update content, time and done", async () => {
+    const { ownerId, projectId } = await seed();
+    const note = await seedNote(projectId, { user: ownerId });
 
-describe("upsertNote — create path (no existing _id)", () => {
-  it("creates a new Note from the input, links it to the project, and returns the populated doc", async () => {
-    const projectDoc = buildProjectDoc();
-    vi.mocked(Project.findById).mockResolvedValue(projectDoc as never);
-
-    const result = await upsertNote(buildNoteInput(), "u1");
-
-    expect(Note).toHaveBeenCalledWith(
-      expect.objectContaining({
-        _id: "n1",
-        content: "hello",
-        time: 12,
-        done: false,
-        project: "p1",
-        user: "u1",
-      }),
+    const result = await upsertNote(
+      noteInput(projectId, { _id: note._id.toString(), content: "Edited", time: 40, done: true }),
+      ownerId,
     );
-    expect(projectDoc.notes).toEqual(["n1"]);
-    expect(projectDoc.save).toHaveBeenCalledTimes(1);
-    expect(result).toBe(populatedNote);
-  });
 
-  it("omits the user field when authorId is null (guest path)", async () => {
-    await upsertNote(buildNoteInput(), null);
-
-    const constructed = vi.mocked(Note).mock.calls[0]![0] as Record<string, unknown>;
-    expect("user" in constructed).toBe(false);
-  });
-
-  it("sets user to the supplied authorId, ignoring any user field in the input", async () => {
-    await upsertNote(buildNoteInput({ user: "stale-from-client" }) as never, "u1");
-
-    const constructed = vi.mocked(Note).mock.calls[0]![0] as Record<string, unknown>;
-    expect(constructed.user).toBe("u1");
-  });
-
-  it("propagates a Project.findById failure (no orphan project save)", async () => {
-    const projectDoc = buildProjectDoc();
-    vi.mocked(Project.findById).mockResolvedValue(projectDoc as never);
-    vi.mocked(Project.findById).mockImplementationOnce(() => {
-      throw new Error("project lookup failed");
+    expect(result.kind).toBe("ok");
+    expect(await Note.findById(note._id)).toMatchObject({
+      content: "Edited",
+      time: 40,
+      done: true,
     });
-
-    await expect(upsertNote(buildNoteInput(), "u1")).rejects.toThrow("project lookup failed");
-    expect(projectDoc.save).not.toHaveBeenCalled();
   });
-});
 
-type FakeNoteDoc = {
-  _id: string;
-  updateOne: ReturnType<typeof vi.fn>;
-  save: ReturnType<typeof vi.fn>;
-};
+  it("leaves fields the payload omits untouched", async () => {
+    const { ownerId, projectId } = await seed();
+    const note = await seedNote(projectId, { time: 40, done: true });
 
-const buildExistingNoteDoc = (overrides: Partial<FakeNoteDoc> = {}): FakeNoteDoc => ({
-  _id: "n1",
-  updateOne: vi.fn().mockResolvedValue(undefined),
-  save: vi.fn().mockResolvedValue(undefined),
-  ...overrides,
-});
+    await upsertNote({ _id: note._id.toString(), content: "Edited", project: projectId }, ownerId);
 
-describe("upsertNote — update path (existing _id)", () => {
-  it("updates the existing note via updateOne+save, never constructs a new Note, and leaves Project.notes alone", async () => {
-    const existingDoc = buildExistingNoteDoc();
-    primeFindById(existingDoc);
-    const projectDoc = buildProjectDoc();
-    vi.mocked(Project.findById).mockResolvedValue(projectDoc as never);
-
-    const result = await upsertNote(buildNoteInput({ content: "edited" }), "u1");
-
-    expect(existingDoc.updateOne).toHaveBeenCalledWith({
-      $set: expect.objectContaining({ content: "edited", user: "u1" }),
+    expect(await Note.findById(note._id)).toMatchObject({
+      content: "Edited",
+      time: 40,
+      done: true,
     });
-    expect(existingDoc.save).toHaveBeenCalledTimes(1);
-    expect(Note).not.toHaveBeenCalled();
-    expect(projectDoc.save).not.toHaveBeenCalled();
-    expect(result).toBe(populatedNote);
   });
 
-  it("does not touch the user field on $set when authorId is null (guest editing)", async () => {
-    const existingDoc = buildExistingNoteDoc();
-    primeFindById(existingDoc);
+  it("decides permission from the stored Note's Project, not the payload", async () => {
+    const { ownerId, projectId: privateProjectId } = await seed();
+    const editable = await Project.create({ title: "Open", user: ownerId });
+    await attachOrUpdateShare(editable, { url: "open", canEdit: true });
+    const note = await seedNote(privateProjectId);
 
-    await upsertNote(buildNoteInput({ content: "edited" }), null);
+    const result = await upsertNote(
+      noteInput(editable._id.toString(), { _id: note._id.toString(), content: "Changed" }),
+      null,
+    );
 
-    const [{ $set }] = vi.mocked(existingDoc.updateOne).mock.calls[0]! as [
-      { $set: Record<string, unknown> },
-    ];
-    expect("user" in $set).toBe(false);
+    expect(result).toEqual({ kind: "forbidden" });
+    expect((await Note.findById(note._id)).content).toBe("Original");
+  });
+
+  it("keeps project and user when the payload tries to change them", async () => {
+    const { ownerId, visitorId, projectId } = await seed({ canEdit: true });
+    const other = await Project.create({ title: "Other", user: visitorId });
+    const note = await seedNote(projectId, { user: ownerId });
+
+    const result = await upsertNote(
+      noteInput(other._id.toString(), {
+        _id: note._id.toString(),
+        content: "Edited",
+        user: visitorId,
+      }),
+      visitorId,
+    );
+
+    expect(result.kind).toBe("ok");
+    const stored = await Note.findById(note._id);
+    expect(stored.content).toBe("Edited");
+    expect(stored.project.toString()).toBe(projectId);
+    expect(stored.user.toString()).toBe(ownerId);
+    expect((await Project.findById(other._id)).notes).toHaveLength(0);
+  });
+
+  it("returns notFound when the stored Note's Project is gone", async () => {
+    const { ownerId, projectId } = await seed();
+    const note = await seedNote(projectId);
+    await Project.deleteOne({ _id: projectId });
+
+    const result = await upsertNote(noteInput(projectId, { _id: note._id.toString() }), ownerId);
+
+    expect(result).toEqual({ kind: "notFound" });
   });
 });
 
 describe("removeDoneProjectNotes", () => {
-  it("deletes done notes scoped to the project and returns the survivors", async () => {
-    const survivors = [
-      { _id: "n2", content: "still todo", done: false, project: "p1" },
-      { _id: "n3", content: "still todo too", done: false, project: "p1" },
-    ];
-    vi.mocked(Note.deleteMany).mockResolvedValue({ deletedCount: 1 } as never);
-    vi.mocked(Note.find).mockReturnValue({
-      lean: vi.fn().mockResolvedValue(survivors),
-    } as never);
+  it("lets the owner remove done Notes, pulling them from the Project", async () => {
+    const { ownerId, projectId } = await seed();
+    const done = await seedNote(projectId, { done: true });
+    const open = await seedNote(projectId);
 
-    const result = await removeDoneProjectNotes("p1");
+    const result = await removeDoneProjectNotes(projectId, ownerId);
 
-    expect(Note.deleteMany).toHaveBeenCalledWith({ project: "p1", done: true });
-    expect(Note.find).toHaveBeenCalledWith({ project: "p1" });
-    expect(result).toBe(survivors);
+    if (result.kind !== "ok") throw new Error(`expected ok, got ${result.kind}`);
+    expect(result.notes.map((note) => note._id.toString())).toEqual([open._id.toString()]);
+    expect(await Note.findById(done._id)).toBeNull();
+    expect((await Project.findById(projectId)).notes.map(String)).toEqual([open._id.toString()]);
   });
 
-  it("returns an empty array when no notes remain", async () => {
-    vi.mocked(Note.deleteMany).mockResolvedValue({ deletedCount: 5 } as never);
-    vi.mocked(Note.find).mockReturnValue({
-      lean: vi.fn().mockResolvedValue([]),
-    } as never);
+  it("lets a guest remove done Notes through an editable Share", async () => {
+    const { projectId } = await seed({ canEdit: true });
+    await seedNote(projectId, { done: true });
+    const open = await seedNote(projectId);
 
-    const result = await removeDoneProjectNotes("p1");
+    const result = await removeDoneProjectNotes(projectId, null);
 
-    expect(result).toEqual([]);
+    if (result.kind !== "ok") throw new Error(`expected ok, got ${result.kind}`);
+    expect(result.notes.map((note) => note._id.toString())).toEqual([open._id.toString()]);
+    expect(await Note.countDocuments()).toBe(1);
+  });
+
+  it.each([
+    ["a guest", guest],
+    ["another user", visitor],
+  ])("forbids %s when the Share has canEdit false", async (_label, caller) => {
+    const ids = await seed({ canEdit: false });
+    await seedNote(ids.projectId, { done: true });
+
+    expect(await removeDoneProjectNotes(ids.projectId, caller(ids))).toEqual({
+      kind: "forbidden",
+    });
+    expect(await Note.countDocuments()).toBe(1);
+  });
+
+  it("returns notFound for a missing or malformed project id", async () => {
+    const { ownerId } = await seed();
+
+    expect(await removeDoneProjectNotes(new Types.ObjectId().toString(), ownerId)).toEqual({
+      kind: "notFound",
+    });
+    expect(await removeDoneProjectNotes({ $ne: null }, ownerId)).toEqual({ kind: "notFound" });
   });
 });

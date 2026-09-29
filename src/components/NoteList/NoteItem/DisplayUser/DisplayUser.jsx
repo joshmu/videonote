@@ -12,7 +12,7 @@ const DisplayUser = ({ noteUser, currentUser, currentSession = false }) => {
     if (noteUserId === currentUser?._id) return <></>;
 
     // else decide on display name
-    displayName = noteUser.username ? noteUser.username : noteUser.email;
+    displayName = noteUser.username || noteUser.email || displayName;
   }
 
   return (

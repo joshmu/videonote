@@ -1,33 +1,37 @@
-import { afterEach, describe, expect, it, vi } from "vitest";
+import { describe, expect, it } from "vitest";
 
-vi.mock("@/utils/mongoose", () => ({
-  Project: { findOne: vi.fn() },
-}));
-
-import { Project } from "@/utils/mongoose";
+import { Note, Project, Share, User } from "@/utils/mongoose";
 import { findProjectWithRelations } from "@/utils/project/findProjectWithRelations";
 
-afterEach(() => {
-  vi.clearAllMocks();
-});
+import { useTestDb } from "../db/testDb";
+
+useTestDb();
 
 describe("findProjectWithRelations", () => {
-  it("hydrates a project with its notes (including each note's author) and its share", async () => {
-    const populated = { _id: "p1", notes: [], share: { url: "x" } };
-    const populateSpy = vi.fn().mockResolvedValue(populated);
-    vi.mocked(Project.findOne).mockReturnValue({ populate: populateSpy } as never);
+  it("hydrates a project with its notes (each with its author) and its share", async () => {
+    const owner = await User.create({ email: "owner@example.com", username: "owner" });
+    const project = await Project.create({ title: "Rough cut", user: owner._id });
+    const note = await Note.create({ content: "Trim", project: project._id, user: owner._id });
+    const share = await Share.create({ url: "rough-cut", user: owner._id, project: project._id });
+    project.notes.push(note._id);
+    project.share = share._id;
+    await project.save();
 
-    const result = await findProjectWithRelations({ _id: "p1" });
+    const hydrated = (await findProjectWithRelations({ _id: project._id })).toObject();
 
-    expect(Project.findOne).toHaveBeenCalledWith({ _id: "p1" });
-    expect(populateSpy).toHaveBeenCalledWith([
-      {
-        path: "notes",
-        model: "Note",
-        populate: { path: "user", model: "User", select: "username email" },
-      },
-      { path: "share", model: "Share" },
+    expect(hydrated.notes).toEqual([
+      expect.objectContaining({
+        _id: note._id,
+        content: "Trim",
+        user: { _id: owner._id, username: "owner", email: "owner@example.com" },
+      }),
     ]);
-    expect(result).toBe(populated);
+    expect(hydrated.share).toMatchObject({ _id: share._id, url: "rough-cut", canEdit: true });
+  });
+
+  it("returns null when no project matches", async () => {
+    const owner = await User.create({ email: "owner@example.com" });
+
+    expect(await findProjectWithRelations({ user: owner._id })).toBeNull();
   });
 });

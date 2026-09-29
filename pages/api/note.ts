@@ -1,27 +1,41 @@
 import { StatusCodes } from "http-status-codes";
+import type { NextApiResponse } from "next";
 
 import { NoteApiAction, NoteInterface } from "@/root/src/components/shared/types";
 import { extractAuthorId, withOptionalUser } from "@/utils/auth/withAuthenticatedUser";
 import { removeDoneProjectNotes, upsertNote } from "@/utils/note/noteIntake";
 
+const DENIED = {
+  notFound: { status: StatusCodes.NOT_FOUND, msg: "Project not found." },
+  forbidden: { status: StatusCodes.FORBIDDEN, msg: "Not allowed to edit notes in this project." },
+} as const;
+
+const deny = (res: NextApiResponse, kind: keyof typeof DENIED) =>
+  res.status(DENIED[kind].status).json({ msg: DENIED[kind].msg });
+
 export default withOptionalUser(async (req, res, ctx) => {
-  const { action, note, projectId } = req.body as {
+  const { action, note, projectId } = (req.body ?? {}) as {
     action?: NoteApiAction;
     note?: NoteInterface;
     projectId?: string;
   };
-  const authorId = extractAuthorId(ctx);
+  const callerId = extractAuthorId(ctx);
 
   try {
     if (action === NoteApiAction.REMOVE_DONE_NOTES) {
-      const notes = await removeDoneProjectNotes(projectId!);
-      return res.status(StatusCodes.OK).json({ notes, token: ctx.newToken });
+      const result = await removeDoneProjectNotes(projectId, callerId);
+      if (result.kind !== "ok") return deny(res, result.kind);
+      return res.status(StatusCodes.OK).json({ notes: result.notes, token: ctx.newToken });
     }
 
-    const noteDoc = await upsertNote(note!, authorId);
-    return res.status(StatusCodes.OK).json({ note: noteDoc.toObject(), token: ctx.newToken });
+    if (typeof note !== "object" || note === null) {
+      return res.status(StatusCodes.BAD_REQUEST).json({ msg: "Note is required." });
+    }
+    const result = await upsertNote(note, callerId);
+    if (result.kind !== "ok") return deny(res, result.kind);
+    return res.status(StatusCodes.OK).json({ note: result.note, token: ctx.newToken });
   } catch (error) {
     console.error(error);
-    return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ msg: "Database error", error });
+    return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ msg: "Database error" });
   }
 });

@@ -132,28 +132,43 @@ Both operations return the project re-loaded through `findProjectWithRelations`
 so callers can hand it straight back to the client. Handlers no longer reach
 into `Share.findById` / `Share.create` / `Share.deleteOne` directly.
 
+**Share access**:
+`utils/share/shareAccess.ts`, the read side of a **Share**.
+`openSharedProject(shareUrl, password)` returns `notFound` |
+`passwordRequired` | `incorrect` | `ok(project)`; a Share whose Project is
+gone (or no longer points back at it) is `notFound`. The `ok` project is the
+**public projection**: title, src, Share `_id`/`url`/`canEdit`, and Notes
+whose author appears as `{ _id, username }` only (`toPublicAuthor`). No Share password, no email; an
+author whose username is missing or is their email appears as `{ _id }`. `mayEditViaShare(project)`
+is the one "may edit via Share" check: the Project's own Share exists and has
+`canEdit`. `pages/api/public_project.ts` only maps outcomes to responses.
+
 **findProjectWithRelations**:
 The populate spec for a hydrated Project in
 `utils/project/findProjectWithRelations.ts`: Project + Notes (with each
-Note's author User) + Share. Used by `pages/api/project.ts` (GET, SHARE,
-REMOVE_SHARE) and the Share intake module. `pages/api/auth.js` and
-`pages/api/public_project.ts` still hand-roll the same populate; folding
-them into this helper is a clean follow-up.
+Note's author User) + Share. Used by `pages/api/auth.js`, the Project
+intake, the Share intake and the Share access module.
 
 ### Architecture (Note seam)
 
 **Note intake**:
 The pair `upsertNote` / `removeDoneProjectNotes` in
-`utils/note/noteIntake.ts` that owns the Project↔Note lifecycle on the
-write path. `upsertNote` decides create-vs-update by
-`Note.findById(input._id)`; on create it pushes the new id onto
-`Project.notes` and returns the Note re-loaded with its author User
-populated. The intake takes a pre-resolved `authorId: string | null` so
-guests skip authorship without the module knowing about
-`OptionalAuthContext`. `removeDoneProjectNotes` deletes every done Note
-in a project and returns the survivors. Handlers no longer reach into
-`Note.findById`, `new Note()`, `Project.findById().notes.push(...)`, or
-`Note.deleteMany` directly.
+`utils/note/noteIntake.ts` that owns the Project↔Note lifecycle and the
+**Note write policy** on the write path. Both take the caller's
+`User._id` as a string, or `null` for a guest, and return `ok` |
+`notFound` | `forbidden`, which `pages/api/note.ts` maps to HTTP 200,
+404 and 403. `upsertNote` decides create-vs-update by `Note.findById(input._id)`.
+On update only `content`, `time` and `done` change; `project` and `user`
+are fixed. On create the caller becomes the author and the new id is pushed
+onto `Project.notes`. The returned Note's author goes through
+`toPublicAuthor`, so a write never returns an email. `removeDoneProjectNotes` deletes the done Notes, pulls
+their ids from `Project.notes` and returns the survivors.
+
+**Note write policy**:
+The Project owner may always write Notes; anyone else (guest or another
+User) only when `mayEditViaShare` allows it. For an existing Note the
+Project is the stored Note's, never the payload's. A missing Project is
+`notFound` and nothing is saved.
 
 **extractAuthorId**:
 The one-line helper in `utils/auth/withAuthenticatedUser.ts` that pulls
@@ -164,16 +179,18 @@ The one-line helper in `utils/auth/withAuthenticatedUser.ts` that pulls
 - A **User** owns many **Projects**; a **Project** has one **User**.
 - A **Project** has many **Notes**; a **Note** belongs to one **Project**.
 - A **Project** may have one **Share**; a **Share** belongs to one **Project**.
-- A guest (no JWT) can create a **Note** against a shared **Project** when the
-  **Share** has `canEdit: true`. They never own a **User**.
+- A guest (no JWT) or another **User** can create, edit and clear done
+  **Notes** on a shared **Project** only when the **Share** has
+  `canEdit: true`. A guest never owns a **User**.
 
 ## Example dialogue
 
 > **Dev:** "When a guest hits `/api/note` to add a **Note**, who's recorded
 > as the author?"
-> **Domain:** "Nobody. The **Note** persists with `user` undefined. The
-> wrapper signals guest mode via `ctx.isGuest === true`, and the handler
-> skips the `user` assignment."
+> **Domain:** "Nobody, and only if the **Share** has `canEdit`. The wrapper
+> signals guest mode via `ctx.isGuest === true`, the handler passes a `null`
+> caller, and the Note intake saves the **Note** with `user` undefined, even
+> if the payload names a `user`."
 
 > **Dev:** "If a **Share** has no password, what does
 > `verifySharePassword` return?"
@@ -191,6 +208,9 @@ re-suggesting in a future architecture review:
   `src/context/globalContext.tsx` keys off `data.msg` rather than
   `res.status`. Migrating both server and client to 401/403 would let
   generic HTTP middleware handle these cases.
+- **Share password on Note writes** (#115): the Note write policy checks
+  only `canEdit`; the Share password gates reading. Any proof of the
+  password on writes belongs in `mayEditViaShare`.
 - **`globalContext.tsx` god-object**: 792 LOC, 28 exposed properties; a
   separate review should consider splitting it along the same seam lines
   used for the API (Identity, Project, Note, Share).

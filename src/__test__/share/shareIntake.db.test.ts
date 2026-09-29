@@ -68,3 +68,55 @@ describe("Share intake against the in-memory database", () => {
     expect(await Share.findById(shareId)).toBeNull();
   });
 });
+
+describe("Share intake password handling", () => {
+  it("stores no protection when the password is empty or omitted", async () => {
+    const { project } = await seedProject();
+    const other = await Project.create({ title: "Other", user: project.user });
+
+    await attachOrUpdateShare(project, { url: "empty", password: "" });
+    await attachOrUpdateShare(other, { url: "omitted" });
+
+    for (const url of ["empty", "omitted"]) {
+      const stored = await Share.findOne({ url });
+      expect(await verifySharePassword(stored.password, undefined)).toEqual({ kind: "open" });
+    }
+  });
+
+  it("updates the attached Share in place, hashing a rotated password", async () => {
+    const { project } = await seedProject();
+    await attachOrUpdateShare(project, { url: "rough-cut", password: "hunter2" });
+
+    const updated = await attachOrUpdateShare(project, {
+      url: "final-cut",
+      canEdit: false,
+      password: "rotated",
+    });
+
+    expect(await Share.countDocuments()).toBe(1);
+    const stored = await Share.findOne({ url: "final-cut" });
+    expect(stored.canEdit).toBe(false);
+    expect(await verifySharePassword(stored.password, "rotated")).toEqual({ kind: "ok" });
+    expect(updated.share).toMatchObject({ _id: stored._id, url: "final-cut" });
+  });
+
+  it("keeps the existing password when an update omits it", async () => {
+    const { project } = await seedProject();
+    await attachOrUpdateShare(project, { url: "rough-cut", password: "hunter2" });
+
+    await attachOrUpdateShare(project, { url: "rough-cut", canEdit: false });
+
+    const stored = await Share.findOne({ url: "rough-cut" });
+    expect(await verifySharePassword(stored.password, "hunter2")).toEqual({ kind: "ok" });
+  });
+
+  it("only detaches a Share that belongs to the project", async () => {
+    const { project } = await seedProject();
+    const other = await Project.create({ title: "Other", user: project.user });
+    const otherShared = await attachOrUpdateShare(other, { url: "other" });
+
+    await detachShare(project, { _id: otherShared.share._id.toString() });
+
+    expect(await Share.countDocuments({ url: "other" })).toBe(1);
+  });
+});
