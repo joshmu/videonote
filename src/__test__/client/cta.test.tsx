@@ -6,9 +6,6 @@ import { CTA } from "@/components/HelloPage/CTA/CTA";
 const mocks = vi.hoisted(() => ({ push: vi.fn() }));
 vi.mock("next/router", () => ({ useRouter: () => ({ push: mocks.push }) }));
 vi.mock("react-scroll", () => ({ animateScroll: { scrollToTop: vi.fn() } }));
-vi.mock("@/shared/ux/Reveal", () => ({
-  Reveal: ({ children }: { children: React.ReactNode }) => children,
-}));
 
 beforeEach(() => {
   vi.useFakeTimers();
