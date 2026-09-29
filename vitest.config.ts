@@ -2,7 +2,7 @@ import react from "@vitejs/plugin-react";
 import path from "path";
 import { configDefaults, defineConfig } from "vitest/config";
 
-const SERVER_TESTS = ["src/__test__/{auth,db,note,project,share}/**/*.test.ts"];
+const SERVER_TESTS = ["src/__test__/{api,auth,db,note,project,share,user}/**/*.test.ts"];
 
 export default defineConfig({
   plugins: [react()],

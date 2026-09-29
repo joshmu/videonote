@@ -70,6 +70,7 @@ const resolveAuthenticatedUser = async (token: string): Promise<ResolveResult> =
     return { ctx: null, status: StatusCodes.UNAUTHORIZED, body: { msg: "Invalid token" } };
   }
 
+  await connectDb();
   const userDoc = await User.findOne({ email });
   if (!userDoc) {
     return { ctx: null, status: StatusCodes.UNAUTHORIZED, body: { msg: "No user found." } };
@@ -85,8 +86,8 @@ const resolveAuthenticatedUser = async (token: string): Promise<ResolveResult> =
 /**
  * Wrap a Next.js API handler so it only runs for authenticated users.
  *
- * The wrapper opens the database (`connectDb`), verifies the token, and looks
- * up the user, then invokes `handler(req, res, ctx)` with a populated
+ * The wrapper verifies the token, then opens the database (`connectDb`) and
+ * looks up the user, then invokes `handler(req, res, ctx)` with a populated
  * {@link AuthContext}. On any auth failure it responds with 401 and a `msg`
  * body and the inner handler is not called. Handler errors propagate so the framework's error handling
  * can run.
@@ -94,7 +95,6 @@ const resolveAuthenticatedUser = async (token: string): Promise<ResolveResult> =
 export const withAuthenticatedUser =
   (handler: AuthenticatedHandler): NextApiHandler =>
   async (req, res) => {
-    await connectDb();
     const token = extractBearer(req.headers["authorization"]);
     if (!token) {
       res.status(StatusCodes.UNAUTHORIZED).json({ msg: "No token. Authorization denied." });
@@ -113,14 +113,16 @@ export const withAuthenticatedUser =
  * users.
  *
  * Missing `authorization` header → guest branch (`ctx.isGuest === true`).
- * Present-but-invalid token → 401 (no silent guest fall-through).
+ * Present-but-invalid token → 401 (no silent guest fall-through), answered
+ * before the database is opened.
  */
 export const withOptionalUser =
   (handler: OptionalAuthHandler): NextApiHandler =>
   async (req, res) => {
-    await connectDb();
     const token = extractBearer(req.headers["authorization"]);
     if (!token) {
+      // Guests still reach the database through the handler.
+      await connectDb();
       await handler(req, res, { isGuest: true, userDoc: null, email: null, newToken: null });
       return;
     }
