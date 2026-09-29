@@ -10,13 +10,20 @@ type Id = Types.ObjectId | string;
 export type ProjectOk = { kind: "ok"; project: ProjectDoc };
 export type ProjectNotFound = { kind: "notFound" };
 export type ProjectUrlTaken = { kind: "urlTaken"; message: string };
-/** A new Project needs a non-empty string title. */
-export type ProjectInvalid = { kind: "invalid" };
+/**
+ * `title`: a new Project needs a non-empty string title. `share`: sharing
+ * needs a share object; unsharing needs one whose `_id` is a hex ObjectId string.
+ */
+export type ProjectInvalid = { kind: "invalid"; reason: "title" | "share" };
 
 /** The only Project fields a client may write. */
 export type ProjectInput = { title?: unknown; src?: unknown; [key: string]: unknown };
 
 const NOT_FOUND: ProjectNotFound = { kind: "notFound" };
+const INVALID_SHARE: ProjectInvalid = { kind: "invalid", reason: "share" };
+
+const isObject = (value: unknown): value is Record<string, unknown> =>
+  typeof value === "object" && value !== null;
 
 const pickEditable = (input: ProjectInput = {}): { title?: string; src?: string } => {
   const fields: { title?: string; src?: string } = {};
@@ -36,7 +43,7 @@ export const createProject = async (
   input: ProjectInput,
 ): Promise<ProjectOk | ProjectInvalid> => {
   const fields = pickEditable(input);
-  if (!fields.title?.trim()) return { kind: "invalid" };
+  if (!fields.title?.trim()) return { kind: "invalid", reason: "title" };
   const project = await Project.create({ ...fields, user: userId });
   await User.updateOne({ _id: userId }, { $push: { projects: project._id } });
   return { kind: "ok", project };
@@ -69,7 +76,8 @@ export const shareProject = async (
   userId: Id,
   projectId: unknown,
   shareData: Partial<ShareProjectInterface>,
-): Promise<ProjectOk | ProjectNotFound | ProjectUrlTaken> => {
+): Promise<ProjectOk | ProjectNotFound | ProjectUrlTaken | ProjectInvalid> => {
+  if (!isObject(shareData)) return INVALID_SHARE;
   const owned = await findOwned(userId, projectId);
   if (!owned) return NOT_FOUND;
   try {
@@ -84,7 +92,9 @@ export const unshareProject = async (
   userId: Id,
   projectId: unknown,
   shareInfo: { _id: string },
-): Promise<ProjectOk | ProjectNotFound> => {
+): Promise<ProjectOk | ProjectNotFound | ProjectInvalid> => {
+  const shareId = isObject(shareInfo) ? shareInfo._id : undefined;
+  if (typeof shareId !== "string" || !isObjectIdOrHexString(shareId)) return INVALID_SHARE;
   const owned = await findOwned(userId, projectId);
   if (!owned) return NOT_FOUND;
   return { kind: "ok", project: await detachShare(owned, shareInfo) };

@@ -38,7 +38,7 @@ export default withAuthenticatedUser(async (req, res, { userDoc, newToken }) => 
     }
   } catch (error) {
     console.error(error);
-    return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ msg: "Database error", error });
+    return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ msg: "Database error" });
   }
 
   res.status(StatusCodes.OK).json({

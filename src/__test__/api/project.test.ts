@@ -162,4 +162,21 @@ describe("/api/project", () => {
 
     expect(status).toBe(StatusCodes.BAD_REQUEST);
   });
+
+  it.each([
+    [ProjectApiActions.REMOVE_SHARE, undefined],
+    [ProjectApiActions.REMOVE_SHARE, { _id: "not-an-id" }],
+    [ProjectApiActions.SHARE, undefined],
+  ])("replies 400 to %s with the share %j", async (action, share) => {
+    const { project } = await seed();
+
+    const { status, body } = await callApi(
+      handler,
+      { action, project: { _id: project._id.toString() }, share },
+      { email: OWNER },
+    );
+
+    expect(status).toBe(StatusCodes.BAD_REQUEST);
+    expect(body).toEqual({ msg: "Share not specified." });
+  });
 });

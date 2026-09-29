@@ -5,15 +5,16 @@
 
 import jwt from "jsonwebtoken";
 
-type TokenPayload = { email: string };
-
+/**
+ * Verify a session token and return its subject, the User._id. Throws for a
+ * bad signature, an expired token or a payload without a non-empty string `sub`.
+ */
 export const authenticateToken = (token: string): string => {
-  const decoded = jwt.verify(token, process.env.JWT_TOKEN_SECRET) as TokenPayload;
-  return decoded.email;
+  const { sub } = jwt.verify(token, process.env.JWT_TOKEN_SECRET) as jwt.JwtPayload;
+  if (typeof sub !== "string" || sub === "") throw new Error("Token has no subject");
+  return sub;
 };
 
-export const generateAccessToken = (email: string): string => {
-  // expires after half and hour (1800 seconds = 30 minutes)
-  const data: TokenPayload = { email };
-  return jwt.sign(data, process.env.JWT_TOKEN_SECRET, { expiresIn: 60 * 30 });
-};
+/** Mint a 30 minute session token whose subject is the User._id. */
+export const generateAccessToken = (userId: string): string =>
+  jwt.sign({}, process.env.JWT_TOKEN_SECRET, { subject: userId, expiresIn: 60 * 30 });

@@ -33,7 +33,7 @@ describe("/api/register", () => {
     const { status, body } = await callApi(registerHandler, { email: EMAIL, password: "hunter2" });
 
     expect(status).toBe(StatusCodes.CREATED);
-    expect(authenticateToken(body.token)).toBe(EMAIL);
+    expect(authenticateToken(body.token)).toBe(body.user._id);
     expect(body.user.password).toBeUndefined();
   });
 
@@ -60,7 +60,7 @@ describe("/api/login", () => {
     const { status, body } = await callApi(loginHandler, { email: EMAIL, password: "hunter2" });
 
     expect(status).toBe(StatusCodes.MOVED_TEMPORARILY);
-    expect(authenticateToken(body.token)).toBe(EMAIL);
+    expect(authenticateToken(body.token)).toBe(body.user._id);
     expect(body.user.email).toBe(EMAIL);
     expect(body.user.password).toBeUndefined();
     expect(body.user.createdAt).toBeUndefined();
@@ -103,7 +103,7 @@ describe("/api/user", () => {
     expect(body.user).toMatchObject({ username: "Owner", email: "new@example.com", role: "free" });
     expect(body.user.password).toBeUndefined();
     expect(body.user.settings).toBeUndefined();
-    expect(authenticateToken(body.token)).toBe("new@example.com");
+    expect(authenticateToken(body.token)).toBe(body.user._id);
   });
 
   it("does not write settings", async () => {
@@ -231,5 +231,24 @@ describe("/api/auth", () => {
         ],
       }),
     ]);
+  });
+
+  it("loads the user's projects in one query, in the user's order, skipping projects they do not own", async () => {
+    const user = await seedUser();
+    const other = await seedUser("other@example.com");
+    const foreign = await Project.create({ title: "Theirs", user: other._id });
+    const later = await Project.create({ title: "Later", user: user._id });
+    const earlier = await Project.create({ title: "Earlier", user: user._id });
+    user.projects.push(earlier._id, foreign._id, later._id);
+    await user.save();
+    const find = vi.spyOn(Project, "find");
+    const findOne = vi.spyOn(Project, "findOne");
+
+    const { status, body } = await callApi(authHandler, {}, { email: EMAIL });
+
+    expect(status).toBe(StatusCodes.OK);
+    expect(body.user.projects.map((project) => project.title)).toEqual(["Earlier", "Later"]);
+    expect(find).toHaveBeenCalledTimes(1);
+    expect(findOne).not.toHaveBeenCalled();
   });
 });

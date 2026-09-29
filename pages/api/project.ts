@@ -29,6 +29,11 @@ import {
 
 type Outcome = ProjectOk | ProjectNotFound | ProjectUrlTaken | ProjectInvalid;
 
+const INVALID_MSG: Record<ProjectInvalid["reason"], string> = {
+  title: "Project title required.",
+  share: "Share not specified.",
+};
+
 export default withAuthenticatedUser(async (req, res, { userDoc, newToken }) => {
   const { action, project, share } = req.body;
   if (typeof project !== "object" || project === null) {
@@ -68,7 +73,7 @@ export default withAuthenticatedUser(async (req, res, { userDoc, newToken }) => 
 
   switch (outcome.kind) {
     case "invalid":
-      return res.status(StatusCodes.BAD_REQUEST).json({ msg: "Project title required." });
+      return res.status(StatusCodes.BAD_REQUEST).json({ msg: INVALID_MSG[outcome.reason] });
     case "notFound":
       return res.status(StatusCodes.NOT_FOUND).json({ msg: "Project not found." });
     case "urlTaken":

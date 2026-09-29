@@ -23,14 +23,20 @@ const isDuplicateKey = (err: unknown): boolean =>
   err !== null &&
   (err as { code?: number }).code === MONGO_DUPLICATE_KEY;
 
-// Hash the password only when the caller supplied the field. An absent
-// `password` key means "leave it alone" — important on the update branch where
-// we must not silently clear a user's existing protection.
-const withHashedPassword = async (
-  shareData: Partial<ShareProjectInterface>,
-): Promise<Partial<ShareProjectInterface>> => {
-  if (!("password" in shareData)) return shareData;
-  return { ...shareData, password: (await hashSharePassword(shareData.password)) ?? undefined };
+/** The Share fields an owner may write; `project` and `user` come from the server. */
+const EDITABLE = ["url", "password", "canEdit"] as const;
+type EditableShare = Partial<Pick<ShareProjectInterface, (typeof EDITABLE)[number]>>;
+
+// Keep only the editable fields, hashing the password only when the caller
+// supplied the field. An absent `password` key means "leave it alone":
+// important on the update branch where we must not silently clear a user's
+// existing protection.
+const toPersisted = async (shareData: Partial<ShareProjectInterface>): Promise<EditableShare> => {
+  const persisted: EditableShare = Object.fromEntries(
+    EDITABLE.filter((key) => key in shareData).map((key) => [key, shareData[key]]),
+  );
+  if (!("password" in persisted)) return persisted;
+  return { ...persisted, password: (await hashSharePassword(persisted.password)) ?? undefined };
 };
 
 /**
@@ -43,7 +49,7 @@ export const attachOrUpdateShare = async (
   projectDoc: ProjectDoc,
   shareData: Partial<ShareProjectInterface>,
 ): Promise<ProjectDoc> => {
-  const persisted = await withHashedPassword(shareData);
+  const persisted = await toPersisted(shareData);
 
   if (projectDoc.share) {
     await Share.findByIdAndUpdate(projectDoc.share, { $set: persisted });
