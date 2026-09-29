@@ -21,7 +21,7 @@ import {
   ShareProjectInterface,
   UserInterface,
 } from "@/root/src/components/shared/types";
-import { type ApiFailure, browserApi, browserSession } from "@/utils/apiClient";
+import { type ApiFailure, browserApi, browserSession, type ShareAccess } from "@/utils/apiClient";
 
 import { ModalType } from "../components/Modals/Modals";
 import {
@@ -346,76 +346,71 @@ export const GlobalProvider = ({
     }
   };
 
-  const fetchWithPasswordPublicProject: FetchWithPasswordPublicProjectType = async (password) => {
+  const fetchWithPasswordPublicProject: FetchWithPasswordPublicProjectType = (password) => {
     // get id
     const shareUrl = window.location.pathname.split("/").slice(-1)[0];
+    return browserApi.openShare(shareUrl, password);
+  };
 
-    const result = await browserApi.openShare(shareUrl, password);
-    // if an error occurs, redirect to homepage for a guest
-    if (result.kind !== "ok") {
-      Router.push("/");
-      return null;
+  const promptForSharePassword = (message: React.ReactElement): void => {
+    createPrompt({
+      msg: (
+        <div>
+          <h2 className="mb-2 text-xl font-bold text-themeAccent">
+            <a href="/">VideoNote</a>
+          </h2>
+          {message}
+        </div>
+      ),
+      passwordRequired: true,
+      action: async (data: any) => {
+        cancelPrompt();
+        const { password } = data;
+        setTimeout(async () => {
+          // get password and send again
+          handleShareAccess(await fetchWithPasswordPublicProject(password));
+        }, 300);
+      },
+    });
+  };
+
+  // A guest reads a Share through the public route only; its reply is the whole project.
+  const handleShareAccess = (access: ShareAccess): void => {
+    switch (access.kind) {
+      case "passwordRequired":
+        return promptForSharePassword(
+          <span className="whitespace-pre">
+            A <span className="text-themeAccent">password </span>
+            is required to access this project
+          </span>,
+        );
+      case "incorrect":
+        return promptForSharePassword(
+          <span className="whitespace-pre">
+            The <span className="text-themeAccent">password </span>
+            is incorrect. Do you want to try again?
+          </span>,
+        );
+      case "ok":
+        setAdmin(false);
+        setProjects([access.project]);
+        setCurrentProject(access.project);
+        alertProjectLoaded(access.project);
+        return;
+      case "notFound":
+      case "error":
+        // redirect to homepage for a guest
+        addAlert({
+          type: "error",
+          msg: access.kind === "error" ? access.msg : "Share url does not exist.",
+        });
+        Router.push("/");
     }
-    return result.data;
   };
 
   //-------------------------------
   const handleInitialServerData: HandleInitialServerDataType = (data) => {
-    // if password is required then lets exit early
-    // fetch data again providing password
-    // re-init 'handleInitialServerData'
-    if (data.msg === "shared project password required") {
-      createPrompt({
-        msg: (
-          <div>
-            <h2 className="mb-2 text-xl font-bold text-themeAccent">
-              <a href="/">VideoNote</a>
-            </h2>
-            <span className="whitespace-pre">
-              A <span className="text-themeAccent">password </span>
-              is required to access this project
-            </span>
-          </div>
-        ),
-        passwordRequired: true,
-        action: async (data: any) => {
-          cancelPrompt();
-          const { password } = data;
-          setTimeout(async () => {
-            // get password and send again
-            const serverData = await fetchWithPasswordPublicProject(password);
-            if (serverData) handleInitialServerData(serverData);
-          }, 300);
-        },
-      });
-      return;
-    } else if (data.msg === "password incorrect") {
-      createPrompt({
-        msg: (
-          <div>
-            <h2 className="mb-2 text-xl font-bold text-themeAccent">
-              <a href="/">VideoNote</a>
-            </h2>
-            <span className="whitespace-pre">
-              The <span className="text-themeAccent">password </span>
-              is incorrect. Do you want to try again?
-            </span>
-          </div>
-        ),
-        passwordRequired: true,
-        action: async (data: any) => {
-          cancelPrompt();
-          const { password } = data;
-
-          setTimeout(async () => {
-            // get password and send again
-            const serverData = await fetchWithPasswordPublicProject(password);
-            if (serverData) handleInitialServerData(serverData);
-          }, 300);
-        },
-      });
-      return;
-    }
+    if (data.share) return handleShareAccess(data.share);
 
     // ERROR
     // a msg or a missing user means the server could not load the account
@@ -433,18 +428,6 @@ export const GlobalProvider = ({
     // HANDLE DATA
     // allocate server data to respective areas
     setProjects(projects);
-
-    // a guest has no account data and no access to the project route:
-    // the public payload already holds the whole shared project
-    if (Object.keys(userAccount).length === 0) {
-      setAdmin(false);
-      const shared: ProjectInterface = projects[0];
-      if (shared) {
-        setCurrentProject(shared);
-        alertProjectLoaded(shared);
-      }
-      return;
-    }
 
     setUser(user as UserInterface);
 

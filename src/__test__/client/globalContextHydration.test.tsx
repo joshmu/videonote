@@ -1,4 +1,4 @@
-import { act, render, waitFor } from "@testing-library/react";
+import { act, render, screen, waitFor } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import type { ProjectInterface } from "@/components/shared/types";
@@ -24,8 +24,9 @@ const fetchStub = (routes: Record<string, Handler> = {}) =>
 let ctx: ReturnType<typeof useGlobalContext>;
 const Probe = () => {
   ctx = useGlobalContext();
-  return null;
+  return ctx.promptState.isOpen ? <div data-testid="prompt">{ctx.promptState.msg}</div> : null;
 };
+const promptText = () => screen.queryByTestId("prompt")?.textContent;
 
 const renderGlobal = (serverData: Record<string, unknown>) =>
   render(
@@ -57,7 +58,7 @@ describe("globalContext hydration", () => {
     vi.stubGlobal("fetch", fetch);
 
     await act(async () => {
-      renderGlobal({ user: { projects: [sharedProject] } });
+      renderGlobal({ share: { kind: "ok", project: sharedProject } });
     });
 
     expect(ctx.admin).toBe(false);
@@ -89,6 +90,34 @@ describe("globalContext hydration", () => {
     await waitFor(() => expect(ctx.project?.title).toBe("Loaded"));
     expect(ctx.admin).toBe(true);
     expect(ctx.user).toMatchObject({ username: "owner" });
+  });
+
+  it("prompts for a Share password, rejects a wrong one and opens the project with the right one", async () => {
+    window.history.pushState({}, "", "/vn/rough-cut");
+    const fetch = fetchStub({
+      "/api/public_project": ({ shareUrl, password }) =>
+        shareUrl !== "rough-cut"
+          ? { status: 404, body: { msg: "Share url does not exist." } }
+          : password === "hunter2"
+            ? { status: 200, body: { user: { projects: [sharedProject] } } }
+            : { status: 403, body: { msg: "password incorrect" } },
+    });
+    vi.stubGlobal("fetch", fetch);
+
+    await act(async () => {
+      renderGlobal({ share: { kind: "passwordRequired" } });
+    });
+    expect(ctx.promptState.passwordRequired).toBe(true);
+    expect(promptText()).toMatch(/password is required/);
+
+    await act(async () => ctx.promptState.action({ password: "nope" }));
+    await waitFor(() => expect(promptText()).toMatch(/password is incorrect/));
+    expect(ctx.project).toBeNull();
+
+    await act(async () => ctx.promptState.action({ password: "hunter2" }));
+    await waitFor(() => expect(ctx.project).toMatchObject({ _id: "p1" }));
+    expect(ctx.admin).toBe(false);
+    expect(mocks.push).not.toHaveBeenCalled();
   });
 
   it("sends a {msg}-only payload to login instead of throwing", async () => {

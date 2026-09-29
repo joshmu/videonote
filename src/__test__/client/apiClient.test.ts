@@ -136,6 +136,25 @@ describe("createApiClient", () => {
   });
 });
 
+describe("openShare", () => {
+  const project = { _id: "p1", title: "Rough cut", notes: [] };
+
+  it.each([
+    [200, { user: { projects: [project] } }, { kind: "ok", project }],
+    [401, { msg: "shared project password required" }, { kind: "passwordRequired" }],
+    [403, { msg: "password incorrect" }, { kind: "incorrect" }],
+    [404, { msg: "Share url does not exist." }, { kind: "notFound" }],
+    [500, { msg: "Database error" }, { kind: "error", msg: "Database error" }],
+  ])("maps a %i reply to its Share access outcome", async (status, body, expected) => {
+    const { fetch, api } = clientWith(reply(status, body), memorySession());
+
+    expect(await api.openShare("rough-cut", "hunter2")).toEqual(expected);
+    const [url, init] = fetch.mock.calls[0] as unknown as [string, RequestInit];
+    expect(url).toBe("/api/public_project");
+    expect(JSON.parse(init.body as string)).toEqual({ shareUrl: "rough-cut", password: "hunter2" });
+  });
+});
+
 describe("session token stores", () => {
   afterEach(() => {
     browserSession.remove();

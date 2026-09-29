@@ -28,37 +28,37 @@ const seedShare = async (password?: string) => {
 };
 
 describe("POST /api/public_project", () => {
-  it("answers 200 with a password-required msg for a protected Share", async () => {
+  it("answers 401 for a protected Share without a password", async () => {
     await seedShare("hunter2");
 
     expect(await post({ shareUrl: "rough-cut" })).toEqual({
-      status: 200,
+      status: 401,
       body: { msg: "shared project password required" },
     });
   });
 
-  it("answers 200 with a password-incorrect msg for a wrong password", async () => {
+  it("answers 403 for a wrong password", async () => {
     await seedShare("hunter2");
 
     expect(await post({ shareUrl: "rough-cut", password: "nope" })).toEqual({
-      status: 200,
+      status: 403,
       body: { msg: "password incorrect" },
     });
   });
 
-  it("answers 400 for an unknown share url", async () => {
+  it("answers 404 for an unknown share url", async () => {
     expect(await post({ shareUrl: "missing" })).toEqual({
-      status: 400,
+      status: 404,
       body: { msg: "Share url does not exist." },
     });
   });
 
-  it("answers 400 when the shared Project was deleted", async () => {
+  it("answers 404 when the shared Project was deleted", async () => {
     const project = await seedShare();
     await Project.deleteOne({ _id: project._id });
 
     expect(await post({ shareUrl: "rough-cut" })).toEqual({
-      status: 400,
+      status: 404,
       body: { msg: "Share url does not exist." },
     });
   });

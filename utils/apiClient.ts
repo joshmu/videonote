@@ -53,6 +53,20 @@ export type UserReply = { user: UserInterface };
 export type SettingsReply = { settings: SettingsInterface };
 export type MsgReply = { msg: string };
 
+/** A Share read from the public route, by status: 401, 403, 404 or ok. */
+export type ShareAccess =
+  | { kind: "ok"; project: ProjectInterface }
+  | { kind: "passwordRequired" }
+  | { kind: "incorrect" }
+  | { kind: "notFound" }
+  | { kind: "error"; msg: string };
+
+const SHARE_STATUS: Record<number, ShareAccess> = {
+  401: { kind: "passwordRequired" },
+  403: { kind: "incorrect" },
+  404: { kind: "notFound" },
+};
+
 type Credentials = { email: string; password: string; password2?: string };
 
 export const createApiClient = ({
@@ -111,8 +125,17 @@ export const createApiClient = ({
       post<MsgReply>("/api/user", { action: "remove", user }),
     updateSettings: (settings: Partial<SettingsInterface>) =>
       post<SettingsReply>("/api/settings", { settings }),
-    openShare: (shareUrl: string, password?: string) =>
-      post<AuthReply>("/api/public_project", { shareUrl, password }),
+    openShare: async (shareUrl: string, password?: string): Promise<ShareAccess> => {
+      const result = await post<{ user?: { projects?: ProjectInterface[] } }>(
+        "/api/public_project",
+        { shareUrl, password },
+      );
+      if (result.kind !== "ok")
+        return SHARE_STATUS[result.status] ?? { kind: "error", msg: result.msg };
+      const project = result.data.user?.projects?.[0];
+      if (!project) return { kind: "error", msg: "Unexpected response from the server." };
+      return { kind: "ok", project };
+    },
   };
 };
 

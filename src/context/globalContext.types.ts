@@ -27,7 +27,7 @@ import {
   ShareProjectInterface,
   UserInterface,
 } from "@/shared/types";
-import type { ProjectReply } from "@/utils/apiClient";
+import type { ProjectReply, ShareAccess } from "@/utils/apiClient";
 
 export interface GlobalContextInterface {
   user: UserInterface;
@@ -109,9 +109,7 @@ export type CreateProjectType = (
 
 export type RemoveProjectType = (_id: string) => Promise<void>;
 
-export type FetchWithPasswordPublicProjectType = (
-  password: string,
-) => Promise<{ [key: string]: any } | null>;
+export type FetchWithPasswordPublicProjectType = (password: string) => Promise<ShareAccess>;
 
 export type HandleInitialServerDataType = (data: { [key: string]: any }) => void;
 
