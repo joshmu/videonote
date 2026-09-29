@@ -170,6 +170,22 @@ describe("projectsContext changes", () => {
     expect(result.current.projects[0]).toMatchObject({ title: "Final", notes });
   });
 
+  it("updates from a closure made before the session started, as hydration does", async () => {
+    const { result, projectRequests } = renderProjects({ "/api/project": projectRoute });
+    act(() => result.current.showSharedProject(project("p1")));
+    const updateFromEarlierRender = result.current.updateProject;
+
+    await act(async () => {
+      result.current.startSession({ user: { _id: "u1", username: "owner", projects: [] } });
+      await updateFromEarlierRender({ ...project("p1"), title: "Final" });
+    });
+
+    expect(projectRequests().at(-1)?.body).toMatchObject({
+      action: "UPDATE",
+      project: { _id: "p1" },
+    });
+  });
+
   it("does not update projects for a guest", async () => {
     const { result, requests } = renderProjects({ "/api/project": projectRoute });
 

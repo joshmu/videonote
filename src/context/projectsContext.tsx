@@ -56,7 +56,7 @@ export const ProjectsProvider = ({ children }: { children: React.ReactNode }) =>
   const [currentProject, setCurrentProject] = useState<ProjectInterface>(null!);
 
   const { addAlert } = useNotificationContext();
-  const { api, user, admin, settings, updateSettings, reportFailure } = useSessionContext();
+  const { api, user, isAdmin, settings, updateSettings, reportFailure } = useSessionContext();
   const { modalsOpen, toggleModalOpen } = useUiShellContext();
 
   // notification recommend creating a project if there are no projects and we have loaded the user
@@ -115,7 +115,7 @@ export const ProjectsProvider = ({ children }: { children: React.ReactNode }) =>
   };
 
   const updateProject: UpdateProjectType = async (projectData) => {
-    if (!admin) return;
+    if (!isAdmin()) return;
 
     // add _id for db processing
     projectData._id = currentProject._id;

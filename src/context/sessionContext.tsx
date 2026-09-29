@@ -25,6 +25,8 @@ interface SessionContextInterface {
   api: ApiClient;
   user: UserInterface;
   admin: boolean;
+  /** `admin` as just set, for actions started in the same tick as startSession. */
+  isAdmin: () => boolean;
   settings: SettingsInterface;
   startSession: (serverData: { [key: string]: any }) => SessionAccount | null;
   updateUser: UpdateUserType;
@@ -56,6 +58,8 @@ export const SessionProvider = ({
     adminRef.current = value;
     setAdminState(value);
   };
+
+  const isAdmin = (): boolean => adminRef.current;
 
   const { addAlert } = useNotificationContext();
 
@@ -108,7 +112,7 @@ export const SessionProvider = ({
   };
 
   const updateSettings: UpdateSettingsType = async (newSettingsData) => {
-    if (!adminRef.current) return;
+    if (!isAdmin()) return;
 
     const result = await api.updateSettings(newSettingsData);
     if (result.kind !== "ok") return reportFailure(result);
@@ -142,6 +146,7 @@ export const SessionProvider = ({
     api,
     user,
     admin,
+    isAdmin,
     settings,
     startSession,
     updateUser,
