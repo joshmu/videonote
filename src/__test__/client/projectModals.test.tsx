@@ -128,6 +128,16 @@ describe("ShareProjectModal fields", () => {
     expect(input(container, "url").value).toBe("my-final-cut");
   });
 
+  it("gives two spaces typed one at a time a single dash", () => {
+    mocks.projects.project = { ...project, share: undefined };
+    const container = renderShare();
+
+    type(container, "url", "rough ");
+    type(container, "url", `${input(container, "url").value} `);
+
+    expect(input(container, "url").value).toBe("rough-");
+  });
+
   it("keeps the url when edit access is toggled", () => {
     mocks.projects.project = { ...project, share: undefined };
     const container = renderShare();

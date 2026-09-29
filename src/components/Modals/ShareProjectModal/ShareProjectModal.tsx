@@ -25,12 +25,13 @@ import { ModalInput } from "@/shared/Modal/ModalInput";
 import { ShareProjectInterface } from "@/shared/types";
 import { copyToClipboard } from "@/utils/clientHelpers";
 
-// Lowercase, each run of whitespace a dash, and only url-safe characters kept.
+// Lowercase, whitespace as one dash (typed a key at a time too), only url-safe characters.
 const formatUrl = (txt: string): string =>
   txt
     .toLowerCase()
     .replace(/\s+/g, "-")
-    .replace(/[^a-z0-9_-]/g, "");
+    .replace(/[^a-z0-9_-]/g, "")
+    .replace(/-{2,}/g, "-");
 
 type ShareForm = { url: string; canEdit: boolean; password: string; removePassword: boolean };
 

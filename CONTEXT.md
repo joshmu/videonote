@@ -286,8 +286,8 @@ An update takes only `title` and `src` from its reply, keeping the loaded
 Notes and Share.
 The Share modal reads `hasPassword`: an empty password field sends no
 `password` (kept), its remove control sends `""`, a typed value sets it.
-A typed url is lowercased, each run of whitespace becomes `-` and any other
-character outside `a-z0-9_-` is dropped.
+A typed url is lowercased, each run of whitespace becomes `-`, any other
+character outside `a-z0-9_-` is dropped and repeated dashes become one.
 
 **Shared-project access context**:
 `src/context/sharedProjectContext.tsx`. Opens a public **Share**
