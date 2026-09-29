@@ -28,10 +28,16 @@ const formatError = {
   target: { error: { code: 4, message: "MEDIA_ELEMENT_ERROR: Format error" } },
 };
 
+const OTHER_SRC = "https://cdn.example.com/other.mp4";
+
 const renderVideo = async (src: string) => {
   const transport = fakeTransport({
     "/api/settings": ({ settings }) => ok({ settings }),
-    "/api/project": ({ project: sent }) => ok({ project: { ...project(src), ...sent } }),
+    "/api/project": ({ project: sent }) =>
+      ok({
+        project:
+          sent._id === "p2" ? { ...project(OTHER_SRC), _id: "p2" } : { ...project(src), ...sent },
+      }),
   });
   const wrapper = ({ children }: { children: React.ReactNode }) => (
     <NotificationProvider>
@@ -57,7 +63,12 @@ const renderVideo = async (src: string) => {
   );
   await act(async () => {
     const account = result.current.startSession({
-      user: { _id: "u1", username: "owner", settings: { _id: "set1" }, projects: [project(src)] },
+      user: {
+        _id: "u1",
+        username: "owner",
+        settings: { _id: "set1", currentProject: "p1" },
+        projects: [project(src), { ...project(OTHER_SRC), _id: "p2" }],
+      },
     });
     result.current.openProjects(account);
   });
@@ -123,5 +134,29 @@ describe("videoContext playback errors", () => {
     await waitFor(() => expect(updates()).toHaveLength(1));
     expect(updates()[0].body.project).toMatchObject({ _id: "p1", src: "" });
     expect(result.current.modalsOpen).toContain(ModalType.CURRENT_PROJECT);
+  });
+
+  it("clears a stale blob src whatever the error message says", async () => {
+    const { result, updates } = await renderVideo("blob:https://videonote.app/stale");
+    const networkError = { target: { error: { code: 2, message: "NS_ERROR_DOM_MEDIA_NETWORK" } } };
+
+    await act(async () => result.current.handlePlayerError(networkError));
+
+    await waitFor(() => expect(updates()).toHaveLength(1));
+    expect(updates()[0].body.project).toMatchObject({ _id: "p1", src: "" });
+  });
+
+  it("shows one warning per project and drops it when another project loads", async () => {
+    const { result } = await renderVideo(WEB_SRC);
+    const warnings = () => result.current.alerts.filter((alert) => alert.type === "warning");
+
+    act(() => result.current.handlePlayerError(formatError));
+    act(() => result.current.handlePlayerError(formatError));
+    expect(warnings()).toHaveLength(1);
+
+    await act(async () => result.current.loadProject("p2"));
+
+    await waitFor(() => expect(result.current.url).toBe(OTHER_SRC));
+    expect(warnings()).toEqual([]);
   });
 });

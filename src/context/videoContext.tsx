@@ -56,7 +56,7 @@ const videoContext = createContext<VideoContextInterface>(null!);
 export const VideoProvider = (props: { [key: string]: any }) => {
   const { project, updateProject, warnLocalVideo } = useProjectsContext();
   const { settings } = useSessionContext();
-  const { addAlert, removeAlert } = useNotificationContext();
+  const { alerts, addAlert, removeAlert } = useNotificationContext();
   const playerRef = useRef<HTMLVideoElement>(null!);
   const [url, setUrl] = useState<string>(null!);
   const [playing, setPlaying] = useState<boolean>(false);
@@ -71,7 +71,24 @@ export const VideoProvider = (props: { [key: string]: any }) => {
     null,
   );
 
+  // the "can't play" warning on screen and the project src it was raised for
+  const unplayableWarning = useRef<{ id: string; projectId: string; src: string }>(null);
+
   const [action, setAction] = useAnounceAction("");
+
+  const isWarningFor = (target: { _id?: string; src?: string } | null): boolean =>
+    unplayableWarning.current?.projectId === target?._id &&
+    unplayableWarning.current?.src === target?.src;
+
+  const dropUnplayableWarning = (): void => {
+    if (unplayableWarning.current) removeAlert(unplayableWarning.current.id);
+    unplayableWarning.current = null;
+  };
+
+  // the warning belongs to one project src: drop it once another one is current
+  useEffect(() => {
+    if (unplayableWarning.current && !isWarningFor(project)) dropUnplayableWarning();
+  }, [project?._id, project?.src]);
 
   useEffect(() => {
     if (project !== null && project.src !== null) {
@@ -160,6 +177,10 @@ export const VideoProvider = (props: { [key: string]: any }) => {
 
     // keep the stored url (other browsers may play it) and offer a local copy instead
     const { _id: projectId, src } = project ?? {};
+    const isShowing = alerts.some((alert) => alert.id === unplayableWarning.current?.id);
+    if (isShowing && isWarningFor(project)) return;
+    dropUnplayableWarning();
+
     const alertId = addAlert({
       type: "warning",
       persistent: true,
@@ -171,12 +192,13 @@ export const VideoProvider = (props: { [key: string]: any }) => {
             id="unplayableVideoFile"
             handleVideoSrc={(localUrl) => {
               setLocalVideo({ projectId, src, url: localUrl });
-              removeAlert(alertId);
+              dropUnplayableWarning();
             }}
           />
         </span>
       ),
     });
+    unplayableWarning.current = { id: alertId, projectId, src };
   };
 
   const handleDuration = (secs: number): void => {
