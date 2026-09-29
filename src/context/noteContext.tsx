@@ -24,7 +24,6 @@ const createId = () => nanoid(24);
 
 type AddNoteType = (note: NoteInterface | { content: string; time: number }) => void;
 type UpdateNoteType = (note: NoteInterface) => void;
-type RemoveNoteType = (id: string) => void;
 type UpdateSearchType = (txt: string) => void;
 type SortType = (notes: NoteInterface[]) => NoteInterface[];
 type RemoveCompletedType = () => void;
@@ -32,7 +31,6 @@ interface NoteContextInterface {
   notes: NoteInterface[];
   addNote: AddNoteType;
   updateNote: UpdateNoteType;
-  removeNote: RemoveNoteType;
   updateSearch: UpdateSearchType;
   sort: SortType;
   search: string;
@@ -147,11 +145,6 @@ export function NoteProvider(props: { [key: string]: any }) {
     });
   };
 
-  const removeNote = (_id: string): void => {
-    const updatedNotes = notes.filter((note) => note._id !== _id);
-    setNotes(updatedNotes);
-  };
-
   const updateSearch: UpdateSearchType = (txt) => {
     setSearch(txt);
   };
@@ -180,7 +173,6 @@ export function NoteProvider(props: { [key: string]: any }) {
     notes,
     addNote,
     updateNote,
-    removeNote,
     search,
     updateSearch,
     sort,

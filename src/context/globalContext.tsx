@@ -683,14 +683,6 @@ export const GlobalProvider = ({
     if (menuOpen) setMenuOpen(false);
   };
 
-  // todo: move to controls context
-  // const handleGlobalEscapeKey: HandleGlobalEscapeKeyType = key => {
-  //   if (key === Key.ESC) {
-  //     cancelModals()
-  //   }
-  // }
-  // useGlobalKeydown(handleGlobalEscapeKey)
-
   const checkCanEdit: CheckCanEditType = () => {
     return admin || ((currentProject?.share ?? {}) as ShareProjectInterface).canEdit;
   };

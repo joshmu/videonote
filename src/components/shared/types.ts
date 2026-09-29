@@ -79,7 +79,6 @@ export enum ProjectApiActions {
 
 export enum NoteApiAction {
   REMOVE_DONE_NOTES = "REMOVE DONE NOTES",
-  REMOVE = "remove",
 }
 
 export interface ProjectDocInterface extends Document {

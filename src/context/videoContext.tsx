@@ -145,33 +145,11 @@ export const VideoProvider = (props: { [key: string]: any }) => {
       updateProject({ src: "" });
 
       warnLocalVideo(project);
-      // requestLocalVideo()
 
       return;
     }
 
     addAlert({ type: "error", msg: "Player unable to load video." });
-  };
-
-  // todo: remove automatic pop up and replace with a button alternative ( or better > auto pop up current project settings modal)
-  const _requestLocalVideo = (): void => {
-    console.log("reqesting local video");
-    var input = document.createElement("input");
-    input.type = "file";
-
-    input.onchange = (event: Event) => {
-      const file = (event.target as HTMLInputElement).files[0];
-      const url = URL.createObjectURL(file);
-      console.log(url);
-      if (typeof url !== "string" || url.length === 0) return;
-
-      // if we have a src url we will update the project information and reset the React Player URL
-      const updatedProject = { ...project, src: url };
-      updateProject(updatedProject);
-      setUrl(url);
-    };
-
-    input.click();
   };
 
   const handleDuration = (secs: number): void => {
