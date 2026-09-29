@@ -14,87 +14,46 @@ import { StatusCodes } from "http-status-codes";
 
 import { ProjectApiActions } from "@/shared/types";
 import { withAuthenticatedUser } from "@/utils/auth/withAuthenticatedUser";
-import { Note, Project, type ProjectDoc, Share } from "@/utils/mongoose";
-import { findProjectWithRelations } from "@/utils/project/findProjectWithRelations";
-import { attachOrUpdateShare, detachShare, ShareUrlTakenError } from "@/utils/share/shareIntake";
+import {
+  createProject,
+  getProject,
+  type ProjectNotFound,
+  type ProjectOk,
+  type ProjectUrlTaken,
+  removeProject,
+  shareProject,
+  unshareProject,
+  updateProject,
+} from "@/utils/project/projectIntake";
+
+type Outcome = ProjectOk | ProjectNotFound | ProjectUrlTaken;
 
 export default withAuthenticatedUser(async (req, res, { userDoc, newToken }) => {
-  const { action, project } = req.body;
+  const { action, project, share } = req.body;
+  const userId = userDoc._id;
+  const projectId = project?._id;
 
-  let projectDoc: ProjectDoc;
+  let outcome: Outcome;
   try {
     switch (action) {
       case ProjectApiActions.GET:
-        projectDoc = await findProjectWithRelations({
-          _id: project._id,
-          user: userDoc._id,
-        });
+        outcome = await getProject(userId, projectId);
         break;
-
       case ProjectApiActions.CREATE:
-        projectDoc = new Project({
-          ...project,
-          user: userDoc._id,
-        });
-        await projectDoc.save();
-        userDoc.projects.push(projectDoc._id);
-        await userDoc.save();
+        outcome = await createProject(userId, project);
         break;
-
-      case ProjectApiActions.UPDATE: {
-        const { _id, ...data } = project;
-        projectDoc = await Project.findOneAndUpdate(
-          { _id, user: userDoc._id },
-          { $set: data },
-          { new: true },
-        );
+      case ProjectApiActions.UPDATE:
+        outcome = await updateProject(userId, projectId, project);
         break;
-      }
-
-      case ProjectApiActions.SHARE: {
-        const owned = await Project.findOne({
-          _id: project._id,
-          user: userDoc._id,
-        });
-        try {
-          projectDoc = await attachOrUpdateShare(owned, req.body.share);
-        } catch (error) {
-          if (error instanceof ShareUrlTakenError) {
-            return res
-              .status(StatusCodes.INTERNAL_SERVER_ERROR)
-              .json({ msg: error.message, error });
-          }
-          throw error;
-        }
+      case ProjectApiActions.SHARE:
+        outcome = await shareProject(userId, projectId, share);
         break;
-      }
-
-      case ProjectApiActions.REMOVE_SHARE: {
-        const owned = await Project.findOne({
-          _id: project._id,
-          user: userDoc._id,
-        });
-        projectDoc = await detachShare(owned, req.body.share);
+      case ProjectApiActions.REMOVE_SHARE:
+        outcome = await unshareProject(userId, projectId, share);
         break;
-      }
-
       case ProjectApiActions.REMOVE:
-        projectDoc = await Project.findOne({
-          _id: project._id,
-          user: userDoc._id,
-        });
-        await Note.deleteMany({ project: projectDoc._id });
-        await Share.deleteMany({ project: projectDoc._id });
-        await userDoc.projects.pull(projectDoc._id);
-        await userDoc.save();
-        await projectDoc.deleteOne();
-
-        return res.status(StatusCodes.OK).json({
-          // toObject method does not work on removed/deleted mongoose document
-          project: projectDoc,
-          token: newToken,
-        });
-
+        outcome = await removeProject(userId, projectId);
+        break;
       default:
         return res.status(StatusCodes.BAD_REQUEST).json({ msg: "Action not specified" });
     }
@@ -103,8 +62,15 @@ export default withAuthenticatedUser(async (req, res, { userDoc, newToken }) => 
     return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ msg: "Database error", error });
   }
 
-  return res.status(StatusCodes.OK).json({
-    project: projectDoc.toObject(),
-    token: newToken,
-  });
+  switch (outcome.kind) {
+    case "notFound":
+      return res.status(StatusCodes.NOT_FOUND).json({ msg: "Project not found." });
+    case "urlTaken":
+      return res.status(StatusCodes.CONFLICT).json({ msg: outcome.message });
+    case "ok":
+      return res.status(StatusCodes.OK).json({
+        project: outcome.project.toObject(),
+        token: newToken,
+      });
+  }
 });
