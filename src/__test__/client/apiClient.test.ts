@@ -136,6 +136,22 @@ describe("createApiClient", () => {
   });
 });
 
+describe("removeAccount", () => {
+  it("tells a wrong password apart from an expired session", async () => {
+    const wrong = clientWith(reply(401, { msg: "Password is incorrect." }));
+    const expired = clientWith(reply(401, { msg: "Invalid token" }));
+
+    expect(await wrong.api.removeAccount({ password: "nope" })).toEqual({
+      kind: "wrongPassword",
+      status: 401,
+      msg: "Password is incorrect.",
+    });
+    expect(await expired.api.removeAccount({ password: "secret" })).toMatchObject({
+      kind: "unauthorized",
+    });
+  });
+});
+
 describe("openShare", () => {
   const project = { _id: "p1", title: "Rough cut", notes: [] };
 

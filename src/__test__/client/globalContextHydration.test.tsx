@@ -161,6 +161,34 @@ const signedInData = (settings: Record<string, unknown>) => ({
   },
 });
 
+describe("globalContext removeAccount", () => {
+  const renderSignedIn = async (reply: { status: number; body: unknown }) => {
+    vi.stubGlobal("fetch", fetchStub({ "/api/user": () => reply }));
+    await act(async () => {
+      renderGlobal({
+        user: { _id: "u1", username: "owner", email: "owner@example.com", projects: [] },
+      });
+    });
+    vi.clearAllMocks();
+    await act(async () => {
+      await ctx.removeAccount({ ...ctx.user, password: "secret" });
+    });
+  };
+
+  it("shows a wrong password without ending the session", async () => {
+    await renderSignedIn({ status: 401, body: { msg: "Password is incorrect." } });
+
+    expect(mocks.addAlert).toHaveBeenCalledWith({ type: "error", msg: "Password is incorrect." });
+    expect(mocks.push).not.toHaveBeenCalled();
+  });
+
+  it("sends an expired session to login", async () => {
+    await renderSignedIn({ status: 401, body: { msg: "Invalid token" } });
+
+    expect(mocks.push).toHaveBeenCalledWith("/login");
+  });
+});
+
 describe("globalContext admin", () => {
   it("starts as a guest until the account is loaded", async () => {
     const seen: boolean[] = [];

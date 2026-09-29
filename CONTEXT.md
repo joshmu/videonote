@@ -182,7 +182,9 @@ The one-line helper in `utils/auth/withAuthenticatedUser.ts` that pulls
 takes `fetch` as a parameter and exposes one typed call per route, each
 returning `ok` | `unauthorized` (401) | `error` (other failures, non-JSON
 bodies, network errors). `openShare` instead returns the Share access outcome
-read from the public route's status. The **SessionStore** it takes is the only
+read from the public route's status, and `removeAccount` adds `wrongPassword`
+(a 401 whose msg is the wrong-password one) so an expired session still reads
+as `unauthorized`. The **SessionStore** it takes is the only
 code that touches the token cookie: `browserSession` reads, writes and removes
 it; `requestSession(cookieHeader)` reads a request's cookie on the server and
 never writes. `browserApi` is the client the browser uses; `globalContext`,

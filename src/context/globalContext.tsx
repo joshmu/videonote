@@ -511,11 +511,11 @@ export const GlobalProvider = ({
 
     // use passed data otherwise use current user information in global state
     const result = await browserApi.removeAccount(userData || user);
-    // a 401 here is a wrong password, so show it rather than ending the session
-    if (result.kind !== "ok") {
+    if (result.kind === "wrongPassword") {
       addAlert({ type: "error", msg: result.msg });
       return;
     }
+    if (result.kind !== "ok") return reportFailure(result);
 
     addAlert({ type: "success", msg: "Account removed. Goodbye! 👋" });
 

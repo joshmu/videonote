@@ -67,6 +67,10 @@ const SHARE_STATUS: Record<number, ShareAccess> = {
   404: { kind: "notFound" },
 };
 
+// /api/user answers a wrong password with 401 as well; only this msg tells it
+// apart from an expired session.
+const WRONG_PASSWORD_MSG = "Password is incorrect.";
+
 type Credentials = { email: string; password: string; password2?: string };
 
 export const createApiClient = ({
@@ -121,8 +125,15 @@ export const createApiClient = ({
       post<NotesReply>("/api/note", { action: NoteApiAction.REMOVE_DONE_NOTES, projectId }),
     updateUser: (user: Partial<UserInterface>) =>
       post<UserReply>("/api/user", { action: "update", user }),
-    removeAccount: (user: Partial<UserInterface>) =>
-      post<MsgReply>("/api/user", { action: "remove", user }),
+    removeAccount: async (
+      user: Partial<UserInterface>,
+    ): Promise<ApiResult<MsgReply> | { kind: "wrongPassword"; status: number; msg: string }> => {
+      const result = await post<MsgReply>("/api/user", { action: "remove", user });
+      if (result.kind === "unauthorized" && result.msg === WRONG_PASSWORD_MSG) {
+        return { ...result, kind: "wrongPassword" };
+      }
+      return result;
+    },
     updateSettings: (settings: Partial<SettingsInterface>) =>
       post<SettingsReply>("/api/settings", { settings }),
     openShare: async (shareUrl: string, password?: string): Promise<ShareAccess> => {
