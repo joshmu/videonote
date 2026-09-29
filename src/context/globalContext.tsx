@@ -96,7 +96,14 @@ export const GlobalProvider = ({
   const [modalsOpen, setModalsOpen] = useState<ModalType[]>([]);
   const actionInputRef = useRef<HTMLInputElement | null>(null);
 
-  const [admin, setAdmin] = useState<boolean>(true);
+  // guest until the account is loaded; the ref lets actions started during
+  // hydration (e.g. updateSettings from loadProject) see the value just set
+  const [admin, setAdminState] = useState<boolean>(false);
+  const adminRef = useRef<boolean>(false);
+  const setAdmin = (value: boolean): void => {
+    adminRef.current = value;
+    setAdminState(value);
+  };
 
   const { addAlert } = useNotificationContext();
   const { promptState, createPrompt, confirmPrompt, cancelPrompt } = usePrompt();
@@ -152,7 +159,7 @@ export const GlobalProvider = ({
   };
 
   const updateProject: UpdateProjectType = async (projectData) => {
-    if (!admin) return;
+    if (!adminRef.current) return;
 
     // add _id for db processing
     projectData._id = currentProject._id;
@@ -221,22 +228,14 @@ export const GlobalProvider = ({
     return true;
   };
 
-  // to have access to general projects information (like note count) we need to update the projects list
-  // we do not alter the current project state with the notes change to avoid a potential update loop
+  // keep the projects list (note counts) and the current project (export, note-count guard,
+  // updateProject) in step with the note list
   const updateProjectsStateWithUpdatedNotes: UpdateProjectsStateWithUpdatedNotesType = async (
     notes,
   ) => {
-    console.log("update projects notes state");
-    // alter state of projects
-    setProjects((current) =>
-      current.map((p) => {
-        if (p._id === currentProject._id) {
-          p.notes = notes;
-        }
-        return p;
-        // return p._id === currentProject._id ? { ...currentProject, notes } : p
-      }),
-    );
+    const projectId = currentProject._id;
+    setProjects((current) => current.map((p) => (p._id === projectId ? { ...p, notes } : p)));
+    setCurrentProject((current) => (current?._id === projectId ? { ...current, notes } : current));
   };
 
   const loadProject: LoadProjectType = async (projectId) => {
@@ -275,7 +274,7 @@ export const GlobalProvider = ({
   };
 
   const updateSettings: UpdateSettingsType = async (newSettingsData) => {
-    if (!admin) return;
+    if (!adminRef.current) return;
 
     const result = await browserApi.updateSettings(newSettingsData);
     if (result.kind !== "ok") return reportFailure(result);
@@ -429,6 +428,7 @@ export const GlobalProvider = ({
     // allocate server data to respective areas
     setProjects(projects);
 
+    setAdmin(true);
     setUser(user as UserInterface);
 
     // avoid null values from mongo

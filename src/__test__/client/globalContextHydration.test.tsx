@@ -3,6 +3,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import type { ProjectInterface } from "@/components/shared/types";
 import { GlobalProvider, useGlobalContext } from "@/context/globalContext";
+import { NoteProvider, useNoteContext } from "@/context/noteContext";
 
 const mocks = vi.hoisted(() => ({ addAlert: vi.fn(), push: vi.fn() }));
 
@@ -10,6 +11,9 @@ vi.mock("@/context/notificationContext", () => ({
   useNotificationContext: () => ({ addAlert: mocks.addAlert }),
 }));
 vi.mock("next/router", () => ({ default: { push: mocks.push } }));
+vi.mock("@/context/videoContext", () => ({
+  useVideoContext: () => ({ progress: { playedSeconds: 0 } }),
+}));
 
 type Handler = (body: Record<string, any>) => { status: number; body: unknown };
 
@@ -144,5 +148,123 @@ describe("globalContext hydration", () => {
     });
 
     expect(mocks.push).toHaveBeenCalledWith("/login");
+  });
+});
+
+const signedInData = (settings: Record<string, unknown>) => ({
+  user: {
+    _id: "u1",
+    username: "owner",
+    email: "owner@example.com",
+    settings,
+    projects: [{ ...sharedProject, share: undefined }],
+  },
+});
+
+describe("globalContext admin", () => {
+  it("starts as a guest until the account is loaded", async () => {
+    const seen: boolean[] = [];
+    const Recorder = () => {
+      seen.push(useGlobalContext().admin);
+      return null;
+    };
+    vi.stubGlobal("fetch", fetchStub());
+
+    await act(async () => {
+      render(
+        <GlobalProvider serverData={{ share: { kind: "ok", project: sharedProject } }}>
+          <Recorder />
+        </GlobalProvider>,
+      );
+    });
+
+    expect(seen[0]).toBe(false);
+    expect(seen.every((admin) => admin === false)).toBe(true);
+  });
+
+  it("saves the loaded project in the settings of a signed-in user", async () => {
+    const fetch = fetchStub({
+      "/api/project": () => ({
+        status: 200,
+        body: { project: { ...sharedProject, share: undefined } },
+      }),
+      "/api/settings": ({ settings }) => ({ status: 200, body: { settings } }),
+    });
+    vi.stubGlobal("fetch", fetch);
+
+    await act(async () => {
+      renderGlobal(signedInData({ _id: "set1", currentProject: null }));
+    });
+
+    await waitFor(() => expect(ctx.settings.currentProject).toBe("p1"));
+    expect(ctx.admin).toBe(true);
+  });
+});
+
+describe("globalContext project notes", () => {
+  it("replaces the current project's notes without mutating the previous project", async () => {
+    vi.stubGlobal(
+      "fetch",
+      fetchStub({
+        "/api/project": () => ({
+          status: 200,
+          body: { project: { ...sharedProject, share: undefined } },
+        }),
+        "/api/settings": ({ settings }) => ({ status: 200, body: { settings } }),
+      }),
+    );
+    await act(async () => {
+      renderGlobal(signedInData({ _id: "set1", currentProject: "p1" }));
+    });
+    await waitFor(() => expect(ctx.project?._id).toBe("p1"));
+    const previous = ctx.projects[0];
+    const previousNotes = previous.notes;
+    const notes = [...previousNotes, { _id: "n2", content: "Grade", time: 9, project: "p1" }];
+
+    await act(async () => {
+      await ctx.updateProjectsStateWithUpdatedNotes(notes);
+    });
+
+    expect(previous.notes).toBe(previousNotes);
+    expect(ctx.projects[0].notes).toEqual(notes);
+    expect(ctx.project.notes).toEqual(notes);
+  });
+
+  it("keeps the current project's notes in step when a note is added", async () => {
+    vi.stubGlobal(
+      "fetch",
+      fetchStub({
+        "/api/project": () => ({
+          status: 200,
+          body: { project: { ...sharedProject, share: undefined } },
+        }),
+        "/api/settings": ({ settings }) => ({ status: 200, body: { settings } }),
+        "/api/note": ({ note }) => ({ status: 200, body: { note } }),
+      }),
+    );
+    let notesCtx: ReturnType<typeof useNoteContext>;
+    const NotesProbe = () => {
+      notesCtx = useNoteContext();
+      return null;
+    };
+    await act(async () => {
+      render(
+        <GlobalProvider serverData={signedInData({ _id: "set1", currentProject: "p1" })}>
+          <NoteProvider>
+            <Probe />
+            <NotesProbe />
+          </NoteProvider>
+        </GlobalProvider>,
+      );
+    });
+    await waitFor(() => expect(notesCtx.notes).toHaveLength(1));
+
+    await act(async () => {
+      notesCtx.addNote({ content: "Grade", time: 9 });
+    });
+
+    expect(notesCtx.notes.map((n) => n.content)).toEqual(["Trim", "Grade"]);
+    expect(ctx.project.notes.map((n) => n.content)).toEqual(["Trim", "Grade"]);
+    expect(ctx.projects[0].notes).toHaveLength(2);
   });
 });
