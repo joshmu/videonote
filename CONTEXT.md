@@ -110,8 +110,10 @@ are written only through `/api/settings`, which takes `currentProject`,
 **User** and returns a discriminated outcome (`ok` / `notFound` /
 `urlTaken` / `invalid`) with no HTTP; `pages/api/project.ts` maps them to
 200, 404, 409 and 400. A malformed or missing project id is `notFound`.
-Create needs a non-empty `title`. Create and update write `title` and
-`src` only. Sharing delegates to the **Share intake**.
+Create needs a non-empty `title` (`invalid`, reason `title`). Create and
+update write `title` and `src` only. Sharing needs a `share` object and
+unsharing one whose `_id` is a hex ObjectId string (`invalid`, reason
+`share`). Sharing delegates to the **Share intake**.
 
 **Project cascade**:
 The one removal path, used by `removeProject` and (through
