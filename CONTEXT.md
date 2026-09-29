@@ -137,7 +137,9 @@ contract for shares. Both treat empty/null as "no password protection".
 **Share intake**:
 The pair `attachOrUpdateShare` / `detachShare` in `utils/share/shareIntake.ts`
 that owns the Project↔Share lifecycle. `attachOrUpdateShare` decides
-create-vs-update by `projectDoc.share`, hashes the password (via
+create-vs-update by `projectDoc.share`, writes only `url`, `password` and
+`canEdit` from the caller (`project` and `user` come from the Project), hashes
+the password (via
 `hashSharePassword`), and surfaces a duplicate `url` as `ShareUrlTakenError`.
 Both operations return the project re-loaded through `findProjectWithRelations`
 so callers can hand it straight back to the client. Handlers no longer reach
