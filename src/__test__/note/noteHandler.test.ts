@@ -77,6 +77,21 @@ describe("POST /api/note", () => {
     expect(removed).toMatchObject({ status: 200, body: { notes: [expect.anything()] } });
   });
 
+  it("never returns the author's email to a guest editing through a Share", async () => {
+    const projectId = await seed({ canEdit: true });
+    const owner = await User.findOne({ email: "owner@example.com" });
+    const authored = await Note.create({ content: "Trim", project: projectId, user: owner._id });
+    await Project.updateOne({ _id: projectId }, { $push: { notes: authored._id } });
+
+    const { status, body } = await post({
+      note: { ...note(projectId), _id: authored._id.toString(), content: "Tighter" },
+    });
+
+    expect(status).toBe(200);
+    expect(body.note.user).toEqual({ _id: owner._id.toString(), username: "owner" });
+    expect(JSON.stringify(body)).not.toContain("owner@example.com");
+  });
+
   it("answers 404 for a missing Project", async () => {
     await seed();
 
@@ -90,6 +105,15 @@ describe("POST /api/note", () => {
         )
       ).status,
     ).toBe(404);
+  });
+
+  it("answers 500 with only a msg when the write fails", async () => {
+    const projectId = await seed();
+    vi.spyOn(console, "error").mockImplementation(() => {});
+
+    const result = await post({ note: { ...note(projectId), _id: "not-an-object-id" } });
+
+    expect(result).toEqual({ status: 500, body: { msg: "Database error" } });
   });
 
   it("answers 400 when no note is sent", async () => {

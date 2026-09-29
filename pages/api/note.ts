@@ -33,9 +33,9 @@ export default withOptionalUser(async (req, res, ctx) => {
     }
     const result = await upsertNote(note, callerId);
     if (result.kind !== "ok") return deny(res, result.kind);
-    return res.status(StatusCodes.OK).json({ note: result.note.toObject(), token: ctx.newToken });
+    return res.status(StatusCodes.OK).json({ note: result.note, token: ctx.newToken });
   } catch (error) {
     console.error(error);
-    return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ msg: "Database error", error });
+    return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ msg: "Database error" });
   }
 });

@@ -47,10 +47,11 @@ describe("upsertNote on create", () => {
     const result = await upsertNote(input, ownerId);
 
     if (result.kind !== "ok") throw new Error(`expected ok, got ${result.kind}`);
-    expect(result.note.toObject()).toMatchObject({
+    expect(result.note).toMatchObject({
       content: "Trim the intro",
-      user: { username: "owner" },
+      user: { _id: ownerId, username: "owner" },
     });
+    expect(JSON.stringify(result.note)).not.toContain("owner@example.com");
     expect((await Project.findById(projectId)).notes.map(String)).toEqual([input._id]);
   });
 
@@ -201,9 +202,13 @@ describe("removeDoneProjectNotes", () => {
   it("lets a guest remove done Notes through an editable Share", async () => {
     const { projectId } = await seed({ canEdit: true });
     await seedNote(projectId, { done: true });
+    const open = await seedNote(projectId);
 
-    expect((await removeDoneProjectNotes(projectId, null)).kind).toBe("ok");
-    expect(await Note.countDocuments()).toBe(0);
+    const result = await removeDoneProjectNotes(projectId, null);
+
+    if (result.kind !== "ok") throw new Error(`expected ok, got ${result.kind}`);
+    expect(result.notes.map((note) => note._id.toString())).toEqual([open._id.toString()]);
+    expect(await Note.countDocuments()).toBe(1);
   });
 
   it.each([

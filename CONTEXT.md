@@ -100,8 +100,8 @@ into `Share.findById` / `Share.create` / `Share.deleteOne` directly.
 `openSharedProject(shareUrl, password)` returns `notFound` |
 `passwordRequired` | `incorrect` | `ok(project)`; a Share whose Project is
 gone (or no longer points back at it) is `notFound`. The `ok` project is the
-**public projection**: title, src, Share `url`/`canEdit`, and Notes whose
-author appears as `{ _id, username }` only. No Share password, no email; an
+**public projection**: title, src, Share `_id`/`url`/`canEdit`, and Notes
+whose author appears as `{ _id, username }` only (`toPublicAuthor`). No Share password, no email; an
 author whose username is their email is left out. `mayEditViaShare(project)`
 is the one "may edit via Share" check: the Project's own Share exists and has
 `canEdit`. `pages/api/public_project.ts` only maps outcomes to responses.
@@ -125,7 +125,8 @@ The pair `upsertNote` / `removeDoneProjectNotes` in
 404 and 403. `upsertNote` decides create-vs-update by `Note.findById(input._id)`.
 On update only `content`, `time` and `done` change; `project` and `user`
 are fixed. On create the caller becomes the author and the new id is pushed
-onto `Project.notes`. `removeDoneProjectNotes` deletes the done Notes, pulls
+onto `Project.notes`. The returned Note's author goes through
+`toPublicAuthor`, so a write never returns an email. `removeDoneProjectNotes` deletes the done Notes, pulls
 their ids from `Project.notes` and returns the survivors.
 
 **Note write policy**:

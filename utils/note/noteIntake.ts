@@ -2,10 +2,12 @@ import { isValidObjectId, type Types } from "mongoose";
 
 import type { NoteInterface } from "@/shared/types";
 import { Note, type NoteDoc, Project, type ProjectDoc } from "@/utils/mongoose";
-import { mayEditViaShare } from "@/utils/share/shareAccess";
+import { mayEditViaShare, type PublicAuthor, toPublicAuthor } from "@/utils/share/shareAccess";
 
 type Denied = { kind: "notFound" } | { kind: "forbidden" };
-export type UpsertNoteResult = { kind: "ok"; note: NoteDoc } | Denied;
+/** A written Note as returned to the caller: the author is the public view only. */
+export type WrittenNote = Omit<ReturnType<NoteDoc["toObject"]>, "user"> & { user?: PublicAuthor };
+export type UpsertNoteResult = { kind: "ok"; note: WrittenNote } | Denied;
 export type RemoveDoneNotesResult =
   | { kind: "ok"; notes: Awaited<ReturnType<typeof findProjectNotes>> }
   | Denied;
@@ -16,7 +18,7 @@ export type RemoveDoneNotesResult =
  * `project` and `user` never change on update. Permission comes from the
  * stored Note's Project on update and from `input.project` on create. A new
  * Note is authored by the caller and pushed onto `Project.notes`. Returns
- * the Note re-loaded with its author User populated.
+ * the Note with its author as the public view (never an email).
  */
 export const upsertNote = async (
   input: NoteInterface,
@@ -31,7 +33,7 @@ export const upsertNote = async (
   if (existing) {
     existing.set(editable);
     await existing.save();
-    return { kind: "ok", note: await reloadWithAuthor(existing._id) };
+    return { kind: "ok", note: await reloadForCaller(existing._id) };
   }
 
   const noteDoc = await Note.create({
@@ -41,7 +43,7 @@ export const upsertNote = async (
     ...(callerId !== null && { user: callerId }),
   });
   await Project.updateOne({ _id: access.projectDoc._id }, { $push: { notes: noteDoc._id } });
-  return { kind: "ok", note: await reloadWithAuthor(noteDoc._id) };
+  return { kind: "ok", note: await reloadForCaller(noteDoc._id) };
 };
 
 /**
@@ -87,5 +89,10 @@ const pickDefined = <T extends Record<string, unknown>>(fields: T): Partial<T> =
 
 const findProjectNotes = (projectId: Types.ObjectId) => Note.find({ project: projectId }).lean();
 
-const reloadWithAuthor = async (noteId: unknown): Promise<NoteDoc> =>
-  Note.findById(noteId).populate("user", "username email");
+// Populates the email only so toPublicAuthor can apply its username rule.
+const reloadForCaller = async (noteId: unknown): Promise<WrittenNote> => {
+  const noteDoc = await Note.findById(noteId).populate("user", "username email");
+  const { user, ...note } = noteDoc!.toObject();
+  const author = toPublicAuthor(user);
+  return { ...note, ...(author && { user: author }) };
+};
