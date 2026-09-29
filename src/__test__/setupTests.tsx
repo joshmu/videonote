@@ -79,17 +79,6 @@ vi.mock("@/root/tailwind.config", () => {
   return { default: config };
 });
 
-// GLOBAL CONTEXT
-vi.mock("@/context/globalContext", () => {
-  const scrollProgress = 0;
-  const values = { scrollProgress };
-  const useGlobalContext = vi.fn(() => values);
-
-  return {
-    useGlobalContext,
-  };
-});
-
 // THEME CONTEXT
 vi.mock("@/context/themeContext", () => {
   const toggleTheme = vi.fn();

@@ -29,9 +29,6 @@ export enum ThemeType {
 }
 
 export const ThemeProvider = ({ children }: { children: ReactNode }) => {
-  // define vh via --vh var to avoid viewport issues on mobile
-  // useSetVh()
-
   // initialize theme with first enum entry
   const [theme, setTheme] = useState<ThemeType>(Object.values(ThemeType)[0] as ThemeType);
 

@@ -37,7 +37,6 @@ import {
   CreateProjectType,
   FetchWithPasswordPublicProjectType,
   GlobalContextInterface,
-  GuestUpdatingProjectType,
   HandleInitialServerDataType,
   LoadProjectType,
   NoteApiRemoveDoneNotes,
@@ -314,29 +313,6 @@ export const GlobalProvider = ({
     if (project.src.length === 0) warnLocalVideo(project);
   };
 
-  const _guestUpdatingProject: GuestUpdatingProjectType = async (project) => {
-    console.log("guest is updating project", project);
-    const body = {
-      project,
-    };
-    const res = await fetch("/api/public_project_update", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(body),
-    });
-    const data = await res.json();
-
-    const { msg } = data;
-
-    // handle if we get a bad response
-    if (badResponse(res, msg)) return;
-
-    // success
-    console.log(data.msg);
-  };
-
   const updateUser: UpdateUserType = async (userData) => {
     // respect format of user mongo object on server
     // @ts-ignore
@@ -392,15 +368,11 @@ export const GlobalProvider = ({
   };
 
   const toggleMenuOpen: ToggleMenuOpenType = (state = undefined) => {
-    const ismenuOpen = state ? state : !menuOpen;
-    setMenuOpen(ismenuOpen);
+    setMenuOpen(state ?? !menuOpen);
   };
 
   const toggleSidebar: ToggleSidebarType = (state = undefined) => {
-    setSidebarOpen((currentState) => {
-      const updatedState = state ? state : !currentState;
-      return updatedState;
-    });
+    setSidebarOpen((currentState) => state ?? !currentState);
   };
 
   const toggleModalOpen: ToggleModalOpenType = (modalName = undefined) => {
@@ -706,14 +678,6 @@ export const GlobalProvider = ({
     if (promptState.isOpen) cancelPrompt();
     if (menuOpen) setMenuOpen(false);
   };
-
-  // todo: move to controls context
-  // const handleGlobalEscapeKey: HandleGlobalEscapeKeyType = key => {
-  //   if (key === Key.ESC) {
-  //     cancelModals()
-  //   }
-  // }
-  // useGlobalKeydown(handleGlobalEscapeKey)
 
   const checkCanEdit: CheckCanEditType = () => {
     return admin || ((currentProject?.share ?? {}) as ShareProjectInterface).canEdit;

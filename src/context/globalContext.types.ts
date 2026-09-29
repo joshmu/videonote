@@ -90,8 +90,6 @@ export type UpdateProjectsStateWithUpdatedNotesType = (notes: NoteInterface[]) =
 
 export type LoadProjectType = (projectId: string) => Promise<void>;
 
-export type GuestUpdatingProjectType = (project: ProjectInterface) => Promise<void>;
-
 export type UpdateUserType = (
   userData: UserInterface | { username: string; email: string },
 ) => Promise<void>;

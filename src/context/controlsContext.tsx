@@ -89,9 +89,6 @@ export function ControlsProvider(props: { [key: string]: any }) {
       case Keymap.ALT:
         toggleMenuOpen();
         break;
-      case Keymap.ESC:
-        cancelModals();
-        break;
       default:
       // console.log('unused key', { key })
     }
@@ -114,8 +111,9 @@ export function ControlsProvider(props: { [key: string]: any }) {
   };
 
   const nextPrevNote = (direction: "next" | "prev" = "next"): void => {
+    if (!currentNote) return;
     // sort via time
-    const sortedNotes = notes.sort((a, b) => a.time - b.time);
+    const sortedNotes = [...notes].sort((a, b) => a.time - b.time);
     const currentIndex = sortedNotes.findIndex((note) => note._id === currentNote._id);
     // based on direction grab next/prev note or stop at the limit
     const idx =

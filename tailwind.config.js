@@ -55,12 +55,8 @@ module.exports = {
       maxHeight: {
         "80vh": "80vh",
       },
-      minHeight: {
-        screenVh: "calc(var(--vh) * 100)",
-      },
       height: {
         "1/12": "8.33333%",
-        screenVh: "calc(var(--vh) * 100)",
       },
     },
   },

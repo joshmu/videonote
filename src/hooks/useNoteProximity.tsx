@@ -21,11 +21,14 @@ export const useNoteProximity = ({
 
     // otherwise compare
     if (notes.length > 1) {
-      const result = notes.reduce((closestNote, nextNote) => {
-        const distA = Math.abs(closestNote.time - progress.playedSeconds);
-        const distB = Math.abs(nextNote.time - progress.playedSeconds);
-        return distA < distB ? closestNote : nextNote;
-      });
+      // reduce in time order so equal-distance ties resolve to the later note
+      const result = [...notes]
+        .sort((a, b) => a.time - b.time)
+        .reduce((closestNote, nextNote) => {
+          const distA = Math.abs(closestNote.time - progress.playedSeconds);
+          const distB = Math.abs(nextNote.time - progress.playedSeconds);
+          return distA < distB ? closestNote : nextNote;
+        });
 
       setCurrentNote(result);
     }
