@@ -95,13 +95,24 @@ Both operations return the project re-loaded through `findProjectWithRelations`
 so callers can hand it straight back to the client. Handlers no longer reach
 into `Share.findById` / `Share.create` / `Share.deleteOne` directly.
 
+**Share access**:
+`utils/share/shareAccess.ts`, the read side of a **Share**.
+`openSharedProject(shareUrl, password)` returns `notFound` |
+`passwordRequired` | `incorrect` | `ok(project)`; a Share whose Project is
+gone (or no longer points back at it) is `notFound`. The `ok` project is the
+**public projection**: title, src, Share `url`/`canEdit`, and Notes whose
+author appears as `{ _id, username }` only. No Share password, no email; an
+author whose username is their email is left out. `mayEditViaShare(project)`
+is the one "may edit via Share" check: the Project's own Share exists and has
+`canEdit`. `pages/api/public_project.ts` only maps outcomes to responses.
+
 **findProjectWithRelations**:
 The populate spec for a hydrated Project in
 `utils/project/findProjectWithRelations.ts`: Project + Notes (with each
 Note's author User) + Share. Used by `pages/api/project.ts` (GET, SHARE,
-REMOVE_SHARE) and the Share intake module. `pages/api/auth.js` and
-`pages/api/public_project.ts` still hand-roll the same populate; folding
-them into this helper is a clean follow-up.
+REMOVE_SHARE), the Share intake and Share access modules. `pages/api/auth.js`
+still hand-rolls the same populate; folding it into this helper is a clean
+follow-up.
 
 ### Architecture (Note seam)
 

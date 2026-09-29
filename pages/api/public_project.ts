@@ -1,72 +1,32 @@
-/**
- * @path /pages/api/public_project.ts
- *
- * @project videonote
- * @file public_project.ts
- *
- * @author Josh Mu <hello@joshmu.dev>
- * @created Thursday, 8th October 2020
- * @modified Sunday, 22nd November 2020 7:02:38 pm
- * @copyright © 2020 - 2020 MU
- */
-
 import { StatusCodes } from "http-status-codes";
 import { NextApiRequest, NextApiResponse } from "next";
 
-import { connectDb, Project, Share } from "@/utils/mongoose";
-import { verifySharePassword } from "@/utils/share/sharePassword";
+import { connectDb } from "@/utils/mongoose";
+import { openSharedProject } from "@/utils/share/shareAccess";
 
-// GET 1 PROJECT
+// Read a shared project. Password outcomes answer 200 + `msg` because the
+// client and the SSR page key off `data.msg` (see CONTEXT.md follow-ups).
 export default async (req: NextApiRequest, res: NextApiResponse) => {
   await connectDb();
-  // project share id
-  const { shareUrl, password } = req.body;
+  const { shareUrl, password } = req.body ?? {};
 
-  // get project
-  let projectDoc: unknown;
+  let result: Awaited<ReturnType<typeof openSharedProject>>;
   try {
-    const shareDoc = await Share.findOne({ url: shareUrl });
-    if (!shareDoc) {
-      return res.status(StatusCodes.BAD_REQUEST).json({ msg: "Share url does not exist." });
-    }
-
-    const access = await verifySharePassword(shareDoc.password, password);
-    // Status code stays 200 here so the existing client (globalContext.tsx)
-    // keeps keying off `data.msg`. See CONTEXT.md follow-ups for the planned
-    // 401 migration once the client switches to status-based handling.
-    if (access.kind === "passwordRequired") {
-      return res.status(StatusCodes.OK).json({ msg: "shared project password required" });
-    }
-    if (access.kind === "incorrect") {
-      return res.status(StatusCodes.OK).json({ msg: "password incorrect" });
-    }
-
-    projectDoc = await Project.findById(shareDoc.project)
-      .populate([
-        {
-          path: "notes",
-          model: "Note",
-          populate: {
-            path: "user",
-            model: "User",
-            select: "username email",
-          },
-        },
-        { path: "share", model: "Share" },
-      ])
-      .lean();
-  } catch {
-    // no project found
-    return res.status(StatusCodes.BAD_REQUEST).json({ msg: "Share url does not exist." });
+    result = await openSharedProject(shareUrl, password);
+  } catch (error) {
+    console.error(error);
+    return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ msg: "Database error" });
   }
 
-  // compose output data in the same shape as the entire user object
-  const data = {
-    user: {
-      projects: [projectDoc],
-    },
-  };
-
-  // send data
-  res.status(StatusCodes.OK).json(data);
+  switch (result.kind) {
+    case "notFound":
+      return res.status(StatusCodes.BAD_REQUEST).json({ msg: "Share url does not exist." });
+    case "passwordRequired":
+      return res.status(StatusCodes.OK).json({ msg: "shared project password required" });
+    case "incorrect":
+      return res.status(StatusCodes.OK).json({ msg: "password incorrect" });
+    case "ok":
+      // Same shape as the signed-in user payload so the client reuses one path.
+      return res.status(StatusCodes.OK).json({ user: { projects: [result.project] } });
+  }
 };
