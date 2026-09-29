@@ -121,6 +121,94 @@ describe("/api/project", () => {
     expect(console.error).toHaveBeenCalled();
   });
 
+  describe("owner projection", () => {
+    const share = (projectId: string, fields: Record<string, unknown>) =>
+      callApi(
+        handler,
+        {
+          action: ProjectApiActions.SHARE,
+          project: { _id: projectId },
+          share: { url: "rough-cut", ...fields },
+        },
+        { email: OWNER },
+      );
+
+    it("replies to SHARE with hasPassword in place of the password hash", async () => {
+      const { project } = await seed();
+
+      const { status, body } = await share(project._id.toString(), { password: "hunter2" });
+
+      expect(status).toBe(StatusCodes.OK);
+      const stored = await Share.findOne({ url: "rough-cut" }).select("+password");
+      expect(body.project.share).toEqual({
+        _id: stored._id.toString(),
+        url: "rough-cut",
+        canEdit: true,
+        hasPassword: true,
+      });
+      expect(JSON.stringify(body)).not.toContain(stored.password);
+      expect(JSON.stringify(body)).not.toContain("password");
+    });
+
+    it("keeps, sets and removes the Share password from SHARE", async () => {
+      const { project } = await seed();
+      const id = project._id.toString();
+
+      expect((await share(id, {})).body.project.share.hasPassword).toBe(false);
+      expect((await share(id, { password: "hunter2" })).body.project.share.hasPassword).toBe(true);
+      expect((await share(id, { canEdit: false })).body.project.share).toMatchObject({
+        canEdit: false,
+        hasPassword: true,
+      });
+      expect((await share(id, { password: "" })).body.project.share.hasPassword).toBe(false);
+    });
+
+    it("replies to GET with note authors as the public view", async () => {
+      const { owner, project } = await seed();
+      const other = await User.findOne({ email: OTHER });
+      await User.updateOne({ _id: owner._id }, { username: OWNER });
+      const own = await Note.create({ content: "Trim", project: project._id, user: owner._id });
+      const theirs = await Note.create({ content: "Grade", project: project._id, user: other._id });
+      const guests = await Note.create({ content: "Louder", project: project._id });
+      await Project.updateOne(
+        { _id: project._id },
+        { $push: { notes: { $each: [own._id, theirs._id, guests._id] } } },
+      );
+
+      const { status, body } = await callApi(
+        handler,
+        { action: ProjectApiActions.GET, project: { _id: project._id.toString() } },
+        { email: OWNER },
+      );
+
+      expect(status).toBe(StatusCodes.OK);
+      expect(body.project.notes.map((note) => note.user)).toEqual([
+        { _id: owner._id.toString(), role: "owner" },
+        { _id: other._id.toString(), username: "other", role: "member" },
+        undefined,
+      ]);
+      expect(JSON.stringify(body)).not.toMatch(/@example\.com/);
+    });
+
+    it("replies to REMOVE SHARE with no Share", async () => {
+      const { project } = await seed();
+      const { body: shared } = await share(project._id.toString(), { password: "hunter2" });
+
+      const { status, body } = await callApi(
+        handler,
+        {
+          action: ProjectApiActions.REMOVE_SHARE,
+          project: { _id: project._id.toString() },
+          share: { _id: shared.project.share._id },
+        },
+        { email: OWNER },
+      );
+
+      expect(status).toBe(StatusCodes.OK);
+      expect(body.project.share).toBeNull();
+    });
+  });
+
   it("replies 409 when the share url is taken", async () => {
     const { owner, project } = await seed();
     const other = await Project.create({ title: "Other", user: owner._id });

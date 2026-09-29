@@ -2,6 +2,7 @@ import { Types } from "mongoose";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { Note, Project, Share, User } from "@/utils/mongoose";
+import type { OwnerShare } from "@/utils/project/ownerProject";
 import {
   createProject,
   getProject,
@@ -54,6 +55,15 @@ describe("createProject", () => {
     expect(stored.share).toBeUndefined();
     expect(stored.sharedUsers).toEqual([]);
     expect((await User.findById(owner._id)).projects).toEqual([stored._id]);
+  });
+
+  it("replies with an empty src for a project created without one", async () => {
+    const owner = await seedOwner();
+
+    const outcome = await createProject(owner._id, { title: "No video yet" });
+
+    if (outcome.kind !== "ok") throw new Error(`expected ok, got ${outcome.kind}`);
+    expect(outcome.project.src).toBe("");
   });
 });
 
@@ -112,10 +122,10 @@ describe("getProject", () => {
 
     expect(outcome.kind).toBe("ok");
     if (outcome.kind !== "ok") return;
-    expect(outcome.project.toObject().notes).toEqual([
+    expect(outcome.project.notes).toEqual([
       expect.objectContaining({
         content: "Trim",
-        user: expect.objectContaining({ username: owner.username }),
+        user: { _id: owner._id.toString(), role: "owner" },
       }),
     ]);
   });
@@ -186,7 +196,7 @@ describe("shareProject / unshareProject", () => {
     if (shared.kind !== "ok") throw new Error("expected ok");
 
     const outcome = await unshareProject(owner._id, project._id.toString(), {
-      _id: shared.project.share._id.toString(),
+      _id: (shared.project.share as OwnerShare)._id,
     });
 
     expect(outcome.kind).toBe("ok");
@@ -215,7 +225,7 @@ describe("removeProject", () => {
     const outcome = await removeProject(owner._id, project._id.toString());
 
     expect(outcome.kind).toBe("ok");
-    if (outcome.kind === "ok") expect(outcome.project._id).toEqual(project._id);
+    if (outcome.kind === "ok") expect(outcome.project._id).toBe(project._id.toString());
     await expectGone(owner, project._id);
   });
 

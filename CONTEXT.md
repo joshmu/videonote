@@ -109,12 +109,22 @@ are written only through `/api/settings`, which takes `currentProject`,
 `unshareProject` / `removeProject` / `removeUserProjects` in
 `utils/project/projectIntake.ts`. Every operation is scoped to the owning
 **User** and returns a discriminated outcome (`ok` / `notFound` /
-`urlTaken` / `invalid`) with no HTTP; `pages/api/project.ts` maps them to
+`urlTaken` / `invalid`) with no HTTP; an `ok` carries the
+**Owner projection**; `pages/api/project.ts` maps them to
 200, 404, 409 and 400. A malformed or missing project id is `notFound`.
 Create needs a non-empty `title` (`invalid`, reason `title`). Create and
 update write `title` and `src` only. Sharing needs a `share` object and
 unsharing one whose `_id` is a hex ObjectId string (`invalid`, reason
 `share`). Sharing delegates to the **Share intake**.
+
+**Owner projection**:
+`toOwnerProject` in `utils/project/ownerProject.ts`, the one shape an owner
+receives their **Project** in, from `/api/auth`, `/api/project` and the
+**Share intake**. Notes go through `toPublicNote` (authors with their
+**Author role**, never an email) and the **Share** is `{ _id, url, canEdit,
+hasPassword }`, never the password hash. Notes and Share not populated (the
+create, update and remove replies) are sent as ids. `src` is `""` when the
+Project has no video yet.
 
 **Project cascade**:
 The one removal path, used by `removeProject` and (through
@@ -142,8 +152,11 @@ create-vs-update by `projectDoc.share`, writes only `url`, `password` and
 `canEdit` from the caller (`project` and `user` come from the Project), hashes
 the password (via
 `hashSharePassword`), and surfaces a duplicate `url` as `ShareUrlTakenError`.
+An absent `password` keeps the current one and an empty one removes it.
 Both operations return the project re-loaded through `findProjectWithRelations`
-so callers can hand it straight back to the client. Handlers no longer reach
+in the **Owner projection**. `Share.password` is not selected by default;
+the code that needs the hash (Share access, `mayEditViaShare`, the populate
+spec for `hasPassword`) asks for `+password`. Handlers no longer reach
 into `Share.findById` / `Share.create` / `Share.deleteOne` directly.
 
 **Share access**:
@@ -153,14 +166,23 @@ into `Share.findById` / `Share.create` / `Share.deleteOne` directly.
 **Share token** only for a password-protected Share; a Share whose Project is
 gone (or no longer points back at it) is `notFound`. The `ok` project is the
 **public projection**: title, src, Share `_id`/`url`/`canEdit`, and Notes
-whose author appears as `{ _id, username }` only (`toPublicAuthor`). No Share password, no email; an
-author whose username is missing or is their email appears as `{ _id }`. `mayEditViaShare(project, shareToken)`
+whose author appears as `{ _id, username, role }` only (`toPublicNote` /
+`toPublicAuthor`). No Share password, no email; an author whose username is
+missing or is their email appears without it. `mayEditViaShare(project, shareToken)`
 is the one "may edit via Share" check, returning `allowed` | `forbidden` |
 `passwordRequired`: the Project's own Share exists and has `canEdit` (read
 live on every write), and a password-protected Share also needs a valid
 **Share token**; an open Share needs none. `pages/api/public_project.ts` only
 maps outcomes to status codes: 401 `passwordRequired`, 403 `incorrect`, 404
 `notFound`, 200 `ok` (the reply carries `shareToken` when there is one).
+
+**Author role**:
+Computed in one place, `toPublicAuthor(user, ownerId)`: `owner` for the
+Project's **User**, `member` for any other **User**. A **Note** with no
+author is a guest's and carries no `user`. Public reads, Note write
+responses and the **Owner projection** all use it; the client only reads
+the role (`DisplayUser` shows the public username, else the role, else
+"guest", and nothing on the viewer's own Notes).
 
 **Share token**:
 `utils/share/shareToken.ts`. A 12 hour JWT proving the caller gave a
@@ -173,11 +195,14 @@ share again, even at the same url) revokes it. The client sends it in the
 **findProjectWithRelations / findProjectsWithRelations**:
 The one populate spec for a hydrated Project in
 `utils/project/findProjectWithRelations.ts`: Project + Notes (with each
-Note's author User) + Share, for one Project or every match of a query.
+Note's author User) + Share (with its password hash, for `hasPassword`),
+for one Project or every match of a query. Its result goes to a client only
+through a projection.
 The single form is used by the Project intake, the Share intake and the
 Share access module. `pages/api/auth.js` loads a User's Projects with the
 many form in one query, filtered to `_id` in `User.projects` and owned by
-the caller, and keeps the `User.projects` order.
+the caller, keeps the `User.projects` order and sends each in the
+**Owner projection**.
 
 ### Architecture (Note seam)
 
@@ -198,7 +223,7 @@ On update only `content`, `time` and `done` change; `project` and `user`
 are fixed. On create the caller becomes the author and the new id is pushed
 onto `Project.notes`. The returned Note's author goes through
 `toPublicAuthor`, so a write never returns an email. `removeDoneProjectNotes` deletes the done Notes, pulls
-their ids from `Project.notes` and returns the survivors.
+their ids from `Project.notes` and returns the survivors, authors the same way.
 
 **Note write policy**:
 The Project owner may always write Notes, with no **Share token**; anyone
@@ -253,16 +278,21 @@ user to `/login`, any other failure is shown as an alert.
 **Projects context**:
 `src/context/projectsContext.tsx`. The **Projects** on screen, the current
 one, and the owner's create, load, update, remove, share and unshare calls.
+An update takes only `title` and `src` from its reply, keeping the loaded
+Notes and Share.
+The Share modal reads `hasPassword`: an empty password field sends no
+`password` (kept), its remove control sends `""`, a typed value sets it.
 
 **Shared-project access context**:
 `src/context/sharedProjectContext.tsx`. Opens a public **Share**
-(prompting for its password and retrying), holds the **Share token** it
+(prompting for its password and retrying; a pending retry is cancelled on
+unmount), holds the **Share token** it
 hands out in memory (`shareToken()`), `renewShareAccess()` to ask for the
 password again when a Note write is refused for it (the project stays on
 screen; it resolves `false` if the prompt is dismissed), and `checkCanEdit`, the one canEdit source: a signed-in User on
 their own Projects may always edit, a guest only when the **Share** has
 `canEdit`. A viewer who cannot edit gets a "View only" hint in place of the
-note input.
+note input and cannot open a Note for editing.
 
 **Video context**:
 `src/context/videoContext.tsx`. The player state and the URL it plays. A

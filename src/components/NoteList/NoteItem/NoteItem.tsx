@@ -14,16 +14,23 @@ import { Variants, motion } from "motion/react";
 import { ChangeEvent, KeyboardEvent, useEffect, useState } from "react";
 
 import { useControlsContext } from "@/context/controlsContext";
-import { useProjectsContext } from "@/context/projectsContext";
 import { useNoteContext } from "@/context/noteContext";
 import { useSessionContext } from "@/context/sessionContext";
+import { useSharedProjectContext } from "@/context/sharedProjectContext";
 import { useVideoContext } from "@/context/videoContext";
 import { useIsMount } from "@/hooks/useIsMount";
 import { Select } from "@/shared/Select/Select";
 import TimeDisplay from "@/shared/TimeDisplay/TimeDisplay";
-import { NoteInterface, ShareProjectInterface } from "@/shared/types";
+import { NoteInterface } from "@/shared/types";
 
 import DisplayUser from "./DisplayUser/DisplayUser";
+
+// A note added in this session, or authored by the signed-in viewer.
+const isOwnNote = (note: NoteInterface, userId?: string): boolean => {
+  if (note.currentSession) return true;
+  const authorId = typeof note.user === "string" ? note.user : note.user?._id;
+  return userId !== undefined && authorId === userId;
+};
 
 interface NoteItemInterface {
   note: NoteInterface;
@@ -32,8 +39,8 @@ interface NoteItemInterface {
 }
 
 export const NoteItem = ({ note, closestProximity, childVariants }: NoteItemInterface) => {
-  const { project } = useProjectsContext();
-  const { admin, user } = useSessionContext();
+  const { user } = useSessionContext();
+  const { checkCanEdit } = useSharedProjectContext();
   const { seekTo } = useVideoContext();
   const { toggleSmartControls } = useControlsContext();
   const { updateNote } = useNoteContext();
@@ -90,7 +97,7 @@ export const NoteItem = ({ note, closestProximity, childVariants }: NoteItemInte
   };
 
   const handleDoubleClick = (): void => {
-    if (!admin && !((project?.share ?? {}) as ShareProjectInterface).canEdit) return;
+    if (!checkCanEdit()) return;
     toggleEdit(true);
   };
 
@@ -122,11 +129,7 @@ export const NoteItem = ({ note, closestProximity, childVariants }: NoteItemInte
               state.done && !closestProximity && "text-themeText2"
             } w-full h-full py-2 pl-2`}
           >
-            <DisplayUser
-              noteUser={note.user}
-              currentUser={user}
-              currentSession={note?.currentSession}
-            />
+            <DisplayUser author={note.user} own={isOwnNote(note, user?._id)} />
             {isEditing ? (
               <input
                 type="text"

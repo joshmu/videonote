@@ -3,6 +3,7 @@ import { StatusCodes } from "http-status-codes";
 import { extractUser } from "@/utils/apiHelpers";
 import { withAuthenticatedUser } from "@/utils/auth/withAuthenticatedUser";
 import { findProjectsWithRelations } from "@/utils/project/findProjectWithRelations";
+import { toOwnerProject } from "@/utils/project/ownerProject";
 
 export default withAuthenticatedUser(async (req, res, { userDoc }) => {
   await userDoc.populate({ path: "settings", model: "Settings" });
@@ -17,7 +18,7 @@ export default withAuthenticatedUser(async (req, res, { userDoc }) => {
   res.status(StatusCodes.OK).json({
     user: {
       ...extractUser(userDoc.toObject()),
-      projects: projects.map((project) => project.toObject()),
+      projects: projects.map(toOwnerProject),
     },
   });
 });

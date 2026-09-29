@@ -14,9 +14,7 @@ type Denied =
 /** A written Note as returned to the caller: the author is the public view only. */
 export type WrittenNote = Omit<ReturnType<NoteDoc["toObject"]>, "user"> & { user?: PublicAuthor };
 export type UpsertNoteResult = { kind: "ok"; note: WrittenNote } | Denied;
-export type RemoveDoneNotesResult =
-  | { kind: "ok"; notes: Awaited<ReturnType<typeof findProjectNotes>> }
-  | Denied;
+export type RemoveDoneNotesResult = { kind: "ok"; notes: WrittenNote[] } | Denied;
 
 /**
  * Upsert a Note for `callerId` (a User._id, or `null` for a guest), who may
@@ -49,7 +47,7 @@ export const upsertNote = async (
   if (existing) {
     existing.set(editable);
     await existing.save();
-    return { kind: "ok", note: await reloadForCaller(existing._id) };
+    return { kind: "ok", note: await reloadForCaller(existing._id, access.projectDoc.user) };
   }
 
   const noteDoc = await Note.create({
@@ -59,13 +57,13 @@ export const upsertNote = async (
     ...(callerId !== null && { user: callerId }),
   });
   await Project.updateOne({ _id: access.projectDoc._id }, { $push: { notes: noteDoc._id } });
-  return { kind: "ok", note: await reloadForCaller(noteDoc._id) };
+  return { kind: "ok", note: await reloadForCaller(noteDoc._id, access.projectDoc.user) };
 };
 
 /**
  * Delete every done Note in the Project, pull them from `Project.notes` and
- * return the survivors (lean). Same write policy as {@link upsertNote}; a
- * malformed or missing project id is `invalid`.
+ * return the survivors, their authors as the public view. Same write policy
+ * as {@link upsertNote}; a malformed or missing project id is `invalid`.
  */
 export const removeDoneProjectNotes = async (
   projectId: unknown,
@@ -81,7 +79,7 @@ export const removeDoneProjectNotes = async (
   const doneIds = done.map((note) => note._id);
   await Note.deleteMany({ _id: { $in: doneIds } });
   await Project.updateOne({ _id }, { $pull: { notes: { $in: doneIds } } });
-  return { kind: "ok", notes: await findProjectNotes(_id) };
+  return { kind: "ok", notes: await findProjectNotes(access.projectDoc) };
 };
 
 const INVALID: Invalid = { kind: "invalid" };
@@ -122,12 +120,19 @@ const pickDefined = <T extends Record<string, unknown>>(fields: T): Partial<T> =
     Object.entries(fields).filter(([, value]) => value !== undefined),
   ) as Partial<T>;
 
-const findProjectNotes = (projectId: Types.ObjectId) => Note.find({ project: projectId }).lean();
-
 // Populates the email only so toPublicAuthor can apply its username rule.
-const reloadForCaller = async (noteId: unknown): Promise<WrittenNote> => {
-  const noteDoc = await Note.findById(noteId).populate("user", "username email");
-  const { user, ...note } = noteDoc!.toObject();
-  const author = toPublicAuthor(user);
+const AUTHOR_FIELDS = "username email";
+
+const withPublicAuthor = (noteDoc: NoteDoc, ownerId: Types.ObjectId): WrittenNote => {
+  const { user, ...note } = noteDoc.toObject();
+  const author = toPublicAuthor(user, ownerId);
   return { ...note, ...(author && { user: author }) };
 };
+
+const findProjectNotes = async ({ _id, user }: ProjectDoc): Promise<WrittenNote[]> => {
+  const notes = await Note.find({ project: _id }).populate("user", AUTHOR_FIELDS);
+  return notes.map((note) => withPublicAuthor(note, user));
+};
+
+const reloadForCaller = async (noteId: unknown, ownerId: Types.ObjectId): Promise<WrittenNote> =>
+  withPublicAuthor((await Note.findById(noteId).populate("user", AUTHOR_FIELDS))!, ownerId);

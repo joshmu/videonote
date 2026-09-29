@@ -30,12 +30,20 @@ export interface ProjectInterface {
   share?: string | ShareProjectInterface;
 }
 
+/** A note author as the server sends it; a note with no author is a guest's. */
+export interface NoteAuthor {
+  _id: string;
+  username?: string;
+  role: "owner" | "member";
+}
+
 export interface NoteInterface {
   _id?: string;
   content: string;
   time?: number;
   done?: boolean;
-  user?: string | UserInterface;
+  /** The author's id on a note added in this session. */
+  user?: string | NoteAuthor;
   project: string | ProjectInterface;
   currentSession?: boolean;
 }
@@ -55,7 +63,10 @@ export interface ShareProjectInterface {
   url: string;
   user?: string | UserInterface;
   project?: string | ProjectInterface;
+  /** Sent to set (non-empty) or remove ("") the password; never received. */
   password?: string;
+  /** Whether the Share is password protected, as the owner receives it. */
+  hasPassword?: boolean;
   canEdit?: boolean;
 }
 

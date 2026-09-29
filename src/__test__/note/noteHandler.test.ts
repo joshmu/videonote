@@ -91,7 +91,7 @@ describe("POST /api/note", () => {
     });
 
     expect(status).toBe(200);
-    expect(body.note.user).toEqual({ _id: owner._id.toString(), username: "owner" });
+    expect(body.note.user).toEqual({ _id: owner._id.toString(), username: "owner", role: "owner" });
     expect(JSON.stringify(body)).not.toContain("owner@example.com");
   });
 
@@ -106,7 +106,7 @@ describe("POST /api/note", () => {
     );
 
     expect(status).toBe(200);
-    expect(body.note.user).toEqual({ _id: owner._id.toString() });
+    expect(body.note.user).toEqual({ _id: owner._id.toString(), role: "owner" });
     expect(JSON.stringify(body.note)).not.toContain("solo@example.com");
   });
 
@@ -261,7 +261,7 @@ describe("POST /api/note through a password-protected Share", () => {
     await attachOrUpdateShare(other, { url: "other-cut", password: "hunter2", canEdit: true });
     const tokenForOther = await openShare("hunter2", "other-cut");
     // Same stored hash on both Shares, so only the token's subject tells them apart.
-    const { password } = await Share.findOne({ url: "other-cut" });
+    const { password } = await Share.findOne({ url: "other-cut" }).select("+password");
     await Share.updateOne({ url: "rough-cut" }, { password });
 
     expect(await post({ note: note(projectId) }, undefined, tokenForOther)).toEqual(

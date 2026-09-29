@@ -89,11 +89,11 @@ export const CurrentProjectModal = ({
               placeholder="Dropbox, Youtube, Vimeo..."
               id="src"
               type="text"
-              value={state.src}
+              value={state.src ?? ""}
               onChange={handleChange}
             />
 
-            {state.src.length === 0 && <LocalVideoForm handleVideoSrc={handleVideoSrc} />}
+            {!state.src && <LocalVideoForm handleVideoSrc={handleVideoSrc} />}
 
             <div className="mt-2">{/* <ExportNotes dynamicLabel={false} /> */}</div>
 

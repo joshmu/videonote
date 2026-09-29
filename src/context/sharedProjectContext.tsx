@@ -1,5 +1,5 @@
 import Router from "next/router";
-import { createContext, useContext, useRef } from "react";
+import { createContext, useContext, useEffect, useRef } from "react";
 
 import type { ShareProjectInterface } from "@/shared/types";
 import type { ShareAccess } from "@/utils/apiClient";
@@ -44,6 +44,10 @@ export const SharedProjectProvider = ({ children }: { children: React.ReactNode 
     resolve: (renewed: boolean) => void;
   } | null>(null);
 
+  // The pending password retry, cancelled on unmount so it never fetches after leaving.
+  const retryTimerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+  useEffect(() => () => clearTimeout(retryTimerRef.current), []);
+
   const settleRenewal = (renewed: boolean): void => {
     const renewal = renewalRef.current;
     renewalRef.current = null;
@@ -72,7 +76,8 @@ export const SharedProjectProvider = ({ children }: { children: React.ReactNode 
       // confirmPrompt closes the prompt after this runs.
       action: async (data: any) => {
         const { password } = data;
-        setTimeout(async () => {
+        clearTimeout(retryTimerRef.current);
+        retryTimerRef.current = setTimeout(async () => {
           // get password and send again
           handleShareAccess(await fetchWithPasswordPublicProject(password));
         }, 300);

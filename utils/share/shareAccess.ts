@@ -5,8 +5,11 @@ import { findProjectWithRelations } from "@/utils/project/findProjectWithRelatio
 import { verifySharePassword } from "@/utils/share/sharePassword";
 import { issueShareToken, verifyShareToken } from "@/utils/share/shareToken";
 
-/** A note author as the public sees them: id, plus username when it is public. */
-export type PublicAuthor = { _id: string; username?: string };
+/** An author's role on a Project: its owner or another User. A Note with no author is a guest's. */
+export type AuthorRole = "owner" | "member";
+
+/** A note author as the public sees them: id, role, plus username when it is public. */
+export type PublicAuthor = { _id: string; username?: string; role: AuthorRole };
 
 export type PublicNote = {
   _id: string;
@@ -49,7 +52,7 @@ export const openSharedProject = async (
   password: unknown,
 ): Promise<OpenSharedProjectResult> => {
   if (typeof shareUrl !== "string") return { kind: "notFound" };
-  const shareDoc = await Share.findOne({ url: shareUrl });
+  const shareDoc = await Share.findOne({ url: shareUrl }).select("+password");
   if (!shareDoc?.project) return { kind: "notFound" };
 
   const access = await verifySharePassword(
@@ -83,7 +86,7 @@ export const mayEditViaShare = async (
   if (!project.share) return FORBIDDEN;
   const shareId = "_id" in project.share ? project.share._id : project.share;
   const share = await Share.findOne({ _id: shareId, project: project._id, canEdit: true })
-    .select("password")
+    .select("+password")
     .lean();
   if (!share) return FORBIDDEN;
   if (share.password && !verifyShareToken(shareToken, share)) return { kind: "passwordRequired" };
@@ -93,17 +96,47 @@ export const mayEditViaShare = async (
 const FORBIDDEN: ShareEditAccess = { kind: "forbidden" };
 
 /**
- * The public view of a populated note author: `{ _id, username }`, or
- * `{ _id }` when the username is missing or is the email; `undefined` when
- * the Note has no author.
+ * The public view of a populated note author: `{ _id, username, role }`, with
+ * no username when it is missing or is the email; `undefined` when the Note
+ * has no author. `role` is `owner` when the author owns the Project (`ownerId`).
  */
-export const toPublicAuthor = (user: unknown): PublicAuthor | undefined => {
+export const toPublicAuthor = (
+  user: unknown,
+  ownerId: Types.ObjectId | string,
+): PublicAuthor | undefined => {
   const author = user as Pick<UserDoc, "_id" | "username" | "email"> | null | undefined;
   if (!author?._id) return undefined;
   const _id = author._id.toString();
+  const role: AuthorRole = _id === ownerId.toString() ? "owner" : "member";
   // Registration defaults username to the email, which must stay private.
-  if (!author.username || author.username === author.email) return { _id };
-  return { _id, username: author.username };
+  if (!author.username || author.username === author.email) return { _id, role };
+  return { _id, username: author.username, role };
+};
+
+type PopulatedNote = {
+  _id: Types.ObjectId;
+  content: string;
+  time: number;
+  done: boolean;
+  project?: Types.ObjectId | null;
+  user?: unknown;
+};
+
+/** The public view of a Note whose author is populated, on the Project listing it. */
+export const toPublicNote = (
+  note: PopulatedNote,
+  project: { _id: Types.ObjectId; user: Types.ObjectId },
+): PublicNote => {
+  const user = toPublicAuthor(note.user, project.user);
+  return {
+    _id: note._id.toString(),
+    content: note.content,
+    time: note.time,
+    done: note.done,
+    // Legacy Notes may lack `project`; they belong to the Project listing them.
+    project: (note.project ?? project._id).toString(),
+    ...(user && { user }),
+  };
 };
 
 const toPublicProject = (projectDoc: ProjectDoc): PublicProject => {
@@ -112,30 +145,12 @@ const toPublicProject = (projectDoc: ProjectDoc): PublicProject => {
     url: string;
     canEdit: boolean;
   };
-  const notes = projectDoc.notes as unknown as Array<{
-    _id: Types.ObjectId;
-    content: string;
-    time: number;
-    done: boolean;
-    project?: Types.ObjectId | null;
-    user?: unknown;
-  }>;
+  const notes = projectDoc.notes as unknown as PopulatedNote[];
   return {
     _id: projectDoc._id.toString(),
     title: projectDoc.title,
     src: projectDoc.src ?? undefined,
     share: { _id: share._id.toString(), url: share.url, canEdit: share.canEdit },
-    notes: notes.map((note) => {
-      const user = toPublicAuthor(note.user);
-      return {
-        _id: note._id.toString(),
-        content: note.content,
-        time: note.time,
-        done: note.done,
-        // Legacy Notes may lack `project`; they belong to the Project listing them.
-        project: (note.project ?? projectDoc._id).toString(),
-        ...(user && { user }),
-      };
-    }),
+    notes: notes.map((note) => toPublicNote(note, projectDoc)),
   };
 };

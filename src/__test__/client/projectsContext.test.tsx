@@ -122,6 +122,15 @@ describe("projectsContext open", () => {
     await waitFor(() => expect(result.current.modalsOpen).toEqual([ModalType.CURRENT_PROJECT]));
   });
 
+  it("asks for a video source when the loaded project has no src at all", async () => {
+    const { src: _src, ...noSrc } = project("p1");
+    const { result } = renderProjects({ "/api/project": () => ok({ project: noSrc }) });
+
+    await signIn(result, [noSrc as ProjectInterface]);
+
+    await waitFor(() => expect(result.current.modalsOpen).toEqual([ModalType.CURRENT_PROJECT]));
+  });
+
   it("shows a shared project on its own", () => {
     const { result } = renderProjects();
 
@@ -168,6 +177,31 @@ describe("projectsContext changes", () => {
 
     expect(result.current.project).toMatchObject({ _id: "p1", title: "Final", notes });
     expect(result.current.projects[0]).toMatchObject({ title: "Final", notes });
+  });
+
+  it("keeps the Share after an update whose reply carries only its id", async () => {
+    const { result, projectRequests } = renderProjects({
+      "/api/project": ({ action, project: sent }) =>
+        action === ProjectApiActions.UPDATE
+          ? ok({ project: { ...project("p1"), ...sent, notes: [], share: "s1" } })
+          : projectRoute({ action, project: sent }),
+    });
+    await signIn(result, [project("p1")]);
+    await waitFor(() => expect(result.current.project?._id).toBe("p1"));
+    await act(async () => {
+      await result.current.shareProject({ url: "rough-cut", canEdit: true });
+    });
+
+    await act(async () => {
+      await result.current.updateProject({ ...project("p1"), title: "Final" });
+    });
+
+    expect(result.current.project).toMatchObject({ title: "Final", share });
+    expect(result.current.projects[0]).toMatchObject({ title: "Final", share });
+    await act(async () => {
+      await result.current.removeShareProject();
+    });
+    expect(projectRequests().at(-1).body).toMatchObject({ share: { _id: "s1" } });
   });
 
   it("updates from a closure made before the session started, as hydration does", async () => {

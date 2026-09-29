@@ -1,19 +1,9 @@
-const DisplayUser = ({ noteUser, currentUser, currentSession = false }) => {
-  let displayName = "guest";
+// The author label: their public username, else their role; a note with no author is a guest's.
+const DisplayUser = ({ author, own = false }) => {
+  // no label on the viewer's own notes
+  if (own) return <></>;
 
-  // if the note containes a temp currentSession flag then we know it is from the current user
-  if (currentSession) return <></>;
-
-  // if we have a noteUser present who is not the admin
-  if (noteUser) {
-    // get the note user id
-    const noteUserId = typeof noteUser === "string" ? noteUser : noteUser._id;
-    // don't display name if the note is created by the current user
-    if (noteUserId === currentUser?._id) return <></>;
-
-    // else decide on display name
-    displayName = noteUser.username || noteUser.email || displayName;
-  }
+  const displayName = author?.username || author?.role || "guest";
 
   return (
     <div className="absolute bottom-0 right-1 text-themeText2">

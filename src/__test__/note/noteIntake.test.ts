@@ -50,7 +50,7 @@ describe("upsertNote on create", () => {
     if (result.kind !== "ok") throw new Error(`expected ok, got ${result.kind}`);
     expect(result.note).toMatchObject({
       content: "Trim the intro",
-      user: { _id: ownerId, username: "owner" },
+      user: { _id: ownerId, username: "owner", role: "owner" },
     });
     expect(JSON.stringify(result.note)).not.toContain("owner@example.com");
     expect((await Project.findById(projectId)).notes.map(String)).toEqual([input._id]);
@@ -101,9 +101,11 @@ describe("upsertNote on create", () => {
   it("lets another user create through an editable Share as themselves", async () => {
     const { ownerId, visitorId, projectId } = await seed({ canEdit: true });
 
-    await upsertNote(noteInput(projectId, { user: ownerId }), visitorId);
+    const result = await upsertNote(noteInput(projectId, { user: ownerId }), visitorId);
 
     expect((await Note.findOne()).user.toString()).toBe(visitorId);
+    if (result.kind !== "ok") throw new Error(`expected ok, got ${result.kind}`);
+    expect(result.note.user).toEqual({ _id: visitorId, username: "visitor", role: "member" });
   });
 
   it("returns notFound for a missing Project and saves nothing", async () => {
@@ -279,6 +281,24 @@ describe("removeDoneProjectNotes", () => {
     expect(result.notes.map((note) => note._id.toString())).toEqual([open._id.toString()]);
     expect(await Note.findById(done._id)).toBeNull();
     expect((await Project.findById(projectId)).notes.map(String)).toEqual([open._id.toString()]);
+  });
+
+  it("returns the survivors with their authors as the public view", async () => {
+    const { ownerId, visitorId, projectId } = await seed();
+    await User.updateOne({ _id: visitorId }, { username: "visitor@example.com" });
+    await seedNote(projectId, { user: ownerId });
+    await seedNote(projectId, { user: visitorId });
+    await seedNote(projectId);
+
+    const result = await removeDoneProjectNotes(projectId, ownerId);
+
+    if (result.kind !== "ok") throw new Error(`expected ok, got ${result.kind}`);
+    expect(result.notes.map((note) => note.user)).toEqual([
+      { _id: ownerId, username: "owner", role: "owner" },
+      { _id: visitorId, role: "member" },
+      undefined,
+    ]);
+    expect(JSON.stringify(result.notes)).not.toMatch(/@example\.com/);
   });
 
   it("lets a guest remove done Notes through an editable Share", async () => {

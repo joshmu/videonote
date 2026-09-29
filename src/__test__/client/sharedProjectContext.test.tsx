@@ -35,7 +35,7 @@ const renderShared = (routes: Routes = {}) => {
       </UiShellProvider>
     </NotificationProvider>
   );
-  const { result } = renderHook(
+  const { result, unmount } = renderHook(
     () => ({
       ...useSharedProjectContext(),
       project: useProjectsContext().project,
@@ -45,7 +45,7 @@ const renderShared = (routes: Routes = {}) => {
     }),
     { wrapper },
   );
-  return { result, ...transport };
+  return { result, unmount, ...transport };
 };
 
 beforeEach(() => {
@@ -103,6 +103,25 @@ describe("sharedProjectContext open", () => {
     await act(async () => result.current.prompt.action({ password: "hunter2" }));
     await waitFor(() => expect(result.current.project).toMatchObject({ _id: "p1" }));
     expect(mocks.push).not.toHaveBeenCalled();
+  });
+
+  it("sends no password retry once the page has unmounted", async () => {
+    vi.useFakeTimers();
+    try {
+      const { result, unmount, requests } = renderShared({
+        "/api/public_project": () => ({ status: 404, body: { msg: "Share url does not exist." } }),
+      });
+      act(() => result.current.handleShareAccess({ kind: "passwordRequired" }));
+      await act(async () => result.current.prompt.action({ password: "hunter2" }));
+
+      unmount();
+      await vi.runAllTimersAsync();
+
+      expect(requests).toEqual([]);
+      expect(mocks.push).not.toHaveBeenCalled();
+    } finally {
+      vi.useRealTimers();
+    }
   });
 
   it("sends a guest home when the Share does not exist", () => {

@@ -3,11 +3,12 @@ import { isObjectIdOrHexString, type Types } from "mongoose";
 import type { ShareProjectInterface } from "@/shared/types";
 import { Note, Project, type ProjectDoc, Share, User } from "@/utils/mongoose";
 import { findProjectWithRelations } from "@/utils/project/findProjectWithRelations";
+import { type OwnerProject, toOwnerProject } from "@/utils/project/ownerProject";
 import { attachOrUpdateShare, detachShare, ShareUrlTakenError } from "@/utils/share/shareIntake";
 
 type Id = Types.ObjectId | string;
 
-export type ProjectOk = { kind: "ok"; project: ProjectDoc };
+export type ProjectOk = { kind: "ok"; project: OwnerProject };
 export type ProjectNotFound = { kind: "notFound" };
 export type ProjectUrlTaken = { kind: "urlTaken"; message: string };
 /**
@@ -46,7 +47,7 @@ export const createProject = async (
   if (!fields.title?.trim()) return { kind: "invalid", reason: "title" };
   const project = await Project.create({ ...fields, user: userId });
   await User.updateOne({ _id: userId }, { $push: { projects: project._id } });
-  return { kind: "ok", project };
+  return { kind: "ok", project: toOwnerProject(project) };
 };
 
 export const getProject = async (
@@ -55,7 +56,7 @@ export const getProject = async (
 ): Promise<ProjectOk | ProjectNotFound> => {
   if (!isObjectIdOrHexString(projectId)) return NOT_FOUND;
   const project = await findProjectWithRelations({ _id: projectId, user: userId });
-  return project ? { kind: "ok", project } : NOT_FOUND;
+  return project ? { kind: "ok", project: toOwnerProject(project) } : NOT_FOUND;
 };
 
 export const updateProject = async (
@@ -69,7 +70,7 @@ export const updateProject = async (
     { $set: pickEditable(input) },
     { returnDocument: "after" },
   );
-  return project ? { kind: "ok", project } : NOT_FOUND;
+  return project ? { kind: "ok", project: toOwnerProject(project) } : NOT_FOUND;
 };
 
 export const shareProject = async (
@@ -117,7 +118,7 @@ export const removeProject = async (
   const owned = await findOwned(userId, projectId);
   if (!owned) return NOT_FOUND;
   await cascadeRemove(owned);
-  return { kind: "ok", project: owned };
+  return { kind: "ok", project: toOwnerProject(owned) };
 };
 
 /** Remove every Project the user owns, each with the same cascade. */

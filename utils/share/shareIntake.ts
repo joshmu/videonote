@@ -3,6 +3,7 @@ import type { Types } from "mongoose";
 import type { ShareProjectInterface } from "@/shared/types";
 import { type ProjectDoc, Share } from "@/utils/mongoose";
 import { findProjectWithRelations } from "@/utils/project/findProjectWithRelations";
+import { type OwnerProject, toOwnerProject } from "@/utils/project/ownerProject";
 import { hashSharePassword } from "@/utils/share/sharePassword";
 
 /**
@@ -28,32 +29,31 @@ const EDITABLE = ["url", "password", "canEdit"] as const;
 type EditableShare = Partial<Pick<ShareProjectInterface, (typeof EDITABLE)[number]>>;
 
 // Keep only the editable fields, hashing the password only when the caller
-// supplied the field. An absent `password` key means "leave it alone":
-// important on the update branch where we must not silently clear a user's
-// existing protection.
+// supplied the field. An absent `password` key means "leave it alone"; an
+// empty one removes the protection.
 const toPersisted = async (shareData: Partial<ShareProjectInterface>): Promise<EditableShare> => {
   const persisted: EditableShare = Object.fromEntries(
     EDITABLE.filter((key) => key in shareData).map((key) => [key, shareData[key]]),
   );
   if (!("password" in persisted)) return persisted;
-  return { ...persisted, password: (await hashSharePassword(persisted.password)) ?? undefined };
+  return { ...persisted, password: (await hashSharePassword(persisted.password)) ?? "" };
 };
 
 /**
  * Attach a new Share to a Project, or update the Share that's already
  * attached. The branch is decided by `projectDoc.share`. Returns the project
- * re-loaded with notes and share populated so callers can hand it straight
- * back to the client.
+ * re-loaded in the owner projection so callers can hand it straight back to
+ * the client.
  */
 export const attachOrUpdateShare = async (
   projectDoc: ProjectDoc,
   shareData: Partial<ShareProjectInterface>,
-): Promise<ProjectDoc> => {
+): Promise<OwnerProject> => {
   const persisted = await toPersisted(shareData);
 
   if (projectDoc.share) {
     await Share.findByIdAndUpdate(projectDoc.share, { $set: persisted });
-    return findProjectWithRelations({ _id: projectDoc._id });
+    return reload(projectDoc);
   }
 
   let createdId: Types.ObjectId;
@@ -70,18 +70,18 @@ export const attachOrUpdateShare = async (
   }
   projectDoc.share = createdId;
   await projectDoc.save();
-  return findProjectWithRelations({ _id: projectDoc._id });
+  return reload(projectDoc);
 };
 
 /**
  * Remove the Share that was attached to this Project. Scoped by user so the
  * caller cannot detach a share from a project they don't own. Returns the
- * project re-loaded with notes and share populated.
+ * project re-loaded in the owner projection.
  */
 export const detachShare = async (
   projectDoc: ProjectDoc,
   shareInfo: { _id: string },
-): Promise<ProjectDoc> => {
+): Promise<OwnerProject> => {
   await Share.deleteOne({
     _id: shareInfo._id,
     project: projectDoc._id,
@@ -89,5 +89,8 @@ export const detachShare = async (
   });
   projectDoc.share = null;
   await projectDoc.save();
-  return findProjectWithRelations({ _id: projectDoc._id });
+  return reload(projectDoc);
 };
+
+const reload = async (projectDoc: ProjectDoc): Promise<OwnerProject> =>
+  toOwnerProject(await findProjectWithRelations({ _id: projectDoc._id }));
