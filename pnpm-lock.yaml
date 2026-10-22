@@ -37,7 +37,7 @@ importers:
         version: 6.0.2
       next:
         specifier: ^16.4.2
-        version: 16.4.2(@types/node@26.6.5)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(sass@1.105.0)
+        version: 16.4.2(@types/node@26.6.5)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(sass@1.105.2)
       next-absolute-url:
         specifier: ^1.2.2
         version: 1.2.2
@@ -77,7 +77,7 @@ importers:
         version: 4.3.3
       '@testing-library/jest-dom':
         specifier: ^7.0.1
-        version: 7.0.1(@testing-library/dom@10.4.1)(vitest@5.0.5(@types/node@26.6.5)(jsdom@29.1.1)(vite@8.0.8(@types/node@26.6.5)(jiti@2.7.0)(sass@1.105.0)(yaml@2.9.1)))
+        version: 7.0.1(@testing-library/dom@10.4.1)(vitest@5.0.5(@types/node@26.6.5)(jsdom@29.1.1)(vite@8.0.8(@types/node@26.6.5)(jiti@2.7.0)(sass@1.105.2)(yaml@2.9.1)))
       '@testing-library/react':
         specifier: ^16.3.2
         version: 16.3.2(@testing-library/dom@10.4.1)(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
@@ -110,7 +110,7 @@ importers:
         version: 13.15.10
       '@vitejs/plugin-react':
         specifier: ^6.1.1
-        version: 6.1.1(vite@8.0.8(@types/node@26.6.5)(jiti@2.7.0)(sass@1.105.0)(yaml@2.9.1))
+        version: 6.1.1(vite@8.0.8(@types/node@26.6.5)(jiti@2.7.0)(sass@1.105.2)(yaml@2.9.1))
       autoprefixer:
         specifier: ^10.5.4
         version: 10.5.4(postcss@8.5.30)
@@ -145,8 +145,8 @@ importers:
         specifier: ^11.5.2
         version: 11.5.2(postcss@8.5.30)
       sass:
-        specifier: ^1.105.0
-        version: 1.105.0
+        specifier: ^1.105.2
+        version: 1.105.2
       tailwindcss:
         specifier: ^4.3.3
         version: 4.3.3
@@ -158,7 +158,7 @@ importers:
         version: 7.0.2
       vitest:
         specifier: ^5.0.5
-        version: 5.0.5(@types/node@26.6.5)(jsdom@29.1.1)(vite@8.0.8(@types/node@26.6.5)(jiti@2.7.0)(sass@1.105.0)(yaml@2.9.1))
+        version: 5.0.5(@types/node@26.6.5)(jsdom@29.1.1)(vite@8.0.8(@types/node@26.6.5)(jiti@2.7.0)(sass@1.105.2)(yaml@2.9.1))
 
 packages:
 
@@ -3584,8 +3584,8 @@ packages:
   safer-buffer@2.1.2:
     resolution: {integrity: sha512-YZo3K82SD7Riyi0E1EQPojLz7kpepnSQI9IyPbHHg1XXXevb5dJI7tpyN2ADxGcQbHG7vcyRHk0cbwqcQriUtg==}
 
-  sass@1.105.0:
-    resolution: {integrity: sha512-4EjSuRTyG8M4yRXXY1PT9OUV5zz23xBxJkbIAprohKHqf6HOU4MCpE3U3vAC+iO1gxobBjESNbcj8rYAQZWnyA==}
+  sass@1.105.2:
+    resolution: {integrity: sha512-KxW6ZKZiBKWK3ziQ4YZ3cpqo8/1TlHXE8t9nBNvGDZFoBFbk2MD7RacxYFs8zy8hzeFwpFYkVyAhboi47uYPEQ==}
     engines: {node: '>=20.19.0'}
     hasBin: true
 
@@ -3635,10 +3635,6 @@ packages:
   smol-toml@1.8.0:
     resolution: {integrity: sha512-kCZr2V3ch9i00x8zXRhjUNVcjG9ijES5dDudkXvUVCT5QlJNQWElSJdZqyPemffHoLNUYwOcou0Fy+ojN0uHSQ==}
     engines: {node: '>= 18'}
-
-  source-map-js@1.2.1:
-    resolution: {integrity: sha512-UXWMKhLOwVKb728IUtQPXxfYU+usdybtUrK/8uGE8CQMvrhOpwvzDBwj0QhSL7MQc7vIsISBG8VQ8+IDQxpfQA==}
-    engines: {node: '>=0.10.0'}
 
   source-map-js@1.2.2:
     resolution: {integrity: sha512-KGj/8Y43x35aZVDtt+J4mK1hoLGHULMYfSkODJNQjNDC3oW1PqPoxMwo0pLUsWM/UEGzON/NxeHywEfNXNP3Vw==}
@@ -5162,7 +5158,7 @@ snapshots:
       picocolors: 1.1.1
       pretty-format: 27.5.1
 
-  '@testing-library/jest-dom@7.0.1(@testing-library/dom@10.4.1)(vitest@5.0.5(@types/node@26.6.5)(jsdom@29.1.1)(vite@8.0.8(@types/node@26.6.5)(jiti@2.7.0)(sass@1.105.0)(yaml@2.9.1)))':
+  '@testing-library/jest-dom@7.0.1(@testing-library/dom@10.4.1)(vitest@5.0.5(@types/node@26.6.5)(jsdom@29.1.1)(vite@8.0.8(@types/node@26.6.5)(jiti@2.7.0)(sass@1.105.2)(yaml@2.9.1)))':
     dependencies:
       '@adobe/css-tools': 4.5.0
       '@testing-library/dom': 10.4.1
@@ -5172,7 +5168,7 @@ snapshots:
       picocolors: 1.1.1
       redent: 3.0.0
     optionalDependencies:
-      vitest: 5.0.5(@types/node@26.6.5)(jsdom@29.1.1)(vite@8.0.8(@types/node@26.6.5)(jiti@2.7.0)(sass@1.105.0)(yaml@2.9.1))
+      vitest: 5.0.5(@types/node@26.6.5)(jsdom@29.1.1)(vite@8.0.8(@types/node@26.6.5)(jiti@2.7.0)(sass@1.105.2)(yaml@2.9.1))
 
   '@testing-library/react@16.3.2(@testing-library/dom@10.4.1)(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)':
     dependencies:
@@ -5330,19 +5326,19 @@ snapshots:
       native-promise-only: 0.8.1
       weakmap-polyfill: 2.0.4
 
-  '@vitejs/plugin-react@6.1.1(vite@8.0.8(@types/node@26.6.5)(jiti@2.7.0)(sass@1.105.0)(yaml@2.9.1))':
+  '@vitejs/plugin-react@6.1.1(vite@8.0.8(@types/node@26.6.5)(jiti@2.7.0)(sass@1.105.2)(yaml@2.9.1))':
     dependencies:
       '@rolldown/pluginutils': 1.0.1
-      vite: 8.0.8(@types/node@26.6.5)(jiti@2.7.0)(sass@1.105.0)(yaml@2.9.1)
+      vite: 8.0.8(@types/node@26.6.5)(jiti@2.7.0)(sass@1.105.2)(yaml@2.9.1)
 
-  '@vitest/mocker@5.0.5(vite@8.0.8(@types/node@26.6.5)(jiti@2.7.0)(sass@1.105.0)(yaml@2.9.1))':
+  '@vitest/mocker@5.0.5(vite@8.0.8(@types/node@26.6.5)(jiti@2.7.0)(sass@1.105.2)(yaml@2.9.1))':
     dependencies:
       '@jridgewell/trace-mapping': 0.3.31
       '@vitest/spy': 5.0.5
       estree-walker: 3.0.3
       magic-string: 1.4.3
     optionalDependencies:
-      vite: 8.0.8(@types/node@26.6.5)(jiti@2.7.0)(sass@1.105.0)(yaml@2.9.1)
+      vite: 8.0.8(@types/node@26.6.5)(jiti@2.7.0)(sass@1.105.2)(yaml@2.9.1)
 
   '@vitest/spy@5.0.5': {}
 
@@ -6649,7 +6645,7 @@ snapshots:
 
   next-absolute-url@1.2.2: {}
 
-  next@16.4.2(@types/node@26.6.5)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(sass@1.105.0):
+  next@16.4.2(@types/node@26.6.5)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(sass@1.105.2):
     dependencies:
       '@next/env': 16.4.2
       '@swc/helpers': 0.5.23
@@ -6668,7 +6664,7 @@ snapshots:
       '@next/swc-linux-x64-musl': 16.4.2
       '@next/swc-win32-arm64-msvc': 16.4.2
       '@next/swc-win32-x64-msvc': 16.4.2
-      sass: 1.105.0
+      sass: 1.105.2
       sharp: 0.35.5(@types/node@26.6.5)
     transitivePeerDependencies:
       - '@babel/core'
@@ -7254,11 +7250,11 @@ snapshots:
 
   safer-buffer@2.1.2: {}
 
-  sass@1.105.0:
+  sass@1.105.2:
     dependencies:
       chokidar: 5.0.0
       immutable: 5.1.9
-      source-map-js: 1.2.1
+      source-map-js: 1.2.2
     optionalDependencies:
       '@parcel/watcher': 2.6.0
 
@@ -7317,8 +7313,6 @@ snapshots:
   slash@5.1.0: {}
 
   smol-toml@1.8.0: {}
-
-  source-map-js@1.2.1: {}
 
   source-map-js@1.2.2: {}
 
@@ -7538,7 +7532,7 @@ snapshots:
       '@vimeo/player': 2.29.0
       media-played-ranges-mixin: 0.1.0
 
-  vite@8.0.8(@types/node@26.6.5)(jiti@2.7.0)(sass@1.105.0)(yaml@2.9.1):
+  vite@8.0.8(@types/node@26.6.5)(jiti@2.7.0)(sass@1.105.2)(yaml@2.9.1):
     dependencies:
       lightningcss: 1.33.0
       picomatch: 4.0.7
@@ -7549,13 +7543,13 @@ snapshots:
       '@types/node': 26.6.5
       fsevents: 2.3.3
       jiti: 2.7.0
-      sass: 1.105.0
+      sass: 1.105.2
       yaml: 2.9.1
 
-  vitest@5.0.5(@types/node@26.6.5)(jsdom@29.1.1)(vite@8.0.8(@types/node@26.6.5)(jiti@2.7.0)(sass@1.105.0)(yaml@2.9.1)):
+  vitest@5.0.5(@types/node@26.6.5)(jsdom@29.1.1)(vite@8.0.8(@types/node@26.6.5)(jiti@2.7.0)(sass@1.105.2)(yaml@2.9.1)):
     dependencies:
       '@types/chai': 5.2.3
-      '@vitest/mocker': 5.0.5(vite@8.0.8(@types/node@26.6.5)(jiti@2.7.0)(sass@1.105.0)(yaml@2.9.1))
+      '@vitest/mocker': 5.0.5(vite@8.0.8(@types/node@26.6.5)(jiti@2.7.0)(sass@1.105.2)(yaml@2.9.1))
       chai: 6.3.0
       es-module-lexer: 2.3.2
       expect-type: 1.4.0
@@ -7566,7 +7560,7 @@ snapshots:
       tinybench: 6.2.2
       tinyexec: 1.3.1
       tinyglobby: 0.2.17
-      vite: 8.0.8(@types/node@26.6.5)(jiti@2.7.0)(sass@1.105.0)(yaml@2.9.1)
+      vite: 8.0.8(@types/node@26.6.5)(jiti@2.7.0)(sass@1.105.2)(yaml@2.9.1)
       why-is-node-running: 3.2.1
     optionalDependencies:
       '@types/node': 26.6.5
