@@ -30,6 +30,12 @@
     "lint": "oxlint .",
     "format": "oxfmt --write .",
     "format:check": "oxfmt --check .",
+    "infra:install": "pnpm --dir infra install --frozen-lockfile",
+    "infra:test": "pnpm --dir infra test",
+    "infra:synth": "pnpm --dir infra cdk:synth",
+    "infra:diff": "pnpm --dir infra cdk:diff",
+    "infra:deploy:dev": "pnpm --dir infra cdk:deploy VideonoteDev",
+    "infra:deploy:prod": "pnpm --dir infra cdk:deploy VideonoteProd",
     "plop": "plop",
     "prepare": "husky"
   },
