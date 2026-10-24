@@ -51,12 +51,26 @@ data: it opens the backend once and retries after a failed attempt.
 in that order; a Project's Share is read only while it still points back at
 that Project. Unique indexes decide a taken email or Share url.
 
+**DynamoDB store**:
+`utils/store/dynamoStore.ts`, the `Store` over one DynamoDB table per
+environment (`DYNAMODB_TABLE`), keys `PK`/`SK`, no secondary indexes. A User,
+a Project (its Share embedded) and each Note are items; claim items (email,
+Share url, Note id) enforce uniqueness through conditional writes in
+transactions and give id-only lookups. A Project's Notes share its partition,
+sorted by id. `projectIds` on the User keeps the Projects' order. Reads are
+strongly consistent. `dynamoClient.ts` picks the credentials: Vercel's OIDC
+role (`AWS_ROLE_ARN`) on Vercel, placeholders for DynamoDB Local
+(`DYNAMODB_ENDPOINT`), else the default AWS chain. `DATA_BACKEND` chooses the
+Store (`mongo` until the migration ends).
+
 **Test database harness**:
 Server tests (the `server` vitest project, `node` environment) share one
-in-memory mongod started by `src/__test__/db/globalSetup.ts`, which pins
-`MONGOMS_VERSION`. A test file calls `useTestDb()` (`src/__test__/db/testDb.ts`)
+in-memory mongod and one DynamoDB Local container (testcontainers) started by
+`src/__test__/db/globalSetup.ts`, which pins both versions. A test file calls `useTestDb()` (`src/__test__/db/testDb.ts`)
 to get its own database, opened through `connectDb`, emptied after each test.
 Intakes take records: tests read them back through `getStore()`.
+`useTestStore(backend)` (`src/__test__/db/testStores.ts`) gives each test a
+fresh Store on either backend: the Store contract tests run once per backend.
 The mongod download is the only network access.
 
 ### Architecture (Identity / Auth seam)

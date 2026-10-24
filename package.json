@@ -17,6 +17,11 @@
   },
   "scripts": {
     "dev": "next dev",
+    "dev:local": "DATA_BACKEND=dynamodb DYNAMODB_ENDPOINT=http://localhost:8000 DYNAMODB_TABLE=videonote-local next dev",
+    "dev:aws": "DATA_BACKEND=dynamodb DYNAMODB_TABLE=videonote-dev AWS_REGION=ap-southeast-2 next dev",
+    "db:up": "node scripts/db-up.mjs",
+    "db:down": "docker stop videonote-dynamodb",
+    "db:seed": "node scripts/db-seed.mjs",
     "build": "next build",
     "start": "next start",
     "prod": "next build && next start",
@@ -40,6 +45,9 @@
     "prepare": "husky"
   },
   "dependencies": {
+    "@aws-sdk/client-dynamodb": "3.1156.0",
+    "@aws-sdk/lib-dynamodb": "3.1156.0",
+    "@vercel/oidc-aws-credentials-provider": "3.3.15",
     "bcryptjs": "^3.0.3",
     "date-fns": "^4.4.0",
     "file-saver": "^2.0.5",
@@ -91,6 +99,7 @@
     "sass": "^1.105.2",
     "tailwindcss": "^4.3.3",
     "tailwindcss-debug-screens": "^3.0.1",
+    "testcontainers": "12.2.1",
     "typescript": "^7.0.2",
     "vitest": "^5.0.5"
   },

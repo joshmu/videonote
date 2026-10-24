@@ -94,9 +94,15 @@ jobs:
       - run: pnpm test:run
 
   e2e:
-    name: E2E
+    name: E2E (${{ matrix.backend }})
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        backend: [mongo, dynamodb]
+    env:
+      DATA_BACKEND: ${{ matrix.backend }}
     steps:
       - uses: actions/checkout@v7
       - uses: pnpm/action-setup@v6
@@ -117,7 +123,7 @@ jobs:
       - uses: actions/upload-artifact@v7
         if: failure()
         with:
-          name: playwright-traces
+          name: playwright-traces-${{ matrix.backend }}
           path: test-results/
           retention-days: 7
 

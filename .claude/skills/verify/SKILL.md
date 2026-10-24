@@ -5,7 +5,7 @@ description: Build, run and drive VideoNote locally (real MongoDB, production bu
 
 # Verify VideoNote locally
 
-For regression coverage run `pnpm test:e2e` first (see the `e2e` skill). Use the steps below to drive a specific change by hand.
+For regression coverage run `pnpm test:e2e` first (see the `e2e` skill). Use the steps below to drive a specific change by hand. On DynamoDB the quickest handle is `pnpm db:up && pnpm dev:local`, then `pnpm db:seed` (demo login printed).
 
 ## Handle
 
