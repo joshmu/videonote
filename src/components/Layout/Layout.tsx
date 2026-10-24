@@ -18,7 +18,7 @@ const metaData: { [key: string]: string } = {
   description: "VideoNote - quick and easy timestamped video notes",
   keywords: "videonote, video, notetaking, todo, josh mu, developer, notes, review, app, timestamp",
   origin: "https://videonote.app",
-  imgUrl: "https://videonote.app/assets/avatar.jpg",
+  imgUrl: "https://videonote.app/images/vn-overview-hero.png",
 };
 
 export const Layout = ({ children }: { children: ReactNode }) => {
