@@ -1,6 +1,6 @@
 import { defineConfig, devices } from "@playwright/test";
 
-import { BACKEND, ORIGIN, PORT } from "./e2e/support/origin";
+import { ORIGIN, PORT } from "./e2e/support/origin";
 
 export default defineConfig({
   testDir: "e2e",
@@ -22,7 +22,7 @@ export default defineConfig({
     command: "node e2e/server.mjs",
     url: `${ORIGIN}/login`,
     reuseExistingServer: !process.env.CI,
-    env: { E2E_PORT: String(PORT), DATA_BACKEND: BACKEND },
+    env: { E2E_PORT: String(PORT) },
     stdout: "ignore",
     stderr: "pipe",
   },

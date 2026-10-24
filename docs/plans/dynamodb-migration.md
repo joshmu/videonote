@@ -1,6 +1,6 @@
 # Plan: move VideoNote from MongoDB to DynamoDB
 
-Status: proposed
+Status: done. The migration commands (`scripts/migrate/`) were removed with MongoDB; git history keeps them ([#176](https://github.com/joshmu/videonote/pull/176)).
 
 ## Goal
 

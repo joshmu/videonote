@@ -1,5 +1,5 @@
 ---
-status: proposed
+status: accepted
 ---
 
 # DynamoDB single table instead of MongoDB

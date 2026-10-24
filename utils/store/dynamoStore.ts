@@ -13,6 +13,8 @@ import {
   UpdateCommand,
 } from "@aws-sdk/lib-dynamodb";
 
+import { isIdString } from "@/utils/ids";
+
 import type {
   Author,
   Id,
@@ -49,8 +51,7 @@ export const keys = {
   shareClaim: (url: string) => ({ PK: `SHARE#${url}`, SK: "SHARE" }),
 };
 
-const ID = /^[0-9a-f]{24}$/i;
-const validId = (id: unknown): id is Id => typeof id === "string" && ID.test(id);
+const validId = isIdString;
 
 /** A new id in the ObjectId format (seconds, then random), sorting by creation time. */
 export const newId = (): Id =>

@@ -9,20 +9,18 @@ to `syd1`.
 - [`CONTEXT.md`](CONTEXT.md): domain language and architecture seams. Use its
   terms in code, tests and docs.
 - [`docs/`](docs/README.md): plans and architecture decision records. The
-  MongoDB → DynamoDB migration is in progress:
-  [`docs/plans/dynamodb-migration.md`](docs/plans/dynamodb-migration.md).
+  data lives in DynamoDB (one table per environment, see
+  [`docs/adr/0001-dynamodb-single-table.md`](docs/adr/0001-dynamodb-single-table.md)).
 
 ## Commands
 
 ```bash
 pnpm db:up          # DynamoDB Local in Docker (data kept in a volume) + the videonote-local table
-pnpm dev:local      # dev server on DynamoDB Local (needs .env.local for JWT_TOKEN_SECRET)
 pnpm db:seed        # made-up demo data through the running app's API
 pnpm dev:aws        # dev server on the videonote-dev table (AWS_PROFILE=personal)
-pnpm dev            # dev server on MongoDB (MONGODB_URI), until the migration ends
-pnpm test           # unit, server and Store contract tests (in-memory mongod + DynamoDB Local)
+pnpm dev            # dev server on DynamoDB Local (needs .env.local for JWT_TOKEN_SECRET)
+pnpm test           # unit, server and Store contract tests (DynamoDB Local)
 pnpm test:e2e       # production build + Playwright user flows on a throwaway database
-DATA_BACKEND=dynamodb pnpm test:e2e   # the same flows on DynamoDB Local
 pnpm typecheck
 pnpm lint           # oxlint
 pnpm format         # oxfmt
@@ -35,10 +33,9 @@ generates the test video) and Playwright's Chromium
 
 ## Tests
 
-- `src/__test__/`: unit and server tests. Server suites run once per backend
-  (`describe.each(BACKENDS)` with `useTestStore(backend)`), seeding and
-  asserting through the Store, never the Mongoose models; `getStore()` returns
-  the test's Store. Mongo-only tests are `*.mongo.test.ts`.
+- `src/__test__/`: unit and server tests. Server suites get a fresh Store on
+  its own DynamoDB Local table from `useTestStore(backend)` and seed and assert
+  through it; `getStore()` returns the test's Store.
 - `e2e/api/`: every API flow through the real routes, using the app's own
   `createApiClient`. Each test registers its own Users, so tests run in
   parallel.

@@ -1,6 +1,5 @@
-import { isObjectIdOrHexString } from "mongoose";
-
 import type { ShareProjectInterface } from "@/shared/types";
+import { isIdString } from "@/utils/ids";
 import { type OwnerProject, toOwnerProject } from "@/utils/project/ownerProject";
 import { attachOrUpdateShare, detachShare, ShareUrlTakenError } from "@/utils/share/shareIntake";
 import { getStore, type Id, type ProjectRecord } from "@/utils/store";
@@ -22,9 +21,6 @@ const INVALID_SHARE: ProjectInvalid = { kind: "invalid", reason: "share" };
 
 const isObject = (value: unknown): value is Record<string, unknown> =>
   typeof value === "object" && value !== null;
-
-const isIdString = (value: unknown): value is string =>
-  typeof value === "string" && isObjectIdOrHexString(value);
 
 const pickEditable = (input: ProjectInput = {}): { title?: string; src?: string } => {
   const fields: { title?: string; src?: string } = {};
