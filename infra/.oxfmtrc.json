@@ -1,0 +1,3 @@
+{
+  "ignorePatterns": ["cdk.out", "pnpm-lock.yaml"]
+}

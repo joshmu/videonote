@@ -19,7 +19,7 @@ export default defineConfig({
           name: "client",
           environment: "jsdom",
           setupFiles: ["./src/__test__/setupTests.tsx"],
-          exclude: [...configDefaults.exclude, ...SERVER_TESTS, "e2e/**"],
+          exclude: [...configDefaults.exclude, ...SERVER_TESTS, "e2e/**", "infra/**"],
         },
       },
       {

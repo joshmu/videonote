@@ -121,6 +121,26 @@ jobs:
           path: test-results/
           retention-days: 7
 
+  infra:
+    name: Infra
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    defaults:
+      run:
+        working-directory: infra
+    steps:
+      - uses: actions/checkout@v7
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: ".nvmrc"
+          cache: pnpm
+          cache-dependency-path: infra/pnpm-lock.yaml
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm typecheck
+      - run: pnpm test
+      - run: pnpm audit --audit-level=critical
+
   gitleaks:
     name: Gitleaks
     runs-on: ubuntu-latest
@@ -152,7 +172,7 @@ jobs:
     name: CI Status
     runs-on: ubuntu-latest
     if: always()
-    needs: [format, lint, typecheck, test, e2e, gitleaks, audit]
+    needs: [format, lint, typecheck, test, e2e, infra, gitleaks, audit]
     steps:
       - name: Check status
         run: |

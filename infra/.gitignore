@@ -1,0 +1,5 @@
+node_modules/
+cdk.out/
+.cdk.staging/
+*.tsbuildinfo
+.DS_Store
