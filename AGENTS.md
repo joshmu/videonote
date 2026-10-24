@@ -35,9 +35,10 @@ generates the test video) and Playwright's Chromium
 
 ## Tests
 
-- `src/__test__/`: unit and server tests. Server tests get their own database
-  from `useTestDb()`; `src/__test__/store/` runs the Store contract against
-  every backend through `useTestStore(backend)`.
+- `src/__test__/`: unit and server tests. Server suites run once per backend
+  (`describe.each(BACKENDS)` with `useTestStore(backend)`), seeding and
+  asserting through the Store, never the Mongoose models; `getStore()` returns
+  the test's Store. Mongo-only tests are `*.mongo.test.ts`.
 - `e2e/api/`: every API flow through the real routes, using the app's own
   `createApiClient`. Each test registers its own Users, so tests run in
   parallel.

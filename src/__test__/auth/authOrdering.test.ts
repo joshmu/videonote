@@ -1,77 +1,75 @@
 import { StatusCodes } from "http-status-codes";
-import mongoose, { Types } from "mongoose";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
+import { withAuthenticatedUser, withOptionalUser } from "@/utils/auth/withAuthenticatedUser";
 import { generateAccessToken } from "@/utils/jwt";
+import { getStore } from "@/utils/store";
 
 import { callApi } from "../api/http";
+import { testId } from "../db/seed";
 
-// A fresh model module per test, so connectDb holds no cached connection.
-const loadWrappers = () => import("@/utils/auth/withAuthenticatedUser");
+// The database is down: opening the Store fails, whatever the backend.
+vi.mock("@/utils/store", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("@/utils/store")>()),
+  getStore: vi.fn(),
+}));
 
-let connect: ReturnType<typeof vi.spyOn>;
+const openStore = vi.mocked(getStore);
 
 beforeEach(() => {
-  vi.resetModules();
-  vi.stubEnv("MONGODB_URI", "mongodb://db.test/videonote");
   vi.stubEnv("JWT_TOKEN_SECRET", "test-secret");
-  connect = vi.spyOn(mongoose, "connect").mockRejectedValue(new Error("unreachable"));
+  openStore.mockReset().mockRejectedValue(new Error("unreachable"));
 });
 
 afterEach(() => {
-  vi.restoreAllMocks();
   vi.unstubAllEnvs();
 });
 
-describe("auth wrappers reject a bad token before opening the database", () => {
+describe("auth wrappers reject a bad token before opening the Store", () => {
   it.each([
     ["no token", undefined],
     ["an invalid token", "Bearer not-a-jwt"],
   ])("withAuthenticatedUser replies 401 to %s while the database is down", async (_, header) => {
-    const { withAuthenticatedUser } = await loadWrappers();
     const handler = vi.fn();
 
     const { status } = await callApi(withAuthenticatedUser(handler), {}, { authorization: header });
 
     expect(status).toBe(StatusCodes.UNAUTHORIZED);
-    expect(connect).not.toHaveBeenCalled();
+    expect(openStore).not.toHaveBeenCalled();
     expect(handler).not.toHaveBeenCalled();
   });
 
   it("withOptionalUser replies 401 to an invalid token while the database is down", async () => {
-    const { withOptionalUser } = await loadWrappers();
     const handler = vi.fn();
 
     const { status } = await callApi(withOptionalUser(handler), {}, { authorization: "Bearer x" });
 
     expect(status).toBe(StatusCodes.UNAUTHORIZED);
-    expect(connect).not.toHaveBeenCalled();
+    expect(openStore).not.toHaveBeenCalled();
     expect(handler).not.toHaveBeenCalled();
   });
 });
 
-describe("auth wrappers open the database when the request needs it", () => {
-  it("withAuthenticatedUser connects for a valid token", async () => {
-    const { withAuthenticatedUser } = await loadWrappers();
+describe("auth wrappers open the Store when the request needs it", () => {
+  it("withAuthenticatedUser opens it for a valid token", async () => {
     const handler = vi.fn();
 
-    const authorization = `Bearer ${generateAccessToken(new Types.ObjectId().toString())}`;
+    const authorization = `Bearer ${generateAccessToken(testId())}`;
 
     await expect(callApi(withAuthenticatedUser(handler), {}, { authorization })).rejects.toThrow(
       "unreachable",
     );
 
-    expect(connect).toHaveBeenCalledTimes(1);
+    expect(openStore).toHaveBeenCalledTimes(1);
     expect(handler).not.toHaveBeenCalled();
   });
 
-  it("withOptionalUser serves a guest and leaves opening the database to the handler", async () => {
-    const { withOptionalUser } = await loadWrappers();
+  it("withOptionalUser serves a guest and leaves opening the Store to the handler", async () => {
     const handler = vi.fn();
 
     await callApi(withOptionalUser(handler), {});
 
-    expect(connect).not.toHaveBeenCalled();
+    expect(openStore).not.toHaveBeenCalled();
     expect(handler).toHaveBeenCalledWith(expect.anything(), expect.anything(), {
       isGuest: true,
       user: null,
