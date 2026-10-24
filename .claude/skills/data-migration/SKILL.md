@@ -9,14 +9,14 @@ description: Runbook for moving VideoNote's data from MongoDB to DynamoDB with `
 `MONGODB_URI` from `.env.local` and, for AWS tables, `AWS_PROFILE=personal`.
 Add `--endpoint http://localhost:8000` to target DynamoDB Local.
 
-| Command | Does |
-| --- | --- |
-| `export` | Snapshots MongoDB to `~/.local/share/videonote-migration/` (mode 600) and prints the path. Snapshots hold user data: never copy one into the repo, a PR or a log. |
-| `plan --snapshot F` | Counts what migrates and what is left out (unreachable records), ids only. |
-| `sync --snapshot F --table T [--wcu 15] [--dry-run]` | Makes the table hold exactly the snapshot's items. Idempotent; paced to `--wcu` write units a second. |
-| `verify --snapshot F --table T` | For every migrated User and Share, compares what `/api/auth` and `/api/public_project` would send from MongoDB and from the table. Prints ids and JSON paths, never values. Exits 1 on any difference. |
-| `delta --from F --to G --table T --since ISO` | Applies MongoDB changes between two snapshots. Never overwrites a newer DynamoDB item, and never deletes one changed after `--since`. |
-| `reverse --since ISO --table T [--dry-run]` | Rollback: copies Users, Projects (with Share and Notes list) and Notes changed on DynamoDB after `--since` back to MongoDB. DynamoDB deletions are not copied. |
+| Command                                              | Does                                                                                                                                                                                                   |
+| ---------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `export`                                             | Snapshots MongoDB to `~/.local/share/videonote-migration/` (mode 600) and prints the path. Snapshots hold user data: never copy one into the repo, a PR or a log.                                      |
+| `plan --snapshot F`                                  | Counts what migrates and what is left out (unreachable records), ids only.                                                                                                                             |
+| `sync --snapshot F --table T [--wcu 15] [--dry-run]` | Makes the table hold exactly the snapshot's items. Idempotent; paced to `--wcu` write units a second.                                                                                                  |
+| `verify --snapshot F --table T`                      | For every migrated User and Share, compares what `/api/auth` and `/api/public_project` would send from MongoDB and from the table. Prints ids and JSON paths, never values. Exits 1 on any difference. |
+| `delta --from F --to G --table T --since ISO`        | Applies MongoDB changes between two snapshots. Never overwrites a newer DynamoDB item, and never deletes one changed after `--since`.                                                                  |
+| `reverse --since ISO --table T [--dry-run]`          | Rollback: copies Users, Projects (with Share and Notes list) and Notes changed on DynamoDB after `--since` back to MongoDB. DynamoDB deletions are not copied.                                         |
 
 What is left out and why: `scripts/migrate/transform.ts` (`toRecords`) reads
 the snapshot the way the Mongo store reads MongoDB. A Project counts only when
