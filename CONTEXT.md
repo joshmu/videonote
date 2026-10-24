@@ -66,11 +66,17 @@ Store (`mongo` until the migration ends).
 **Test database harness**:
 Server tests (the `server` vitest project, `node` environment) share one
 in-memory mongod and one DynamoDB Local container (testcontainers) started by
-`src/__test__/db/globalSetup.ts`, which pins both versions. A test file calls `useTestDb()` (`src/__test__/db/testDb.ts`)
-to get its own database, opened through `connectDb`, emptied after each test.
-Intakes take records: tests read them back through `getStore()`.
-`useTestStore(backend)` (`src/__test__/db/testStores.ts`) gives each test a
-fresh Store on either backend: the Store contract tests run once per backend.
+`src/__test__/db/globalSetup.ts`, which pins both versions. Each server suite
+runs once per backend: `describe.each(BACKENDS)` and `useTestStore(backend)`
+(`src/__test__/db/testStores.ts`) give every test a fresh Store, its own Mongo
+database or DynamoDB Local table, which `getStore()` also returns for the test
+(`setStoreForTests`), so intakes and handlers run on it. Tests seed through the
+Store (`src/__test__/db/seed.ts`), read back through it, and inject failures by
+spying on Store methods. `rawData()` (`src/__test__/db/rawData.ts`) writes only
+what the Store API cannot (legacy or half-removed data), per backend. Notes
+are compared sorted by id; a User's Project order is behaviour. Mongo-only
+tests are named `*.mongo.test.ts`; they, `useTestDb()` and the `mongo` branches
+of the helpers go with the Mongo backend (as does the migration test).
 The mongod download is the only network access.
 
 ### Architecture (Identity / Auth seam)

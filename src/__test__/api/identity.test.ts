@@ -1,23 +1,19 @@
-import bcrypt from "bcryptjs";
 import { StatusCodes } from "http-status-codes";
-import { afterEach, beforeAll, describe, expect, it, vi } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 
 import authHandler from "@/api/auth";
 import loginHandler from "@/api/login";
 import registerHandler from "@/api/register";
 import userHandler from "@/api/user";
 import { authenticateToken } from "@/utils/jwt";
-import { Note, Project, Settings, Share, User } from "@/utils/mongoose";
+import { hashSharePassword } from "@/utils/share/sharePassword";
 
-import { useTestDb } from "../db/testDb";
+import { rawData } from "../db/rawData";
+import { seedNote, seedProject, seedUser as seedAnyUser, sortById } from "../db/seed";
+import { BACKENDS, useTestStore } from "../db/testStores";
 import { callApi, useTestJwtSecret } from "./http";
 
-useTestDb();
 useTestJwtSecret();
-
-beforeAll(async () => {
-  await User.init();
-});
 
 afterEach(() => {
   vi.restoreAllMocks();
@@ -25,248 +21,251 @@ afterEach(() => {
 
 const EMAIL = "owner@example.com";
 
-const seedUser = async (email = EMAIL) =>
-  User.create({ email, username: email, password: await bcrypt.hash("hunter2", 4) });
+describe.each(BACKENDS)("identity routes: %s", (backend) => {
+  const store = useTestStore(backend);
 
-describe("/api/register", () => {
-  it("replies 201 with a token for a new account", async () => {
-    const { status, body } = await callApi(registerHandler, { email: EMAIL, password: "hunter2" });
+  const seedUser = (email = EMAIL) => seedAnyUser(store(), email, { password: "hunter2" });
 
-    expect(status).toBe(StatusCodes.CREATED);
-    expect(authenticateToken(body.token)).toBe(body.user._id);
-    expect(body.user.password).toBeUndefined();
-  });
+  describe("/api/register", () => {
+    it("replies 201 with a token for a new account", async () => {
+      const { status, body } = await callApi(registerHandler, {
+        email: EMAIL,
+        password: "hunter2",
+      });
 
-  it("replies 409 for an email that is already registered", async () => {
-    await seedUser();
+      expect(status).toBe(StatusCodes.CREATED);
+      expect(authenticateToken(body.token)).toBe(body.user._id);
+      expect(body.user.password).toBeUndefined();
+    });
 
-    const { status } = await callApi(registerHandler, { email: EMAIL, password: "x" });
+    it("replies 409 for an email that is already registered", async () => {
+      await seedUser();
 
-    expect(status).toBe(StatusCodes.CONFLICT);
-  });
+      const { status } = await callApi(registerHandler, { email: EMAIL, password: "x" });
 
-  it.each([{}, { password: "x" }, { email: EMAIL }, { email: "nope", password: "x" }])(
-    "replies 400 to %j",
-    async (body) => {
-      expect((await callApi(registerHandler, body)).status).toBe(StatusCodes.BAD_REQUEST);
-    },
-  );
-});
+      expect(status).toBe(StatusCodes.CONFLICT);
+    });
 
-describe("/api/login", () => {
-  it("replies 302 with a token and the user without its password", async () => {
-    await seedUser();
-
-    const { status, body } = await callApi(loginHandler, { email: EMAIL, password: "hunter2" });
-
-    expect(status).toBe(StatusCodes.MOVED_TEMPORARILY);
-    expect(authenticateToken(body.token)).toBe(body.user._id);
-    expect(body.user.email).toBe(EMAIL);
-    expect(body.user.password).toBeUndefined();
-    expect(body.user.createdAt).toBeUndefined();
-    expect(body.user.updatedAt).toBeUndefined();
-  });
-
-  it("replies 404 for an unknown email and 401 for a wrong password", async () => {
-    await seedUser();
-
-    expect((await callApi(loginHandler, { email: "x@example.com", password: "a" })).status).toBe(
-      StatusCodes.NOT_FOUND,
-    );
-    expect((await callApi(loginHandler, { email: EMAIL, password: "wrong" })).status).toBe(
-      StatusCodes.UNAUTHORIZED,
+    it.each([{}, { password: "x" }, { email: EMAIL }, { email: "nope", password: "x" }])(
+      "replies 400 to %j",
+      async (body) => {
+        expect((await callApi(registerHandler, body)).status).toBe(StatusCodes.BAD_REQUEST);
+      },
     );
   });
 
-  it.each([{}, { password: "hunter2" }, { email: EMAIL }, { email: { $ne: null }, password: "a" }])(
-    "replies 400 to %j",
-    async (body) => {
+  describe("/api/login", () => {
+    it("replies 302 with a token and the user without its password", async () => {
+      await seedUser();
+
+      const { status, body } = await callApi(loginHandler, { email: EMAIL, password: "hunter2" });
+
+      expect(status).toBe(StatusCodes.MOVED_TEMPORARILY);
+      expect(authenticateToken(body.token)).toBe(body.user._id);
+      expect(body.user.email).toBe(EMAIL);
+      expect(body.user.password).toBeUndefined();
+      expect(body.user.createdAt).toBeUndefined();
+      expect(body.user.updatedAt).toBeUndefined();
+    });
+
+    it("replies 404 for an unknown email and 401 for a wrong password", async () => {
+      await seedUser();
+
+      expect((await callApi(loginHandler, { email: "x@example.com", password: "a" })).status).toBe(
+        StatusCodes.NOT_FOUND,
+      );
+      expect((await callApi(loginHandler, { email: EMAIL, password: "wrong" })).status).toBe(
+        StatusCodes.UNAUTHORIZED,
+      );
+    });
+
+    it.each([
+      {},
+      { password: "hunter2" },
+      { email: EMAIL },
+      { email: { $ne: null }, password: "a" },
+    ])("replies 400 to %j", async (body) => {
       await seedUser();
       expect((await callApi(loginHandler, body)).status).toBe(StatusCodes.BAD_REQUEST);
-    },
-  );
-});
-
-describe("/api/user", () => {
-  it("updates the profile and replies with a token for the new email", async () => {
-    const user = await seedUser();
-    user.settings = (await Settings.create({ user: user._id, playOffset: 1 }))._id;
-    await user.save();
-
-    const { status, body } = await callApi(
-      userHandler,
-      { action: "update", user: { username: "Owner", email: "new@example.com", role: "paid" } },
-      { email: EMAIL },
-    );
-
-    expect(status).toBe(StatusCodes.OK);
-    expect(body.user).toMatchObject({ username: "Owner", email: "new@example.com", role: "free" });
-    expect(body.user.password).toBeUndefined();
-    expect(body.user.settings).toBeUndefined();
-    expect(authenticateToken(body.token)).toBe(body.user._id);
-  });
-
-  it("does not write settings", async () => {
-    await seedUser();
-
-    const { status } = await callApi(
-      userHandler,
-      { action: "update", user: { settings: { playOffset: 9 } } },
-      { email: EMAIL },
-    );
-
-    expect(status).toBe(StatusCodes.OK);
-    expect(await Settings.countDocuments()).toBe(0);
-    expect((await User.findOne({ email: EMAIL })).settings).toBeUndefined();
-  });
-
-  it("replies 409 when the new email belongs to another user", async () => {
-    await seedUser();
-    await seedUser("taken@example.com");
-
-    const { status } = await callApi(
-      userHandler,
-      { action: "update", user: { email: "taken@example.com" } },
-      { email: EMAIL },
-    );
-
-    expect(status).toBe(StatusCodes.CONFLICT);
-  });
-
-  it("replies 400 to a malformed email", async () => {
-    await seedUser();
-
-    const { status } = await callApi(
-      userHandler,
-      { action: "update", user: { email: "nope" } },
-      { email: EMAIL },
-    );
-
-    expect(status).toBe(StatusCodes.BAD_REQUEST);
-  });
-
-  it.each([undefined, "explode"])("replies 400 to action %s", async (action) => {
-    await seedUser();
-
-    const { status } = await callApi(userHandler, { action, user: {} }, { email: EMAIL });
-
-    expect(status).toBe(StatusCodes.BAD_REQUEST);
-  });
-
-  it("removes the account and its data", async () => {
-    const user = await seedUser();
-    const project = await Project.create({ title: "Cut", user: user._id });
-    await Note.create({ content: "Trim", project: project._id, user: user._id });
-
-    const { status } = await callApi(
-      userHandler,
-      { action: "remove", user: { password: "hunter2" } },
-      { email: EMAIL },
-    );
-
-    expect(status).toBe(StatusCodes.OK);
-    expect(await User.countDocuments()).toBe(0);
-    expect(await Project.countDocuments()).toBe(0);
-    expect(await Note.countDocuments()).toBe(0);
-  });
-
-  it("replies 401 to a wrong password on remove", async () => {
-    await seedUser();
-
-    const { status } = await callApi(
-      userHandler,
-      { action: "remove", user: { password: "wrong" } },
-      { email: EMAIL },
-    );
-
-    expect(status).toBe(StatusCodes.UNAUTHORIZED);
-    expect(await User.countDocuments()).toBe(1);
-  });
-
-  it("replies 500, not 200, when removal fails part-way", async () => {
-    const user = await seedUser();
-    await Project.create({ title: "Cut", user: user._id });
-    vi.spyOn(Share, "deleteMany").mockRejectedValueOnce(new Error("share store down"));
-    vi.spyOn(console, "error").mockImplementation(() => undefined);
-
-    const { status } = await callApi(
-      userHandler,
-      { action: "remove", user: { password: "hunter2" } },
-      { email: EMAIL },
-    );
-
-    expect(status).toBe(StatusCodes.INTERNAL_SERVER_ERROR);
-    expect(await User.countDocuments()).toBe(1);
-  });
-});
-
-describe("/api/auth", () => {
-  it("replies with the user, settings and each project in the owner projection", async () => {
-    const user = await seedUser();
-    const member = await seedUser("member@example.com");
-    const settings = await Settings.create({ user: user._id, playOffset: 2 });
-    const project = await Project.create({ title: "Cut", user: user._id });
-    const own = await Note.create({ content: "Trim", project: project._id, user: user._id });
-    const theirs = await Note.create({ content: "Grade", project: project._id, user: member._id });
-    const guests = await Note.create({ content: "Louder", project: project._id });
-    const hash = await bcrypt.hash("letmein", 4);
-    const share = await Share.create({
-      url: "cut",
-      user: user._id,
-      project: project._id,
-      password: hash,
     });
-    project.notes.push(own._id, theirs._id, guests._id);
-    project.share = share._id;
-    await project.save();
-    user.settings = settings._id;
-    user.projects.push(project._id);
-    await user.save();
-
-    const { status, body } = await callApi(authHandler, {}, { email: EMAIL });
-
-    expect(status).toBe(StatusCodes.OK);
-    expect(body.user.password).toBeUndefined();
-    expect(body.user.settings).toMatchObject({ playOffset: 2 });
-    expect(body.user.projects).toEqual([
-      expect.objectContaining({
-        title: "Cut",
-        share: { _id: share._id.toString(), url: "cut", canEdit: true, hasPassword: true },
-        notes: [
-          expect.objectContaining({
-            content: "Trim",
-            user: { _id: user._id.toString(), role: "owner" },
-          }),
-          expect.objectContaining({
-            content: "Grade",
-            user: { _id: member._id.toString(), role: "member" },
-          }),
-          expect.not.objectContaining({ user: expect.anything() }),
-        ],
-      }),
-    ]);
-    const wire = JSON.stringify(body.user.projects);
-    expect(wire).not.toContain(hash);
-    expect(wire).not.toContain("password");
-    expect(wire).not.toMatch(/@example\.com/);
   });
 
-  it("loads the user's projects in one query, in the user's order, skipping projects they do not own", async () => {
-    const user = await seedUser();
-    const other = await seedUser("other@example.com");
-    const foreign = await Project.create({ title: "Theirs", user: other._id });
-    const later = await Project.create({ title: "Later", user: user._id });
-    const earlier = await Project.create({ title: "Earlier", user: user._id });
-    user.projects.push(earlier._id, foreign._id, later._id);
-    await user.save();
-    const find = vi.spyOn(Project, "find");
-    const findOne = vi.spyOn(Project, "findOne");
+  describe("/api/user", () => {
+    it("updates the profile and replies with a token for the new email", async () => {
+      const user = await seedUser();
+      await store().saveSettings(user._id, { playOffset: 1 });
 
-    const { status, body } = await callApi(authHandler, {}, { email: EMAIL });
+      const { status, body } = await callApi(
+        userHandler,
+        { action: "update", user: { username: "Owner", email: "new@example.com", role: "paid" } },
+        { email: EMAIL },
+      );
 
-    expect(status).toBe(StatusCodes.OK);
-    expect(body.user.projects.map((project) => project.title)).toEqual(["Earlier", "Later"]);
-    expect(find).toHaveBeenCalledTimes(1);
-    expect(findOne).not.toHaveBeenCalled();
+      expect(status).toBe(StatusCodes.OK);
+      expect(body.user).toMatchObject({
+        username: "Owner",
+        email: "new@example.com",
+        role: "free",
+      });
+      expect(body.user.password).toBeUndefined();
+      expect(body.user.settings).toBeUndefined();
+      expect(authenticateToken(body.token)).toBe(body.user._id);
+    });
+
+    it("does not write settings", async () => {
+      const user = await seedUser();
+
+      const { status } = await callApi(
+        userHandler,
+        { action: "update", user: { settings: { playOffset: 9 } } },
+        { email: EMAIL },
+      );
+
+      expect(status).toBe(StatusCodes.OK);
+      expect((await store().getUser(user._id))!.settings).toBeNull();
+    });
+
+    it("replies 409 when the new email belongs to another user", async () => {
+      await seedUser();
+      await seedUser("taken@example.com");
+
+      const { status } = await callApi(
+        userHandler,
+        { action: "update", user: { email: "taken@example.com" } },
+        { email: EMAIL },
+      );
+
+      expect(status).toBe(StatusCodes.CONFLICT);
+    });
+
+    it("replies 400 to a malformed email", async () => {
+      await seedUser();
+
+      const { status } = await callApi(
+        userHandler,
+        { action: "update", user: { email: "nope" } },
+        { email: EMAIL },
+      );
+
+      expect(status).toBe(StatusCodes.BAD_REQUEST);
+    });
+
+    it.each([undefined, "explode"])("replies 400 to action %s", async (action) => {
+      await seedUser();
+
+      const { status } = await callApi(userHandler, { action, user: {} }, { email: EMAIL });
+
+      expect(status).toBe(StatusCodes.BAD_REQUEST);
+    });
+
+    it("removes the account and its data", async () => {
+      const user = await seedUser();
+      const project = await seedProject(store(), user._id, { title: "Cut" });
+      const note = await seedNote(store(), project._id, { content: "Trim", authorId: user._id });
+
+      const { status } = await callApi(
+        userHandler,
+        { action: "remove", user: { password: "hunter2" } },
+        { email: EMAIL },
+      );
+
+      expect(status).toBe(StatusCodes.OK);
+      expect(await store().getUser(user._id)).toBeNull();
+      expect(await store().findUserByEmail(EMAIL)).toBeNull();
+      expect(await store().getProject(project._id)).toBeNull();
+      expect(await store().getNote(note._id)).toBeNull();
+    });
+
+    it("replies 401 to a wrong password on remove", async () => {
+      const user = await seedUser();
+
+      const { status } = await callApi(
+        userHandler,
+        { action: "remove", user: { password: "wrong" } },
+        { email: EMAIL },
+      );
+
+      expect(status).toBe(StatusCodes.UNAUTHORIZED);
+      expect(await store().getUser(user._id)).not.toBeNull();
+    });
+
+    it("replies 500, not 200, when removal fails part-way", async () => {
+      const user = await seedUser();
+      await seedProject(store(), user._id, { title: "Cut" });
+      vi.spyOn(store(), "removeProject").mockRejectedValueOnce(new Error("project store down"));
+      vi.spyOn(console, "error").mockImplementation(() => undefined);
+
+      const { status } = await callApi(
+        userHandler,
+        { action: "remove", user: { password: "hunter2" } },
+        { email: EMAIL },
+      );
+
+      expect(status).toBe(StatusCodes.INTERNAL_SERVER_ERROR);
+      expect(await store().getUser(user._id)).not.toBeNull();
+    });
+  });
+
+  describe("/api/auth", () => {
+    it("replies with the user, settings and each project in the owner projection", async () => {
+      const user = await seedUser();
+      const member = await seedUser("member@example.com");
+      await store().saveSettings(user._id, { playOffset: 2 });
+      const project = await seedProject(store(), user._id, { title: "Cut" });
+      await seedNote(store(), project._id, { content: "Trim", authorId: user._id });
+      await seedNote(store(), project._id, { content: "Grade", authorId: member._id });
+      await seedNote(store(), project._id, { content: "Louder" });
+      const hash = await hashSharePassword("letmein");
+      const share = await store().putShare(project._id, { url: "cut", passwordHash: hash });
+      if (share === "urlTaken") throw new Error("expected a Share");
+
+      const { status, body } = await callApi(authHandler, {}, { email: EMAIL });
+
+      expect(status).toBe(StatusCodes.OK);
+      expect(body.user.password).toBeUndefined();
+      expect(body.user.settings).toMatchObject({ playOffset: 2 });
+      expect(body.user.projects).toEqual([
+        expect.objectContaining({
+          title: "Cut",
+          share: { _id: share._id, url: "cut", canEdit: true, hasPassword: true },
+        }),
+      ]);
+      expect(sortById(body.user.projects[0].notes)).toEqual([
+        expect.objectContaining({
+          content: "Trim",
+          user: { _id: user._id, role: "owner" },
+        }),
+        expect.objectContaining({
+          content: "Grade",
+          user: { _id: member._id, role: "member" },
+        }),
+        expect.not.objectContaining({ user: expect.anything() }),
+      ]);
+      const wire = JSON.stringify(body.user.projects);
+      expect(wire).not.toContain(hash);
+      expect(wire).not.toContain("password");
+      expect(wire).not.toMatch(/@example\.com/);
+    });
+
+    it("loads the user's projects in one Store call, in the user's order, skipping projects they do not own", async () => {
+      const user = await seedUser();
+      const other = await seedUser("other@example.com");
+      const foreign = await seedProject(store(), other._id, { title: "Theirs" });
+      const later = await seedProject(store(), user._id, { title: "Later" });
+      const earlier = await seedProject(store(), user._id, { title: "Earlier" });
+      // A list out of creation order that names another owner's Project, as legacy data can.
+      await rawData().listProjects(user._id, [earlier._id, foreign._id, later._id]);
+      const loadProjects = vi.spyOn(store(), "loadProjects");
+      const loadProject = vi.spyOn(store(), "loadProject");
+      const getProject = vi.spyOn(store(), "getProject");
+
+      const { status, body } = await callApi(authHandler, {}, { email: EMAIL });
+
+      expect(status).toBe(StatusCodes.OK);
+      expect(body.user.projects.map((project) => project.title)).toEqual(["Earlier", "Later"]);
+      expect(loadProjects).toHaveBeenCalledTimes(1);
+      expect(loadProject).not.toHaveBeenCalled();
+      expect(getProject).not.toHaveBeenCalled();
+    });
   });
 });

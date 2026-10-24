@@ -1,16 +1,16 @@
 import { createHash, createHmac } from "node:crypto";
 
 import jwt from "jsonwebtoken";
-import { Types } from "mongoose";
 import { describe, expect, it } from "vitest";
 
 import { issueShareToken, verifyShareToken } from "@/utils/share/shareToken";
 
 import { useTestJwtSecret } from "../api/http";
+import { testId } from "../db/seed";
 
 useTestJwtSecret();
 
-const share = { _id: new Types.ObjectId(), password: "$2a$10$storedbcrypthash" };
+const share = { _id: testId(), password: "$2a$10$storedbcrypthash" };
 const version = createHash("sha256").update(share.password).digest("hex");
 const derivedSecret = () => createHmac("sha256", "test-secret").update("share-token").digest("hex");
 

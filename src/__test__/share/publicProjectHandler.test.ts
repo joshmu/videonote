@@ -2,13 +2,13 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import { describe, expect, it, vi } from "vitest";
 
 import handler from "@/api/public_project";
-import { Note, Project, User } from "@/utils/mongoose";
 import { attachOrUpdateShare } from "@/utils/share/shareIntake";
 
 import { useTestJwtSecret } from "../api/http";
-import { useTestDb } from "../db/testDb";
+import { rawData } from "../db/rawData";
+import { seedNote, seedProject, seedUser } from "../db/seed";
+import { BACKENDS, useTestStore } from "../db/testStores";
 
-useTestDb();
 useTestJwtSecret();
 
 const post = async (body: Record<string, unknown>) => {
@@ -19,17 +19,17 @@ const post = async (body: Record<string, unknown>) => {
   return { status: res.status.mock.calls[0][0], body: res.json.mock.calls[0][0] };
 };
 
-const seedShare = async (password?: string) => {
-  const owner = await User.create({ email: "owner@example.com", username: "owner" });
-  const project = await Project.create({ title: "Rough cut", user: owner._id });
-  const note = await Note.create({ content: "Trim", project: project._id, user: owner._id });
-  project.notes.push(note._id);
-  await project.save();
-  await attachOrUpdateShare(project, { url: "rough-cut", password });
-  return project;
-};
+describe.each(BACKENDS)("POST /api/public_project: %s", (backend) => {
+  const store = useTestStore(backend);
 
-describe("POST /api/public_project", () => {
+  const seedShare = async (password?: string) => {
+    const owner = await seedUser(store(), "owner@example.com", { username: "owner" });
+    const project = await seedProject(store(), owner._id, { title: "Rough cut" });
+    await seedNote(store(), project._id, { content: "Trim", authorId: owner._id });
+    await attachOrUpdateShare(project, { url: "rough-cut", password });
+    return project;
+  };
+
   it("answers 401 for a protected Share without a password", async () => {
     await seedShare("hunter2");
 
@@ -57,7 +57,7 @@ describe("POST /api/public_project", () => {
 
   it("answers 404 when the shared Project was deleted", async () => {
     const project = await seedShare();
-    await Project.deleteOne({ _id: project._id });
+    await rawData().removeProjectOnly(project._id);
 
     expect(await post({ shareUrl: "rough-cut" })).toEqual({
       status: 404,
@@ -72,10 +72,10 @@ describe("POST /api/public_project", () => {
 
     expect(status).toBe(200);
     expect(body.user.projects).toEqual([
-      expect.objectContaining({ _id: project._id.toString(), title: "Rough cut" }),
+      expect.objectContaining({ _id: project._id, title: "Rough cut" }),
     ]);
     expect(body.user.projects[0].notes[0].user).toEqual({
-      _id: project.user.toString(),
+      _id: project.ownerId,
       username: "owner",
       role: "owner",
     });

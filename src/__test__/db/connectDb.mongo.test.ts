@@ -1,4 +1,5 @@
 // @vitest-environment node
+// Mongo backend only: delete with utils/mongoose.ts.
 import mongoose from "mongoose";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 

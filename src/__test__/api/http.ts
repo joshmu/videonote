@@ -2,7 +2,7 @@ import type { NextApiHandler, NextApiRequest, NextApiResponse } from "next";
 import { beforeAll, vi } from "vitest";
 
 import { generateAccessToken } from "@/utils/jwt";
-import { User } from "@/utils/mongoose";
+import { getStore } from "@/utils/store";
 
 /** Sign tokens with a test secret for the calling file. */
 export const useTestJwtSecret = () => {
@@ -13,9 +13,9 @@ export const useTestJwtSecret = () => {
 
 /** A session token for the stored User with `email`. */
 export const tokenFor = async (email: string): Promise<string> => {
-  const user = await User.findOne({ email });
+  const user = await (await getStore()).findUserByEmail(email);
   if (!user) throw new Error(`No test user with email ${email}`);
-  return generateAccessToken(user._id.toString());
+  return generateAccessToken(user._id);
 };
 
 export type ApiResult = { status: number; body: Record<string, any> };
