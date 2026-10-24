@@ -3,10 +3,10 @@ import isEmail from "validator/lib/isEmail";
 import normalizeEmail from "validator/lib/normalizeEmail";
 
 import { generateAccessToken } from "@/utils/jwt";
-import { Note, Settings, Share, User, type UserDoc } from "@/utils/mongoose";
 import { removeUserProjects } from "@/utils/project/projectIntake";
+import { getStore, type UserRecord } from "@/utils/store";
 
-export type Session = { kind: "ok"; user: UserDoc; token: string };
+export type Session = { kind: "ok"; user: UserRecord; token: string };
 /** `missing`: an absent, empty or non-string field; `email`: not an email address. */
 export type Invalid = { kind: "invalid"; reason: "missing" | "email" };
 export type EmailTaken = { kind: "emailTaken" };
@@ -15,12 +15,6 @@ export type WrongPassword = { kind: "wrongPassword" };
 
 export type Credentials = { email?: unknown; password?: unknown };
 export type ProfileInput = { username?: unknown; email?: unknown; [key: string]: unknown };
-
-const MONGO_DUPLICATE_KEY = 11000;
-const isDuplicateKey = (err: unknown): boolean =>
-  typeof err === "object" &&
-  err !== null &&
-  (err as { code?: number }).code === MONGO_DUPLICATE_KEY;
 
 const isFilled = (value: unknown): value is string => typeof value === "string" && value !== "";
 
@@ -36,30 +30,27 @@ const parseCredentials = ({ email, password }: Credentials = {}): ParsedCredenti
   return { email: normalised, password };
 };
 
-const session = (user: UserDoc): Session => ({
+const session = (user: UserRecord): Session => ({
   kind: "ok",
   user,
-  token: generateAccessToken(user._id.toString()),
+  token: generateAccessToken(user._id),
 });
 
-const passwordMatches = async (user: UserDoc, password: unknown): Promise<boolean> =>
-  isFilled(password) && isFilled(user.password) && bcrypt.compare(password, user.password);
+const passwordMatches = async (user: UserRecord, password: unknown): Promise<boolean> =>
+  isFilled(password) && isFilled(user.passwordHash) && bcrypt.compare(password, user.passwordHash);
 
-/** Create a User; the unique email index decides whether the email is taken. */
+/** Create a User; the Store decides atomically whether the email is taken. */
 export const register = async (input: Credentials): Promise<Session | Invalid | EmailTaken> => {
   const parsed = parseCredentials(input);
   if ("kind" in parsed) return parsed;
-  try {
-    const user = await User.create({
-      email: parsed.email,
-      username: parsed.email,
-      password: await bcrypt.hash(parsed.password, 10),
-    });
-    return session(user);
-  } catch (error) {
-    if (isDuplicateKey(error)) return { kind: "emailTaken" };
-    throw error;
-  }
+  const user = await (
+    await getStore()
+  ).createUser({
+    email: parsed.email,
+    username: parsed.email,
+    passwordHash: await bcrypt.hash(parsed.password, 10),
+  });
+  return user === "emailTaken" ? { kind: "emailTaken" } : session(user);
 };
 
 export const authenticate = async (
@@ -67,7 +58,7 @@ export const authenticate = async (
 ): Promise<Session | Invalid | NotFound | WrongPassword> => {
   const parsed = parseCredentials(input);
   if ("kind" in parsed) return parsed;
-  const user = await User.findOne({ email: parsed.email });
+  const user = await (await getStore()).findUserByEmail(parsed.email);
   if (!user) return { kind: "notFound" };
   if (!(await passwordMatches(user, parsed.password))) return { kind: "wrongPassword" };
   return session(user);
@@ -79,7 +70,7 @@ export const authenticate = async (
  * email change keeps the session; a fresh token is still returned.
  */
 export const updateProfile = async (
-  user: UserDoc,
+  user: UserRecord,
   input: ProfileInput = {},
 ): Promise<Session | Invalid | EmailTaken> => {
   const changes: { username?: string; email?: string } = {};
@@ -89,33 +80,23 @@ export const updateProfile = async (
     if (!email) return { kind: "invalid", reason: "email" };
     changes.email = email;
   }
-  user.set(changes);
-  try {
-    await user.save();
-  } catch (error) {
-    if (isDuplicateKey(error)) return { kind: "emailTaken" };
-    throw error;
-  }
-  return session(user);
+  const updated = await (await getStore()).updateProfile(user._id, changes);
+  return updated === "emailTaken" ? { kind: "emailTaken" } : session(updated);
 };
 
 /**
  * Delete the account after checking its password: owned Projects (via the
- * Project intake cascade, which takes their Notes), Shares, Settings, then
- * the User. Notes the user wrote on other owners' Projects are kept with no
+ * Project intake cascade, which takes their Notes and Shares), then the User
+ * with its Settings. Notes the user wrote on other owners' Projects are kept with no
  * author. Any failed step throws with the User still in place, so the removal
  * can be re-run.
  */
 export const removeAccount = async (
-  user: UserDoc,
+  user: UserRecord,
   password: unknown,
 ): Promise<{ kind: "ok" } | WrongPassword> => {
   if (!(await passwordMatches(user, password))) return { kind: "wrongPassword" };
   await removeUserProjects(user._id);
-  // Only Notes on other owners' Projects are left after the cascade.
-  await Note.updateMany({ user: user._id }, { $unset: { user: 1 } });
-  await Share.deleteMany({ user: user._id });
-  await Settings.deleteMany({ user: user._id });
-  await User.deleteOne({ _id: user._id });
+  await (await getStore()).removeUser(user);
   return { kind: "ok" };
 };

@@ -1,23 +1,20 @@
 import { StatusCodes } from "http-status-codes";
 
-import { extractUser } from "@/utils/apiHelpers";
+import { toAccountUser, toSettingsReply } from "@/utils/apiHelpers";
 import { withAuthenticatedUser } from "@/utils/auth/withAuthenticatedUser";
-import { findProjectsWithRelations } from "@/utils/project/findProjectWithRelations";
 import { toOwnerProject } from "@/utils/project/ownerProject";
+import { getStore } from "@/utils/store";
 
-export default withAuthenticatedUser(async (req, res, { userDoc }) => {
-  await userDoc.populate({ path: "settings", model: "Settings" });
-  const found = await findProjectsWithRelations({
-    _id: { $in: userDoc.projects },
-    user: userDoc._id,
-  });
-  // Keep the order of `User.projects`.
-  const byId = new Map(found.map((project) => [project._id.toString(), project]));
-  const projects = userDoc.projects.map((_id) => byId.get(_id.toString())).filter(Boolean);
+export default withAuthenticatedUser(async (req, res, { user }) => {
+  // In the order the User lists them; only Projects the User still owns.
+  const projects = (await (await getStore()).loadProjects(user.projectIds)).filter(
+    (project) => project.ownerId === user._id,
+  );
 
   res.status(StatusCodes.OK).json({
     user: {
-      ...extractUser(userDoc.toObject()),
+      ...toAccountUser(user),
+      ...(user.settings && { settings: toSettingsReply(user._id, user.settings) }),
       projects: projects.map(toOwnerProject),
     },
   });

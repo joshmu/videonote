@@ -99,7 +99,7 @@ describe("withAuthenticatedUser", () => {
 
     expect(handler).toHaveBeenCalledTimes(1);
     const ctx = handler.mock.calls[0][2];
-    expect(ctx.userDoc._id).toEqual(user._id);
+    expect(ctx.user._id).toBe(user._id.toString());
     expect(ctx.email).toBe(EMAIL);
     expect(jwt.decode(ctx.newToken)).toMatchObject({ sub: userId });
     expect(authenticateToken(ctx.newToken)).toBe(userId);
@@ -137,7 +137,7 @@ describe("withOptionalUser", () => {
 
     expect(handler.mock.calls[0][2]).toEqual({
       isGuest: true,
-      userDoc: null,
+      user: null,
       email: null,
       newToken: null,
     });
@@ -151,7 +151,7 @@ describe("withOptionalUser", () => {
 
     const ctx = handler.mock.calls[0][2];
     expect(ctx.isGuest).toBe(false);
-    expect(ctx.userDoc._id).toEqual(user._id);
+    expect(ctx.user._id).toBe(user._id.toString());
   });
 
   it("replies 401 for an invalid token instead of falling back to guest", async () => {

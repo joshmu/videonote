@@ -1,7 +1,6 @@
 import { createHash, createHmac } from "node:crypto";
 
 import jwt from "jsonwebtoken";
-import type { Types } from "mongoose";
 
 /**
  * The Share token: proof that the caller gave a password-protected Share's
@@ -11,7 +10,7 @@ import type { Types } from "mongoose";
 const SHARE_AUDIENCE = "share";
 const SHARE_TOKEN_TTL = "12h";
 
-type ProtectedShare = { _id: Types.ObjectId; password?: string | null };
+type ProtectedShare = { _id: { toString(): string } | string; password?: string | null };
 
 // Its own secret, derived from the session secret, so neither token verifies as the other.
 const shareSecret = (): string =>

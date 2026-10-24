@@ -38,7 +38,7 @@ describe("createProject", () => {
     const intruder = await seedOwner("intruder@example.com");
     const foreignId = new Types.ObjectId();
 
-    const outcome = await createProject(owner._id, {
+    const outcome = await createProject(owner.id, {
       title: "Rough cut",
       src: "https://v.test/a.mp4",
       user: intruder._id.toString(),
@@ -60,7 +60,7 @@ describe("createProject", () => {
   it("replies with an empty src for a project created without one", async () => {
     const owner = await seedOwner();
 
-    const outcome = await createProject(owner._id, { title: "No video yet" });
+    const outcome = await createProject(owner.id, { title: "No video yet" });
 
     if (outcome.kind !== "ok") throw new Error(`expected ok, got ${outcome.kind}`);
     expect(outcome.project.src).toBe("");
@@ -72,7 +72,7 @@ describe("createProject validation", () => {
     const owner = await seedOwner();
 
     for (const input of [{}, { title: "" }, { title: "   " }, { title: 7 }]) {
-      expect(await createProject(owner._id, input)).toEqual({ kind: "invalid", reason: "title" });
+      expect(await createProject(owner.id, input)).toEqual({ kind: "invalid", reason: "title" });
     }
     expect(await Project.countDocuments()).toBe(0);
     expect((await User.findById(owner._id)).projects).toEqual([]);
@@ -85,7 +85,7 @@ describe("updateProject", () => {
     const project = await seedProject(owner);
     const intruder = await seedOwner("intruder@example.com");
 
-    const outcome = await updateProject(owner._id, project._id.toString(), {
+    const outcome = await updateProject(owner.id, project._id.toString(), {
       title: "Final cut",
       src: "",
       user: intruder._id.toString(),
@@ -106,7 +106,7 @@ describe("updateProject", () => {
     const project = await seedProject(owner);
     const other = await seedOwner("other@example.com");
 
-    const outcome = await updateProject(other._id, project._id.toString(), { title: "Hijack" });
+    const outcome = await updateProject(other.id, project._id.toString(), { title: "Hijack" });
 
     expect(outcome).toEqual({ kind: "notFound" });
     expect((await Project.findById(project._id)).title).toBe("Rough cut");
@@ -118,7 +118,7 @@ describe("getProject", () => {
     const owner = await seedOwner();
     const project = await seedProject(owner);
 
-    const outcome = await getProject(owner._id, project._id.toString());
+    const outcome = await getProject(owner.id, project._id.toString());
 
     expect(outcome.kind).toBe("ok");
     if (outcome.kind !== "ok") return;
@@ -136,11 +136,11 @@ describe("getProject", () => {
     const other = await seedOwner("other@example.com");
     const notFound = { kind: "notFound" };
 
-    expect(await getProject(other._id, project._id.toString())).toEqual(notFound);
-    expect(await getProject(owner._id, new Types.ObjectId().toString())).toEqual(notFound);
-    expect(await getProject(owner._id, "not-an-id")).toEqual(notFound);
-    expect(await getProject(owner._id, { $ne: null } as unknown as string)).toEqual(notFound);
-    expect(await getProject(owner._id, undefined)).toEqual(notFound);
+    expect(await getProject(other.id, project._id.toString())).toEqual(notFound);
+    expect(await getProject(owner.id, new Types.ObjectId().toString())).toEqual(notFound);
+    expect(await getProject(owner.id, "not-an-id")).toEqual(notFound);
+    expect(await getProject(owner.id, { $ne: null } as unknown as string)).toEqual(notFound);
+    expect(await getProject(owner.id, undefined)).toEqual(notFound);
   });
 });
 
@@ -151,8 +151,8 @@ describe("shareProject / unshareProject", () => {
     const second = await seedProject(owner, "Second");
     await Share.init();
 
-    const shared = await shareProject(owner._id, first._id.toString(), { url: "taken" });
-    const clash = await shareProject(owner._id, second._id.toString(), { url: "taken" });
+    const shared = await shareProject(owner.id, first._id.toString(), { url: "taken" });
+    const clash = await shareProject(owner.id, second._id.toString(), { url: "taken" });
 
     expect(shared.kind).toBe("ok");
     expect(clash.kind).toBe("urlTaken");
@@ -164,11 +164,11 @@ describe("shareProject / unshareProject", () => {
     const project = await seedProject(owner);
     const other = await seedOwner("other@example.com");
 
-    expect(await shareProject(other._id, project._id.toString(), { url: "x" })).toEqual({
+    expect(await shareProject(other.id, project._id.toString(), { url: "x" })).toEqual({
       kind: "notFound",
     });
     expect(
-      await unshareProject(other._id, project._id.toString(), {
+      await unshareProject(other.id, project._id.toString(), {
         _id: new Types.ObjectId().toString(),
       }),
     ).toEqual({ kind: "notFound" });
@@ -180,10 +180,10 @@ describe("shareProject / unshareProject", () => {
     const project = await seedProject(owner);
     const invalid = { kind: "invalid", reason: "share" };
 
-    expect(await shareProject(owner._id, project._id.toString(), undefined)).toEqual(invalid);
-    expect(await unshareProject(owner._id, project._id.toString(), undefined)).toEqual(invalid);
+    expect(await shareProject(owner.id, project._id.toString(), undefined)).toEqual(invalid);
+    expect(await unshareProject(owner.id, project._id.toString(), undefined)).toEqual(invalid);
     expect(
-      await unshareProject(owner._id, project._id.toString(), {
+      await unshareProject(owner.id, project._id.toString(), {
         _id: { _bsontype: "ObjectId" } as never,
       }),
     ).toEqual(invalid);
@@ -192,10 +192,10 @@ describe("shareProject / unshareProject", () => {
   it("unshares an owned project", async () => {
     const owner = await seedOwner();
     const project = await seedProject(owner);
-    const shared = await shareProject(owner._id, project._id.toString(), { url: "cut" });
+    const shared = await shareProject(owner.id, project._id.toString(), { url: "cut" });
     if (shared.kind !== "ok") throw new Error("expected ok");
 
-    const outcome = await unshareProject(owner._id, project._id.toString(), {
+    const outcome = await unshareProject(owner.id, project._id.toString(), {
       _id: (shared.project.share as OwnerShare)._id,
     });
 
@@ -208,7 +208,7 @@ describe("removeProject", () => {
   const seedShared = async () => {
     const owner = await seedOwner();
     const project = await seedProject(owner);
-    await shareProject(owner._id, project._id.toString(), { url: "cut" });
+    await shareProject(owner.id, project._id.toString(), { url: "cut" });
     return { owner, project };
   };
 
@@ -222,7 +222,7 @@ describe("removeProject", () => {
   it("removes the notes, the share, the owner's ref and then the project", async () => {
     const { owner, project } = await seedShared();
 
-    const outcome = await removeProject(owner._id, project._id.toString());
+    const outcome = await removeProject(owner.id, project._id.toString());
 
     expect(outcome.kind).toBe("ok");
     if (outcome.kind === "ok") expect(outcome.project._id).toBe(project._id.toString());
@@ -233,7 +233,7 @@ describe("removeProject", () => {
     const { project } = await seedShared();
     const other = await seedOwner("other@example.com");
 
-    expect(await removeProject(other._id, project._id.toString())).toEqual({ kind: "notFound" });
+    expect(await removeProject(other.id, project._id.toString())).toEqual({ kind: "notFound" });
     expect(await Project.findById(project._id)).not.toBeNull();
     expect(await Note.countDocuments({ project: project._id })).toBe(1);
   });
@@ -242,12 +242,12 @@ describe("removeProject", () => {
     const { owner, project } = await seedShared();
     vi.spyOn(Share, "deleteMany").mockRejectedValueOnce(new Error("share store down"));
 
-    await expect(removeProject(owner._id, project._id.toString())).rejects.toThrow(
+    await expect(removeProject(owner.id, project._id.toString())).rejects.toThrow(
       "share store down",
     );
     expect(await Project.findById(project._id)).not.toBeNull();
 
-    expect((await removeProject(owner._id, project._id.toString())).kind).toBe("ok");
+    expect((await removeProject(owner.id, project._id.toString())).kind).toBe("ok");
     await expectGone(owner, project._id);
   });
 });
@@ -260,7 +260,7 @@ describe("removeUserProjects", () => {
     const other = await seedOwner("other@example.com");
     const kept = await seedProject(other, "Kept");
 
-    await removeUserProjects(owner._id);
+    await removeUserProjects(owner.id);
 
     expect(await Project.countDocuments({ _id: { $in: [a._id, b._id] } })).toBe(0);
     expect(await Note.countDocuments({ project: { $in: [a._id, b._id] } })).toBe(0);

@@ -1,22 +1,22 @@
 import { StatusCodes } from "http-status-codes";
 
-import { extractUser } from "@/utils/apiHelpers";
+import { toAccountUser } from "@/utils/apiHelpers";
 import { withAuthenticatedUser } from "@/utils/auth/withAuthenticatedUser";
 import { removeAccount, updateProfile } from "@/utils/user/identityIntake";
 
 // Settings are read and written through /api/settings only.
-const profileOf = (userDoc) => {
-  const { settings: _settings, ...profile } = extractUser(userDoc.toObject());
+const profileOf = (user) => {
+  const { settings: _settings, ...profile } = toAccountUser(user);
   return profile;
 };
 
-export default withAuthenticatedUser(async (req, res, { userDoc }) => {
+export default withAuthenticatedUser(async (req, res, { user }) => {
   const { action, user: input } = req.body;
 
   try {
     switch (action) {
       case "update": {
-        const outcome = await updateProfile(userDoc, input);
+        const outcome = await updateProfile(user, input);
         if (outcome.kind === "invalid") {
           return res
             .status(StatusCodes.BAD_REQUEST)
@@ -31,11 +31,11 @@ export default withAuthenticatedUser(async (req, res, { userDoc }) => {
         });
       }
       case "remove": {
-        const outcome = await removeAccount(userDoc, input?.password);
+        const outcome = await removeAccount(user, input?.password);
         if (outcome.kind === "wrongPassword") {
           return res.status(StatusCodes.UNAUTHORIZED).json({ msg: "Password is incorrect." });
         }
-        return res.status(StatusCodes.OK).json({ msg: `${userDoc.email} removed` });
+        return res.status(StatusCodes.OK).json({ msg: `${user.email} removed` });
       }
       default:
         return res.status(StatusCodes.BAD_REQUEST).json({ msg: "Action not specified" });

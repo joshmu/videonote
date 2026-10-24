@@ -12,12 +12,10 @@
 
 import { StatusCodes } from "http-status-codes";
 
-import { extractUser } from "@/utils/apiHelpers";
-import { connectDb } from "@/utils/mongoose";
+import { toAccountUser } from "@/utils/apiHelpers";
 import { register } from "@/utils/user/identityIntake";
 
 export default async (req, res) => {
-  await connectDb();
   const outcome = await register(req.body ?? {});
 
   switch (outcome.kind) {
@@ -31,7 +29,7 @@ export default async (req, res) => {
     case "ok":
       // 201 - created
       return res.status(StatusCodes.CREATED).json({
-        user: extractUser(outcome.user.toObject()),
+        user: toAccountUser(outcome.user),
         token: outcome.token,
       });
   }

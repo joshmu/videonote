@@ -33,36 +33,42 @@ Per-user playback and UI preferences (e.g. `playOffset`, `seekJump`,
 
 ### Architecture (Database)
 
-**Model module**:
-`utils/mongoose.ts`. Holds the schemas, the models (`User`, `Project`,
-`Note`, `Settings`, `Share`) and the Doc types inferred from them
-(`UserDoc`, `ProjectDoc`, `NoteDoc`, `SettingsDoc`, `ShareDoc`). Importing it
-opens no connection. Server code takes Doc types from here;
+**Store**:
+The persistence seam, `utils/store/`. `types.ts` holds the plain records
+(`UserRecord`, `ProjectRecord`, `NoteRecord`, `ShareRecord`,
+`SettingsRecord`), the views (`ProjectView`: a Project with its Notes, each
+`NoteView` with its resolved `Author`) and the `Store` interface. Ids are
+24 character hex strings on every backend. Intakes own validation,
+permissions, hashing and projections; a Store only reads and writes records.
+`getStore()` (`utils/store/index.ts`) is the one way server code reaches the
+data: it opens the backend once and retries after a failed attempt.
 `src/components/shared/types.ts` holds only client/wire types.
 
-**connectDb**:
-The one way to open the database, exported by the model module. Reuses the
-pending or open connection and retries after a failed attempt. Called by
-`withAuthenticatedUser` / `withOptionalUser` and by each unwrapped
-`pages/api` handler that touches the database.
+**Mongo store**:
+`utils/store/mongoStore.ts`, the `Store` over the Mongoose models in
+`utils/mongoose.ts` (schemas and models; importing it opens no connection;
+`connectDb` opens it). A Project's Notes are the ones its `notes` list names,
+in that order; a Project's Share is read only while it still points back at
+that Project. Unique indexes decide a taken email or Share url.
 
 **Test database harness**:
 Server tests (the `server` vitest project, `node` environment) share one
 in-memory mongod started by `src/__test__/db/globalSetup.ts`, which pins
 `MONGOMS_VERSION`. A test file calls `useTestDb()` (`src/__test__/db/testDb.ts`)
 to get its own database, opened through `connectDb`, emptied after each test.
+Intakes take records: tests read them back through `getStore()`.
 The mongod download is the only network access.
 
 ### Architecture (Identity / Auth seam)
 
 **AuthContext**:
 The bag passed into every handler wrapped by `withAuthenticatedUser`:
-`{ userDoc, email, newToken }`. The `newToken` is already rotated; handlers
+`{ user, email, newToken }`, `user` being the caller's `UserRecord`. The `newToken` is already rotated; handlers
 just echo it back to the client.
 
 **OptionalAuthContext**:
 The discriminated bag for `withOptionalUser`. Either `{ isGuest: true,
-userDoc: null, email: null, newToken: null }` or the same shape as
+user: null, email: null, newToken: null }` or the same shape as
 `AuthContext` with `isGuest: false`.
 
 **Session token**:
@@ -78,7 +84,7 @@ The wrapper that owns the JWT-extraction → verify → user-lookup contract.
 Lives in `utils/auth/withAuthenticatedUser.ts`. The **User** is looked up by
 the **Session token** subject. Handlers never read
 `req.headers["authorization"]` directly. A missing or invalid token is
-answered with 401 before `connectDb` runs, so a database outage cannot
+answered with 401 before the Store opens, so a database outage cannot
 turn it into a 500.
 
 **withOptionalUser**:
@@ -92,8 +98,8 @@ still 401s — there is no silent fallback.
 Each returns a discriminated outcome (`ok` / `invalid` / `emailTaken` /
 `notFound` / `wrongPassword`) and does no HTTP; `pages/api/login.js`,
 `register.js` and `user.js` map outcomes to status codes. Credentials must
-be non-empty strings. A taken email is detected from the unique index
-(E11000), never by check-then-save. `updateProfile` writes `username` and
+be non-empty strings. A taken email is decided atomically by the Store
+(`emailTaken`), never by check-then-save. `updateProfile` writes `username` and
 `email` only and returns a fresh **Session token**; its subject is the
 `User._id`, so an email change keeps the session. `removeAccount` checks the password, removes owned
 **Projects** through the **Project intake**, unsets the author on the user's
@@ -122,15 +128,15 @@ unsharing one whose `_id` is a hex ObjectId string (`invalid`, reason
 receives their **Project** in, from `/api/auth`, `/api/project` and the
 **Share intake**. Notes go through `toPublicNote` (authors with their
 **Author role**, never an email) and the **Share** is `{ _id, url, canEdit,
-hasPassword }`, never the password hash. Notes and Share not populated (the
-create, update and remove replies) are sent as ids. `src` is `""` when the
-Project has no video yet.
+hasPassword }`, never the password hash. Every reply carries the Project with
+its Notes (a new one has none). `src` is `""` when the Project has no video
+yet.
 
 **Project cascade**:
-The one removal path, used by `removeProject` and (through
-`removeUserProjects`) by account removal: the Project's **Notes** (via the
-`Note` model), its **Share**, the owner's `User.projects` ref, then the
-**Project**. Every step is a no-op when already done and the Project goes
+The one removal path, `Store.removeProject`, used by `removeProject` and
+(through `removeUserProjects`, over every Project the User owns) by account
+removal: the Project's **Notes**, its **Share**, its place in the owner's list,
+then the **Project**. Every step is a no-op when already done and the Project goes
 last, so a failed cascade throws with the Project still findable and a
 re-run finishes it.
 
@@ -147,18 +153,16 @@ contract for shares. Both treat empty/null as "no password protection".
 
 **Share intake**:
 The pair `attachOrUpdateShare` / `detachShare` in `utils/share/shareIntake.ts`
-that owns the Project↔Share lifecycle. `attachOrUpdateShare` decides
-create-vs-update by `projectDoc.share`, writes only `url`, `password` and
-`canEdit` from the caller (`project` and `user` come from the Project), hashes
-the password (via
-`hashSharePassword`), and surfaces a duplicate `url` as `ShareUrlTakenError`
-on create and update alike.
+that owns the Project↔Share lifecycle. `attachOrUpdateShare` writes
+only `url`, `password` and `canEdit` from the caller through `Store.putShare`
+(which creates the Project's Share or updates the one it has), hashes the
+password (via `hashSharePassword`), and surfaces a taken `url` as
+`ShareUrlTakenError` on create and update alike.
 An absent `password` keeps the current one and an empty one removes it.
-Both operations return the project re-loaded through `findProjectWithRelations`
-in the **Owner projection**. `Share.password` is not selected by default;
-the code that needs the hash (Share access, `mayEditViaShare`, the populate
-spec for `hasPassword`) asks for `+password`. Handlers no longer reach
-into `Share.findById` / `Share.create` / `Share.deleteOne` directly.
+Both operations return the project re-loaded through `Store.loadProject` in
+the **Owner projection**. A `ShareRecord` carries its `passwordHash`; only
+projections decide what leaves the server (`hasPassword` for the owner,
+nothing for the public).
 
 **Share access**:
 `utils/share/shareAccess.ts`, the read side of a **Share**.
@@ -193,16 +197,12 @@ derived from `JWT_TOKEN_SECRET`. A new password or a new Share (unshare and
 share again, even at the same url) revokes it. The client sends it in the
 `x-share-token` header, never in `Authorization`.
 
-**findProjectWithRelations / findProjectsWithRelations**:
-The one populate spec for a hydrated Project in
-`utils/project/findProjectWithRelations.ts`: Project + Notes (with each
-Note's author User) + Share (with its password hash, for `hasPassword`),
-for one Project or every match of a query. Its result goes to a client only
-through a projection.
-The single form is used by the Project intake, the Share intake and the
-Share access module. `pages/api/auth.js` loads a User's Projects with the
-many form in one query, filtered to `_id` in `User.projects` and owned by
-the caller, keeps the `User.projects` order and sends each in the
+**loadProject / loadProjects**:
+The Store's hydrated read: a `ProjectView` is the Project + Share + Notes,
+each Note with its `Author` (email included, for `toPublicAuthor`'s username
+rule). Its result goes to a client only through a projection. `loadProjects`
+keeps the order of the ids it is given: `pages/api/auth.js` passes the User's
+`projectIds`, keeps only Projects the caller owns, and sends each in the
 **Owner projection**.
 
 ### Architecture (Note seam)
@@ -221,13 +221,12 @@ finite number, `done` a boolean. A missing or null `time` or `done` is not
 `invalid`: `time` is 0 and `done` false on create, and either is left
 unchanged on update (legacy Notes may store a null `done`). It is checked
 before the permission check.
-`upsertNote` decides create-vs-update by `Note.findById(input._id)`; a
+`upsertNote` decides create-vs-update by `Store.getNote(input._id)`; a
 missing id creates.
 On update only `content`, `time` and `done` change; `project` and `user`
-are fixed. On create the caller becomes the author and the new id is pushed
-onto `Project.notes`. The returned Note's author goes through
-`toPublicAuthor`, so a write never returns an email. `removeDoneProjectNotes` deletes the done Notes, pulls
-their ids from `Project.notes` and returns the survivors, authors the same way.
+are fixed. On create the caller becomes the author and the Note joins its Project. The returned Note's author goes through
+`toPublicAuthor`, so a write never returns an email. `removeDoneProjectNotes` deletes the done Notes and
+returns the survivors, authors the same way.
 
 **Note write policy**:
 The Project owner may always write Notes, with no **Share token**; anyone

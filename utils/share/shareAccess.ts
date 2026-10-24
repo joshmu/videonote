@@ -1,7 +1,5 @@
-import type { Types } from "mongoose";
-
-import { type ProjectDoc, Share, type UserDoc } from "@/utils/mongoose";
-import { findProjectWithRelations } from "@/utils/project/findProjectWithRelations";
+import { getStore } from "@/utils/store";
+import type { Author, Id, NoteView, ProjectRecord, ProjectView } from "@/utils/store";
 import { verifySharePassword } from "@/utils/share/sharePassword";
 import { issueShareToken, verifyShareToken } from "@/utils/share/shareToken";
 
@@ -52,105 +50,80 @@ export const openSharedProject = async (
   password: unknown,
 ): Promise<OpenSharedProjectResult> => {
   if (typeof shareUrl !== "string") return { kind: "notFound" };
-  const shareDoc = await Share.findOne({ url: shareUrl }).select("+password");
-  if (!shareDoc?.project) return { kind: "notFound" };
+  const store = await getStore();
+  const found = await store.findShareByUrl(shareUrl);
+  if (!found) return { kind: "notFound" };
 
   const access = await verifySharePassword(
-    shareDoc.password,
+    found.share.passwordHash,
     typeof password === "string" ? password : undefined,
   );
   if (access.kind === "passwordRequired" || access.kind === "incorrect") return access;
 
-  const projectDoc = await findProjectWithRelations({ _id: shareDoc.project });
-  if (!projectDoc?.share?._id.equals(shareDoc._id)) return { kind: "notFound" };
+  const view = await store.loadProject(found.projectId);
+  if (!view?.share || view.share._id !== found.share._id) return { kind: "notFound" };
 
-  const project = toPublicProject(projectDoc);
+  const project = toPublicProject(view);
   if (access.kind === "open") return { kind: "ok", project };
-  const shareToken = issueShareToken({ _id: shareDoc._id, password: shareDoc.password! });
+  const shareToken = issueShareToken({ _id: view.share._id, password: view.share.passwordHash });
   return { kind: "ok", project, shareToken };
 };
 
 /**
  * The one "may edit via Share" check: the Project's own Share exists and has
- * `canEdit`, both read live, and a password-protected Share also needs a
- * Share token for its current password (`passwordRequired` otherwise).
- * Callers decide ownership separately.
+ * `canEdit`, as read with the Project, and a password-protected Share also
+ * needs a Share token for its current password (`passwordRequired`
+ * otherwise). Callers decide ownership separately.
  */
-export const mayEditViaShare = async (
-  project: {
-    _id: Types.ObjectId;
-    share?: Types.ObjectId | { _id: Types.ObjectId } | null;
-  },
+export const mayEditViaShare = (
+  project: Pick<ProjectRecord, "share">,
   shareToken: unknown,
-): Promise<ShareEditAccess> => {
-  if (!project.share) return FORBIDDEN;
-  const shareId = "_id" in project.share ? project.share._id : project.share;
-  const share = await Share.findOne({ _id: shareId, project: project._id, canEdit: true })
-    .select("+password")
-    .lean();
-  if (!share) return FORBIDDEN;
-  if (share.password && !verifyShareToken(shareToken, share)) return { kind: "passwordRequired" };
+): ShareEditAccess => {
+  const { share } = project;
+  if (!share?.canEdit) return FORBIDDEN;
+  if (
+    share.passwordHash &&
+    !verifyShareToken(shareToken, { _id: share._id, password: share.passwordHash })
+  )
+    return { kind: "passwordRequired" };
   return { kind: "allowed" };
 };
 
 const FORBIDDEN: ShareEditAccess = { kind: "forbidden" };
 
 /**
- * The public view of a populated note author: `{ _id, username, role }`, with
- * no username when it is missing or is the email; `undefined` when the Note
- * has no author. `role` is `owner` when the author owns the Project (`ownerId`).
+ * The public view of a Note author: `{ _id, username, role }`, with no
+ * username when it is missing or is the email; `undefined` when the Note has
+ * no author. `role` is `owner` when the author owns the Project (`ownerId`).
  */
 export const toPublicAuthor = (
-  user: unknown,
-  ownerId: Types.ObjectId | string,
+  author: Author | null | undefined,
+  ownerId: Id,
 ): PublicAuthor | undefined => {
-  const author = user as Pick<UserDoc, "_id" | "username" | "email"> | null | undefined;
   if (!author?._id) return undefined;
-  const _id = author._id.toString();
-  const role: AuthorRole = _id === ownerId.toString() ? "owner" : "member";
+  const role: AuthorRole = author._id === ownerId ? "owner" : "member";
   // Registration defaults username to the email, which must stay private.
-  if (!author.username || author.username === author.email) return { _id, role };
-  return { _id, username: author.username, role };
+  if (!author.username || author.username === author.email) return { _id: author._id, role };
+  return { _id: author._id, username: author.username, role };
 };
 
-type PopulatedNote = {
-  _id: Types.ObjectId;
-  content: string;
-  time: number;
-  done: boolean;
-  project?: Types.ObjectId | null;
-  user?: unknown;
-};
-
-/** The public view of a Note whose author is populated, on the Project listing it. */
-export const toPublicNote = (
-  note: PopulatedNote,
-  project: { _id: Types.ObjectId; user: Types.ObjectId },
-): PublicNote => {
-  const user = toPublicAuthor(note.user, project.user);
+/** The public view of a Note on a Project owned by `ownerId`. */
+export const toPublicNote = (note: NoteView, ownerId: Id): PublicNote => {
+  const user = toPublicAuthor(note.author, ownerId);
   return {
-    _id: note._id.toString(),
+    _id: note._id,
     content: note.content,
     time: note.time,
     done: note.done,
-    // Legacy Notes may lack `project`; they belong to the Project listing them.
-    project: (note.project ?? project._id).toString(),
+    project: note.projectId,
     ...(user && { user }),
   };
 };
 
-const toPublicProject = (projectDoc: ProjectDoc): PublicProject => {
-  const share = projectDoc.share as unknown as {
-    _id: Types.ObjectId;
-    url: string;
-    canEdit: boolean;
-  };
-  const notes = projectDoc.notes as unknown as PopulatedNote[];
-  return {
-    _id: projectDoc._id.toString(),
-    title: projectDoc.title,
-    src: projectDoc.src ?? undefined,
-    share: { _id: share._id.toString(), url: share.url, canEdit: share.canEdit },
-    notes: notes.map((note) => toPublicNote(note, projectDoc)),
-  };
-};
+const toPublicProject = (view: ProjectView): PublicProject => ({
+  _id: view._id,
+  title: view.title,
+  src: view.src,
+  share: { _id: view.share!._id, url: view.share!.url, canEdit: view.share!.canEdit },
+  notes: view.notes.map((note) => toPublicNote(note, view.ownerId)),
+});

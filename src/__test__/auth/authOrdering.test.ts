@@ -65,13 +65,18 @@ describe("auth wrappers open the database when the request needs it", () => {
     expect(handler).not.toHaveBeenCalled();
   });
 
-  it("withOptionalUser connects before serving a guest", async () => {
+  it("withOptionalUser serves a guest and leaves opening the database to the handler", async () => {
     const { withOptionalUser } = await loadWrappers();
     const handler = vi.fn();
 
-    await expect(callApi(withOptionalUser(handler), {})).rejects.toThrow("unreachable");
+    await callApi(withOptionalUser(handler), {});
 
-    expect(connect).toHaveBeenCalledTimes(1);
-    expect(handler).not.toHaveBeenCalled();
+    expect(connect).not.toHaveBeenCalled();
+    expect(handler).toHaveBeenCalledWith(expect.anything(), expect.anything(), {
+      isGuest: true,
+      user: null,
+      email: null,
+      newToken: null,
+    });
   });
 });

@@ -4,6 +4,7 @@ import { afterEach, beforeAll, describe, expect, it, vi } from "vitest";
 import { authenticateToken } from "@/utils/jwt";
 import { Note, Project, Settings, Share, User } from "@/utils/mongoose";
 import { authenticate, register, removeAccount, updateProfile } from "@/utils/user/identityIntake";
+import { getStore } from "@/utils/store";
 
 import { useTestJwtSecret } from "../api/http";
 import { useTestDb } from "../db/testDb";
@@ -18,6 +19,9 @@ beforeAll(async () => {
 afterEach(() => {
   vi.restoreAllMocks();
 });
+
+// The User as the auth wrappers hand it to an intake.
+const record = async (user: { id: string }) => (await (await getStore()).getUser(user.id))!;
 
 const seedUser = async (email = "owner@example.com", password = "hunter2") =>
   User.create({ email, username: email, password: await bcrypt.hash(password, 4) });
@@ -64,7 +68,7 @@ describe("authenticate", () => {
 
     expect(outcome.kind).toBe("ok");
     if (outcome.kind !== "ok") return;
-    expect(outcome.user._id).toEqual(user._id);
+    expect(outcome.user._id).toBe(user.id);
     expect(authenticateToken(outcome.token)).toBe(user._id.toString());
   });
 
@@ -198,7 +202,7 @@ describe("removeAccount", () => {
   it("removes the user's projects, share and settings, keeps their notes on other owners' projects without an author, then removes the user", async () => {
     const seeded = await seedAccount();
 
-    expect(await removeAccount(seeded.user, "hunter2")).toEqual({ kind: "ok" });
+    expect(await removeAccount(await record(seeded.user), "hunter2")).toEqual({ kind: "ok" });
 
     await expectOnlyOthersLeft(seeded);
     expect(await Note.countDocuments()).toBe(2);
@@ -208,10 +212,12 @@ describe("removeAccount", () => {
     const seeded = await seedAccount();
     vi.spyOn(Note, "updateMany").mockRejectedValueOnce(new Error("notes store down"));
 
-    await expect(removeAccount(seeded.user, "hunter2")).rejects.toThrow("notes store down");
+    await expect(removeAccount(await record(seeded.user), "hunter2")).rejects.toThrow(
+      "notes store down",
+    );
     expect(await User.findById(seeded.user._id)).not.toBeNull();
 
-    expect(await removeAccount(seeded.user, "hunter2")).toEqual({ kind: "ok" });
+    expect(await removeAccount(await record(seeded.user), "hunter2")).toEqual({ kind: "ok" });
     await expectOnlyOthersLeft(seeded);
     expect(await Note.countDocuments()).toBe(2);
   });
@@ -219,8 +225,8 @@ describe("removeAccount", () => {
   it("reports wrongPassword and removes nothing", async () => {
     const { user } = await seedAccount();
 
-    expect(await removeAccount(user, "wrong")).toEqual({ kind: "wrongPassword" });
-    expect(await removeAccount(user, undefined)).toEqual({ kind: "wrongPassword" });
+    expect(await removeAccount(await record(user), "wrong")).toEqual({ kind: "wrongPassword" });
+    expect(await removeAccount(await record(user), undefined)).toEqual({ kind: "wrongPassword" });
     expect(await Project.countDocuments({ user: user._id })).toBe(1);
     expect(await User.findById(user._id)).not.toBeNull();
   });
@@ -229,10 +235,12 @@ describe("removeAccount", () => {
     const seeded = await seedAccount();
     vi.spyOn(Settings, "deleteMany").mockRejectedValueOnce(new Error("settings store down"));
 
-    await expect(removeAccount(seeded.user, "hunter2")).rejects.toThrow("settings store down");
+    await expect(removeAccount(await record(seeded.user), "hunter2")).rejects.toThrow(
+      "settings store down",
+    );
     expect(await User.findById(seeded.user._id)).not.toBeNull();
 
-    expect(await removeAccount(seeded.user, "hunter2")).toEqual({ kind: "ok" });
+    expect(await removeAccount(await record(seeded.user), "hunter2")).toEqual({ kind: "ok" });
     await expectOnlyOthersLeft(seeded);
   });
 });

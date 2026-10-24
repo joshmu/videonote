@@ -1,14 +1,12 @@
 import { StatusCodes } from "http-status-codes";
 
-import { extractUser } from "@/utils/apiHelpers";
-import { connectDb } from "@/utils/mongoose";
+import { toAccountUser } from "@/utils/apiHelpers";
 import { authenticate } from "@/utils/user/identityIntake";
 
 // One message for every credential failure so the reply does not reveal which part was wrong.
 const CREDENTIALS_MSG = "Your Email and/or Password is incorrect.";
 
 export default async (req, res) => {
-  await connectDb();
   const outcome = await authenticate(req.body ?? {});
 
   switch (outcome.kind) {
@@ -23,7 +21,7 @@ export default async (req, res) => {
     case "ok":
       // 302 - found
       return res.status(StatusCodes.MOVED_TEMPORARILY).json({
-        user: extractUser(outcome.user.toObject()),
+        user: toAccountUser(outcome.user),
         token: outcome.token,
       });
   }

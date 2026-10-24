@@ -66,7 +66,7 @@ describe("/api/settings", () => {
 
   it("replies 500 with only a message when the database fails, logging the error", async () => {
     await User.create({ email: EMAIL });
-    vi.spyOn(Settings, "findOne").mockRejectedValueOnce(new Error("settings store down"));
+    vi.spyOn(Settings, "create").mockRejectedValueOnce(new Error("settings store down"));
     vi.spyOn(console, "error").mockImplementation(() => undefined);
 
     const { status, body } = await callApi(handler, { settings: {} }, { email: EMAIL });

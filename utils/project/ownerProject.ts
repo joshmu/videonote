@@ -1,48 +1,41 @@
-import { Types } from "mongoose";
-
-import type { ProjectDoc } from "@/utils/mongoose";
+import type { ProjectRecord, ProjectView, ShareRecord } from "@/utils/store";
 import { type PublicNote, toPublicNote } from "@/utils/share/shareAccess";
 
 /** A Share as its owner sees it: whether it has a password, never the hash. */
 export type OwnerShare = { _id: string; url: string; canEdit: boolean; hasPassword: boolean };
 
-/**
- * A Project as its owner sees it. Notes and Share are projected when
- * populated and sent as ids when not (the create, update and remove replies).
- */
+/** A Project as its owner sees it. */
 export type OwnerProject = {
   _id: string;
   title: string;
   /** Empty when the Project has no video yet. */
   src: string;
   user: string;
-  notes: Array<PublicNote | string>;
-  share: OwnerShare | string | null;
+  notes: PublicNote[];
+  share: OwnerShare | null;
 };
 
-type PopulatedShare = { _id: Types.ObjectId; url: string; canEdit: boolean; password?: string };
-
-const toOwnerShare = (share: unknown): OwnerShare | string | null => {
-  if (!share) return null;
-  if (share instanceof Types.ObjectId) return share.toString();
-  const { _id, url, canEdit, password } = share as PopulatedShare;
-  return { _id: _id.toString(), url, canEdit, hasPassword: Boolean(password) };
-};
+const toOwnerShare = (share: ShareRecord | null): OwnerShare | null =>
+  share
+    ? {
+        _id: share._id,
+        url: share.url,
+        canEdit: share.canEdit,
+        hasPassword: Boolean(share.passwordHash),
+      }
+    : null;
 
 /**
  * The one owner-facing projection, for every reply that hands an owner their
  * Project: note authors through the public author view (with role), and the
- * Share's password replaced by `hasPassword`.
+ * Share's password replaced by `hasPassword`. A Project read without its Notes
+ * (a new one) has none.
  */
-export const toOwnerProject = (projectDoc: ProjectDoc): OwnerProject => ({
-  _id: projectDoc._id.toString(),
-  title: projectDoc.title,
-  src: projectDoc.src ?? "",
-  user: projectDoc.user.toString(),
-  notes: (projectDoc.notes as unknown[]).map((note) =>
-    note instanceof Types.ObjectId
-      ? note.toString()
-      : toPublicNote(note as Parameters<typeof toPublicNote>[0], projectDoc),
-  ),
-  share: toOwnerShare(projectDoc.share),
+export const toOwnerProject = (project: ProjectView | ProjectRecord): OwnerProject => ({
+  _id: project._id,
+  title: project.title,
+  src: project.src ?? "",
+  user: project.ownerId,
+  notes: "notes" in project ? project.notes.map((note) => toPublicNote(note, project.ownerId)) : [],
+  share: toOwnerShare(project.share),
 });

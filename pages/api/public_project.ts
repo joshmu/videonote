@@ -1,13 +1,11 @@
 import { StatusCodes } from "http-status-codes";
 import { NextApiRequest, NextApiResponse } from "next";
 
-import { connectDb } from "@/utils/mongoose";
 import { openSharedProject } from "@/utils/share/shareAccess";
 
 // Read a shared project: 401 password required, 403 wrong password, 404 no such Share.
 // A password-protected Share's reply also carries the Share token for Note writes.
 export default async (req: NextApiRequest, res: NextApiResponse) => {
-  await connectDb();
   const { shareUrl, password } = req.body ?? {};
 
   let result: Awaited<ReturnType<typeof openSharedProject>>;

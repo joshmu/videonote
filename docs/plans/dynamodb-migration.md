@@ -220,8 +220,9 @@ Scripts under `scripts/migrate/`:
 What the app can't reach today isn't migrated: notes their project doesn't
 list, references to deleted records, projects or settings whose user is gone.
 These are a handful of records. They're reported by `export` and kept in the
-snapshot. Projects missing from their owner's list are migrated but stay out of
-`projectIds`, exactly as hidden as today.
+snapshot. Projects missing from their owner's list are skipped too: nothing
+in the app can reach them, so a User's owned Projects are exactly their
+`projectIds` (`Store.ownedProjectIds`).
 
 Rehearsal: export production, load into DynamoDB Local, verify, run the e2e
 suite. Real user data never goes to the dev table.
