@@ -5,7 +5,7 @@ import type { Store } from "@/utils/store/types";
 
 import { BACKENDS, useTestStore } from "../db/testStores";
 
-// The same behaviour from every Store: these run against MongoDB and DynamoDB Local.
+// The behaviour every Store must keep, run against DynamoDB Local.
 describe.each(BACKENDS)("Store contract: %s", (backend) => {
   const store = useTestStore(backend);
 

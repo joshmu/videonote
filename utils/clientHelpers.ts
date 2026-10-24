@@ -75,7 +75,7 @@ export const checkPasswordMatch = (password1: string, password2: string): boolea
   return password1 === password2;
 };
 
-/** A MongoDB ObjectId-compatible id: 4-byte seconds timestamp + 8 random bytes, as hex. */
+/** A 24 character hex id (ObjectId format): 4-byte seconds timestamp + 8 random bytes. */
 export const createObjectId = (): string => {
   const seconds = Math.floor(Date.now() / 1000)
     .toString(16)

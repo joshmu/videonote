@@ -87,7 +87,7 @@ export const SessionProvider = ({
     setAdmin(true);
     setUser(user as UserInterface);
 
-    // avoid null values from mongo
+    // avoid null values from the server
     // if we have any null property values in returned settings then replace with defaults
     if (typeof settings === "object" && settings !== null) {
       Object.keys(settings).forEach((key) => {
