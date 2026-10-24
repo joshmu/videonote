@@ -38,18 +38,12 @@ The persistence seam, `utils/store/`. `types.ts` holds the plain records
 (`UserRecord`, `ProjectRecord`, `NoteRecord`, `ShareRecord`,
 `SettingsRecord`), the views (`ProjectView`: a Project with its Notes, each
 `NoteView` with its resolved `Author`) and the `Store` interface. Ids are
-24 character hex strings on every backend. Intakes own validation,
+24 character hex strings (`isIdString`, `utils/ids.ts`). Intakes own validation,
 permissions, hashing and projections; a Store only reads and writes records.
 `getStore()` (`utils/store/index.ts`) is the one way server code reaches the
-data: it opens the backend once and retries after a failed attempt.
+data: it opens the table named by `DYNAMODB_TABLE` once and retries after a
+failed attempt.
 `src/components/shared/types.ts` holds only client/wire types.
-
-**Mongo store**:
-`utils/store/mongoStore.ts`, the `Store` over the Mongoose models in
-`utils/mongoose.ts` (schemas and models; importing it opens no connection;
-`connectDb` opens it). A Project's Notes are the ones its `notes` list names,
-in that order; a Project's Share is read only while it still points back at
-that Project. Unique indexes decide a taken email or Share url.
 
 **DynamoDB store**:
 `utils/store/dynamoStore.ts`, the `Store` over one DynamoDB table per
@@ -60,24 +54,20 @@ transactions and give id-only lookups. A Project's Notes share its partition,
 sorted by id. `projectIds` on the User keeps the Projects' order. Reads are
 strongly consistent. `dynamoClient.ts` picks the credentials: Vercel's OIDC
 role (`AWS_ROLE_ARN`) on Vercel, placeholders for DynamoDB Local
-(`DYNAMODB_ENDPOINT`), else the default AWS chain. `DATA_BACKEND` chooses the
-Store (`mongo` until the migration ends).
+(`DYNAMODB_ENDPOINT`), else the default AWS chain.
 
 **Test database harness**:
 Server tests (the `server` vitest project, `node` environment) share one
-in-memory mongod and one DynamoDB Local container (testcontainers) started by
-`src/__test__/db/globalSetup.ts`, which pins both versions. Each server suite
-runs once per backend: `describe.each(BACKENDS)` and `useTestStore(backend)`
-(`src/__test__/db/testStores.ts`) give every test a fresh Store, its own Mongo
-database or DynamoDB Local table, which `getStore()` also returns for the test
+DynamoDB Local container (testcontainers) started by
+`src/__test__/db/globalSetup.ts`, which pins its version.
+`useTestStore(backend)` (`src/__test__/db/testStores.ts`) gives every test a
+fresh Store on its own table, which `getStore()` also returns for the test
 (`setStoreForTests`), so intakes and handlers run on it. Tests seed through the
 Store (`src/__test__/db/seed.ts`), read back through it, and inject failures by
 spying on Store methods. `rawData()` (`src/__test__/db/rawData.ts`) writes only
-what the Store API cannot (legacy or half-removed data), per backend. Notes
-are compared sorted by id; a User's Project order is behaviour. Mongo-only
-tests are named `*.mongo.test.ts`; they, `useTestDb()` and the `mongo` branches
-of the helpers go with the Mongo backend (as does the migration test).
-The mongod download is the only network access.
+what the Store API cannot (legacy or half-removed data). Notes are compared
+sorted by id; a User's Project order is behaviour. The container image pull is
+the only network access.
 
 ### Architecture (Identity / Auth seam)
 

@@ -1,18 +1,17 @@
 ---
 name: verify
-description: Build, run and drive VideoNote locally (real MongoDB, production build, headless browser) to verify a change at its surface.
+description: Build, run and drive VideoNote locally (DynamoDB Local, production build, headless browser) to verify a change at its surface.
 ---
 
 # Verify VideoNote locally
 
-For regression coverage run `pnpm test:e2e` first (see the `e2e` skill). Use the steps below to drive a specific change by hand. On DynamoDB the quickest handle is `pnpm db:up && pnpm dev:local`, then `pnpm db:seed` (demo login printed).
+For regression coverage run `pnpm test:e2e` first (see the `e2e` skill). Use the steps below to drive a specific change by hand. The quickest handle is `pnpm db:up && pnpm dev`, then `pnpm db:seed` (demo login printed).
 
 ## Handle
 
 1. Worktree at the ref under test, `pnpm install --frozen-lockfile`.
-2. MongoDB: reuse the mongod binary the test harness caches:
-   `~/.cache/mongodb-binaries/mongod-<arch>-<os>-<ver> --dbpath $(mktemp -d) --port 27399 --bind_ip 127.0.0.1`
-3. Only two env vars: `MONGODB_URI=mongodb://127.0.0.1:27399/videonote_verify JWT_TOKEN_SECRET=<any>`.
+2. DynamoDB Local: `pnpm db:up` (port 8000, table `videonote-local`).
+3. Env: `DYNAMODB_ENDPOINT=http://localhost:8000 DYNAMODB_TABLE=videonote-local JWT_TOKEN_SECRET=<any>`.
    `pnpm build`, then `pnpm start -p 3977 -H 127.0.0.1` with the same env.
 4. Browse via `http://localhost:3977`, NOT `127.0.0.1`: `pages/index.tsx` builds its API origin with next-absolute-url, which picks `https:` for any host other than `localhost`, so `/` fails and bounces to `/login`.
 

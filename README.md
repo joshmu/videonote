@@ -9,7 +9,7 @@ A video review app with slick intuitive controls to create timestamped notes on 
 - [Framer Motion](https://www.framer.com/motion/)
 - [react-intersection-observer](https://github.com/thebuilder/react-intersection-observer)
 - [react-icons](https://github.com/react-icons/react-icons)
-- [mongoose](https://mongoosejs.com)
+- [Amazon DynamoDB](https://aws.amazon.com/dynamodb/) via the AWS SDK, infrastructure in AWS CDK (`infra/`)
 - [react-player](https://github.com/CookPete/react-player)
 - [universal-cookie](https://github.com/reactivestack/cookies/tree/master/packages/universal-cookie)
 - [nanoid](https://github.com/ai/nanoid)
@@ -18,14 +18,14 @@ Some additional experimental features are enabled in `tailwind.config.js`: _unif
 
 ### Setup
 
-- MongoDB database
-- JWT
+- Docker (DynamoDB Local)
+- JWT secret
 
 Create a `.env.local` based on the `.env.example` for local development.
 
 ### Run it
 
-`pnpm install && pnpm dev`
+`pnpm install && pnpm db:up && pnpm dev`, then `pnpm db:seed` for demo data.
 
 ### Test it
 

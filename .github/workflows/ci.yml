@@ -85,24 +85,12 @@ jobs:
           node-version-file: ".nvmrc"
           cache: pnpm
       - run: pnpm install --frozen-lockfile
-      - name: Cache mongod binary
-        uses: actions/cache@v6
-        with:
-          path: ~/.cache/mongodb-binaries
-          # globalSetup pins MONGOMS_VERSION
-          key: mongodb-binaries-${{ runner.os }}-${{ hashFiles('src/__test__/db/globalSetup.ts') }}
       - run: pnpm test:run
 
   e2e:
-    name: E2E (${{ matrix.backend }})
+    name: E2E
     runs-on: ubuntu-latest
     timeout-minutes: 15
-    strategy:
-      fail-fast: false
-      matrix:
-        backend: [mongo, dynamodb]
-    env:
-      DATA_BACKEND: ${{ matrix.backend }}
     steps:
       - uses: actions/checkout@v7
       - uses: pnpm/action-setup@v6
@@ -111,11 +99,6 @@ jobs:
           node-version-file: ".nvmrc"
           cache: pnpm
       - run: pnpm install --frozen-lockfile
-      - name: Cache mongod binary
-        uses: actions/cache@v6
-        with:
-          path: ~/.cache/mongodb-binaries
-          key: mongodb-binaries-${{ runner.os }}-${{ hashFiles('src/__test__/db/globalSetup.ts', 'e2e/server.mjs') }}
       - name: Install ffmpeg
         run: command -v ffmpeg || (sudo apt-get update && sudo apt-get install -y --no-install-recommends ffmpeg)
       - run: pnpm exec playwright install --with-deps chromium
@@ -123,7 +106,7 @@ jobs:
       - uses: actions/upload-artifact@v7
         if: failure()
         with:
-          name: playwright-traces-${{ matrix.backend }}
+          name: playwright-traces
           path: test-results/
           retention-days: 7
 

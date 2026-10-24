@@ -1,23 +1,12 @@
-// Runs the production build against a throwaway database for the e2e suite:
-// an in-memory mongod (DATA_BACKEND=mongo, the default) or a DynamoDB Local
-// container (DATA_BACKEND=dynamodb).
+// Runs the production build against a throwaway DynamoDB Local container for
+// the e2e suite.
 import { spawn } from "node:child_process";
 
 import { CreateTableCommand, DynamoDBClient } from "@aws-sdk/client-dynamodb";
-import { MongoMemoryServer } from "mongodb-memory-server";
 import { GenericContainer } from "testcontainers";
 
 const PORT = process.env.E2E_PORT ?? "3977";
-const BACKEND = process.env.DATA_BACKEND === "dynamodb" ? "dynamodb" : "mongo";
 const TABLE = "videonote-e2e";
-
-const startMongo = async () => {
-  const db = await MongoMemoryServer.create({ binary: { version: "8.2.6" } });
-  return {
-    env: { DATA_BACKEND: "mongo", MONGODB_URI: db.getUri("videonote_e2e") },
-    stop: () => db.stop(),
-  };
-};
 
 const startDynamo = async () => {
   const container = await new GenericContainer("amazon/dynamodb-local:3.3.2")
@@ -47,7 +36,6 @@ const startDynamo = async () => {
   client.destroy();
   return {
     env: {
-      DATA_BACKEND: "dynamodb",
       DYNAMODB_ENDPOINT: endpoint,
       DYNAMODB_TABLE: TABLE,
       AWS_REGION: "ap-southeast-2",
@@ -56,7 +44,7 @@ const startDynamo = async () => {
   };
 };
 
-const db = BACKEND === "dynamodb" ? await startDynamo() : await startMongo();
+const db = await startDynamo();
 const app = spawn("pnpm", ["exec", "next", "start", "-p", PORT, "-H", "127.0.0.1"], {
   stdio: "inherit",
   env: {

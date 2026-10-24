@@ -1,8 +1,7 @@
 import { randomBytes } from "node:crypto";
 
-import { isObjectIdOrHexString } from "mongoose";
-
 import type { NoteInterface } from "@/shared/types";
+import { isIdString } from "@/utils/ids";
 import { mayEditViaShare, type PublicAuthor, toPublicAuthor } from "@/utils/share/shareAccess";
 import { getStore, type Id, type NoteView, type ProjectRecord } from "@/utils/store";
 
@@ -97,10 +96,6 @@ export const removeDoneProjectNotes = async (
 };
 
 const INVALID: Invalid = { kind: "invalid" };
-
-// Only a hex string: isObjectIdOrHexString also passes objects that claim to be ObjectIds.
-const isIdString = (value: unknown): value is string =>
-  typeof value === "string" && isObjectIdOrHexString(value);
 
 // Mirrors the Note schema, so a bad field is `invalid` rather than a failed save.
 const isValidEdit = (
