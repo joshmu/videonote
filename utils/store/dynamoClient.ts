@@ -8,8 +8,10 @@ import { awsCredentialsProvider } from "@vercel/oidc-aws-credentials-provider";
 
 /**
  * The DynamoDB client for this runtime:
- * - on Vercel, the environment's IAM role through Vercel's OIDC token (`AWS_ROLE_ARN`);
  * - with `DYNAMODB_ENDPOINT` (DynamoDB Local), placeholder credentials;
+ * - with `AWS_ROLE_ARN` (set on Vercel), that IAM role through Vercel's OIDC
+ *   token. Never the default chain there: on Vercel it finds the platform's
+ *   own AWS credentials, not ours;
  * - otherwise the default AWS credential chain (e.g. `AWS_PROFILE`).
  */
 export const dynamoClientFromEnv = (): DynamoDBClient => {
@@ -22,7 +24,7 @@ export const dynamoClientFromEnv = (): DynamoDBClient => {
       credentials: { accessKeyId: "local", secretAccessKey: "local" },
     });
   }
-  if (process.env.VERCEL && process.env.AWS_ROLE_ARN) {
+  if (process.env.AWS_ROLE_ARN) {
     // The roles trust Vercel's default audience, so no custom `audience` here.
     return new DynamoDBClient({
       region,

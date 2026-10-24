@@ -16,10 +16,11 @@ if (!running) {
   const exists = docker("ps", "-aq", "--filter", `name=^${CONTAINER}$`);
   if (exists) docker("start", CONTAINER);
   else
+    // prettier-ignore
     docker(
-      ...["run", "-d", "--name", CONTAINER, "-p", "8000:8000"],
-      ...["-v", `${CONTAINER}:/home/dynamodblocal/data`, "--user", "root", IMAGE],
-      ...["-jar", "DynamoDBLocal.jar", "-sharedDb", "-dbPath", "./data"],
+      "run", "-d", "--name", CONTAINER, "-p", "8000:8000",
+      "-v", `${CONTAINER}:/home/dynamodblocal/data`, "--user", "root", IMAGE,
+      "-jar", "DynamoDBLocal.jar", "-sharedDb", "-dbPath", "./data",
     );
 }
 

@@ -310,6 +310,18 @@ export const createDynamoStore = ({ client, tableName }: DynamoStoreOptions): St
     });
   };
 
+  // Bump an item's timestamp when something it lists changes, as Mongoose does.
+  const touch = (key: Item) =>
+    db.send(
+      new UpdateCommand({
+        TableName,
+        Key: key,
+        UpdateExpression: "SET updatedAt = :at",
+        ExpressionAttributeValues: { ":at": now() },
+        ConditionExpression: "attribute_exists(PK)",
+      }),
+    );
+
   const getUser: Store["getUser"] = async (id) => {
     if (!validId(id)) return null;
     const item = await get(keys.user(id));
@@ -442,8 +454,11 @@ export const createDynamoStore = ({ client, tableName }: DynamoStoreOptions): St
         new UpdateCommand({
           TableName,
           Key: keys.user(userId),
-          UpdateExpression: "SET settings = :settings",
-          ExpressionAttributeValues: { ":settings": settingsItem(settings) },
+          UpdateExpression: "SET settings = :settings, updatedAt = :at",
+          ExpressionAttributeValues: {
+            ":settings": settingsItem(settings),
+            ":at": at.toISOString(),
+          },
           ConditionExpression: "attribute_exists(PK)",
         }),
       );
@@ -478,8 +493,13 @@ export const createDynamoStore = ({ client, tableName }: DynamoStoreOptions): St
           Update: {
             TableName,
             Key: keys.user(ownerId),
-            UpdateExpression: "SET projectIds = list_append(if_not_exists(projectIds, :none), :id)",
-            ExpressionAttributeValues: { ":id": [project._id], ":none": [] },
+            UpdateExpression:
+              "SET projectIds = list_append(if_not_exists(projectIds, :none), :id), updatedAt = :at",
+            ExpressionAttributeValues: {
+              ":id": [project._id],
+              ":none": [],
+              ":at": at.toISOString(),
+            },
             ConditionExpression: "attribute_exists(PK)",
           },
         },
@@ -557,9 +577,9 @@ export const createDynamoStore = ({ client, tableName }: DynamoStoreOptions): St
             new UpdateCommand({
               TableName,
               Key: keys.user(project.ownerId),
-              UpdateExpression: `REMOVE projectIds[${index}]`,
+              UpdateExpression: `REMOVE projectIds[${index}] SET updatedAt = :at`,
               ConditionExpression: `projectIds[${index}] = :id`,
-              ExpressionAttributeValues: { ":id": project._id },
+              ExpressionAttributeValues: { ":id": project._id, ":at": now() },
             }),
           );
         } catch (error) {
@@ -599,9 +619,9 @@ export const createDynamoStore = ({ client, tableName }: DynamoStoreOptions): St
         Update: {
           TableName,
           Key: keys.project(projectId),
-          UpdateExpression: "SET #share = :share",
+          UpdateExpression: "SET #share = :share, updatedAt = :at",
           ExpressionAttributeNames: { "#share": "share" },
-          ExpressionAttributeValues: { ":share": shareItem(share) },
+          ExpressionAttributeValues: { ":share": shareItem(share), ":at": at.toISOString() },
           ConditionExpression: "attribute_exists(PK)",
         },
       };
@@ -637,10 +657,10 @@ export const createDynamoStore = ({ client, tableName }: DynamoStoreOptions): St
           Update: {
             TableName,
             Key: keys.project(projectId),
-            UpdateExpression: "SET #share = :none",
+            UpdateExpression: "SET #share = :none, updatedAt = :at",
             ConditionExpression: "#share.#id = :shareId",
             ExpressionAttributeNames: { "#share": "share", "#id": "_id" },
-            ExpressionAttributeValues: { ":none": null, ":shareId": shareId },
+            ExpressionAttributeValues: { ":none": null, ":shareId": shareId, ":at": now() },
           },
         },
       ]);
@@ -696,9 +716,11 @@ export const createDynamoStore = ({ client, tableName }: DynamoStoreOptions): St
           },
         },
         {
-          ConditionCheck: {
+          Update: {
             TableName,
             Key: keys.project(projectId),
+            UpdateExpression: "SET updatedAt = :at",
+            ExpressionAttributeValues: { ":at": at.toISOString() },
             ConditionExpression: "attribute_exists(PK)",
           },
         },
@@ -741,6 +763,8 @@ export const createDynamoStore = ({ client, tableName }: DynamoStoreOptions): St
       await deleteAll(
         done.flatMap((note) => [keys.note(projectId, note._id), keys.noteClaim(note._id)]),
       );
+      // The Project's Notes changed: its timestamp says so, as MongoDB's does.
+      if (done.length > 0) await touch(keys.project(projectId));
     },
   };
 };
