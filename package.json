@@ -22,6 +22,7 @@
     "db:up": "node scripts/db-up.mjs",
     "db:down": "docker stop videonote-dynamodb",
     "db:seed": "node scripts/db-seed.mjs",
+    "migrate": "tsx --env-file-if-exists=.env.local scripts/migrate/cli.ts",
     "build": "next build",
     "start": "next start",
     "prod": "next build && next start",
@@ -100,6 +101,7 @@
     "tailwindcss": "^4.3.3",
     "tailwindcss-debug-screens": "^3.0.1",
     "testcontainers": "12.2.1",
+    "tsx": "4.23.15",
     "typescript": "^7.0.2",
     "vitest": "^5.0.5"
   },
