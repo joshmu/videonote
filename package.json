@@ -17,6 +17,11 @@
   },
   "scripts": {
     "dev": "next dev",
+    "dev:local": "DATA_BACKEND=dynamodb DYNAMODB_ENDPOINT=http://localhost:8000 DYNAMODB_TABLE=videonote-local next dev",
+    "dev:aws": "DATA_BACKEND=dynamodb DYNAMODB_TABLE=videonote-dev AWS_REGION=ap-southeast-2 next dev",
+    "db:up": "node scripts/db-up.mjs",
+    "db:down": "docker stop videonote-dynamodb",
+    "db:seed": "node scripts/db-seed.mjs",
     "build": "next build",
     "start": "next start",
     "prod": "next build && next start",

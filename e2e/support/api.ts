@@ -2,7 +2,9 @@ import { randomUUID } from "node:crypto";
 
 import { createApiClient, type SessionStore } from "@/utils/apiClient";
 
-export const ORIGIN = "http://localhost:3977";
+import { ORIGIN } from "./origin";
+
+export { ORIGIN };
 
 /** A session held in memory, standing in for the browser's token cookie. */
 const memorySession = (): SessionStore & { token?: string } => {

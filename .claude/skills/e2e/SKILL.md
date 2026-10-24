@@ -12,10 +12,12 @@ pnpm test:e2e                                  # build, then every spec
 pnpm exec playwright test --project=api        # API flows only (reuses a running server)
 pnpm exec playwright test e2e/browser -g share # one journey by title
 pnpm exec playwright test --repeat-each=3      # flake check before pushing
+DATA_BACKEND=dynamodb pnpm exec playwright test # the same flows on DynamoDB Local
 ```
 
 `playwright.config.ts` starts `node e2e/server.mjs`: the existing `.next`
-build on port 3977 against a throwaway in-memory mongod. Locally a server
+build against a throwaway database, an in-memory mongod on port 3977 or (with
+`DATA_BACKEND=dynamodb`) a DynamoDB Local container on port 3978. CI runs both. Locally a server
 already on 3977 is reused, so rebuild (`pnpm build`) and restart it after
 changing app code. Browse it at `http://localhost:3977`, not `127.0.0.1`.
 

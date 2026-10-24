@@ -4,7 +4,7 @@ import type { Page } from "@playwright/test";
 
 import { ProjectApiActions } from "@/shared/types";
 
-import { objectId, ok, PASSWORD, registeredUser, uniqueEmail } from "../support/api";
+import { objectId, ok, ORIGIN, PASSWORD, registeredUser, uniqueEmail } from "../support/api";
 import { expect, test, VIDEO_URL } from "../support/browser";
 
 const sharedProject = async (share: { password?: string; canEdit?: boolean }) => {
@@ -68,7 +68,7 @@ test.describe("user journeys", () => {
   });
 
   test("a bad session cookie sends the visitor to log in", async ({ page, context }) => {
-    await context.addCookies([{ name: "token", value: "garbage", url: "http://localhost:3977" }]);
+    await context.addCookies([{ name: "token", value: "garbage", url: ORIGIN }]);
 
     await page.goto("/");
 
