@@ -1,20 +1,19 @@
 import { StatusCodes } from "http-status-codes";
-import { isObjectIdOrHexString } from "mongoose";
 import type { NextApiHandler, NextApiRequest, NextApiResponse } from "next";
 
 import { authenticateToken, generateAccessToken } from "@/utils/jwt";
-import { connectDb, User, type UserDoc } from "@/utils/mongoose";
+import { getStore, type UserRecord } from "@/utils/store";
 
 /**
  * Context passed to handlers wrapped by {@link withAuthenticatedUser}.
  *
- * - `userDoc`: the Mongoose user document for the verified caller
- * - `email`: the caller's stored email (`userDoc.email`)
+ * - `user`: the verified caller's User record
+ * - `email`: the caller's stored email (`user.email`)
  * - `newToken`: a freshly rotated JWT the handler should return so the
  *   caller's session is refreshed
  */
 export type AuthContext = {
-  userDoc: UserDoc;
+  user: UserRecord;
   email: string;
   newToken: string;
 };
@@ -23,20 +22,20 @@ export type AuthContext = {
  * Context passed to handlers wrapped by {@link withOptionalUser}.
  *
  * When the request carries no `authorization` header `isGuest` is `true` and
- * `userDoc`/`email`/`newToken` are `null`. When a token is present it must be
+ * `user`/`email`/`newToken` are `null`. When a token is present it must be
  * valid; an invalid token short-circuits with 401 (no silent fall-through to
  * the guest branch).
  */
 export type OptionalAuthContext =
-  | { isGuest: true; userDoc: null; email: null; newToken: null }
-  | { isGuest: false; userDoc: UserDoc; email: string; newToken: string };
+  | { isGuest: true; user: null; email: null; newToken: null }
+  | { isGuest: false; user: UserRecord; email: string; newToken: string };
 
 /**
  * Pull the caller's User._id out of an {@link OptionalAuthContext} as a
  * string, or `null` for guests.
  */
 export const extractAuthorId = (ctx: OptionalAuthContext): string | null =>
-  ctx.isGuest ? null : ctx.userDoc._id.toString();
+  ctx.isGuest ? null : ctx.user._id;
 
 export type AuthenticatedHandler = (
   req: NextApiRequest,
@@ -72,14 +71,13 @@ const resolveAuthenticatedUser = async (token: string): Promise<ResolveResult> =
     return { ctx: null, status: StatusCodes.UNAUTHORIZED, body: { msg: "Invalid token" } };
   }
 
-  await connectDb();
-  const userDoc = isObjectIdOrHexString(userId) ? await User.findById(userId) : null;
-  if (!userDoc) {
+  const user = await (await getStore()).getUser(userId);
+  if (!user) {
     return { ctx: null, status: StatusCodes.UNAUTHORIZED, body: { msg: "No user found." } };
   }
 
   return {
-    ctx: { userDoc, email: userDoc.email, newToken: generateAccessToken(userId) },
+    ctx: { user, email: user.email, newToken: generateAccessToken(userId) },
     status: StatusCodes.OK,
     body: null,
   };
@@ -88,7 +86,7 @@ const resolveAuthenticatedUser = async (token: string): Promise<ResolveResult> =
 /**
  * Wrap a Next.js API handler so it only runs for authenticated users.
  *
- * The wrapper verifies the token, then opens the database (`connectDb`) and
+ * The wrapper verifies the token, then opens the Store and
  * looks up the user, then invokes `handler(req, res, ctx)` with a populated
  * {@link AuthContext}. On any auth failure it responds with 401 and a `msg`
  * body and the inner handler is not called. Handler errors propagate so the framework's error handling
@@ -116,16 +114,14 @@ export const withAuthenticatedUser =
  *
  * Missing `authorization` header → guest branch (`ctx.isGuest === true`).
  * Present-but-invalid token → 401 (no silent guest fall-through), answered
- * before the database is opened.
+ * before the Store is opened.
  */
 export const withOptionalUser =
   (handler: OptionalAuthHandler): NextApiHandler =>
   async (req, res) => {
     const token = extractBearer(req.headers["authorization"]);
     if (!token) {
-      // Guests still reach the database through the handler.
-      await connectDb();
-      await handler(req, res, { isGuest: true, userDoc: null, email: null, newToken: null });
+      await handler(req, res, { isGuest: true, user: null, email: null, newToken: null });
       return;
     }
     const result = await resolveAuthenticatedUser(token);

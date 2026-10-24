@@ -1,12 +1,9 @@
-import { isObjectIdOrHexString, type Types } from "mongoose";
+import { isObjectIdOrHexString } from "mongoose";
 
 import type { ShareProjectInterface } from "@/shared/types";
-import { Note, Project, type ProjectDoc, Share, User } from "@/utils/mongoose";
-import { findProjectWithRelations } from "@/utils/project/findProjectWithRelations";
 import { type OwnerProject, toOwnerProject } from "@/utils/project/ownerProject";
 import { attachOrUpdateShare, detachShare, ShareUrlTakenError } from "@/utils/share/shareIntake";
-
-type Id = Types.ObjectId | string;
+import { getStore, type Id, type ProjectRecord } from "@/utils/store";
 
 export type ProjectOk = { kind: "ok"; project: OwnerProject };
 export type ProjectNotFound = { kind: "notFound" };
@@ -26,6 +23,9 @@ const INVALID_SHARE: ProjectInvalid = { kind: "invalid", reason: "share" };
 const isObject = (value: unknown): value is Record<string, unknown> =>
   typeof value === "object" && value !== null;
 
+const isIdString = (value: unknown): value is string =>
+  typeof value === "string" && isObjectIdOrHexString(value);
+
 const pickEditable = (input: ProjectInput = {}): { title?: string; src?: string } => {
   const fields: { title?: string; src?: string } = {};
   if (typeof input.title === "string") fields.title = input.title;
@@ -33,10 +33,11 @@ const pickEditable = (input: ProjectInput = {}): { title?: string; src?: string 
   return fields;
 };
 
-// A malformed or non-string id is treated as a missing project.
-const findOwned = async (userId: Id, projectId: unknown): Promise<ProjectDoc | null> => {
-  if (!isObjectIdOrHexString(projectId)) return null;
-  return Project.findOne({ _id: projectId, user: userId });
+// A malformed or non-string id, or another owner's Project, is a missing project.
+const findOwned = async (userId: Id, projectId: unknown): Promise<ProjectRecord | null> => {
+  if (!isIdString(projectId)) return null;
+  const project = await (await getStore()).getProject(projectId);
+  return project?.ownerId === userId ? project : null;
 };
 
 export const createProject = async (
@@ -45,8 +46,9 @@ export const createProject = async (
 ): Promise<ProjectOk | ProjectInvalid> => {
   const fields = pickEditable(input);
   if (!fields.title?.trim()) return { kind: "invalid", reason: "title" };
-  const project = await Project.create({ ...fields, user: userId });
-  await User.updateOne({ _id: userId }, { $push: { projects: project._id } });
+  const project = await (
+    await getStore()
+  ).createProject(userId, { title: fields.title, ...fields });
   return { kind: "ok", project: toOwnerProject(project) };
 };
 
@@ -54,9 +56,9 @@ export const getProject = async (
   userId: Id,
   projectId: unknown,
 ): Promise<ProjectOk | ProjectNotFound> => {
-  if (!isObjectIdOrHexString(projectId)) return NOT_FOUND;
-  const project = await findProjectWithRelations({ _id: projectId, user: userId });
-  return project ? { kind: "ok", project: toOwnerProject(project) } : NOT_FOUND;
+  if (!isIdString(projectId)) return NOT_FOUND;
+  const project = await (await getStore()).loadProject(projectId);
+  return project?.ownerId === userId ? { kind: "ok", project: toOwnerProject(project) } : NOT_FOUND;
 };
 
 export const updateProject = async (
@@ -64,13 +66,11 @@ export const updateProject = async (
   projectId: unknown,
   input: ProjectInput,
 ): Promise<ProjectOk | ProjectNotFound> => {
-  if (!isObjectIdOrHexString(projectId)) return NOT_FOUND;
-  const project = await Project.findOneAndUpdate(
-    { _id: projectId, user: userId },
-    { $set: pickEditable(input) },
-    { returnDocument: "after" },
-  );
-  return project ? { kind: "ok", project: toOwnerProject(project) } : NOT_FOUND;
+  const owned = await findOwned(userId, projectId);
+  if (!owned) return NOT_FOUND;
+  const store = await getStore();
+  await store.updateProject(owned._id, pickEditable(input));
+  return { kind: "ok", project: toOwnerProject((await store.loadProject(owned._id))!) };
 };
 
 export const shareProject = async (
@@ -95,19 +95,10 @@ export const unshareProject = async (
   shareInfo: { _id: string },
 ): Promise<ProjectOk | ProjectNotFound | ProjectInvalid> => {
   const shareId = isObject(shareInfo) ? shareInfo._id : undefined;
-  if (typeof shareId !== "string" || !isObjectIdOrHexString(shareId)) return INVALID_SHARE;
+  if (!isIdString(shareId)) return INVALID_SHARE;
   const owned = await findOwned(userId, projectId);
   if (!owned) return NOT_FOUND;
-  return { kind: "ok", project: await detachShare(owned, shareInfo) };
-};
-
-// Each step is a no-op when already done and the Project goes last, so a
-// failed cascade leaves the project findable and a re-run finishes the job.
-const cascadeRemove = async (project: ProjectDoc): Promise<void> => {
-  await Note.deleteMany({ $or: [{ project: project._id }, { _id: { $in: project.notes } }] });
-  await Share.deleteMany({ project: project._id });
-  await User.updateOne({ _id: project.user }, { $pull: { projects: project._id } });
-  await Project.deleteOne({ _id: project._id });
+  return { kind: "ok", project: await detachShare(owned, { _id: shareId }) };
 };
 
 /** Remove an owned Project with its Notes, its Share and the owner's ref. */
@@ -115,15 +106,19 @@ export const removeProject = async (
   userId: Id,
   projectId: unknown,
 ): Promise<ProjectOk | ProjectNotFound> => {
-  const owned = await findOwned(userId, projectId);
-  if (!owned) return NOT_FOUND;
-  await cascadeRemove(owned);
-  return { kind: "ok", project: toOwnerProject(owned) };
+  if (!isIdString(projectId)) return NOT_FOUND;
+  const store = await getStore();
+  const project = await store.loadProject(projectId);
+  if (project?.ownerId !== userId) return NOT_FOUND;
+  await store.removeProject(project);
+  return { kind: "ok", project: toOwnerProject(project) };
 };
 
 /** Remove every Project the user owns, each with the same cascade. */
 export const removeUserProjects = async (userId: Id): Promise<void> => {
-  for (const project of await Project.find({ user: userId })) {
-    await cascadeRemove(project);
+  const store = await getStore();
+  for (const projectId of await store.ownedProjectIds(userId)) {
+    const project = await store.getProject(projectId);
+    if (project) await store.removeProject(project);
   }
 };

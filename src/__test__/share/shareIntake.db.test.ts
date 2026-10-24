@@ -75,7 +75,8 @@ describe("Share intake against the in-memory database", () => {
       ShareUrlTakenError,
     );
 
-    expect((await Share.findById(project.share)).url).toBe("rough-cut");
+    const { share } = await Project.findById(project._id);
+    expect((await Share.findById(share)).url).toBe("rough-cut");
   });
 
   it("detaches the Share, deleting it and clearing the project's reference", async () => {

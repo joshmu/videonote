@@ -34,12 +34,12 @@ const INVALID_MSG: Record<ProjectInvalid["reason"], string> = {
   share: "Share not specified.",
 };
 
-export default withAuthenticatedUser(async (req, res, { userDoc, newToken }) => {
+export default withAuthenticatedUser(async (req, res, { user, newToken }) => {
   const { action, project, share } = req.body;
   if (typeof project !== "object" || project === null) {
     return res.status(StatusCodes.BAD_REQUEST).json({ msg: "Project not specified" });
   }
-  const userId = userDoc._id;
+  const userId = user._id;
   const projectId = project._id;
 
   let outcome: Outcome;
