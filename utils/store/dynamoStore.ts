@@ -311,7 +311,7 @@ export const createDynamoStore = ({ client, tableName }: DynamoStoreOptions): St
     });
   };
 
-  // Bump an item's timestamp when something it lists changes, as Mongoose does.
+  // Bump an item's timestamp when something it lists changes, so `updatedAt` covers its lists.
   const touch = (key: Item) =>
     db.send(
       new UpdateCommand({
@@ -764,7 +764,7 @@ export const createDynamoStore = ({ client, tableName }: DynamoStoreOptions): St
       await deleteAll(
         done.flatMap((note) => [keys.note(projectId, note._id), keys.noteClaim(note._id)]),
       );
-      // The Project's Notes changed: its timestamp says so, as MongoDB's does.
+      // The Project's Notes changed: its timestamp says so.
       if (done.length > 0) await touch(keys.project(projectId));
     },
   };
