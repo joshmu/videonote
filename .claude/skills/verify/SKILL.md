@@ -5,6 +5,8 @@ description: Build, run and drive VideoNote locally (real MongoDB, production bu
 
 # Verify VideoNote locally
 
+For regression coverage run `pnpm test:e2e` first (see the `e2e` skill). Use the steps below to drive a specific change by hand.
+
 ## Handle
 
 1. Worktree at the ref under test, `pnpm install --frozen-lockfile`.

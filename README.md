@@ -27,6 +27,11 @@ Create a `.env.local` based on the `.env.example` for local development.
 
 `pnpm install && pnpm dev`
 
+### Test it
+
+- `pnpm test`: unit and server tests
+- `pnpm test:e2e`: production build plus Playwright user flows (needs `ffmpeg` and `pnpm exec playwright install chromium`)
+
 ## API conventions
 
 Routes under `pages/api/` use two small higher-order wrappers from
