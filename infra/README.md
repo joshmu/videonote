@@ -59,8 +59,8 @@ is revisited.
 
 Vercel OIDC federation is on with the team issuer
 (`https://oidc.vercel.com/joshmu`). GitHub's `AWS_ROLE_ARN` values are
-environment variables, not secrets. The `prod` GitHub environment needs
-approval from `joshmu` and only accepts `main`.
+environment variables, not secrets. The `prod` GitHub environment only
+accepts `main`; it has no approval step, so a merge to `main` deploys prod.
 
 ## Commands
 
@@ -84,14 +84,15 @@ Inside `infra/`: `pnpm test`, `pnpm typecheck`, `pnpm lint`, `pnpm format`,
 ```mermaid
 flowchart LR
   PR[pull request] --> T1[test, lint, synth] --> D["cdk diff both stacks (dev role)"]
-  Main[push to main] --> T2[test, lint, synth] --> Dev[deploy VideonoteDev] --> Gate{prod approval} --> Prod[deploy VideonoteProd]
+  Main[push to main] --> T2[test, lint, synth] --> Dev[deploy VideonoteDev] --> Prod[deploy VideonoteProd]
 ```
 
 - PR diffs use the `dev` environment's role for both stacks, because the
   `prod` environment only accepts `main`. The CDK bootstrap roles are
   account-wide, so that role can read (and deploy) any stack: the
-  dev/prod split for GitHub deploys rests on who can push to the repo, while
-  prod's approval gate guards the deploy flow. Fork PRs get no OIDC token.
+  dev/prod split for GitHub deploys rests on who can push to the repo, and
+  every change reaches prod through a reviewed PR and its `cdk diff`. Fork
+  PRs get no OIDC token.
 - The main CI workflow also typechecks, tests and audits `infra/` on every PR.
 
 The GitHub roles live in the stacks they deploy, so the first deploy of each

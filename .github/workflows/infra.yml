@@ -111,7 +111,7 @@ jobs:
     needs: deploy-dev
     runs-on: ubuntu-latest
     timeout-minutes: 20
-    # Required reviewer and main-only branch policy live on this environment.
+    # Runs straight after dev; the environment only accepts `main`.
     environment: prod
     permissions:
       contents: read
