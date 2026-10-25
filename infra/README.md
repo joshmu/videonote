@@ -7,7 +7,8 @@ install and CI don't pull in CDK.
 The GitHub and Vercel OIDC identity providers and the CDK bootstrap are
 account-wide and live in the private `joshmu/aws-account` repo. These stacks
 read the provider ARNs from SSM (`/account/oidc/github/arn`,
-`/account/oidc/vercel/arn`) at deploy time.
+`/account/oidc/vercel/arn`) at deploy time, and prod's alarms notify the
+account alerts topic (`/account/alerts/topic/arn`), which emails the owner.
 
 ## What's deployed
 
@@ -31,6 +32,11 @@ Two stacks in `ap-southeast-2`, built from one `VideonoteStack` class
 - **GitHub role:** trusted only for `aud` `sts.amazonaws.com` and
   `sub` `repo:joshmu/videonote:environment:<env>`. It may assume the CDK
   bootstrap roles (`cdk-hnb659fds-*`) and describe stacks.
+- **Alarms (prod only):** `videonote-prod-throttled` on any throttled read
+  or write in 5 minutes, and `videonote-prod-{read,write}-capacity-high` when
+  use stays above 80% of provisioned capacity for 5 minutes. Each notifies the
+  alerts topic when raised and when cleared. See
+  [`docs/observability.md`](../docs/observability.md).
 - **Outputs:** `TableName`, `VercelRoleArn`, `GitHubDeployRoleArn`.
 
 ## Capacity budget

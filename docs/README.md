@@ -4,4 +4,5 @@
 - [`adr/`](adr/): architecture decision records
 - [`plans/`](plans/): plans for multi-PR changes
   - [DynamoDB migration](plans/dynamodb-migration.md)
-- [`infra/`](../infra/README.md): AWS CDK stacks (DynamoDB tables, OIDC roles)
+- [Observability](observability.md): Sentry, the health check, alarms and what to do when they fire
+- [`infra/`](../infra/README.md): AWS CDK stacks (DynamoDB tables, OIDC roles, prod alarms)

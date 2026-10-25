@@ -18,7 +18,11 @@ export const tokenFor = async (email: string): Promise<string> => {
   return generateAccessToken(user._id);
 };
 
-export type ApiResult = { status: number; body: Record<string, any> };
+export type ApiResult = {
+  status: number;
+  body: Record<string, any>;
+  headers: Record<string, string>;
+};
 
 /**
  * Call a Next.js API handler with a fake req/res and capture the reply.
@@ -33,7 +37,7 @@ export const callApi = async (
   const header = email ? `Bearer ${await tokenFor(email)}` : authorization;
   const headers = header ? { authorization: header } : {};
   const req = { method: "POST", headers, body } as unknown as NextApiRequest;
-  const result: ApiResult = { status: 0, body: undefined };
+  const result: ApiResult = { status: 0, body: undefined, headers: {} };
   const res = {
     status(code: number) {
       result.status = code;
@@ -41,6 +45,10 @@ export const callApi = async (
     },
     json(payload: Record<string, any>) {
       result.body = JSON.parse(JSON.stringify(payload));
+      return res;
+    },
+    setHeader(name: string, value: string) {
+      result.headers[name.toLowerCase()] = value;
       return res;
     },
   } as unknown as NextApiResponse;

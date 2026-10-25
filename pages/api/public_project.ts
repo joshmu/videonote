@@ -1,6 +1,7 @@
 import { StatusCodes } from "http-status-codes";
 import { NextApiRequest, NextApiResponse } from "next";
 
+import { reportError } from "@/utils/reportError";
 import { openSharedProject } from "@/utils/share/shareAccess";
 
 // Read a shared project: 401 password required, 403 wrong password, 404 no such Share.
@@ -12,7 +13,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
   try {
     result = await openSharedProject(shareUrl, password);
   } catch (error) {
-    console.error(error);
+    await reportError(error);
     return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ msg: "Database error" });
   }
 

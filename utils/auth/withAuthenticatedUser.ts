@@ -1,3 +1,4 @@
+import * as Sentry from "@sentry/nextjs";
 import { StatusCodes } from "http-status-codes";
 import type { NextApiHandler, NextApiRequest, NextApiResponse } from "next";
 
@@ -76,6 +77,8 @@ const resolveAuthenticatedUser = async (token: string): Promise<ResolveResult> =
     return { ctx: null, status: StatusCodes.UNAUTHORIZED, body: { msg: "No user found." } };
   }
 
+  // The id only: Sentry counts affected Users without holding their email.
+  Sentry.setUser({ id: userId });
   return {
     ctx: { user, email: user.email, newToken: generateAccessToken(userId) },
     status: StatusCodes.OK,

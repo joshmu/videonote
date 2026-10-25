@@ -10,6 +10,7 @@ A video review app with slick intuitive controls to create timestamped notes on 
 - [react-intersection-observer](https://github.com/thebuilder/react-intersection-observer)
 - [react-icons](https://github.com/react-icons/react-icons)
 - [Amazon DynamoDB](https://aws.amazon.com/dynamodb/) via the AWS SDK, infrastructure in AWS CDK (`infra/`)
+- [Sentry](https://sentry.io/) for errors and uptime ([`docs/observability.md`](docs/observability.md))
 - [react-player](https://github.com/CookPete/react-player)
 - [universal-cookie](https://github.com/reactivestack/cookies/tree/master/packages/universal-cookie)
 - [nanoid](https://github.com/ai/nanoid)

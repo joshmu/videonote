@@ -25,5 +25,6 @@ export const environments = {
     retainData: true,
     // Set to true once its cost is approved (well under $0.01/month at current size).
     pointInTimeRecovery: false,
+    alarms: true,
   },
 } satisfies Record<string, EnvironmentConfig>;

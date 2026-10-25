@@ -2,7 +2,7 @@ import { App } from "aws-cdk-lib";
 import { Match, Template } from "aws-cdk-lib/assertions";
 import { describe, expect, it } from "vitest";
 import { environments } from "../lib/environments.ts";
-import { TABLE_ACTIONS, VideonoteStack } from "../lib/videonote-stack.ts";
+import { ALERTS_TOPIC_ARN_PARAM, TABLE_ACTIONS, VideonoteStack } from "../lib/videonote-stack.ts";
 
 const ACCOUNT = "123456789012";
 
@@ -182,5 +182,63 @@ describe("GitHub deploy role", () => {
         Resource: "*",
       },
     ]);
+  });
+});
+
+describe("alarms", () => {
+  const alarms = Object.values(prod.findResources("AWS::CloudWatch::Alarm"));
+  const named = (name: string) => {
+    const match = alarms.find((alarm) => alarm.Properties.AlarmName === name);
+    expect(match, `alarm ${name}`).toBeDefined();
+    return match!.Properties;
+  };
+
+  it("dev has none", () => {
+    dev.resourceCountIs("AWS::CloudWatch::Alarm", 0);
+  });
+
+  it("prod alarms on throttling and on read and write capacity", () => {
+    expect(alarms.map((alarm) => alarm.Properties.AlarmName).sort()).toEqual([
+      "videonote-prod-read-capacity-high",
+      "videonote-prod-throttled",
+      "videonote-prod-write-capacity-high",
+    ]);
+  });
+
+  it("raises on the first throttled read or write in 5 minutes", () => {
+    const alarm = named("videonote-prod-throttled");
+    expect(alarm).toMatchObject({
+      Threshold: 0,
+      ComparisonOperator: "GreaterThanThreshold",
+      EvaluationPeriods: 1,
+      TreatMissingData: "notBreaching",
+    });
+    const metricNames = alarm.Metrics.flatMap(
+      (query: { MetricStat?: { Metric: { MetricName: string } } }) =>
+        query.MetricStat ? [query.MetricStat.Metric.MetricName] : [],
+    );
+    expect(metricNames.sort()).toEqual(["ReadThrottleEvents", "WriteThrottleEvents"]);
+  });
+
+  it.each(["read", "write"])(
+    "raises when %s use stays above 16 of its 20 units per second for 5 minutes",
+    (kind) => {
+      expect(named(`videonote-prod-${kind}-capacity-high`)).toMatchObject({
+        Threshold: 16,
+        ComparisonOperator: "GreaterThanThreshold",
+        EvaluationPeriods: 5,
+        TreatMissingData: "notBreaching",
+      });
+    },
+  );
+
+  it("notifies the account alerts topic when raised and when cleared", () => {
+    const params = prod.findParameters("*", { Default: ALERTS_TOPIC_ARN_PARAM });
+    const [param] = Object.keys(params);
+    expect(param, "alerts topic SSM parameter").toBeDefined();
+    for (const alarm of alarms) {
+      expect(alarm.Properties.AlarmActions).toEqual([{ Ref: param }]);
+      expect(alarm.Properties.OKActions).toEqual([{ Ref: param }]);
+    }
   });
 });
