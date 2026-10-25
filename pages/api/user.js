@@ -2,6 +2,7 @@ import { StatusCodes } from "http-status-codes";
 
 import { toAccountUser } from "@/utils/apiHelpers";
 import { withAuthenticatedUser } from "@/utils/auth/withAuthenticatedUser";
+import { reportError } from "@/utils/reportError";
 import { removeAccount, updateProfile } from "@/utils/user/identityIntake";
 
 // Settings are read and written through /api/settings only.
@@ -41,7 +42,7 @@ export default withAuthenticatedUser(async (req, res, { user }) => {
         return res.status(StatusCodes.BAD_REQUEST).json({ msg: "Action not specified" });
     }
   } catch (error) {
-    console.error(error);
+    await reportError(error);
     return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ msg: "Database error" });
   }
 });

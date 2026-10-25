@@ -26,6 +26,7 @@ import {
   unshareProject,
   updateProject,
 } from "@/utils/project/projectIntake";
+import { reportError } from "@/utils/reportError";
 
 type Outcome = ProjectOk | ProjectNotFound | ProjectUrlTaken | ProjectInvalid;
 
@@ -67,7 +68,7 @@ export default withAuthenticatedUser(async (req, res, { user, newToken }) => {
         return res.status(StatusCodes.BAD_REQUEST).json({ msg: "Action not specified" });
     }
   } catch (error) {
-    console.error(error);
+    await reportError(error);
     return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ msg: "Database error" });
   }
 

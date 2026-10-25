@@ -4,6 +4,7 @@ import type { NextApiResponse } from "next";
 import { NoteApiAction, NoteInterface } from "@/root/src/components/shared/types";
 import { extractAuthorId, withOptionalUser } from "@/utils/auth/withAuthenticatedUser";
 import { removeDoneProjectNotes, upsertNote } from "@/utils/note/noteIntake";
+import { reportError } from "@/utils/reportError";
 
 const DENIED = {
   invalid: { status: StatusCodes.BAD_REQUEST, msg: "Invalid note." },
@@ -46,7 +47,7 @@ export default withOptionalUser(async (req, res, ctx) => {
     if (result.kind !== "ok") return deny(res, result.kind);
     return res.status(StatusCodes.OK).json({ note: result.note, token: ctx.newToken });
   } catch (error) {
-    console.error(error);
+    await reportError(error);
     return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ msg: "Database error" });
   }
 });

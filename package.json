@@ -46,6 +46,7 @@
   "dependencies": {
     "@aws-sdk/client-dynamodb": "3.1156.0",
     "@aws-sdk/lib-dynamodb": "3.1156.0",
+    "@sentry/nextjs": "11.9.0",
     "@vercel/oidc-aws-credentials-provider": "3.3.15",
     "bcryptjs": "^3.0.3",
     "date-fns": "^4.4.0",

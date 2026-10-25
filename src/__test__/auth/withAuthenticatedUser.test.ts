@@ -1,3 +1,4 @@
+import * as Sentry from "@sentry/nextjs";
 import { StatusCodes } from "http-status-codes";
 import jwt from "jsonwebtoken";
 import type { NextApiHandler } from "next";
@@ -10,6 +11,8 @@ import { callApi, useTestJwtSecret } from "../api/http";
 import { seedUser, testId } from "../db/seed";
 import { BACKENDS, useTestStore } from "../db/testStores";
 
+vi.mock("@sentry/nextjs", () => ({ setUser: vi.fn() }));
+
 useTestJwtSecret();
 
 const EMAIL = "user@example.com";
@@ -21,6 +24,15 @@ describe.each(BACKENDS)("auth wrappers: %s", (backend) => {
   const store = useTestStore(backend);
 
   describe("withAuthenticatedUser", () => {
+    it("tags Sentry with the caller's id and nothing else", async () => {
+      const user = await seedUser(store(), EMAIL);
+      vi.mocked(Sentry.setUser).mockClear();
+
+      await call(withAuthenticatedUser(vi.fn()), `Bearer ${generateAccessToken(user._id)}`);
+
+      expect(Sentry.setUser).toHaveBeenCalledExactlyOnceWith({ id: user._id });
+    });
+
     it("replies 401 without calling the handler when no token is sent", async () => {
       const handler = vi.fn();
 

@@ -11,6 +11,9 @@ to `syd1`.
 - [`docs/`](docs/README.md): plans and architecture decision records. The
   data lives in DynamoDB (one table per environment, see
   [`docs/adr/0001-dynamodb-single-table.md`](docs/adr/0001-dynamodb-single-table.md)).
+- [`docs/observability.md`](docs/observability.md): Sentry, `/api/health`
+  and the prod alarms. Routes that catch an error and answer it themselves
+  call `reportError` so it still reaches Sentry.
 
 ## Commands
 

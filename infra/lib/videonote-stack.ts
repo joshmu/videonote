@@ -1,12 +1,16 @@
 import {
   CfnOutput,
   DefaultStackSynthesizer,
+  Duration,
   RemovalPolicy,
   Stack,
   type StackProps,
 } from "aws-cdk-lib";
+import * as cloudwatch from "aws-cdk-lib/aws-cloudwatch";
+import * as actions from "aws-cdk-lib/aws-cloudwatch-actions";
 import * as dynamodb from "aws-cdk-lib/aws-dynamodb";
 import * as iam from "aws-cdk-lib/aws-iam";
+import * as sns from "aws-cdk-lib/aws-sns";
 import * as ssm from "aws-cdk-lib/aws-ssm";
 import type { Construct } from "constructs";
 
@@ -15,6 +19,12 @@ export const OIDC_PROVIDER_ARN_PARAMS = {
   github: "/account/oidc/github/arn",
   vercel: "/account/oidc/vercel/arn",
 } as const;
+
+/** The account alerts topic (emails the account owner), from the same stack. */
+export const ALERTS_TOPIC_ARN_PARAM = "/account/alerts/topic/arn";
+
+/** Share of provisioned capacity that, held for 5 minutes, raises an alarm. */
+export const CAPACITY_ALARM_RATIO = 0.8;
 
 export const VERCEL_TEAM = "joshmu";
 export const VERCEL_PROJECT = "videonote";
@@ -60,6 +70,12 @@ export interface VideonoteStackProps extends StackProps {
    * @default false
    */
   readonly pointInTimeRecovery?: boolean;
+  /**
+   * CloudWatch alarms on throttling and sustained high capacity, sent to the
+   * account alerts topic. The free tier covers 10 alarms per account.
+   * @default false
+   */
+  readonly alarms?: boolean;
 }
 
 /** One VideoNote environment: its table, the Vercel runtime role and the GitHub deploy role. */
@@ -144,8 +160,68 @@ export class VideonoteStack extends Stack {
       }),
     );
 
+    if (props.alarms) this.addAlarms(name, props);
+
     new CfnOutput(this, "TableName", { value: this.table.tableName });
     new CfnOutput(this, "VercelRoleArn", { value: this.vercelRole.roleArn });
     new CfnOutput(this, "GitHubDeployRoleArn", { value: this.githubDeployRole.roleArn });
+  }
+
+  /**
+   * Capacity is fixed (no auto scaling), so throttling is how this table
+   * fails under load. Alert on any throttled request, and earlier on
+   * consumption that stays near the provisioned limit.
+   */
+  private addAlarms(name: string, props: VideonoteStackProps) {
+    const topicArn = ssm.StringParameter.valueForStringParameter(this, ALERTS_TOPIC_ARN_PARAM);
+    const notify = new actions.SnsAction(sns.Topic.fromTopicArn(this, "AlertsTopic", topicArn));
+    const alarm = (id: string, alarmProps: cloudwatch.AlarmProps) => {
+      const created = new cloudwatch.Alarm(this, id, {
+        treatMissingData: cloudwatch.TreatMissingData.NOT_BREACHING,
+        ...alarmProps,
+      });
+      created.addAlarmAction(notify);
+      created.addOkAction(notify);
+    };
+
+    const fiveMinutes = { period: Duration.minutes(5), statistic: cloudwatch.Stats.SUM };
+    alarm("ThrottleAlarm", {
+      alarmName: `${name}-throttled`,
+      alarmDescription: `${name} rejected requests for lack of provisioned capacity`,
+      metric: new cloudwatch.MathExpression({
+        expression: "FILL(reads, 0) + FILL(writes, 0)",
+        usingMetrics: {
+          reads: this.table.metric("ReadThrottleEvents", fiveMinutes),
+          writes: this.table.metric("WriteThrottleEvents", fiveMinutes),
+        },
+        period: Duration.minutes(5),
+        label: "Throttled requests",
+      }),
+      threshold: 0,
+      comparisonOperator: cloudwatch.ComparisonOperator.GREATER_THAN_THRESHOLD,
+      evaluationPeriods: 1,
+    });
+
+    const perMinute = { period: Duration.minutes(1), statistic: cloudwatch.Stats.SUM };
+    const capacity = [
+      ["Read", props.readCapacity, this.table.metricConsumedReadCapacityUnits(perMinute)],
+      ["Write", props.writeCapacity, this.table.metricConsumedWriteCapacityUnits(perMinute)],
+    ] as const;
+    for (const [kind, provisioned, consumed] of capacity) {
+      alarm(`${kind}CapacityAlarm`, {
+        alarmName: `${name}-${kind.toLowerCase()}-capacity-high`,
+        alarmDescription: `${name} used over ${CAPACITY_ALARM_RATIO * 100}% of its ${provisioned} ${kind.toLowerCase()} capacity units for 5 minutes`,
+        // Consumed units are summed per minute; divide for units per second.
+        metric: new cloudwatch.MathExpression({
+          expression: "consumed / 60",
+          usingMetrics: { consumed },
+          period: Duration.minutes(1),
+          label: `${kind} capacity units per second`,
+        }),
+        threshold: provisioned * CAPACITY_ALARM_RATIO,
+        comparisonOperator: cloudwatch.ComparisonOperator.GREATER_THAN_THRESHOLD,
+        evaluationPeriods: 5,
+      });
+    }
   }
 }

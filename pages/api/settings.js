@@ -2,6 +2,7 @@ import { StatusCodes } from "http-status-codes";
 
 import { toSettingsReply } from "@/utils/apiHelpers";
 import { withAuthenticatedUser } from "@/utils/auth/withAuthenticatedUser";
+import { reportError } from "@/utils/reportError";
 import { getStore } from "@/utils/store";
 
 // The Settings fields a client may write; `user` and `_id` are never taken from the body.
@@ -18,7 +19,7 @@ export default withAuthenticatedUser(async (req, res, { user, newToken }) => {
       await getStore()
     ).saveSettings(user._id, pickEditable(req.body?.settings ?? {}));
   } catch (error) {
-    console.error(error);
+    await reportError(error);
     return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ msg: "Database error" });
   }
 
