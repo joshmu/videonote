@@ -11,7 +11,7 @@
  */
 
 import { Variants, motion } from "motion/react";
-import { type SyntheticEvent, useEffect, useState } from "react";
+import { type SyntheticEvent, useCallback, useEffect, useState } from "react";
 import ReactPlayer from "react-player";
 
 import { useVideoContext } from "@/context/videoContext";
@@ -37,6 +37,18 @@ const videoContentVariants: Variants = {
   },
 };
 
+/**
+ * ReactPlayer calls play() without handling its promise. A source the browser
+ * can't play rejects it, and `onError` already warns the user about that source.
+ */
+const ignoreUnsupportedPlay = (player: HTMLVideoElement): void => {
+  const play = player.play.bind(player);
+  player.play = () =>
+    Promise.resolve(play()).catch((error: unknown) => {
+      if ((error as Error)?.name !== "NotSupportedError") throw error;
+    });
+};
+
 export const VideoPlayer = () => {
   const {
     url,
@@ -59,6 +71,14 @@ export const VideoPlayer = () => {
     console.log(`loading ${url}`);
     if (typeof url === "string" && url.length > 0) setIsLoading(true);
   }, [url, isMount]);
+
+  const attachPlayer = useCallback(
+    (player: HTMLVideoElement | null) => {
+      playerRef.current = player;
+      if (player) ignoreUnsupportedPlay(player);
+    },
+    [playerRef],
+  );
 
   const preHandleReady = () => {
     handleReady();
@@ -102,7 +122,7 @@ export const VideoPlayer = () => {
           <div className={`${style.playerWrapper} w-full h-full`}>
             {url && (
               <ReactPlayer
-                ref={playerRef}
+                ref={attachPlayer}
                 src={url}
                 onError={handlePlayerError}
                 controls={false}

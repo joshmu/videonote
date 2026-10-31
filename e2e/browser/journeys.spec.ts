@@ -53,6 +53,41 @@ test.describe("user journeys", () => {
     await expect(page.getByText("tighten the intro")).toBeVisible();
   });
 
+  test("a video that can't play warns the User and raises no unhandled rejection", async ({
+    page,
+  }) => {
+    await page.route("https://video.test/missing.mp4", (route) => route.fulfill({ status: 404 }));
+    const rejections: string[] = [];
+    await page.exposeFunction("recordRejection", (reason: string) => rejections.push(reason));
+    await page.addInitScript(() =>
+      window.addEventListener("unhandledrejection", (event) =>
+        (window as unknown as { recordRejection(reason: string): void }).recordRejection(
+          String(event.reason),
+        ),
+      ),
+    );
+    const { api, email } = await registeredUser();
+    ok(await api.project(ProjectApiActions.CREATE, { title: "Broken cut", src: VIDEO_URL }));
+
+    await page.goto("/login");
+    await page.getByPlaceholder("Email Address").fill(email);
+    await page.getByPlaceholder("Password").fill(PASSWORD);
+    await page.getByRole("button", { name: "Login" }).click();
+    await expect(page).toHaveURL("/");
+    await expect(page.locator("#actionInput")).toBeVisible();
+
+    await page.keyboard.press("Escape");
+    await page.keyboard.press(" ");
+    await openMenu(page);
+    await page.getByText("create new", { exact: true }).dispatchEvent("click");
+    await page.getByLabel("Project Title").fill("Missing cut");
+    await page.getByLabel("Video URL").fill("https://video.test/missing.mp4");
+    await page.getByRole("button", { name: "Create" }).dispatchEvent("click");
+
+    await expect(page.getByText("This browser can't play this video.")).toBeVisible();
+    expect(rejections).toEqual([]);
+  });
+
   test("a signed-in User logs in and sees their Projects", async ({ page }) => {
     const { api, email } = await registeredUser();
     ok(await api.project(ProjectApiActions.CREATE, { title: "Returning project" }));

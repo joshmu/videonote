@@ -30,7 +30,7 @@ const formatError = {
 
 const OTHER_SRC = "https://cdn.example.com/other.mp4";
 
-const renderVideo = async (src: string) => {
+const renderVideo = async (src: string, playsAs = src) => {
   const transport = fakeTransport({
     "/api/settings": ({ settings }) => ok({ settings }),
     "/api/project": ({ project: sent }) =>
@@ -72,7 +72,7 @@ const renderVideo = async (src: string) => {
     });
     result.current.openProjects(account);
   });
-  await waitFor(() => expect(result.current.url).toBe(src));
+  await waitFor(() => expect(result.current.url).toBe(playsAs));
   const updates = () =>
     transport.requests.filter(
       (request) => request.path === "/api/project" && request.body.action === "UPDATE",
@@ -82,6 +82,19 @@ const renderVideo = async (src: string) => {
 
 afterEach(() => {
   vi.restoreAllMocks();
+});
+
+describe("videoContext url", () => {
+  it("removes spaces pasted into a hosted video link", async () => {
+    await renderVideo(
+      "https://youtu.be/ aqz-KE-bpKQ? si=abc",
+      "https://youtu.be/aqz-KE-bpKQ?si=abc",
+    );
+  });
+
+  it("keeps the spaces in a video file's name", async () => {
+    await renderVideo("https://cdn.example.com/rough cut.mp4");
+  });
 });
 
 describe("videoContext playback errors", () => {
