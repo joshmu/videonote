@@ -4,6 +4,8 @@
 // The output holds no ids, emails, Notes or video links. See docs/product-metrics.md.
 import { pathToFileURL } from "node:url";
 
+import { SAMPLE_PROJECT } from "../utils/sampleProject.mjs";
+
 const DAY = 24 * 60 * 60 * 1000;
 const WINDOWS = { "7d": 7, "30d": 30, "90d": 90, "365d": 365 };
 const READ_UNITS_PER_SECOND = 8;
@@ -25,14 +27,31 @@ export const classifySrc = (src) => {
   }
 };
 
+/** Every Note but the oldest on each sample Project, which are the seeded ones. */
+const withoutSeededNotes = (sampleProjects, notes) => {
+  const seeded = new Set();
+  for (const { projectId } of sampleProjects) {
+    notes
+      .filter((note) => note.projectId === projectId)
+      .sort((a, b) => a.createdAt - b.createdAt)
+      .slice(0, SAMPLE_PROJECT.notes.length)
+      .forEach((note) => seeded.add(note));
+  }
+  return notes.filter((note) => !seeded.has(note));
+};
+
 /**
  * @param {{ userId: string, createdAt: number, lastSeenOn?: string }[]} users
  * @param {{ ownerId: string, projectId: string, createdAt: number, src: string, shared: boolean }[]} projects
  * @param {{ projectId: string, createdAt: number }[]} notes
  * @param {number} now
  */
-export const summarise = (users, projects, notes, now) => {
-  const projectById = new Map(projects.map((project) => [project.projectId, project]));
+export const summarise = (users, allProjects, allNotes, now) => {
+  // A sample isn't a Project the User made, and its seeded Notes aren't Notes they wrote.
+  const isSample = (project) => project.src === SAMPLE_PROJECT.src;
+  const projects = allProjects.filter((project) => !isSample(project));
+  const notes = withoutSeededNotes(allProjects.filter(isSample), allNotes);
+  const projectById = new Map(allProjects.map((project) => [project.projectId, project]));
   const ownerOf = (note) => projectById.get(note.projectId)?.ownerId;
   const since = (days) => now - days * DAY;
 
@@ -42,7 +61,7 @@ export const summarise = (users, projects, notes, now) => {
     if (owner) notesByOwner.set(owner, [...(notesByOwner.get(owner) ?? []), note.createdAt]);
   }
   const owners = new Set(projects.map((project) => project.ownerId));
-  const sharers = new Set(projects.filter((p) => p.shared).map((p) => p.ownerId));
+  const sharers = new Set(allProjects.filter((p) => p.shared).map((p) => p.ownerId));
   const noteCounts = [...notesByOwner.values()].map((times) => times.length);
   const countWith = (min) => noteCounts.filter((count) => count >= min).length;
 
@@ -101,7 +120,12 @@ export const summarise = (users, projects, notes, now) => {
     );
 
   return {
-    totals: { users: users.length, projects: projects.length, notes: notes.length },
+    totals: {
+      users: users.length,
+      projects: projects.length,
+      sampleProjects: allProjects.length - projects.length,
+      notes: notes.length,
+    },
     funnel: {
       signedUp: users.length,
       madeProject: users.filter((user) => owners.has(user.userId)).length,

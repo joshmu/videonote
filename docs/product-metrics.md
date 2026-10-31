@@ -29,7 +29,7 @@ flowchart LR
 
 ## Sources
 
-**Usage report.** Reads the table once, slowly, and prints counts:
+**Usage report.** Reads the table once, slowly, and prints counts. Sample Projects count only under `totals.sampleProjects` and their seeded Notes count nowhere, but a Note a User writes on a sample counts as theirs:
 
 ```bash
 AWS_PROFILE=personal node scripts/usage-report.mjs videonote-prod

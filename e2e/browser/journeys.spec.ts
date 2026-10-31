@@ -232,6 +232,29 @@ test.describe("user journeys", () => {
     await expect(page.locator("body")).toHaveClass("theme-dark");
   });
 
+  test("a new User reaches a first Note through the sample video", async ({ page }) => {
+    await page.goto("/login");
+    await page.getByRole("button", { name: "Register" }).click();
+    await page.getByPlaceholder("Email Address").fill(`sample-${Date.now()}@example.com`);
+    await page.getByPlaceholder("Password").first().fill("passw0rd-e2e");
+    await page.getByPlaceholder(/confirm/i).fill("passw0rd-e2e");
+    await page.getByRole("button", { name: "Register" }).last().click();
+    await expect(page.getByRole("dialog")).toBeVisible();
+    await page.keyboard.press("Escape");
+    await expect(page.getByRole("dialog")).toBeHidden();
+
+    await page.getByRole("button", { name: "Or try a sample video" }).click();
+    await expect(page.getByRole("button", { name: "Or try a sample video" })).toBeHidden();
+    const seeded = page.getByText("Love the spray can moment, the pink really pops");
+    await expect(seeded).toBeVisible();
+    await expect(page.getByText("1:16", { exact: true })).toBeVisible();
+    await addNote(page, "my first Note");
+
+    await page.reload();
+    await expect(seeded).toBeVisible();
+    await expect(page.getByText("my first Note")).toBeVisible();
+  });
+
   test("Tab stays inside an open modal", async ({ page }) => {
     await logInToProject(page);
     await openMenu(page);

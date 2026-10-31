@@ -1,17 +1,28 @@
+import { useState } from "react";
+
 import { ModalType } from "@/components/Modals/Modals";
 import { useProjectsContext } from "@/context/projectsContext";
 import { useSessionContext } from "@/context/sessionContext";
 import { useUiShellContext } from "@/context/uiShellContext";
 import { ModalPrimaryBtn } from "@/shared/Modal/ModalBtn";
 import { Heading2 } from "@/shared/Text/Text";
+import { SAMPLE_PROJECT } from "@/utils/sampleProject.mjs";
 
 // A signed-in User with no Project yet has nothing else on screen to act on.
 export const FirstProjectPrompt = () => {
   const { admin } = useSessionContext();
-  const { project } = useProjectsContext();
+  const { project, createProject } = useProjectsContext();
   const { toggleModalOpen } = useUiShellContext();
+  const [creatingSample, setCreatingSample] = useState(false);
 
   if (!admin || project) return null;
+
+  const trySample = async () => {
+    setCreatingSample(true);
+    const { notes, ...sample } = SAMPLE_PROJECT;
+    await createProject(sample, notes);
+    setCreatingSample(false);
+  };
 
   return (
     <div className="absolute inset-0 z-10 flex flex-col items-center justify-center px-6 text-center">
@@ -22,6 +33,14 @@ export const FirstProjectPrompt = () => {
       <ModalPrimaryBtn handleClick={() => toggleModalOpen(ModalType.CREATE_PROJECT)}>
         Create Project
       </ModalPrimaryBtn>
+      <button
+        type="button"
+        className="mt-4 text-sm underline underline-offset-4 cursor-pointer text-themeText2 hover:text-themeAccent"
+        disabled={creatingSample}
+        onClick={trySample}
+      >
+        Or try a sample video
+      </button>
     </div>
   );
 };
