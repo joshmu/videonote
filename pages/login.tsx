@@ -45,7 +45,7 @@ const Login: NextPage = () => {
         <ThemeToggle />
       </div>
       <div
-        className="flex items-center justify-center h-screen bg-opacity-25"
+        className="flex items-center justify-center h-screen"
         style={{
           backgroundImage: `radial-gradient(circle farthest-corner at center, ${twConfig.theme.colors.themeSelectOpacity} 0%, ${twConfig.theme.colors.themeBg} 100%)`,
         }}

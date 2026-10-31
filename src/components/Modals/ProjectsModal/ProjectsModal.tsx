@@ -72,8 +72,10 @@ export const ProjectsModal = ({
             onMouseEnter={() => handleMousePosition(true, project)}
             onMouseLeave={() => handleMousePosition(false, project)}
             className={`${
-              currentProject._id === project._id ? "bg-opacity-25" : " bg-opacity-0 cursor-pointer"
-            } relative bg-themeSelectOpacity transition-colors duration-200 ease-out`}
+              currentProject._id === project._id
+                ? "bg-themeSelect/25"
+                : "bg-transparent cursor-pointer"
+            } relative transition-colors duration-200 ease-out`}
           >
             <Select
               cursor={currentProject._id === project._id ? "cursor-default" : "cursor-pointer"}

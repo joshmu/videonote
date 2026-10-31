@@ -19,7 +19,7 @@ export const AppContainer = ({ children, ...props }: { children: ReactNode; prop
 
   return (
     <div
-      className="flex flex-1 w-full h-full max-h-screen bg-opacity-25"
+      className="flex flex-1 w-full h-full max-h-screen"
       {...props}
       style={{
         backgroundImage: `radial-gradient(circle farthest-corner at center, ${twConfig.theme.colors.themeSelectOpacity} 0%, ${twConfig.theme.colors.themeBg} 100%)`,

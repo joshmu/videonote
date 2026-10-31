@@ -55,8 +55,8 @@ export const Overlay = () => {
           variants={variants}
           onClick={handleOverlayClick}
           className={`${
-            promptState.isOpen ? "z-40 bg-opacity-75" : "z-10 bg-opacity-50"
-          } absolute inset-0 bg-black`}
+            promptState.isOpen ? "z-40 bg-black/75" : "z-10 bg-black/50"
+          } absolute inset-0`}
         ></motion.div>
       )}
     </AnimatePresence>
