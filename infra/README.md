@@ -30,7 +30,8 @@ Two stacks in `ap-southeast-2`, built from one `VideonoteStack` class
   deployment can't reach prod data. The app must use the default token
   audience (no custom `audience` in `awsCredentialsProvider`).
 - **GitHub role:** trusted only for `aud` `sts.amazonaws.com` and
-  `sub` `repo:joshmu/videonote:environment:<env>`. It may assume the CDK
+  `sub` `repo:joshmu/videonote:environment:<env>` or
+  `repo:joshmu/videonote-v2:environment:<env>`. It may assume the CDK
   bootstrap roles (`cdk-hnb659fds-*`) and describe stacks.
 - **Alarms (prod only):** `videonote-prod-throttled` on any throttled read
   or write in 5 minutes, and `videonote-prod-{read,write}-capacity-high` when
