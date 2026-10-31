@@ -12,12 +12,12 @@ export const HeroTitle = ({
   props?: { [key: string]: any };
 }) => {
   return (
-    <h1
+    <div
       onClick={onClick}
-      className={`z-10 font-serif tracking-tight cursor-pointer text-7xl sm:text-8xl ${className}`}
+      className={`z-10 font-serif tracking-tight cursor-pointer text-6xl sm:text-8xl ${className}`}
       {...props}
     >
       {children}
-    </h1>
+    </div>
   );
 };

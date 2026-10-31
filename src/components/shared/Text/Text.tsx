@@ -18,14 +18,19 @@ interface TextProps extends React.HTMLAttributes<HTMLElement> {
   props?: { [key: string]: any };
 }
 
-export const Heading = ({ className = "", children, ...props }: TextProps) => {
+export const Heading = ({
+  as: Tag = "h1",
+  className = "",
+  children,
+  ...props
+}: TextProps & { as?: "h1" | "h2" }) => {
   return (
-    <h1
+    <Tag
       className={`${className} mt-0 mb-2 text-6xl font-normal leading-normal tracking-tight font-serif`}
       {...props}
     >
       {children}
-    </h1>
+    </Tag>
   );
 };
 

@@ -40,12 +40,12 @@ const Login: NextPage = () => {
   const handleEmail = (email: string): void => setEmail(email);
 
   return (
-    <Layout>
+    <Layout title="Log in">
       <div className="absolute top-0 right-0 z-50 p-4 text-2xl text-themeAccent">
         <ThemeToggle />
       </div>
       <div
-        className="flex items-center justify-center h-screen"
+        className="flex items-center justify-center min-h-screen px-4 py-16"
         style={{
           backgroundImage: `radial-gradient(circle farthest-corner at center, ${twConfig.theme.colors.themeSelectOpacity} 0%, ${twConfig.theme.colors.themeBg} 100%)`,
         }}

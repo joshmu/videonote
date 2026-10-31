@@ -12,7 +12,7 @@
 
 import "@/styles/globals.css";
 
-import { AnimatePresence } from "motion/react";
+import { AnimatePresence, MotionConfig } from "motion/react";
 import { AppProps } from "next/app";
 import { Playfair_Display, Roboto } from "next/font/google";
 
@@ -33,9 +33,11 @@ const MyApp = ({ Component, pageProps, router }: AppProps) => {
         }
       `}</style>
       <ThemeProvider>
-        <AnimatePresence mode="wait">
-          <Component {...pageProps} key={router.route} />
-        </AnimatePresence>
+        <MotionConfig reducedMotion="user">
+          <AnimatePresence mode="wait">
+            <Component {...pageProps} key={router.route} />
+          </AnimatePresence>
+        </MotionConfig>
       </ThemeProvider>
     </NotificationProvider>
   );

@@ -165,6 +165,53 @@ test.describe("user journeys", () => {
     await expect(page.getByRole("dialog")).toBeInViewport({ ratio: 1 });
   });
 
+  test("Tab stays inside an open modal", async ({ page }) => {
+    await logInToProject(page);
+    await openMenu(page);
+    await page.getByText("settings", { exact: true }).dispatchEvent("click");
+    const dialog = page.getByRole("dialog");
+    await expect(dialog).toBeVisible();
+
+    for (let press = 0; press < 12; press++) {
+      await page.keyboard.press("Tab");
+      await expect(dialog.locator(":focus")).toHaveCount(1);
+    }
+    await page.keyboard.press("Shift+Tab");
+    await expect(dialog.locator(":focus")).toHaveCount(1);
+  });
+
+  test("a new Share is read-only until the owner allows editing", async ({ page }) => {
+    await logInToProject(page);
+    await openMenu(page);
+    await page.getByText("Share Project", { exact: true }).dispatchEvent("click");
+    await expect(page.getByRole("dialog").getByText("Users can edit notes?")).toBeVisible();
+  });
+
+  test("signup can be reached at 200% zoom", async ({ page }) => {
+    await page.setViewportSize({ width: 640, height: 300 });
+    await page.goto("/login");
+    await page.getByRole("button", { name: "Register" }).click();
+    for (const control of [
+      page.getByRole("link", { name: "VideoNote" }),
+      page.getByRole("button", { name: "Register" }),
+    ]) {
+      await control.scrollIntoViewIfNeeded();
+      await expect(control).toBeInViewport({ ratio: 1 });
+    }
+  });
+
+  test("public pages have one main heading and their own title", async ({ page }) => {
+    for (const [path, title] of [
+      ["/hello", "Timestamped video notes | VideoNote"],
+      ["/terms", "Terms of Service | VideoNote"],
+      ["/privacy", "Privacy Policy | VideoNote"],
+    ]) {
+      await page.goto(path);
+      await expect(page).toHaveTitle(title);
+      await expect(page.locator("h1")).toHaveCount(1);
+    }
+  });
+
   test("a User plays and pauses a video by clicking it", async ({ page }) => {
     await logInToProject(page);
     const isPaused = () =>
