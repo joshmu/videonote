@@ -109,6 +109,9 @@ export const VideoProvider = (props: { [key: string]: any }) => {
   };
 
   const togglePlay = (): void => {
+    // nothing to play yet: staying off stops the next video starting by itself
+    if (!url) return;
+
     setPlaying((playing) => {
       const updatedPlayState = !playing;
       // console.log({ playing, newState })
