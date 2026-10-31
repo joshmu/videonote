@@ -30,9 +30,9 @@ export const ModalInput = ({
   value,
   placeholder = "",
   autoFocus = false,
-  min: _min = undefined,
-  max: _max = undefined,
-  step: _step = undefined,
+  min = undefined,
+  max = undefined,
+  step = undefined,
   ...props
 }: ModalInputInterface) => {
   return (
@@ -46,6 +46,9 @@ export const ModalInput = ({
         value={value}
         autoFocus={autoFocus}
         placeholder={placeholder}
+        min={min}
+        max={max}
+        step={step}
         className={`block w-full ${
           type === "range" ? "px-0" : "px-4"
         } py-2 mt-2 border rounded-sm border-themeText2 text-themeText bg-themeBg focus:border-themeText focus:outline-none`}

@@ -28,8 +28,8 @@ export const LocalVideoLoader = ({
   return (
     <div className="mt-3">
       <label htmlFor={id}>
-        <input className="hidden" id={id} name={id} type="file" onChange={handleFileInput} />
-        <span className="px-4 py-2 text-sm transition-colors duration-200 ease-in-out border rounded-sm cursor-pointer text-themeText hover:border-transparent hover:text-themeBg hover:bg-themeAccent">
+        <input className="sr-only peer" id={id} name={id} type="file" onChange={handleFileInput} />
+        <span className="peer-focus-visible:ring-2 ring-themeAccent px-4 py-2 text-sm transition-colors duration-200 ease-in-out border rounded-sm cursor-pointer text-themeText hover:border-transparent hover:text-themeBg hover:bg-themeAccent">
           Use Local Video
         </span>
       </label>

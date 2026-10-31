@@ -31,7 +31,7 @@ export const Notification = () => {
   };
 
   return (
-    <div className="absolute top-0 left-0 z-50 w-full max-w-md">
+    <div role="status" aria-live="polite" className="absolute top-0 left-0 z-50 w-full max-w-md">
       <AnimatePresence>
         {alerts.length > 0 &&
           alerts.map((alert) => (

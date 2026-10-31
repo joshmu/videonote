@@ -11,7 +11,7 @@
  */
 
 import { HTMLMotionProps, motion } from "motion/react";
-import { ReactNode } from "react";
+import { ReactNode, useEffect, useRef } from "react";
 
 import { CancelBtn } from "@/shared/CancelBtn/CancelBtn";
 
@@ -30,6 +30,15 @@ export const ModalContainer = ({
   zIndex = null,
   ...props
 }: ModalContainerInterface) => {
+  const box = useRef<HTMLDivElement>(null);
+
+  // take focus so the keyboard starts in the modal, and hand it back on close
+  useEffect(() => {
+    const previous = document.activeElement as HTMLElement | null;
+    if (!box.current?.contains(previous)) box.current?.focus();
+    return () => previous?.focus?.();
+  }, []);
+
   const variants = {
     initial: { opacity: 0, y: "-40%", x: "-50%" },
     animate: { opacity: 1, y: "-50%", transition: { duration: 0.2 } },
@@ -39,6 +48,10 @@ export const ModalContainer = ({
   return (
     <motion.div
       key={motionKey}
+      ref={box}
+      role="dialog"
+      aria-modal="true"
+      tabIndex={-1}
       initial="initial"
       animate="animate"
       exit="exit"

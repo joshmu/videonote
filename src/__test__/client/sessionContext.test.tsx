@@ -64,7 +64,7 @@ describe("sessionContext start", () => {
     expect(result.current.admin).toBe(true);
     expect(result.current.user).toEqual(owner);
     expect(result.current.settings).toEqual({ ...SETTINGS_DEFAULTS, _id: "set1", seekJump: 5 });
-    expect(result.current.alerts).toContain("Logged in: owner");
+    expect(result.current.alerts).toEqual([]);
     expect(account.projects).toEqual([{ _id: "p1", title: "Cut" }]);
   });
 

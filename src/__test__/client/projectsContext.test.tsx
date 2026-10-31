@@ -108,7 +108,7 @@ describe("projectsContext open", () => {
     await signIn(result, []);
 
     expect(result.current.modalsOpen).toEqual([ModalType.WELCOME]);
-    expect(result.current.alerts).toContain("Create a project to start");
+    expect(result.current.alerts).toEqual([]);
     expect(result.current.projectsExist).toBe(false);
   });
 

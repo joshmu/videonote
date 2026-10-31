@@ -17,7 +17,9 @@ export const CancelBtn = ({ cancel }: { cancel: () => void }) => {
   const handleClick = (): void => cancel();
 
   return (
-    <motion.div
+    <motion.button
+      type="button"
+      aria-label="Close"
       onClick={handleClick}
       className="absolute top-0 right-0 p-2 text-xl transition-colors duration-300 ease-in-out cursor-pointer hover:text-themeAccent text-themeText2"
       whileHover={{
@@ -25,6 +27,6 @@ export const CancelBtn = ({ cancel }: { cancel: () => void }) => {
       }}
     >
       <CloseIcon />
-    </motion.div>
+    </motion.button>
   );
 };

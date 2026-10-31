@@ -151,8 +151,8 @@ export const Menu = () => {
               </Select>
             )}
             {admin && (
-              <Link href="/hello">
-                <Select onClick={handleSignOutClick}>
+              <Link href="/hello" onClick={handleSignOutClick}>
+                <Select>
                   <IconMenuItemWrapper>
                     <SignoutIcon />
                   </IconMenuItemWrapper>

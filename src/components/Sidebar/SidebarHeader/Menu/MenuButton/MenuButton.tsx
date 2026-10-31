@@ -28,7 +28,9 @@ export const MenuButton = ({ drawAttention }: { drawAttention: boolean }) => {
       whileHover={{ rotate: 90 }}
       className={drawAttention ? "" : "animate-pulse text-themeAccent"}
     >
-      <MenuIcon onClick={handleMenuClick} role="button" aria-label="Menu" className="text-2xl" />
+      <button type="button" aria-label="Menu" onClick={handleMenuClick} className="block">
+        <MenuIcon className="text-2xl" />
+      </button>
     </motion.div>
   );
 };
