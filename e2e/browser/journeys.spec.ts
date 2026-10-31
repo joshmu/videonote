@@ -233,7 +233,6 @@ test.describe("user journeys", () => {
   });
 
   test("a new User reaches a first Note through the sample video", async ({ page }) => {
-    await page.route("https://www.youtube.com/**", (route) => route.abort());
     await page.goto("/login");
     await page.getByRole("button", { name: "Register" }).click();
     await page.getByPlaceholder("Email Address").fill(`sample-${Date.now()}@example.com`);
@@ -246,9 +245,7 @@ test.describe("user journeys", () => {
 
     await page.getByRole("button", { name: "Or try a sample video" }).click();
     await expect(page.getByRole("button", { name: "Or try a sample video" })).toBeHidden();
-    const note = page.locator("#actionInput");
-    await note.fill("the bunny wakes up");
-    await note.press("Enter");
+    await addNote(page, "the bunny wakes up");
     await expect(page.getByText("the bunny wakes up")).toBeVisible();
   });
 
