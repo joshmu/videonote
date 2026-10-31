@@ -132,6 +132,17 @@ describe("videoContext playback errors", () => {
     expect(result.current.modalsOpen).not.toContain(ModalType.CURRENT_PROJECT);
   });
 
+  it("explains that a Google Drive link is a page rather than a video", async () => {
+    const { result } = await renderVideo("https://drive.google.com/file/d/abc/view");
+
+    act(() => result.current.handlePlayerError(formatError));
+
+    const warning = result.current.alerts.find((alert) => alert.type === "warning");
+    render(<>{warning?.msg}</>);
+    expect(screen.getByText(/open a page rather than a video/)).toBeInTheDocument();
+    expect(screen.queryByText(/re-encode it/)).not.toBeInTheDocument();
+  });
+
   it("plays a local file offered by the warning without saving it", async () => {
     vi.spyOn(URL, "createObjectURL").mockReturnValue("blob:local-copy");
     const { result, updates } = await renderVideo(WEB_SRC);
