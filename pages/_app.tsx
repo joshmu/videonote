@@ -14,14 +14,24 @@ import "@/styles/globals.css";
 
 import { AnimatePresence } from "motion/react";
 import { AppProps } from "next/app";
+import { Playfair_Display, Roboto } from "next/font/google";
 
 import { NotificationProvider } from "@/context/notificationContext";
 
 import { ThemeProvider } from "../src/context/themeContext";
 
+const playfair = Playfair_Display({ subsets: ["latin"] });
+const roboto = Roboto({ subsets: ["latin"], weight: ["400", "500", "700"] });
+
 const MyApp = ({ Component, pageProps, router }: AppProps) => {
   return (
     <NotificationProvider>
+      <style jsx global>{`
+        :root {
+          --font-playfair: ${playfair.style.fontFamily};
+          --font-roboto: ${roboto.style.fontFamily};
+        }
+      `}</style>
       <ThemeProvider>
         <AnimatePresence mode="wait">
           <Component {...pageProps} key={router.route} />

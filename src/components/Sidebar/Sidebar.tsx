@@ -11,7 +11,7 @@
  */
 
 import { Variants, motion } from "motion/react";
-import { useEffect } from "react";
+import { type CSSProperties, useEffect } from "react";
 
 import { NoteList } from "@/components/NoteList/NoteList";
 import { useSessionContext } from "@/context/sessionContext";
@@ -69,23 +69,27 @@ export const Sidebar = (props: { [key: string]: any }) => {
       exit="exit"
       variants={sidebarVariants}
       id="sidebar"
-      style={{
-        width: sidebarOpen ? resizeState.size : 0,
-      }}
-      className="relative flex flex-col h-auto transition-all duration-500 ease-in-out border-l border-themeText2"
+      style={
+        {
+          "--sidebar-width": `${sidebarOpen ? resizeState.size : 0}px`,
+          "--sidebar-inner-width": `${resizeState.size}px`,
+        } as CSSProperties
+      }
+      // a phone stacks it under the player at full width; only wider screens resize or close it
+      className="relative flex flex-col flex-1 w-full min-h-0 transition-all duration-500 ease-in-out border-t md:flex-none md:h-auto md:border-t-0 md:border-l border-themeText2 md:w-(--sidebar-width)"
       {...props}
     >
       {/* sidebar edge for resizing */}
       {sidebarOpen && (
         <div
-          className="absolute left-0 z-10 w-6 h-full transform -translate-x-4/5"
+          className="absolute left-0 z-10 hidden w-6 h-full transform -translate-x-4/5 md:block"
           style={{ cursor: "ew-resize" }}
           onMouseDown={handleStartResize}
         ></div>
       )}
 
       {/* sidebar inner wrapper to maintain width */}
-      <div style={{ width: resizeState.size + "px" }} className="relative flex flex-col h-full">
+      <div className="relative flex flex-col w-full h-full md:w-(--sidebar-inner-width)">
         <SidebarHeader />
 
         {/* sidebar content */}

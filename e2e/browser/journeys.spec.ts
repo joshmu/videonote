@@ -145,6 +145,26 @@ test.describe("user journeys", () => {
     await expect(page.locator("#actionInput")).toBeVisible();
   };
 
+  test("a User reviews on a phone: modal, video, Note input and Notes all fit", async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    await logInToProject(page);
+
+    await expect.poll(() => videoHeight(page)).toBeGreaterThan(100);
+    await expect
+      .poll(async () => (await page.locator("#actionInput").boundingBox())?.width)
+      .toBeGreaterThan(200);
+    await expect(page.getByRole("button", { name: "Menu" })).toBeInViewport({ ratio: 1 });
+
+    await addNote(page, "looks fine on a phone");
+    await expect(page.getByText("looks fine on a phone")).toBeInViewport();
+
+    await openMenu(page);
+    await page.getByText("create new", { exact: true }).dispatchEvent("click");
+    await expect(page.getByRole("dialog")).toBeInViewport({ ratio: 1 });
+  });
+
   test("a User plays and pauses a video by clicking it", async ({ page }) => {
     await logInToProject(page);
     const isPaused = () =>

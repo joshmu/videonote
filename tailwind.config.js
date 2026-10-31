@@ -34,8 +34,8 @@ module.exports = {
   theme: {
     extend: {
       fontFamily: {
-        serif: ["Playfair Display", ...defaultTheme.fontFamily.serif],
-        sans: ["Roboto", ...defaultTheme.fontFamily.sans],
+        serif: ["var(--font-playfair)", ...defaultTheme.fontFamily.serif],
+        sans: ["var(--font-roboto)", ...defaultTheme.fontFamily.sans],
       },
       colors: {
         themeText: "var(--text)",
