@@ -48,7 +48,8 @@ the error goes to Sentry.
   (Vercel, through the Sentry integration) and not served to browsers.
 - **Tracing:** 10% of requests.
 - **Not collected:** request bodies (they hold Notes and Share passwords),
-  cookies, local variables, database query data, IP addresses and emails.
+  cookies, local variables, console output (it logs Notes and video URLs),
+  database query data, IP addresses and emails.
   Signed-in requests carry the User id only (`withAuthenticatedUser`). The
   Sentry project also scrubs IP addresses, `email` fields and the default
   sensitive keys server-side.
