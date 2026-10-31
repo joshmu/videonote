@@ -15,6 +15,7 @@ import { type RefObject, createContext, useContext, useEffect, useRef, useState 
 import { ProgressInterface } from "@/components/shared/types";
 import { useAnounceAction } from "@/hooks/useAnounceAction";
 import { LocalVideoLoader } from "@/shared/LocalVideoForm/LocalVideoLoader";
+import { playableSrc } from "@/utils/playableSrc";
 
 import { useNotificationContext } from "./notificationContext";
 import { useProjectsContext } from "./projectsContext";
@@ -93,7 +94,7 @@ export const VideoProvider = (props: { [key: string]: any }) => {
   useEffect(() => {
     if (project !== null && project.src !== null) {
       const isLocal = localVideo?.projectId === project._id && localVideo.src === project.src;
-      const nextUrl = isLocal ? localVideo.url : project.src;
+      const nextUrl = isLocal ? localVideo.url : project.src && playableSrc(project.src);
       if (nextUrl !== url) {
         console.log("project changed, setting url");
         setUrl(nextUrl);
