@@ -66,6 +66,8 @@ export const VideoPlayer = () => {
 
   // the url the player last said it could play: anything else is still loading
   const [readyUrl, setReadyUrl] = useState<string>(null);
+  // the url that last failed: nothing more is coming, so stop showing the loader
+  const [failedUrl, setFailedUrl] = useState<string>(null);
   const isLoading = !!url && readyUrl !== url;
   const currentUrl = useRef<string>(url);
   currentUrl.current = url;
@@ -123,7 +125,10 @@ export const VideoPlayer = () => {
               <ReactPlayer
                 ref={attachPlayer}
                 src={url}
-                onError={handlePlayerError}
+                onError={(error) => {
+                  setFailedUrl(url);
+                  handlePlayerError(error);
+                }}
                 controls={false}
                 playing={playing}
                 volume={volume}
@@ -137,7 +142,7 @@ export const VideoPlayer = () => {
           </div>
         </motion.div>
 
-        <Loader show={isLoading} />
+        <Loader show={isLoading && failedUrl !== url} />
       </div>
 
       {/* input wrapper */}
