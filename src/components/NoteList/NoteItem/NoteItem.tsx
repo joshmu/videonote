@@ -125,8 +125,8 @@ export const NoteItem = ({ note, closestProximity, childVariants }: NoteItemInte
       // * childVariants used so we don't pass 'initial', 'animate' etc
       variants={childVariants}
       className={`${
-        closestProximity ? "bg-opacity-25" : "bg-opacity-0"
-      } relative border-b cursor-pointer border-themeText2 bg-themeSelectOpacity transition-colors duration-200 ease-out`}
+        closestProximity ? "bg-themeSelect/25" : "bg-transparent"
+      } relative border-b cursor-pointer border-themeText2 transition-colors duration-200 ease-out`}
     >
       <Select padding="p-0">
         <div className="relative flex items-center justify-start w-full h-full text-base">

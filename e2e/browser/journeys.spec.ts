@@ -29,6 +29,9 @@ const addNote = async (page: Page, content: string) => {
   await expect(page.getByText(content)).toBeVisible();
 };
 
+const videoHeight = (page: Page) =>
+  page.locator("video").evaluate((video) => video.getBoundingClientRect().height);
+
 test.describe("user journeys", () => {
   test("a visitor registers, creates a Project, adds a Note and finds it after a reload", async ({
     page,
@@ -44,9 +47,13 @@ test.describe("user journeys", () => {
 
     await openMenu(page);
     await page.getByText("create new", { exact: true }).dispatchEvent("click");
+    await expect(page.getByLabel("Project Title")).toBeInViewport({ ratio: 1 });
     await page.getByLabel("Project Title").fill("My first cut");
     await page.getByLabel("Video URL").fill(VIDEO_URL);
     await page.getByRole("button", { name: "Create" }).dispatchEvent("click");
+
+    await expect(page.locator("#actionInput")).toBeVisible();
+    await expect.poll(() => videoHeight(page)).toBeGreaterThan(100);
 
     await addNote(page, "tighten the intro");
     await page.reload();

@@ -10,11 +10,10 @@ const twConfig = {
       themeText2: "var(--text2)",
       themeBg: "var(--bg)",
       themeBg2: "var(--bg2)",
-      themeBgOpacity: "rgba(var(--bgNum), var(--tw-bg-opacity))",
       themeAccent: "var(--accent)",
       themeAccent2: "var(--accent2)",
       themeSelect: "var(--select)",
-      themeSelectOpacity: "rgba(var(--selectNum), var(--tw-bg-opacity))",
+      themeSelectOpacity: "rgba(var(--selectNum), 0.25)",
     },
   },
 };

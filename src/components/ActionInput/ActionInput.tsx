@@ -110,8 +110,8 @@ export const ActionInput = () => {
   return (
     <div
       className={`${
-        isActive ? "bg-opacity-90" : "bg-opacity-25"
-      } relative flex items-center w-full h-full bg-themeBgOpacity`}
+        isActive ? "bg-themeBg/90" : "bg-themeBg/25"
+      } relative flex items-center w-full h-full`}
     >
       <div className="flex items-center self-center justify-center h-full transition-all duration-150 ease-in-out bg-transparent rounded-r-none text-themeText2">
         <TimeDisplay
