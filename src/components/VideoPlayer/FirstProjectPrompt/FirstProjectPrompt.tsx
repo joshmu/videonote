@@ -5,10 +5,16 @@ import { useUiShellContext } from "@/context/uiShellContext";
 import { ModalPrimaryBtn } from "@/shared/Modal/ModalBtn";
 import { Heading2 } from "@/shared/Text/Text";
 
+// Big Buck Bunny, (c) Blender Foundation, CC BY 3.0, on Blender's own channel
+const SAMPLE_PROJECT = {
+  title: "Sample: Big Buck Bunny",
+  src: "https://www.youtube.com/watch?v=aqz-KE-bpKQ",
+};
+
 // A signed-in User with no Project yet has nothing else on screen to act on.
 export const FirstProjectPrompt = () => {
   const { admin } = useSessionContext();
-  const { project } = useProjectsContext();
+  const { project, createProject } = useProjectsContext();
   const { toggleModalOpen } = useUiShellContext();
 
   if (!admin || project) return null;
@@ -22,6 +28,13 @@ export const FirstProjectPrompt = () => {
       <ModalPrimaryBtn handleClick={() => toggleModalOpen(ModalType.CREATE_PROJECT)}>
         Create Project
       </ModalPrimaryBtn>
+      <button
+        type="button"
+        className="mt-4 text-sm underline underline-offset-4 cursor-pointer text-themeText2 hover:text-themeAccent"
+        onClick={() => createProject(SAMPLE_PROJECT)}
+      >
+        Or try a sample video
+      </button>
     </div>
   );
 };

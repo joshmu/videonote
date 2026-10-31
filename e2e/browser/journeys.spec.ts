@@ -232,6 +232,26 @@ test.describe("user journeys", () => {
     await expect(page.locator("body")).toHaveClass("theme-dark");
   });
 
+  test("a new User reaches a first Note through the sample video", async ({ page }) => {
+    await page.route("https://www.youtube.com/**", (route) => route.abort());
+    await page.goto("/login");
+    await page.getByRole("button", { name: "Register" }).click();
+    await page.getByPlaceholder("Email Address").fill(`sample-${Date.now()}@example.com`);
+    await page.getByPlaceholder("Password").first().fill("passw0rd-e2e");
+    await page.getByPlaceholder(/confirm/i).fill("passw0rd-e2e");
+    await page.getByRole("button", { name: "Register" }).last().click();
+    await expect(page.getByRole("dialog")).toBeVisible();
+    await page.keyboard.press("Escape");
+    await expect(page.getByRole("dialog")).toBeHidden();
+
+    await page.getByRole("button", { name: "Or try a sample video" }).click();
+    await expect(page.getByRole("button", { name: "Or try a sample video" })).toBeHidden();
+    const note = page.locator("#actionInput");
+    await note.fill("the bunny wakes up");
+    await note.press("Enter");
+    await expect(page.getByText("the bunny wakes up")).toBeVisible();
+  });
+
   test("Tab stays inside an open modal", async ({ page }) => {
     await logInToProject(page);
     await openMenu(page);
