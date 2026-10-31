@@ -21,10 +21,13 @@ import { Heading2, SubHeading } from "@/shared/Text/Text";
 import { isValidCredentials } from "@/utils/clientHelpers";
 import { browserApi } from "@/utils/apiClient";
 
+import { TurnstileCheck } from "./TurnstileCheck";
+
 type RegisterBodyType = {
   email: string;
   password: string;
   password2: string;
+  turnstileToken?: string;
 };
 
 export const RegisterModal = ({ toggleLoginView: toggleLoginRegisterView, handleLogin, email }) => {
@@ -36,6 +39,10 @@ export const RegisterModal = ({ toggleLoginView: toggleLoginRegisterView, handle
   const { addAlert } = useNotificationContext();
   // held from the request until a refusal: a second click would find the email taken
   const isRegistering = useRef<boolean>(false);
+  const turnstileSiteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
+  const [turnstileToken, setTurnstileToken] = useState<string>("");
+  // a token works once, so a refused signup needs a fresh check
+  const [turnstileAttempt, setTurnstileAttempt] = useState<number>(0);
 
   // if email has been entered accidentally on login page then prefill for register page
   useEffect(() => {
@@ -61,6 +68,11 @@ export const RegisterModal = ({ toggleLoginView: toggleLoginRegisterView, handle
     )
       return;
 
+    if (turnstileSiteKey && !turnstileToken) {
+      addAlert({ type: "info", msg: "One moment, we're checking you're not a bot." });
+      return;
+    }
+
     await handleRegister();
   };
 
@@ -71,6 +83,7 @@ export const RegisterModal = ({ toggleLoginView: toggleLoginRegisterView, handle
       email: user.email,
       password: user.password,
       password2: user.password2,
+      ...(turnstileSiteKey && { turnstileToken }),
     };
     const result = await browserApi.register(body);
 
@@ -82,6 +95,8 @@ export const RegisterModal = ({ toggleLoginView: toggleLoginRegisterView, handle
       handleLogin();
     } else {
       isRegistering.current = false;
+      setTurnstileToken("");
+      setTurnstileAttempt((attempt) => attempt + 1);
       addAlert({ type: "error", msg: result.msg });
     }
   };
@@ -140,6 +155,14 @@ export const RegisterModal = ({ toggleLoginView: toggleLoginRegisterView, handle
               onChange={handleChange}
             />
           </div>
+
+          {turnstileSiteKey && (
+            <TurnstileCheck
+              key={turnstileAttempt}
+              siteKey={turnstileSiteKey}
+              onToken={setTurnstileToken}
+            />
+          )}
 
           <div className="flex items-center justify-end mt-4">
             <ModalPrimaryBtn handleClick={handleSubmit}>Register</ModalPrimaryBtn>

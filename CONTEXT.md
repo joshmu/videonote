@@ -107,7 +107,11 @@ still 401s — there is no silent fallback.
 `utils/user/identityIntake.ts`, the only writer of **User** documents.
 Each returns a discriminated outcome (`ok` / `invalid` / `emailTaken` /
 `notFound` / `wrongPassword`) and does no HTTP; `pages/api/login.js`,
-`register.js` and `user.js` map outcomes to status codes. Credentials must
+`register.js` and `user.js` map outcomes to status codes. `register.js` first
+checks a Cloudflare Turnstile token (`utils/auth/turnstile.ts`) where
+`TURNSTILE_SECRET_KEY` is set; `TurnstileCheck` shows the check on the signup
+form where `NEXT_PUBLIC_TURNSTILE_SITE_KEY` is set. Both are production only:
+previews, dev and tests have neither. Credentials must
 be non-empty strings. A taken email is decided atomically by the Store
 (`emailTaken`), never by check-then-save. `updateProfile` writes `username` and
 `email` only and returns a fresh **Session token**; its subject is the

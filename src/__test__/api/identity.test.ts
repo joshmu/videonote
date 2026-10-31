@@ -1,5 +1,5 @@
 import { StatusCodes } from "http-status-codes";
-import { afterEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import authHandler from "@/api/auth";
 import loginHandler from "@/api/login";
@@ -36,6 +36,72 @@ describe.each(BACKENDS)("identity routes: %s", (backend) => {
       expect(status).toBe(StatusCodes.CREATED);
       expect(authenticateToken(body.token)).toBe(body.user._id);
       expect(body.user.password).toBeUndefined();
+    });
+
+    describe("with Turnstile on", () => {
+      const siteverify = (reply: () => Promise<unknown>) =>
+        vi.stubGlobal(
+          "fetch",
+          vi.fn(async () => ({ json: reply })),
+        );
+
+      beforeEach(() => {
+        process.env.TURNSTILE_SECRET_KEY = "test-secret";
+      });
+
+      afterEach(() => {
+        delete process.env.TURNSTILE_SECRET_KEY;
+        vi.unstubAllGlobals();
+      });
+
+      it("refuses a signup with no token and creates nothing", async () => {
+        siteverify(async () => ({ success: true }));
+
+        const { status } = await callApi(registerHandler, { email: EMAIL, password: "hunter2" });
+
+        expect(status).toBe(StatusCodes.FORBIDDEN);
+        expect(fetch).not.toHaveBeenCalled();
+        expect(await store().findUserByEmail(EMAIL)).toBeNull();
+      });
+
+      it("refuses a token Cloudflare rejects", async () => {
+        siteverify(async () => ({ success: false }));
+
+        const { status } = await callApi(registerHandler, {
+          email: EMAIL,
+          password: "hunter2",
+          turnstileToken: "forged",
+        });
+
+        expect(status).toBe(StatusCodes.FORBIDDEN);
+      });
+
+      it("creates the account for a token Cloudflare accepts", async () => {
+        siteverify(async () => ({ success: true }));
+
+        const { status } = await callApi(registerHandler, {
+          email: EMAIL,
+          password: "hunter2",
+          turnstileToken: "good",
+        });
+
+        expect(status).toBe(StatusCodes.CREATED);
+      });
+
+      it("lets the signup through when Cloudflare can't answer", async () => {
+        vi.spyOn(console, "error").mockImplementation(() => {});
+        siteverify(async () => {
+          throw new Error("not json");
+        });
+
+        const { status } = await callApi(registerHandler, {
+          email: EMAIL,
+          password: "hunter2",
+          turnstileToken: "good",
+        });
+
+        expect(status).toBe(StatusCodes.CREATED);
+      });
     });
 
     it("replies 409 for an email that is already registered", async () => {

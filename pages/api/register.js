@@ -13,9 +13,16 @@
 import { StatusCodes } from "http-status-codes";
 
 import { toAccountUser } from "@/utils/apiHelpers";
+import { passesTurnstile } from "@/utils/auth/turnstile";
 import { register } from "@/utils/user/identityIntake";
 
 export default async (req, res) => {
+  if (!(await passesTurnstile(req.body?.turnstileToken))) {
+    return res.status(StatusCodes.FORBIDDEN).json({
+      msg: "We couldn't confirm you're not a bot. Refresh the page and try again.",
+    });
+  }
+
   const outcome = await register(req.body ?? {});
 
   switch (outcome.kind) {
