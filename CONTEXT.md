@@ -315,7 +315,10 @@ note input and cannot open a Note for editing.
 `src/context/videoContext.tsx`. The player state and the URL it plays. A
 playback error never clears a stored web `src` (another browser may play
 it): it shows a warning with a codec hint and a local-file picker, and a
-picked file plays for this session only, never saved. Only a stored `blob:`
+picked file plays for this session only, never saved. A Google Drive or Docs
+link gets its own warning, since it opens a page rather than a video. A shared
+Dropbox file link plays with `raw=1` (`playableSrc`), with no change to what's
+stored. Only a stored `blob:`
 `src` (a local file from an earlier session) is cleared.
 
 **Note context**:

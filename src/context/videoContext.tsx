@@ -15,7 +15,7 @@ import { type RefObject, createContext, useContext, useEffect, useRef, useState 
 import { ProgressInterface } from "@/components/shared/types";
 import { useAnounceAction } from "@/hooks/useAnounceAction";
 import { LocalVideoLoader } from "@/shared/LocalVideoForm/LocalVideoLoader";
-import { playableSrc } from "@/utils/playableSrc";
+import { isGooglePage, playableSrc } from "@/utils/playableSrc";
 
 import { useNotificationContext } from "./notificationContext";
 import { useProjectsContext } from "./projectsContext";
@@ -190,8 +190,9 @@ export const VideoProvider = (props: { [key: string]: any }) => {
       persistent: true,
       msg: (
         <span>
-          This browser can't play this video. Check the URL, or if its codec is the problem, try
-          another browser or re-encode it to H.264/AAC.
+          {isGooglePage(src ?? "")
+            ? "Google Drive and Docs links open a page rather than a video, so they can't play here. Download the video and pick the file below, or use a YouTube or Vimeo link."
+            : "This browser can't play this video. Check the URL, or if its codec is the problem, try another browser or re-encode it to H.264/AAC."}
           <LocalVideoLoader
             id="unplayableVideoFile"
             handleVideoSrc={(localUrl) => {
