@@ -96,11 +96,6 @@ export const SessionProvider = ({
       setSettings({ ...SETTINGS_DEFAULTS, ...settings });
     }
 
-    addAlert({
-      type: "success",
-      msg: `Logged in: ${(user as UserInterface).username}`,
-    });
-
     return { projects, settings };
   };
 

@@ -50,7 +50,7 @@ test.describe("user journeys", () => {
     await expect(page.getByLabel("Project Title")).toBeInViewport({ ratio: 1 });
     await page.getByLabel("Project Title").fill("My first cut");
     await page.getByLabel("Video URL").fill(VIDEO_URL);
-    await page.getByRole("button", { name: "Create" }).dispatchEvent("click");
+    await page.getByRole("button", { name: "Create", exact: true }).dispatchEvent("click");
 
     await expect(page.locator("#actionInput")).toBeVisible();
     await expect.poll(() => videoHeight(page)).toBeGreaterThan(100);
@@ -72,11 +72,11 @@ test.describe("user journeys", () => {
     await page.getByText("create new", { exact: true }).dispatchEvent("click");
     await page.getByLabel("Project Title").fill("My first cut");
     await page.getByLabel("Video URL").fill("holiday");
-    await page.getByRole("button", { name: "Create" }).dispatchEvent("click");
+    await page.getByRole("button", { name: "Create", exact: true }).dispatchEvent("click");
     await expect(page.getByText("That doesn't look like a video link.")).toBeVisible();
 
     await page.getByLabel("Video URL").fill(VIDEO_URL);
-    await page.getByRole("button", { name: "Create" }).dispatchEvent("click");
+    await page.getByRole("button", { name: "Create", exact: true }).dispatchEvent("click");
     await addNote(page, "tighten the intro");
     await expect(page.getByText("tighten the intro")).toBeVisible();
   });
@@ -125,13 +125,58 @@ test.describe("user journeys", () => {
     await page.getByText("create new", { exact: true }).dispatchEvent("click");
     await page.getByLabel("Project Title").fill("Missing cut");
     await page.getByLabel("Video URL").fill("https://video.test/missing.mp4");
-    await page.getByRole("button", { name: "Create" }).dispatchEvent("click");
+    await page.getByRole("button", { name: "Create", exact: true }).dispatchEvent("click");
 
     await expect(page.getByText("This browser can't play this video.")).toBeVisible();
     // the loader fades in after the warning, so an immediate check passes on a stuck loader
     await page.waitForTimeout(1000);
     await expect(page.getByTestId("videoLoader")).toHaveCount(0);
     expect(rejections).toEqual([]);
+  });
+
+  const logInToProject = async (page: Page) => {
+    const { api, email } = await registeredUser();
+    ok(await api.project(ProjectApiActions.CREATE, { title: "Clicked cut", src: VIDEO_URL }));
+    await page.goto("/login");
+    await page.getByPlaceholder("Email Address").fill(email);
+    await page.getByPlaceholder("Password").fill(PASSWORD);
+    await page.getByRole("button", { name: "Login" }).click();
+    await expect(page).toHaveURL("/");
+    await expect(page.locator("#actionInput")).toBeVisible();
+  };
+
+  test("a User plays and pauses a video by clicking it", async ({ page }) => {
+    await logInToProject(page);
+    const isPaused = () =>
+      page.locator("video").evaluate((video: HTMLVideoElement) => video.paused);
+
+    await page.getByRole("button", { name: "Play" }).click();
+    await expect.poll(isPaused).toBe(false);
+
+    await page.locator("video").click();
+    await expect.poll(isPaused).toBe(true);
+  });
+
+  test("Sign Out by keyboard ends the session", async ({ page, context }) => {
+    await logInToProject(page);
+
+    await page.locator("#actionInput").blur();
+    await page.keyboard.press("Alt");
+    await page.getByRole("link", { name: "Sign Out" }).press("Enter");
+
+    await expect(page).toHaveURL("/hello");
+    expect((await context.cookies()).map((cookie) => cookie.name)).not.toContain("token");
+  });
+
+  test("a keyboard User reaches Create New from the Menu", async ({ page }) => {
+    await logInToProject(page);
+
+    await page.getByRole("button", { name: "Menu" }).focus();
+    await page.keyboard.press("Enter");
+    await page.getByRole("button", { name: /create new/i }).press("Enter");
+
+    await expect(page.getByRole("dialog")).toBeVisible();
+    await expect(page.getByLabel("Project Title")).toBeVisible();
   });
 
   test("a signed-in User logs in and sees their Projects", async ({ page }) => {

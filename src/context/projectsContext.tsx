@@ -71,11 +71,6 @@ export const ProjectsProvider = ({ children }: { children: React.ReactNode }) =>
 
       // welcome modal
       toggleModalOpen(ModalType.WELCOME);
-
-      addAlert({
-        type: "info",
-        msg: "Create a project to start",
-      });
     }
   }, [projects, user]);
 
@@ -273,8 +268,9 @@ export const ProjectsProvider = ({ children }: { children: React.ReactNode }) =>
       type: "warning",
       msg: (
         <span>
-          Please provide video source for project:{" "}
-          {project?.title && <span className="text-themeAccent">{project.title}</span>}
+          {project?.title && <span className="text-themeAccent">{project.title}</span>} has no video
+          right now. A video file from your computer only lasts for one session, so pick it again,
+          or use a link.
         </span>
       ),
       duration: 12000,

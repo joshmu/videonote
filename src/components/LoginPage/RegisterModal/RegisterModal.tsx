@@ -88,10 +88,6 @@ export const RegisterModal = ({ toggleLoginView: toggleLoginRegisterView, handle
     const result = await browserApi.register(body);
 
     if (result.kind === "ok") {
-      addAlert({
-        type: "info",
-        msg: "Account created",
-      });
       handleLogin();
     } else {
       isRegistering.current = false;

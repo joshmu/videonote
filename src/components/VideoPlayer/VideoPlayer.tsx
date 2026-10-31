@@ -12,6 +12,7 @@
 
 import { Variants, motion } from "motion/react";
 import { type SyntheticEvent, useCallback, useRef, useState } from "react";
+import { BsFillPlayFill as PlayIcon } from "react-icons/bs";
 import ReactPlayer from "react-player";
 
 import { useVideoContext } from "@/context/videoContext";
@@ -57,6 +58,7 @@ export const VideoPlayer = () => {
     playing,
     volume,
     playbackRate,
+    togglePlay,
     handleReady,
     handleProgress,
     handlePlayerError,
@@ -120,7 +122,7 @@ export const VideoPlayer = () => {
           id="videoContent"
         >
           {/* resposive video wrapper */}
-          <div className={`${style.playerWrapper} w-full h-full`}>
+          <div className={`${style.playerWrapper} w-full h-full`} onClick={togglePlay}>
             {url && (
               <ReactPlayer
                 ref={attachPlayer}
@@ -141,6 +143,17 @@ export const VideoPlayer = () => {
             )}
           </div>
         </motion.div>
+
+        {isPlayerReady && !playing && (
+          <button
+            type="button"
+            aria-label="Play"
+            onClick={togglePlay}
+            className="absolute inset-0 z-10 flex items-center justify-center w-full cursor-pointer text-white/90 hover:text-white"
+          >
+            <PlayIcon className="text-7xl drop-shadow-lg" />
+          </button>
+        )}
 
         <Loader show={isLoading && failedUrl !== url} />
       </div>

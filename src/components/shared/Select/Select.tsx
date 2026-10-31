@@ -10,7 +10,7 @@
  * @copyright © 2020 - 2020 MU
  */
 
-import React, { ReactNode } from "react";
+import React, { KeyboardEvent, ReactNode } from "react";
 
 interface SelectProps extends React.HTMLAttributes<HTMLDivElement> {
   children: ReactNode;
@@ -31,9 +31,20 @@ export const Select = ({
   cursor = "cursor-pointer",
   ...props
 }: SelectProps) => {
+  const isAction = !!modalId || "onClick" in props;
+
   return (
     <div
       data-modal={modalId}
+      {...(isAction && {
+        role: "button",
+        tabIndex: 0,
+        onKeyDown: (event: KeyboardEvent<HTMLDivElement>) => {
+          if (event.key !== "Enter" && event.key !== " ") return;
+          event.preventDefault();
+          event.currentTarget.click();
+        },
+      })}
       className={`${padding} ${animate} flex items-center ${cursor} ${text} hover:bg-themeSelect hover:text-white`}
       {...props}
     >
