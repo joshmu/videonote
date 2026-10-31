@@ -16,6 +16,8 @@ export default defineConfig({
   projects: [
     { name: "api", testDir: "e2e/api" },
     { name: "browser", testDir: "e2e/browser", use: { ...devices["Desktop Chrome"] } },
+    { name: "firefox", testDir: "e2e/browser", use: { ...devices["Desktop Firefox"] } },
+    { name: "webkit", testDir: "e2e/browser", use: { ...devices["Desktop Safari"] } },
   ],
   webServer: {
     // Serves the existing production build; `pnpm test:e2e` builds first.
