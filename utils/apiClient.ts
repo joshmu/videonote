@@ -9,9 +9,9 @@ import {
   type ShareProjectInterface,
   type UserInterface,
 } from "@/shared/types";
+import { reportError } from "@/utils/reportError";
 
 const TOKEN_COOKIE = "token";
-import { reportError } from "@/utils/reportError";
 
 /** Where the session token lives. The only code that touches the token cookie. */
 export interface SessionStore {
