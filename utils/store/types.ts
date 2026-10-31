@@ -31,6 +31,8 @@ export type UserRecord = {
   /** The User's Projects in the order they list. */
   projectIds: Id[];
   settings: SettingsRecord | null;
+  /** The last UTC day (YYYY-MM-DD) the User made a signed-in request. Absent until the first one. */
+  lastSeenOn?: string;
   createdAt: Date;
   updatedAt: Date;
 };
@@ -98,6 +100,8 @@ export interface Store {
     id: Id,
     changes: { username?: string; email?: string },
   ): Promise<UserRecord | "emailTaken">;
+  /** Record the day the User was last seen. Leaves `updatedAt` alone; a no-op once the User is gone. */
+  markSeen(id: Id, day: string): Promise<void>;
   /** Write the User's Settings, creating them on first save. */
   saveSettings(userId: Id, changes: SettingsChanges): Promise<SettingsRecord>;
   /**

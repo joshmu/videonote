@@ -87,6 +87,7 @@ const toUser = (item: Item): UserRecord => ({
   role: item.role ?? "free",
   projectIds: item.projectIds ?? [],
   settings: toSettings(item.settings),
+  lastSeenOn: item.lastSeenOn ?? undefined,
   createdAt: date(item.createdAt),
   updatedAt: date(item.updatedAt),
 });
@@ -395,6 +396,22 @@ export const createDynamoStore = ({ client, tableName }: DynamoStoreOptions): St
         throw error;
       }
       return user;
+    },
+
+    markSeen: async (id, day) => {
+      try {
+        await db.send(
+          new UpdateCommand({
+            TableName,
+            Key: keys.user(id),
+            UpdateExpression: "SET lastSeenOn = :day",
+            ExpressionAttributeValues: { ":day": day },
+            ConditionExpression: "attribute_exists(PK)",
+          }),
+        );
+      } catch (error) {
+        if (!isConditionFailure(error)) throw error;
+      }
     },
 
     updateProfile: async (id, changes) => {

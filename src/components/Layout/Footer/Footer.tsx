@@ -15,6 +15,9 @@ export const Footer = () => {
         <Link href="/privacy" className="underline">
           Privacy Policy
         </Link>{" "}
+        <a className="underline" href="mailto:hello@videonote.app?subject=VideoNote%20feedback">
+          Feedback
+        </a>{" "}
         <a className="underline" href="/terms">
           Terms
         </a>

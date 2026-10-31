@@ -2,7 +2,7 @@ import * as Sentry from "@sentry/nextjs";
 import { StatusCodes } from "http-status-codes";
 import jwt from "jsonwebtoken";
 import type { NextApiHandler } from "next";
-import { describe, expect, it, vi } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { withAuthenticatedUser, withOptionalUser } from "@/utils/auth/withAuthenticatedUser";
 import { authenticateToken, generateAccessToken } from "@/utils/jwt";
@@ -11,7 +11,11 @@ import { callApi, useTestJwtSecret } from "../api/http";
 import { seedUser, testId } from "../db/seed";
 import { BACKENDS, useTestStore } from "../db/testStores";
 
-vi.mock("@sentry/nextjs", () => ({ setUser: vi.fn() }));
+vi.mock("@sentry/nextjs", () => ({
+  setUser: vi.fn(),
+  captureException: vi.fn(),
+  flush: vi.fn(),
+}));
 
 useTestJwtSecret();
 
@@ -31,6 +35,43 @@ describe.each(BACKENDS)("auth wrappers: %s", (backend) => {
       await call(withAuthenticatedUser(vi.fn()), `Bearer ${generateAccessToken(user._id)}`);
 
       expect(Sentry.setUser).toHaveBeenCalledExactlyOnceWith({ id: user._id });
+    });
+
+    describe("marking the User seen", () => {
+      const TODAY = new Date().toISOString().slice(0, 10);
+
+      afterEach(() => vi.restoreAllMocks());
+
+      it("records today on a signed-in request", async () => {
+        const user = await seedUser(store(), EMAIL);
+
+        await call(withAuthenticatedUser(vi.fn()), `Bearer ${generateAccessToken(user._id)}`);
+
+        expect((await store().getUser(user._id))?.lastSeenOn).toBe(TODAY);
+      });
+
+      it("writes once a day", async () => {
+        const user = await seedUser(store(), EMAIL);
+        await store().markSeen(user._id, TODAY);
+        const markSeen = vi.spyOn(store(), "markSeen");
+
+        await call(withAuthenticatedUser(vi.fn()), `Bearer ${generateAccessToken(user._id)}`);
+
+        expect(markSeen).not.toHaveBeenCalled();
+      });
+
+      it("still answers the request and reports the error when the write fails", async () => {
+        const user = await seedUser(store(), EMAIL);
+        const failure = new Error("write failed");
+        vi.spyOn(store(), "markSeen").mockRejectedValue(failure);
+        vi.spyOn(console, "error").mockImplementation(() => {});
+        const handler = vi.fn();
+
+        await call(withAuthenticatedUser(handler), `Bearer ${generateAccessToken(user._id)}`);
+
+        expect(handler).toHaveBeenCalledOnce();
+        expect(Sentry.captureException).toHaveBeenCalledWith(failure);
+      });
     });
 
     it("replies 401 without calling the handler when no token is sent", async () => {

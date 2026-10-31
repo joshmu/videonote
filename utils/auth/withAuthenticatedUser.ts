@@ -3,6 +3,7 @@ import { StatusCodes } from "http-status-codes";
 import type { NextApiHandler, NextApiRequest, NextApiResponse } from "next";
 
 import { authenticateToken, generateAccessToken } from "@/utils/jwt";
+import { reportError } from "@/utils/reportError";
 import { getStore, type UserRecord } from "@/utils/store";
 
 /**
@@ -63,6 +64,17 @@ type ResolveResult = {
   body: { msg: string } | null;
 };
 
+// At most one write per User per day, and a failed one never costs the User their request.
+const markSeenToday = async (user: UserRecord): Promise<void> => {
+  const today = new Date().toISOString().slice(0, 10);
+  if (user.lastSeenOn === today) return;
+  try {
+    await (await getStore()).markSeen(user._id, today);
+  } catch (error) {
+    await reportError(error);
+  }
+};
+
 // The token's subject is the User._id; the user is looked up by it.
 const resolveAuthenticatedUser = async (token: string): Promise<ResolveResult> => {
   let userId: string;
@@ -79,6 +91,7 @@ const resolveAuthenticatedUser = async (token: string): Promise<ResolveResult> =
 
   // The id only: Sentry counts affected Users without holding their email.
   Sentry.setUser({ id: userId });
+  await markSeenToday(user);
   return {
     ctx: { user, email: user.email, newToken: generateAccessToken(userId) },
     status: StatusCodes.OK,
