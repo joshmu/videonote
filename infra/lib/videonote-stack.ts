@@ -28,7 +28,8 @@ export const CAPACITY_ALARM_RATIO = 0.8;
 
 export const VERCEL_TEAM = "joshmu";
 export const VERCEL_PROJECT = "videonote";
-export const GITHUB_REPO = "joshmu/videonote";
+/** Repos that may deploy. The old repo stays until the new one has deployed both stacks. */
+export const GITHUB_REPOS = ["joshmu/videonote", "joshmu/videonote-v2"];
 
 const VERCEL_ISSUER = `oidc.vercel.com/${VERCEL_TEAM}`;
 const VERCEL_AUDIENCE = `https://vercel.com/${VERCEL_TEAM}`;
@@ -135,11 +136,13 @@ export class VideonoteStack extends Stack {
     const qualifier = DefaultStackSynthesizer.DEFAULT_QUALIFIER;
     this.githubDeployRole = new iam.Role(this, "GitHubDeployRole", {
       roleName: `${name}-github-deploy`,
-      description: `GitHub Actions (${GITHUB_REPO}, environment ${props.githubEnvironment}) -> CDK bootstrap roles`,
+      description: `GitHub Actions (${GITHUB_REPOS.join(", ")}, environment ${props.githubEnvironment}) -> CDK bootstrap roles`,
       assumedBy: new iam.WebIdentityPrincipal(githubProviderArn, {
         StringEquals: {
           [`${GITHUB_ISSUER}:aud`]: GITHUB_AUDIENCE,
-          [`${GITHUB_ISSUER}:sub`]: `repo:${GITHUB_REPO}:environment:${props.githubEnvironment}`,
+          [`${GITHUB_ISSUER}:sub`]: GITHUB_REPOS.map(
+            (repo) => `repo:${repo}:environment:${props.githubEnvironment}`,
+          ),
         },
       }),
     });

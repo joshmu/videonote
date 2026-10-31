@@ -149,7 +149,10 @@ describe("GitHub deploy role", () => {
     expect(trust.Condition).toEqual({
       StringEquals: {
         "token.actions.githubusercontent.com:aud": "sts.amazonaws.com",
-        "token.actions.githubusercontent.com:sub": `repo:joshmu/videonote:environment:${env}`,
+        "token.actions.githubusercontent.com:sub": [
+          `repo:joshmu/videonote:environment:${env}`,
+          `repo:joshmu/videonote-v2:environment:${env}`,
+        ],
       },
     });
   });
