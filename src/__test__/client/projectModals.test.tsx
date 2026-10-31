@@ -185,7 +185,7 @@ describe("ShareProjectModal fields", () => {
 
     expect(input(container, "url").value).toBe("final-cut");
     submit("Share");
-    expect(sent()).toEqual({ url: "final-cut", canEdit: true, password: "hunter2" });
+    expect(sent()).toEqual({ url: "final-cut", canEdit: false, password: "hunter2" });
   });
 
   it("turns every run of whitespace into a dash and drops url-unsafe characters", () => {
@@ -222,7 +222,7 @@ describe("ShareProjectModal fields", () => {
     const container = renderShare();
 
     type(container, "url", "final");
-    fireEvent.click(screen.getByText("Users can edit notes."));
+    fireEvent.click(screen.getByText("Users can edit notes?"));
 
     expect(input(container, "url").value).toBe("final");
   });

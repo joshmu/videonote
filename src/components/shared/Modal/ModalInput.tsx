@@ -51,7 +51,7 @@ export const ModalInput = ({
         step={step}
         className={`block w-full ${
           type === "range" ? "px-0" : "px-4"
-        } py-2 mt-2 border rounded-sm border-themeText2 text-themeText bg-themeBg focus:border-themeText focus:outline-none`}
+        } py-2 mt-2 border rounded-sm border-themeText2 text-themeText bg-themeBg placeholder:text-themeText2 accent-themeAccent focus:border-themeText focus:outline-none`}
         {...props}
       />
     </div>

@@ -47,7 +47,7 @@ export const Features = () => {
     <div id="features" className="container px-4 mx-auto my-24">
       {/* header */}
       <div className="flex items-center mb-2">
-        <Heading>Features</Heading>
+        <Heading as="h2">Features</Heading>
         <h2 className="ml-3 text-xl italic opacity-50 text-themeText">...more to come!</h2>
       </div>
 

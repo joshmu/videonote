@@ -21,7 +21,7 @@ import { ThemeToggle } from "@/components/shared/ThemeToggle/ThemeToggle";
 
 const TermsPage: NextPage = () => {
   return (
-    <Layout>
+    <Layout title="Terms of Service">
       <motion.div
         key="privacyPolicyPage"
         initial={{ opacity: 0 }}
@@ -45,7 +45,7 @@ export default TermsPage;
 
 const Terms = () => {
   return (
-    <div className="container max-w-2xl px-4 pt-4 mx-auto">
+    <div className="container max-w-[65ch] px-4 pt-4 mx-auto">
       <Heading className="mb-4">Terms of Service</Heading>
       <SubHeading className="mt-4 mb-1 font-serif">1. Terms</SubHeading>
       <p>
@@ -127,13 +127,13 @@ const Terms = () => {
       <p>
         VideoNote has not reviewed all of the sites linked to its website and is not responsible for
         the contents of any such linked site. The inclusion of any link does not imply endorsement
-        by VideoNote of the site. Use of any such linked website is at the font-serif's own risk.
+        by VideoNote of the site. Use of any such linked website is at the user's own risk.
       </p>
       <SubHeading className="mt-4 mb-1 italic">7. Modifications</SubHeading>
       <p>
         VideoNote may revise these terms of service for its website at any time without notice. By
-        using this website you are agreeing to be bound by the then current version of these
-        font-serifof service.
+        using this website you are agreeing to be bound by the then current version of these terms
+        of service.
       </p>
       <SubHeading className="mt-4 mb-1 italic">8. Governing Law</SubHeading>
       <p>

@@ -22,7 +22,7 @@ import { ThemeToggle } from "@/shared/ThemeToggle/ThemeToggle";
 
 const HelloPage: NextPage = () => {
   return (
-    <Layout>
+    <Layout title="Timestamped video notes">
       <div className="fixed top-0 right-0 z-50 p-4 text-2xl hover:text-themeAccent">
         <ThemeToggle lightColor="text-themeAccent" darkColor="text-themeAccent" />
       </div>

@@ -21,7 +21,7 @@ import { ThemeToggle } from "@/components/shared/ThemeToggle/ThemeToggle";
 
 const PrivacyPage: NextPage = () => {
   return (
-    <Layout>
+    <Layout title="Privacy Policy">
       <motion.div
         key="privacyPolicyPage"
         initial={{ opacity: 0 }}
@@ -45,7 +45,7 @@ export default PrivacyPage;
 
 const PrivacyPolicy = () => {
   return (
-    <div className="container max-w-2xl px-4 pt-4 mx-auto">
+    <div className="container max-w-[65ch] px-4 pt-4 mx-auto">
       <Heading className="mb-4">Privacy Policy</Heading>
       <div className="space-y-4">
         <p>

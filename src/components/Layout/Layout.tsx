@@ -21,11 +21,11 @@ const metaData: { [key: string]: string } = {
   imgUrl: "https://videonote.app/images/vn-overview-hero.png",
 };
 
-export const Layout = ({ children }: { children: ReactNode }) => {
+export const Layout = ({ title, children }: { title?: string; children: ReactNode }) => {
   return (
     <>
       <Head>
-        <title>{metaData.title}</title>
+        <title>{title ? `${title} | ${metaData.title}` : metaData.title}</title>
 
         {/* // * meta needs to be direct child of <Head> otherwise nextjs breaks... */}
         {/* HTML Meta Tags */}

@@ -64,7 +64,7 @@ export const ShareProjectModal = ({
   const share = project.share as ShareProjectInterface | undefined;
   const initialState: ShareForm = share
     ? toForm(share)
-    : { url: formatUrl(project.title), canEdit: true, password: "", removePassword: false };
+    : { url: formatUrl(project.title), canEdit: false, password: "", removePassword: false };
 
   const [state, setState] = useState<ShareForm>(initialState);
 
