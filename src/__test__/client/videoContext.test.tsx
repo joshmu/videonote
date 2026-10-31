@@ -97,6 +97,26 @@ describe("videoContext url", () => {
   });
 });
 
+describe("videoContext togglePlay", () => {
+  it("does nothing while there is no video to play", async () => {
+    const { result } = await renderVideo("");
+
+    act(() => result.current.togglePlay());
+
+    expect(result.current.playing).toBe(false);
+  });
+
+  it("plays and pauses a loaded video", async () => {
+    const { result } = await renderVideo(WEB_SRC);
+
+    act(() => result.current.togglePlay());
+    expect(result.current.playing).toBe(true);
+
+    act(() => result.current.togglePlay());
+    expect(result.current.playing).toBe(false);
+  });
+});
+
 describe("videoContext playback errors", () => {
   it("keeps a web src and warns with a codec hint when this browser can't play it", async () => {
     const { result, updates } = await renderVideo(WEB_SRC);
