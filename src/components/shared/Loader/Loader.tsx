@@ -28,6 +28,7 @@ export const Loader = ({ show }: { show: boolean }) => {
       {show && (
         <motion.div
           key="videoLoader"
+          data-testid="videoLoader"
           initial="initial"
           animate="animate"
           exit="exit"

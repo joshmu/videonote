@@ -121,6 +121,9 @@ test.describe("user journeys", () => {
     await page.getByRole("button", { name: "Create" }).dispatchEvent("click");
 
     await expect(page.getByText("This browser can't play this video.")).toBeVisible();
+    // the loader fades in after the warning, so an immediate check passes on a stuck loader
+    await page.waitForTimeout(1000);
+    await expect(page.getByTestId("videoLoader")).toHaveCount(0);
     expect(rejections).toEqual([]);
   });
 
