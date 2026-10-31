@@ -21,6 +21,7 @@ import { ModalForm } from "@/shared/Modal/ModalForm";
 import { ModalHeader } from "@/shared/Modal/ModalHeader";
 import { ModalInnerContainer } from "@/shared/Modal/ModalInnerContainer";
 import { ModalInput } from "@/shared/Modal/ModalInput";
+import { NOT_A_VIDEO_LINK, videoLink } from "@/utils/videoLink";
 
 export const CreateProjectModal = ({
   toggle: toggleModal,
@@ -56,7 +57,13 @@ export const CreateProjectModal = ({
       return;
     }
 
-    const newProject = { title, src: videoSrc };
+    const src = videoLink(videoSrc);
+    if (src === null) {
+      addAlert({ type: "error", msg: NOT_A_VIDEO_LINK });
+      return;
+    }
+
+    const newProject = { title, src };
     await createProject(newProject);
     toggleModal();
   };

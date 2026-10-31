@@ -58,18 +58,32 @@ describe("summarise", () => {
   });
 
   it("counts recent activity per window, by the Project's owner", () => {
-    expect(report.windows["7d"]).toEqual({ signups: 1, projects: 0, notes: 1, noters: 1, seen: 1 });
+    expect(report.windows["7d"]).toEqual({
+      signups: 1,
+      projects: 0,
+      notes: 1,
+      noters: 1,
+      notALink: 0,
+      seen: 1,
+    });
     expect(report.windows["30d"]).toEqual({
       signups: 2,
       projects: 0,
       notes: 2,
       noters: 2,
+      notALink: 0,
       seen: 1,
     });
   });
 
   it("counts a noter as returning only across calendar weeks", () => {
     expect(report.returningNoters).toBe(1);
+  });
+
+  it("counts recent Projects whose video isn't a link", () => {
+    const words = [project("w1", "a", { src: "holiday", createdAt: daysAgo(1) })];
+
+    expect(summarise(users, words, [], NOW).windows["7d"].notALink).toBe(1);
   });
 
   it("counts Projects with no Notes", () => {
