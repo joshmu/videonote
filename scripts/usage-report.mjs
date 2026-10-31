@@ -26,7 +26,7 @@ export const classifySrc = (src) => {
 };
 
 /**
- * @param {{ createdAt: number }[]} users each with a `userId`
+ * @param {{ userId: string, createdAt: number, lastSeenOn?: string }[]} users
  * @param {{ ownerId: string, projectId: string, createdAt: number, src: string, shared: boolean }[]} projects
  * @param {{ projectId: string, createdAt: number }[]} notes
  * @param {number} now
@@ -57,6 +57,7 @@ export const summarise = (users, projects, notes, now) => {
           projects: projects.filter(recent).length,
           notes: recentNotes.length,
           noters: new Set(recentNotes.map(ownerOf).filter(Boolean)).size,
+          seen: users.filter((user) => Date.parse(user.lastSeenOn) >= since(days)).length,
         },
       ];
     }),
@@ -145,13 +146,14 @@ const scan = async (tableName) => {
         Limit: 200,
         ExclusiveStartKey: startKey,
         ReturnConsumedCapacity: "TOTAL",
-        ProjectionExpression: "PK, SK, createdAt, ownerId, src, #share",
+        ProjectionExpression: "PK, SK, createdAt, ownerId, src, lastSeenOn, #share",
         ExpressionAttributeNames: { "#share": "share" },
       }),
     );
     for (const item of page.Items) {
       const [pk, sk, createdAt] = [item.PK.S, item.SK.S, time(item.createdAt)];
-      if (sk === "PROFILE") users.push({ userId: pk.replace("USER#", ""), createdAt });
+      if (sk === "PROFILE")
+        users.push({ userId: pk.replace("USER#", ""), createdAt, lastSeenOn: item.lastSeenOn?.S });
       else if (sk === "PROJECT")
         projects.push({
           projectId: pk,

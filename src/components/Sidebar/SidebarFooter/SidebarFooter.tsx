@@ -21,6 +21,12 @@ export const SidebarFooter = () => {
   return (
     <div className="absolute bottom-0 flex items-center justify-between w-full h-8 px-4 border-t bg-themeBg border-themeText2">
       <ExportNotes />
+      <a
+        className="text-sm underline text-themeText2"
+        href="mailto:hello@videonote.app?subject=VideoNote%20feedback"
+      >
+        Feedback
+      </a>
       {admin && <RemoveNotes />}
     </div>
   );

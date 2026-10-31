@@ -49,6 +49,28 @@ describe.each(BACKENDS)("Store contract: %s", (backend) => {
       expect(await s.findUserByEmail("a@example.com")).toEqual(user);
     });
 
+    it("records the day a User was seen without touching updatedAt", async () => {
+      const s = store();
+      const user = await seedUser(s, "seen@example.com");
+      expect(user.lastSeenOn).toBeUndefined();
+
+      await s.markSeen(user._id, "2026-10-31");
+
+      const seen = await s.getUser(user._id);
+      expect(seen?.lastSeenOn).toBe("2026-10-31");
+      expect(seen?.updatedAt).toEqual(user.updatedAt);
+    });
+
+    it("doesn't bring back a removed User when marking them seen", async () => {
+      const s = store();
+      const user = await seedUser(s, "gone@example.com");
+      await s.removeUser(user);
+
+      await s.markSeen(user._id, "2026-10-31");
+
+      expect(await s.getUser(user._id)).toBeNull();
+    });
+
     it("finds nothing for an unknown or malformed id or email", async () => {
       const s = store();
 

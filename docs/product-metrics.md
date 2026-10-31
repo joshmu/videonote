@@ -63,7 +63,9 @@ requests, so route counts are estimates.
 
 ## What can't be answered yet
 
-- **Watching without writing.** Nothing records a signed-in User's visit, and
-  Sentry doesn't identify visitors, so a User reading their own Notes looks idle.
+- **Who came back before `lastSeenOn` existed.** The report's `seen` counts
+  Users by the last day they made a signed-in request, so history starts when
+  that field went live, and guests reading a Share aren't counted.
 - **Where people drop off inside a step**, such as a video that never plays.
-- **Why.** There's no feedback channel, and these numbers only show what happened.
+- **Why.** These numbers only show what happened. Feedback links reach
+  `hello@videonote.app`.
