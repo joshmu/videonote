@@ -12,7 +12,7 @@
 
 import { motion } from "motion/react";
 import Link from "next/link";
-import { ChangeEvent, useEffect, useState } from "react";
+import { ChangeEvent, useEffect, useRef, useState } from "react";
 
 import { ModalPrimaryBtn } from "@/components/shared/Modal/ModalBtn";
 import { useNotificationContext } from "@/context/notificationContext";
@@ -34,6 +34,8 @@ export const RegisterModal = ({ toggleLoginView: toggleLoginRegisterView, handle
     password2: "",
   });
   const { addAlert } = useNotificationContext();
+  // held from the request until a refusal: a second click would find the email taken
+  const isRegistering = useRef<boolean>(false);
 
   // if email has been entered accidentally on login page then prefill for register page
   useEffect(() => {
@@ -46,6 +48,8 @@ export const RegisterModal = ({ toggleLoginView: toggleLoginRegisterView, handle
 
   const handleSubmit = async (event: ChangeEvent<HTMLInputElement>): Promise<void> => {
     event.preventDefault();
+
+    if (isRegistering.current) return;
 
     if (
       !isValidCredentials({
@@ -62,6 +66,7 @@ export const RegisterModal = ({ toggleLoginView: toggleLoginRegisterView, handle
 
   const handleRegister = async (): Promise<void> => {
     console.log("registering new user");
+    isRegistering.current = true;
     const body: RegisterBodyType = {
       email: user.email,
       password: user.password,
@@ -76,6 +81,7 @@ export const RegisterModal = ({ toggleLoginView: toggleLoginRegisterView, handle
       });
       handleLogin();
     } else {
+      isRegistering.current = false;
       addAlert({ type: "error", msg: result.msg });
     }
   };
