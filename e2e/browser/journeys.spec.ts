@@ -5,7 +5,7 @@ import type { Page } from "@playwright/test";
 import { ProjectApiActions } from "@/shared/types";
 
 import { objectId, ok, ORIGIN, PASSWORD, registeredUser, uniqueEmail } from "../support/api";
-import { expect, test, VIDEO_URL } from "../support/browser";
+import { expect, test, VIDEO_URL, YOUTUBE_URL } from "../support/browser";
 
 const sharedProject = async (share: { password?: string; canEdit?: boolean }) => {
   const owner = await registeredUser();
@@ -51,6 +51,21 @@ test.describe("user journeys", () => {
     await addNote(page, "tighten the intro");
     await page.reload();
     await expect(page.getByText("tighten the intro")).toBeVisible();
+  });
+
+  test("a User adds a Note to a Project on a YouTube link", async ({ page }) => {
+    const { api, email } = await registeredUser();
+    ok(await api.project(ProjectApiActions.CREATE, { title: "Tutorial", src: YOUTUBE_URL }));
+
+    await page.goto("/login");
+    await page.getByPlaceholder("Email Address").fill(email);
+    await page.getByPlaceholder("Password").fill(PASSWORD);
+    await page.getByRole("button", { name: "Login" }).click();
+    await expect(page).toHaveURL("/");
+
+    await addNote(page, "good bit here");
+    await page.reload();
+    await expect(page.getByText("good bit here")).toBeVisible();
   });
 
   test("a video that can't play warns the User and raises no unhandled rejection", async ({

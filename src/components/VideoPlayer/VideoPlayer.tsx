@@ -11,11 +11,10 @@
  */
 
 import { Variants, motion } from "motion/react";
-import { type SyntheticEvent, useCallback, useEffect, useState } from "react";
+import { type SyntheticEvent, useCallback, useRef, useState } from "react";
 import ReactPlayer from "react-player";
 
 import { useVideoContext } from "@/context/videoContext";
-import { useIsMount } from "@/hooks/useIsMount";
 import { Loader } from "@/shared/Loader/Loader";
 
 import { ActionInput } from "../ActionInput/ActionInput";
@@ -49,6 +48,9 @@ const ignoreUnsupportedPlay = (player: HTMLVideoElement): void => {
     });
 };
 
+// Hosted players never fire canplay: YouTube and Vimeo fire loadedmetadata, TikTok only durationchange.
+const READY_EVENTS = ["loadedmetadata", "durationchange", "canplay"];
+
 export const VideoPlayer = () => {
   const {
     url,
@@ -62,28 +64,29 @@ export const VideoPlayer = () => {
     playerRef,
   } = useVideoContext();
 
-  const isMount = useIsMount();
-  const [isLoading, setIsLoading] = useState<boolean>(false);
+  // the url the player last said it could play: anything else is still loading
+  const [readyUrl, setReadyUrl] = useState<string>(null);
+  const isLoading = !!url && readyUrl !== url;
+  const currentUrl = useRef<string>(url);
+  currentUrl.current = url;
 
-  useEffect(() => {
-    if (isMount) return;
-    // if url changes then presume we are loading a new video
-    console.log(`loading ${url}`);
-    if (typeof url === "string" && url.length > 0) setIsLoading(true);
-  }, [url, isMount]);
-
+  // React sets src while rendering, so a quick player can be ready before this
+  // runs, and well before event props attach: its event would be missed for good.
   const attachPlayer = useCallback(
     (player: HTMLVideoElement | null) => {
       playerRef.current = player;
-      if (player) ignoreUnsupportedPlay(player);
+      if (!player) return;
+      ignoreUnsupportedPlay(player);
+      const handleLoaded = () => {
+        handleDuration(player.duration);
+        handleReady();
+        setReadyUrl(currentUrl.current);
+      };
+      READY_EVENTS.forEach((type) => player.addEventListener(type, handleLoaded));
+      if (player.readyState >= HTMLMediaElement.HAVE_METADATA) handleLoaded();
     },
     [playerRef],
   );
-
-  const preHandleReady = () => {
-    handleReady();
-    setIsLoading(false);
-  };
 
   const handleTimeUpdate = (e: SyntheticEvent<HTMLVideoElement>) => {
     const el = e.currentTarget;
@@ -96,10 +99,6 @@ export const VideoPlayer = () => {
           ? el.buffered.end(el.buffered.length - 1) / el.duration
           : 0,
     });
-  };
-
-  const handleLoadedMetadata = (e: SyntheticEvent<HTMLVideoElement>) => {
-    handleDuration(e.currentTarget.duration);
   };
 
   const isPlayerReady = !isLoading && !!playerRef.current;
@@ -129,8 +128,6 @@ export const VideoPlayer = () => {
                 playing={playing}
                 volume={volume}
                 playbackRate={playbackRate}
-                onLoadedMetadata={handleLoadedMetadata}
-                onCanPlay={preHandleReady}
                 onTimeUpdate={handleTimeUpdate}
                 className={`${style.reactPlayer} `}
                 width="100%"
