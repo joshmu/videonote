@@ -35,7 +35,7 @@ describe("classifySrc", () => {
 describe("summarise", () => {
   const users = [
     { userId: "a", createdAt: daysAgo(100) },
-    { userId: "b", createdAt: daysAgo(10) },
+    { userId: "b", createdAt: daysAgo(10), lastSeenOn: "2026-10-29" },
     { userId: "c", createdAt: daysAgo(3) },
   ];
   const projects = [project("p1", "a", { shared: true }), project("p2", "b"), project("p3", "b")];
@@ -58,8 +58,14 @@ describe("summarise", () => {
   });
 
   it("counts recent activity per window, by the Project's owner", () => {
-    expect(report.windows["7d"]).toEqual({ signups: 1, projects: 0, notes: 1, noters: 1 });
-    expect(report.windows["30d"]).toEqual({ signups: 2, projects: 0, notes: 2, noters: 2 });
+    expect(report.windows["7d"]).toEqual({ signups: 1, projects: 0, notes: 1, noters: 1, seen: 1 });
+    expect(report.windows["30d"]).toEqual({
+      signups: 2,
+      projects: 0,
+      notes: 2,
+      noters: 2,
+      seen: 1,
+    });
   });
 
   it("counts a noter as returning only across calendar weeks", () => {
