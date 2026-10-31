@@ -5,4 +5,5 @@
 - [`plans/`](plans/): plans for multi-PR changes
   - [DynamoDB migration](plans/dynamodb-migration.md)
 - [Observability](observability.md): Sentry, the health check, alarms and what to do when they fire
+- [Product metrics](product-metrics.md): how to tell whether the app is being used
 - [`infra/`](../infra/README.md): AWS CDK stacks (DynamoDB tables, OIDC roles, prod alarms)
