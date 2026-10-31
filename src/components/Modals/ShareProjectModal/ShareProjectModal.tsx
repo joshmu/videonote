@@ -88,8 +88,6 @@ export const ShareProjectModal = ({
     if (apiSuccess) {
       addAlert({ type: "success", msg: "Shared project updated." });
       copyToClipboard(`https://${shareLink(state.url)}`, addAlert);
-    } else {
-      addAlert({ type: "error", msg: "An error occurred..." });
     }
   };
   const handleRemoveShare = async (event: MouseEvent<HTMLElement>): Promise<void> => {
@@ -99,8 +97,6 @@ export const ShareProjectModal = ({
     if (apiSuccess) {
       addAlert({ type: "success", msg: "Project is now private." });
       toggleModal();
-    } else {
-      addAlert({ type: "error", msg: "An error occurred..." });
     }
   };
 

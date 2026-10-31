@@ -176,6 +176,14 @@ describe("ShareProjectModal fields", () => {
     mocks.projects.shareProject = vi.fn().mockResolvedValue(false);
   });
 
+  it("adds no alert of its own when a Share is refused", async () => {
+    renderShare();
+    submit("Update");
+    await waitFor(() => expect(mocks.projects.shareProject).toHaveBeenCalled());
+    await Promise.resolve();
+    expect(mocks.addAlert).not.toHaveBeenCalled();
+  });
+
   it("keeps the url when the password is typed after it", () => {
     mocks.projects.project = { ...project, share: undefined };
     const container = renderShare();

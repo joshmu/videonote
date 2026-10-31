@@ -142,9 +142,11 @@ export const ProjectsProvider = ({ children }: { children: React.ReactNode }) =>
     // also update current project state with new 'share' data
     setCurrentProject((current) => ({ ...current, share: project.share }));
 
-    // return true/false based on returned data matching data sent to server
+    // a refused request has already told the User why; only a mismatch is still unexplained
     const valuesToCheck = ["canEdit", "url"];
-    return valuesToCheck.every((key) => share[key] === shareData[key]);
+    const saved = valuesToCheck.every((key) => share[key] === shareData[key]);
+    if (!saved) addAlert({ type: "error", msg: "The Share could not be saved. Please try again." });
+    return saved;
   };
 
   const removeShareProject: RemoveShareProjectType = async () => {
