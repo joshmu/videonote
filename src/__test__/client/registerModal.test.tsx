@@ -1,7 +1,8 @@
-import { fireEvent, render, screen, waitFor } from "@testing-library/react";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { act, fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { RegisterModal } from "@/components/LoginPage/RegisterModal/RegisterModal";
+import { TurnstileCheck } from "@/components/LoginPage/RegisterModal/TurnstileCheck";
 import { browserApi } from "@/utils/apiClient";
 
 const addAlert = vi.fn();
@@ -10,6 +11,9 @@ vi.mock("@/context/notificationContext", () => ({
   useNotificationContext: () => ({ addAlert }),
 }));
 vi.mock("@/utils/apiClient", () => ({ browserApi: { register: vi.fn() } }));
+vi.mock("@/components/LoginPage/RegisterModal/TurnstileCheck", () => ({
+  TurnstileCheck: vi.fn(() => null),
+}));
 
 const register = vi.mocked(browserApi.register);
 const handleLogin = vi.fn();
@@ -29,6 +33,57 @@ const submit = () => fireEvent.click(screen.getByRole("button", { name: "Registe
 
 beforeEach(() => {
   vi.clearAllMocks();
+});
+
+describe("RegisterModal with Turnstile on", () => {
+  let passCheck: (token: string) => void;
+
+  beforeEach(() => {
+    vi.stubEnv("NEXT_PUBLIC_TURNSTILE_SITE_KEY", "test-site-key");
+    vi.mocked(TurnstileCheck).mockImplementation((({ onToken }) => {
+      passCheck = onToken;
+      return null;
+    }) as typeof TurnstileCheck);
+  });
+
+  afterEach(() => {
+    vi.unstubAllEnvs();
+  });
+
+  it("waits for the check before registering", () => {
+    renderFilledIn();
+
+    submit();
+
+    expect(register).not.toHaveBeenCalled();
+    expect(addAlert).toHaveBeenCalledWith(expect.objectContaining({ type: "info" }));
+  });
+
+  it("sends the token once the check passes", async () => {
+    register.mockResolvedValue({ kind: "ok" } as never);
+    renderFilledIn();
+
+    act(() => passCheck("token-1"));
+    submit();
+
+    await waitFor(() =>
+      expect(register).toHaveBeenCalledWith(expect.objectContaining({ turnstileToken: "token-1" })),
+    );
+  });
+
+  it("asks for a fresh check after a refused signup", async () => {
+    register.mockResolvedValue({ kind: "error", msg: "The email has already been used." } as never);
+    renderFilledIn();
+
+    act(() => passCheck("token-1"));
+    submit();
+    await waitFor(() => expect(addAlert).toHaveBeenCalled());
+    register.mockClear();
+
+    submit();
+
+    expect(register).not.toHaveBeenCalled();
+  });
 });
 
 describe("RegisterModal submit", () => {

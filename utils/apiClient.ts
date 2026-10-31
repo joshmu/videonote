@@ -82,7 +82,7 @@ const WRONG_PASSWORD_MSG = "Password is incorrect.";
 // /api/note answers 403 to a forbidden write too; only this code asks for the Share password.
 const SHARE_PASSWORD_REQUIRED = "sharePasswordRequired";
 
-type Credentials = { email: string; password: string; password2?: string };
+type Credentials = { email: string; password: string; password2?: string; turnstileToken?: string };
 
 export const createApiClient = ({
   fetch,
