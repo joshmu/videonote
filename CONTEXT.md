@@ -260,7 +260,8 @@ when there is one). `saveNote` and `removeDoneNotes` take an optional
 **Share token**, sent as `x-share-token`, and add `sharePasswordRequired`
 (a 403 whose body has `code: "sharePasswordRequired"`), and `removeAccount` adds `wrongPassword`
 (a 401 whose msg is the wrong-password one) so an expired session still reads
-as `unauthorized`. The **SessionStore** it takes is the only
+as `unauthorized`. A 5xx or success reply without JSON was never answered by
+the app, so it goes to `reportError` as well. The **SessionStore** it takes is the only
 code that touches the token cookie: `browserSession` reads, writes and removes
 it; `requestSession(cookieHeader)` reads a request's cookie on the server and
 never writes. `browserApi` is the client the browser uses; the **Session

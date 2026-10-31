@@ -9,6 +9,7 @@ import {
   type ShareProjectInterface,
   type UserInterface,
 } from "@/shared/types";
+import { reportError } from "@/utils/reportError";
 
 const TOKEN_COOKIE = "token";
 
@@ -116,6 +117,11 @@ export const createApiClient = ({
     }
 
     const data = await readJsonObject(res);
+    // The app always answers in JSON, so this came from a crashed or timed-out
+    // function or the proxy in front of it. Nothing on the server can report those.
+    if (!data && (res.status >= 500 || res.status < 400)) {
+      await reportError(new Error(`${path} answered ${res.status} without JSON`));
+    }
     const msg = typeof data?.msg === "string" ? data.msg : `Request failed (${res.status}).`;
     if (res.status === 401) return { kind: "unauthorized", status: res.status, msg };
     // Login answers 302 on success, so any status below 400 is ok.

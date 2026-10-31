@@ -23,7 +23,8 @@ flowchart LR
 | --------------------------------------- | ------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------- |
 | Sentry, server SDK                      | Errors that escape a route (`onRequestError`), and errors a route catches and answers itself (`reportError`) | Sentry issues, tagged by environment                                      |
 | Sentry, browser SDK                     | Uncaught errors and unhandled rejections in the browser                                                      | Sentry issues                                                             |
-| Sentry, `pages/_error.tsx`              | Errors while rendering a page on the server                                                                  | Sentry issues                                                             |
+| Sentry, `pages/_error.tsx`              | Errors while rendering a page, on the server or in the browser                                               | Sentry issues                                                             |
+| Sentry, API client (`reportError`)      | Requests the app never answered: a crashed or timed-out function, or the proxy in front of it failing        | Sentry issues titled `<path> answered <status> without JSON`              |
 | Sentry uptime monitor                   | `/api/health` failing or unreachable on videonote.app                                                        | Sentry uptime, emails on down and recovery                                |
 | CloudWatch alarms (`infra/`, prod only) | Any throttled request; read or write use above 80% of provisioned capacity for 5 minutes                     | The account alerts topic, which emails the owner on alarm and on recovery |
 | Vercel runtime logs                     | Everything functions print, including `reportError`'s `console.error`                                        | Vercel dashboard (short retention on Hobby)                               |
@@ -46,6 +47,8 @@ the error goes to Sentry.
 - **Release:** the git commit SHA, so an issue shows which deploy introduced it.
 - **Source maps:** uploaded at build time where `SENTRY_AUTH_TOKEN` is set
   (Vercel, through the Sentry integration) and not served to browsers.
+- **Tunnel:** the browser SDK posts to `/vn-relay`, which Next rewrites to
+  Sentry, so ad blockers don't drop its events.
 - **Tracing:** 10% of requests.
 - **Not collected:** request bodies (they hold Notes and Share passwords),
   cookies, local variables, console output (it logs Notes and video URLs),
@@ -63,6 +66,12 @@ the error goes to Sentry.
 | Uptime down                   | `curl -i https://videonote.app/api/health`; the matching Sentry issue holds the error; check the Vercel deployment and the AWS role          |
 | `videonote-prod-throttled`    | Requests are being rejected. Find the hot path in Sentry traces; raising capacity means revisiting the free-tier budget in `infra/README.md` |
 | `*-capacity-high`             | Traffic is near the provisioned limit. Same budget question, before it throttles                                                             |
+
+An error that escapes a route can appear twice: once from the server, and once
+as `<path> answered 500 without JSON` from the client that got Next's plain 500.
+
+Not sent on purpose: video playback errors (a User's broken link or codec,
+already shown as a warning) and browser network failures (mostly offline Users).
 
 ## Sentry CLI
 
