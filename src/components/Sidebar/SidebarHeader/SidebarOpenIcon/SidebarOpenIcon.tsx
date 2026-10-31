@@ -24,7 +24,7 @@ export const SidebarOpenIcon = ({
   isVisible && (
     <div
       onClick={toggleOpen}
-      className={`relative z-10 transition-all duration-200 ease-in-out cursor-pointer text-themeAccent2 hover:text-themeAccent ${
+      className={`relative z-10 hidden md:block transition-all duration-200 ease-in-out cursor-pointer text-themeAccent2 hover:text-themeAccent ${
         sidebarOpen ? "" : "rotate-180 -translate-x-full transform"
       }`}
     >

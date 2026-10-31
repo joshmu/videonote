@@ -126,7 +126,7 @@ export const ActionInput = () => {
         <input
           ref={actionInputRef}
           className={`${
-            isActive ? "opacity-100" : "opacity-50"
+            isActive ? "opacity-100" : "opacity-80"
           } relative w-full h-full px-2 py-1 transition-colors duration-150 ease-in-out bg-transparent rounded-sm rounded-b-none rounded-l-none placeholder-themeText2 text-themeText text-md focus:outline-none`}
           autoFocus={true}
           id="actionInput"
@@ -141,7 +141,7 @@ export const ActionInput = () => {
           onBlur={handleBlur}
         />
       ) : (
-        <p className="w-full px-2 py-1 text-sm opacity-50 text-themeText2">View only</p>
+        <p className="w-full px-2 py-1 text-sm text-themeText2">View only</p>
       )}
 
       <ActionSymbols />

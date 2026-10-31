@@ -108,7 +108,7 @@ export const VideoPlayer = () => {
   const isPlayerReady = !isLoading && !!playerRef.current;
 
   return (
-    <div className="relative flex w-full transition-all duration-500 ease-in-out">
+    <div className="relative flex w-full transition-all duration-500 ease-in-out shrink-0 md:shrink">
       <Underlay show={isPlayerReady} />
 
       <div className="relative z-10 w-full my-auto">
