@@ -1,14 +1,19 @@
-import { fireEvent, render, screen } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
+import { CreateProjectModal } from "@/components/Modals/CreateProjectModal/CreateProjectModal";
 import { CurrentProjectModal } from "@/components/Modals/CurrentProjectModal/CurrentProjectModal";
 import { ShareProjectModal } from "@/components/Modals/ShareProjectModal/ShareProjectModal";
+import { NOT_A_VIDEO_LINK } from "@/utils/videoLink";
 
-const mocks = vi.hoisted(() => ({ projects: {} as Record<string, any> }));
+const mocks = vi.hoisted(() => ({
+  projects: {} as Record<string, any>,
+  addAlert: vi.fn(),
+}));
 
 vi.mock("@/context/projectsContext", () => ({ useProjectsContext: () => mocks.projects }));
 vi.mock("@/context/notificationContext", () => ({
-  useNotificationContext: () => ({ addAlert: vi.fn() }),
+  useNotificationContext: () => ({ addAlert: mocks.addAlert }),
 }));
 
 const project = {
@@ -30,12 +35,76 @@ const input = (container: HTMLElement, id: string) =>
   container.querySelector<HTMLInputElement>(`#${id}`)!;
 
 beforeEach(() => {
+  mocks.addAlert.mockClear();
   mocks.projects = {
     project,
+    createProject: vi.fn(),
     updateProject: vi.fn(),
     shareProject: vi.fn(),
     removeShareProject: vi.fn(),
   };
+});
+
+describe("project modals check the video link", () => {
+  const notALink = expect.objectContaining({ msg: NOT_A_VIDEO_LINK });
+
+  const create = (title: string, src: string) => {
+    const toggle = vi.fn();
+    const { container } = render(<CreateProjectModal toggle={toggle} motionKey="create" />);
+    fireEvent.change(input(container, "title"), { target: { id: "title", value: title } });
+    fireEvent.change(input(container, "src"), { target: { id: "src", value: src } });
+    fireEvent.click(screen.getByRole("button", { name: "Create" }));
+    return toggle;
+  };
+
+  const update = (changes: Record<string, string>) => {
+    const { container } = render(<CurrentProjectModal toggle={vi.fn()} motionKey="current" />);
+    for (const [id, value] of Object.entries(changes))
+      fireEvent.change(input(container, id), { target: { id, value } });
+    fireEvent.click(screen.getByRole("button", { name: "Update" }));
+  };
+
+  it("doesn't create a Project from a word, and keeps the form open", async () => {
+    const toggle = create("Holiday", "holiday");
+
+    await waitFor(() => expect(mocks.addAlert).toHaveBeenCalledWith(notALink));
+    expect(mocks.projects.createProject).not.toHaveBeenCalled();
+    expect(toggle).not.toHaveBeenCalled();
+  });
+
+  it("creates a Project from a link missing its scheme", async () => {
+    create("Holiday", "youtube.com/watch?v=abc");
+
+    await waitFor(() =>
+      expect(mocks.projects.createProject).toHaveBeenCalledWith({
+        title: "Holiday",
+        src: "https://youtube.com/watch?v=abc",
+      }),
+    );
+  });
+
+  it("doesn't save a word as a Project's new video", () => {
+    update({ src: "holiday" });
+
+    expect(mocks.addAlert).toHaveBeenCalledWith(notALink);
+    expect(mocks.projects.updateProject).not.toHaveBeenCalled();
+  });
+
+  it("still renames a Project already saved with a word", () => {
+    mocks.projects.project = { ...project, src: "holiday" };
+
+    update({ title: "Final cut" });
+
+    expect(mocks.projects.updateProject).toHaveBeenCalledWith(
+      expect.objectContaining({ title: "Final cut", src: "holiday" }),
+    );
+  });
+
+  it("still lets a Project's video be cleared", () => {
+    update({ src: "" });
+
+    expect(mocks.projects.updateProject).toHaveBeenCalledWith(expect.objectContaining({ src: "" }));
+  });
 });
 
 describe("project modals keep edits across note changes", () => {

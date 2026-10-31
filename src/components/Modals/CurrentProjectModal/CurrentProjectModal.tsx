@@ -22,6 +22,7 @@ import { ModalHeader } from "@/shared/Modal/ModalHeader";
 import { ModalInnerContainer } from "@/shared/Modal/ModalInnerContainer";
 import { ModalInput } from "@/shared/Modal/ModalInput";
 import { ProjectInterface } from "@/shared/types";
+import { NOT_A_VIDEO_LINK, videoLink } from "@/utils/videoLink";
 
 // import { ExportNotes } from './ExportNotes/ExportNotes'
 
@@ -52,7 +53,15 @@ export const CurrentProjectModal = ({
       return;
     }
 
-    updateProject(state);
+    // a Project already saved with something else can still be renamed
+    const srcChanged = (state.src ?? "") !== (project?.src ?? "") && !!state.src?.trim();
+    const src = srcChanged ? videoLink(state.src) : state.src;
+    if (src === null) {
+      addAlert({ type: "error", msg: NOT_A_VIDEO_LINK });
+      return;
+    }
+
+    updateProject({ ...state, src });
     addAlert({ type: "info", msg: `Updating project: ${state.title}` });
     toggleModal();
   };

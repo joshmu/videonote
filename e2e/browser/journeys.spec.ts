@@ -53,6 +53,27 @@ test.describe("user journeys", () => {
     await expect(page.getByText("tighten the intro")).toBeVisible();
   });
 
+  test("a User who types a word as the video is asked for a link", async ({ page }) => {
+    const { email } = await registeredUser();
+    await page.goto("/login");
+    await page.getByPlaceholder("Email Address").fill(email);
+    await page.getByPlaceholder("Password").fill(PASSWORD);
+    await page.getByRole("button", { name: "Login" }).click();
+    await expect(page).toHaveURL("/");
+
+    await openMenu(page);
+    await page.getByText("create new", { exact: true }).dispatchEvent("click");
+    await page.getByLabel("Project Title").fill("My first cut");
+    await page.getByLabel("Video URL").fill("holiday");
+    await page.getByRole("button", { name: "Create" }).dispatchEvent("click");
+    await expect(page.getByText("That doesn't look like a video link.")).toBeVisible();
+
+    await page.getByLabel("Video URL").fill(VIDEO_URL);
+    await page.getByRole("button", { name: "Create" }).dispatchEvent("click");
+    await addNote(page, "tighten the intro");
+    await expect(page.getByText("tighten the intro")).toBeVisible();
+  });
+
   test("a User adds a Note to a Project on a YouTube link", async ({ page }) => {
     const { api, email } = await registeredUser();
     ok(await api.project(ProjectApiActions.CREATE, { title: "Tutorial", src: YOUTUBE_URL }));

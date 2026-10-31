@@ -57,6 +57,9 @@ export const summarise = (users, projects, notes, now) => {
           projects: projects.filter(recent).length,
           notes: recentNotes.length,
           noters: new Set(recentNotes.map(ownerOf).filter(Boolean)).size,
+          // the Project form rejects these, so anything recent came around it
+          notALink: projects.filter((p) => recent(p) && classifySrc(p.src).kind === "notALink")
+            .length,
           seen: users.filter((user) => Date.parse(user.lastSeenOn) >= since(days)).length,
         },
       ];
