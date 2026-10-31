@@ -23,7 +23,7 @@ interface NotificationContextInterface {
 export interface AlertInterface {
   id?: string;
   msg: string | ReactNode;
-  type?: "info" | "warning" | "error" | "success" | "project";
+  type?: "info" | "warning" | "error" | "success";
   duration?: number;
   persistent?: boolean;
 }

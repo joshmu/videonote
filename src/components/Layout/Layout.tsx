@@ -13,6 +13,8 @@
 import Head from "next/head";
 import { ReactNode } from "react";
 
+import { THEME_BACKGROUND, useThemeContext } from "@/context/themeContext";
+
 const metaData: { [key: string]: string } = {
   title: "VideoNote",
   description: "VideoNote - quick and easy timestamped video notes",
@@ -22,6 +24,8 @@ const metaData: { [key: string]: string } = {
 };
 
 export const Layout = ({ title, children }: { title?: string; children: ReactNode }) => {
+  const { theme } = useThemeContext();
+
   return (
     <>
       <Head>
@@ -61,7 +65,7 @@ export const Layout = ({ title, children }: { title?: string; children: ReactNod
         <link rel="shortcut icon" href="favicon.ico" />
         <meta name="msapplication-TileColor" content="#da532c" />
         <meta name="msapplication-config" content="browserconfig.xml" />
-        <meta name="theme-color" content="#ffffff" />
+        <meta name="theme-color" content={THEME_BACKGROUND[theme]} />
       </Head>
 
       <div className="relative min-h-screen overflow-hidden font-sans antialiased transition-colors duration-300 ease-in-out debug-screens">

@@ -45,11 +45,16 @@ export const Heading2 = ({ className = "", children, ...props }: TextProps) => {
   );
 };
 
-export const SubHeading = ({ className = "", children, ...props }: TextProps) => {
+export const SubHeading = ({
+  as: Tag = "h3",
+  className = "",
+  children,
+  ...props
+}: TextProps & { as?: "h2" | "h3" }) => {
   return (
-    <h3 className={`${className} mt-1 text-xl font-normal text-themeText font-sans`} {...props}>
+    <Tag className={`${className} mt-1 text-xl font-normal text-themeText font-sans`} {...props}>
       {children}
-    </h3>
+    </Tag>
   );
 };
 

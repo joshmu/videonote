@@ -17,7 +17,6 @@ import {
   BsLightningFill as ZapIcon,
   BsSunFill as SunIcon,
 } from "react-icons/bs";
-import { IoMdFlame as FlameIcon } from "react-icons/io";
 
 import { ThemeType, useThemeContext } from "@/context/themeContext";
 
@@ -62,7 +61,8 @@ export const ThemeToggle = ({
           <motion.button
             key="themeToggle-dark"
             {...motionStyle}
-            className="relative focus:outline-none"
+            aria-label="Change theme"
+            className="relative cursor-pointer focus:outline-none"
           >
             <MoonIcon className="fill-current" />
           </motion.button>
@@ -72,7 +72,8 @@ export const ThemeToggle = ({
           <motion.button
             key="themeToggle-light"
             {...motionStyle}
-            className="relative focus:outline-none"
+            aria-label="Change theme"
+            className="relative cursor-pointer focus:outline-none"
           >
             <SunIcon className="fill-current" />
           </motion.button>
@@ -82,19 +83,10 @@ export const ThemeToggle = ({
           <motion.button
             key="themeToggle-superhero"
             {...motionStyle}
-            className="relative focus:outline-none"
+            aria-label="Change theme"
+            className="relative cursor-pointer focus:outline-none"
           >
             <ZapIcon className="fill-current" />
-          </motion.button>
-        )}
-
-        {ThemeType.HOT === theme && (
-          <motion.button
-            key="themeToggle-hot"
-            {...motionStyle}
-            className="relative focus:outline-none"
-          >
-            <FlameIcon className="fill-current" />
           </motion.button>
         )}
       </AnimatePresence>

@@ -189,7 +189,11 @@ export const ShareProjectModal = ({
 
           {project.share && (
             <div className="flex items-center">
-              <ModalPrimaryBtn handleClick={handleRemoveShare} type="button" color="bg-red-400">
+              <ModalPrimaryBtn
+                handleClick={handleRemoveShare}
+                type="button"
+                color="bg-red-400 text-neutral-900"
+              >
                 <span className="italic">Remove Share Access</span>
               </ModalPrimaryBtn>
             </div>

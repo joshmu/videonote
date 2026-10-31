@@ -133,7 +133,11 @@ export const UserAccountModal = ({
 
           {/* remove account btn */}
           <div className="flex items-center">
-            <ModalPrimaryBtn handleClick={handleRemoveAccount} type="button" color="bg-red-400">
+            <ModalPrimaryBtn
+              handleClick={handleRemoveAccount}
+              type="button"
+              color="bg-red-400 text-neutral-900"
+            >
               <span className="italic">Remove Account</span>
             </ModalPrimaryBtn>
           </div>

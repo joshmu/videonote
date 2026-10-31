@@ -32,8 +32,8 @@ export const ModalPrimaryBtn = ({
       // @ts-ignore
       type={type}
       className={`${
-        color.length > 0 ? color : "bg-themeAccent"
-      } px-6 py-2 rounded-sm text-themeBg transition-colors duration-300 ease-in-out focus:outline-none`}
+        color.length > 0 ? color : "bg-themeAccent text-themeBg"
+      } px-6 py-2 rounded-sm transition-colors duration-300 ease-in-out focus:outline-none`}
       onClick={handleClick}
     >
       {children}

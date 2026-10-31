@@ -22,40 +22,37 @@ const themeContext = createContext<ThemeContextInterface>(null!);
 const LOCALSTORAGE_KEY: string = "vn:theme";
 
 export enum ThemeType {
-  SUPERHERO = "theme-superhero",
   DARK = "theme-dark",
+  SUPERHERO = "theme-superhero",
   LIGHT = "theme-light",
-  HOT = "theme-hot",
 }
 
+const DEFAULT_THEME = ThemeType.DARK;
+
+// matches --bg in globals.css, for the phone browser's toolbar
+export const THEME_BACKGROUND: Record<ThemeType, string> = {
+  [ThemeType.DARK]: "#202020",
+  [ThemeType.SUPERHERO]: "#46344e",
+  [ThemeType.LIGHT]: "#f9fafb",
+};
+
+// Runs before first paint, so a saved theme never flashes the default.
+export const applySavedThemeScript = `try{var t=localStorage.getItem(${JSON.stringify(LOCALSTORAGE_KEY)});if(${JSON.stringify(Object.values(ThemeType))}.indexOf(t)>-1)document.body.className=t}catch(e){}`;
+
 export const ThemeProvider = ({ children }: { children: ReactNode }) => {
-  // initialize theme with first enum entry
-  const [theme, setTheme] = useState<ThemeType>(Object.values(ThemeType)[0] as ThemeType);
+  // starts on the default so the first render matches the server's
+  const [theme, setTheme] = useState<ThemeType>(DEFAULT_THEME);
 
-  // initial theme
   useEffect(() => {
-    // get locally stored theme
-    let savedTheme = window.localStorage.getItem(LOCALSTORAGE_KEY) as ThemeType;
-
-    // validation check
-    if (!Object.values(ThemeType).includes(savedTheme)) savedTheme = null;
-
-    // if we have a saved theme then set it
-    // otherwise update localStorage with default initial theme
-    if (savedTheme) {
-      setTheme(savedTheme);
-    } else {
-      window.localStorage.setItem(LOCALSTORAGE_KEY, theme);
+    // the script in _document has already put the saved theme on the body
+    const current =
+      Object.values(ThemeType).find((name) => document.body.classList.contains(name)) ??
+      DEFAULT_THEME;
+    setTheme(current);
+    if (!window.localStorage.getItem(LOCALSTORAGE_KEY)) {
+      window.localStorage.setItem(LOCALSTORAGE_KEY, current);
     }
   }, []);
-
-  // when theme changes then assign to body tag
-  useEffect(() => {
-    Object.values(ThemeType).forEach((className) =>
-      globalThis.document.body.classList.remove(className),
-    );
-    globalThis.document.body.classList.add(theme);
-  }, [theme]);
 
   const toggleTheme = () => {
     // get list of themeIds
@@ -68,6 +65,8 @@ export const ThemeProvider = ({ children }: { children: ReactNode }) => {
     // validation check & fallback
     if (!themeList.includes(newTheme)) newTheme = themeList[0];
 
+    themeList.forEach((className) => document.body.classList.remove(className));
+    document.body.classList.add(newTheme);
     setTheme(newTheme);
     window.localStorage.setItem(LOCALSTORAGE_KEY, newTheme);
   };

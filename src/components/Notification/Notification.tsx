@@ -60,11 +60,6 @@ interface AlertProps extends AlertInterface {
 const Alert = ({ type, msg, cancel }: AlertProps) => (
   <div className="relative flex w-full max-w-md mx-auto overflow-hidden border rounded-sm shadow-md bg-themeBg border-themeText2">
     <CancelBtn cancel={cancel} />
-    {type === "project" && (
-      <div className="flex items-center justify-center w-12 bg-themeAccent">
-        <ProjectIcon className="w-6 h-6 text-white fill-current" />
-      </div>
-    )}
     {type === "success" && (
       <div className="flex items-center justify-center w-12 bg-green-400">
         <SuccessIcon className="w-6 h-6 text-white fill-current" />
@@ -88,12 +83,6 @@ const Alert = ({ type, msg, cancel }: AlertProps) => (
 
     <div className="px-4 py-2 -mx-3">
       <div className="mx-3">
-        {type === "project" && (
-          <>
-            <AlertTitle>Project</AlertTitle>
-            <AlertMsg>{msg}</AlertMsg>
-          </>
-        )}
         {type === "success" && (
           <>
             <AlertTitle>Success</AlertTitle>

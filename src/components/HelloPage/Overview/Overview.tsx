@@ -33,9 +33,7 @@ export const Overview = () => {
               <Heading>VideoNote</Heading>
             </Reveal>
             <Reveal>
-              <h2 className="mb-8 text-xl italic opacity-50 text-themeText">
-                ...efficiency at its core.
-              </h2>
+              <h2 className="mb-8 text-xl italic text-themeText2">...efficiency at its core.</h2>
             </Reveal>
             <Reveal>
               <p className="tracking-wide">

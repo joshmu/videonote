@@ -96,5 +96,8 @@ vi.mock("@/context/themeContext", () => {
 
   return {
     useThemeContext,
+    applySavedThemeScript: "",
+    THEME_BACKGROUND: {},
+    ThemeType: { DARK: "theme-dark", SUPERHERO: "theme-superhero", LIGHT: "theme-light" },
   };
 });
