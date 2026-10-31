@@ -15,4 +15,6 @@ export default withSentryConfig(nextConfig, {
   authToken: process.env.SENTRY_AUTH_TOKEN,
   silent: !process.env.CI,
   widenClientFileUpload: true,
+  // Same-origin, and named so ad blockers don't drop the browser's events.
+  tunnelRoute: "/vn-relay",
 });

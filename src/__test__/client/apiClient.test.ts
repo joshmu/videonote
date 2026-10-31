@@ -7,6 +7,9 @@ import {
   requestSession,
   type SessionStore,
 } from "@/utils/apiClient";
+import { reportError } from "@/utils/reportError";
+
+vi.mock("@/utils/reportError", () => ({ reportError: vi.fn() }));
 
 const reply = (status: number, body: unknown) =>
   new Response(typeof body === "string" ? body : JSON.stringify(body), {
@@ -35,6 +38,41 @@ const clientWith = (response: Response | Error, session = memorySession("t1"), o
   });
   return { fetch, session, api: createApiClient({ fetch, session, origin }) };
 };
+
+describe("createApiClient reports requests the app never answered", () => {
+  afterEach(() => {
+    vi.mocked(reportError).mockClear();
+  });
+
+  it.each([
+    ["a timed-out function", 504, "An error occurred with your deployment"],
+    ["a crashed function", 500, "Internal Server Error"],
+    ["a page from the proxy in front", 200, "<html>Just a moment</html>"],
+  ])("reports %s", async (_name, status, body) => {
+    const { api } = clientWith(reply(status, body));
+
+    const result = await api.project(ProjectApiActions.GET, { _id: "p1" });
+
+    expect(result.kind).toBe("error");
+    expect(reportError).toHaveBeenCalledTimes(1);
+    expect(vi.mocked(reportError).mock.calls[0][0]).toEqual(
+      new Error(`/api/project answered ${status} without JSON`),
+    );
+  });
+
+  it.each([
+    ["an error the app answered itself, already reported by the route", reply(500, { msg: "x" })],
+    ["a refusal the app answered itself", reply(403, { msg: "x" })],
+    ["a missing route", reply(404, "Not Found")],
+    ["a browser that can't reach the server", new Error("offline")],
+  ])("doesn't report %s", async (_name, response) => {
+    const { api } = clientWith(response);
+
+    await api.project(ProjectApiActions.GET, { _id: "p1" });
+
+    expect(reportError).not.toHaveBeenCalled();
+  });
+});
 
 describe("createApiClient", () => {
   it("POSTs JSON with the session token and returns ok with the data", async () => {
