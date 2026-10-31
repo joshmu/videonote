@@ -205,6 +205,33 @@ test.describe("user journeys", () => {
     await expect(page.locator("body")).toHaveClass(/theme-dark/);
   });
 
+  test("the toggle icon and phone toolbar follow a saved theme after hydration", async ({
+    page,
+  }) => {
+    await page.addInitScript(() => {
+      if (!sessionStorage.getItem("seeded")) {
+        sessionStorage.setItem("seeded", "1");
+        localStorage.setItem("vn:theme", "theme-light");
+      }
+    });
+    await page.goto("/login");
+    const toggle = page.getByRole("button", { name: "Change theme" });
+    const icon = () => toggle.locator("svg path").first().getAttribute("d");
+    const toolbar = page.locator('meta[name="theme-color"]');
+    await expect(toolbar).toHaveAttribute("content", "#f9fafb");
+    await expect(page.locator("body")).toHaveClass("theme-light");
+    await expect(toggle).toBeVisible();
+    const lightIcon = await icon();
+
+    await toggle.click();
+    await expect(page.locator("body")).toHaveClass("theme-dark");
+    await expect(toolbar).toHaveAttribute("content", "#202020");
+    await expect.poll(icon).not.toBe(lightIcon);
+
+    await page.reload();
+    await expect(page.locator("body")).toHaveClass("theme-dark");
+  });
+
   test("Tab stays inside an open modal", async ({ page }) => {
     await logInToProject(page);
     await openMenu(page);

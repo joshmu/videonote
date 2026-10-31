@@ -3,7 +3,7 @@
 
 .theme-light {
   --text: #202020;
-  --text2: #5f6673;
+  --text2: #525866;
 
   --bg: #f9fafb;
   --bg2: #9ca3af;
@@ -13,8 +13,8 @@
   --accent: #4056a1;
   --accent2: #4056a1;
 
-  --select: rgb(112, 135, 255);
-  --selectNum: 112, 135, 255;
+  --select: rgb(84, 104, 232);
+  --selectNum: 84, 104, 232;
 
   .neu-bg {
     border-radius: 0.75rem;
@@ -63,7 +63,7 @@
 
 .theme-superhero {
   --text: #f3f4f6;
-  --text2: #b9b1c0;
+  --text2: #cdc6d3;
   --bg: #46344e;
   --bg2: #9d8d8f;
   --bgNum: 70, 52, 78;
@@ -71,8 +71,8 @@
   --accent: #faed26;
   --accent2: rgb(250, 184, 38);
 
-  --select: rgb(112, 135, 255);
-  --selectNum: 112, 135, 255;
+  --select: rgb(84, 104, 232);
+  --selectNum: 84, 104, 232;
 
   .neu-bg {
     border-radius: 0.75rem;
@@ -101,12 +101,12 @@ body {
   }
 
   ::-moz-selection {
-    color: var(--accent);
-    background: var(--bg2);
+    color: var(--bg);
+    background: var(--accent);
   }
   ::selection {
-    color: var(--accent);
-    background: var(--bg2);
+    color: var(--bg);
+    background: var(--accent);
   }
 }
 

@@ -48,7 +48,7 @@ export const Features = () => {
       {/* header */}
       <div className="flex items-center mb-2">
         <Heading as="h2">Features</Heading>
-        <h2 className="ml-3 text-xl italic opacity-50 text-themeText">...more to come!</h2>
+        <h2 className="ml-3 text-xl italic text-themeText2">...more to come!</h2>
       </div>
 
       {/* features */}
@@ -100,28 +100,23 @@ const Shape = ({ idx }) => {
   // style variants based on idx
   const styles = [
     {
-      backgroundColor: "red",
       width: "1rem",
     },
     {
-      backgroundColor: "green",
       borderRadius: "100%",
     },
     {
-      backgroundColor: "darkgray",
       transform: "rotate(45deg)",
       width: "0.75rem",
     },
-    {
-      backgroundColor: "blue",
-    },
+    {},
   ];
 
   const choice = idx % 4;
 
   return (
     <div
-      className="absolute top-0 left-0 z-0 w-8 h-8 transform opacity-50 -translate-x-1/4 -translate-y-1/4"
+      className="absolute top-0 left-0 z-0 w-8 h-8 transform opacity-25 bg-themeAccent -translate-x-1/4 -translate-y-1/4"
       style={styles[choice]}
     ></div>
   );
