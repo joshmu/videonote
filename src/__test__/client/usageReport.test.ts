@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import { classifySrc, summarise } from "../../../scripts/usage-report.mjs";
+import { SAMPLE_PROJECT } from "../../../utils/sampleProject.mjs";
 
 const NOW = Date.parse("2026-10-31T00:00:00Z");
 const DAY = 24 * 60 * 60 * 1000;
@@ -29,6 +30,29 @@ describe("classifySrc", () => {
 
   it("drops www from the host", () => {
     expect(classifySrc("https://www.youtube.com/watch?v=abc").host).toBe("youtube.com");
+  });
+});
+
+describe("summarise with a sample Project", () => {
+  const users = [{ userId: "a", createdAt: daysAgo(10) }];
+  const sample = project("s1", "a", { src: SAMPLE_PROJECT.src, createdAt: daysAgo(9) });
+  const seeded = SAMPLE_PROJECT.notes.map((_: unknown, i: number) => ({
+    projectId: "s1",
+    createdAt: daysAgo(9) + i,
+  }));
+
+  it("doesn't count the seeded Notes or the Project as the User's own", () => {
+    const report = summarise(users, [sample], seeded, NOW);
+    expect(report.funnel).toMatchObject({ madeProject: 0, wroteNote: 0 });
+    expect(report.totals).toMatchObject({ projects: 0, sampleProjects: 1, notes: 0 });
+    expect(report.windows["30d"].noters).toBe(0);
+  });
+
+  it("counts a Note the User writes on the sample", () => {
+    const written = { projectId: "s1", createdAt: daysAgo(8) };
+    const report = summarise(users, [sample], [...seeded, written], NOW);
+    expect(report.funnel.wroteNote).toBe(1);
+    expect(report.windows["30d"]).toMatchObject({ notes: 1, noters: 1 });
   });
 });
 

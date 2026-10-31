@@ -8,6 +8,7 @@ import {
   type ShareProjectInterface,
 } from "@/shared/types";
 import type { ProjectReply } from "@/utils/apiClient";
+import { createObjectId } from "@/utils/clientHelpers";
 
 import { useNotificationContext } from "./notificationContext";
 import { type SessionAccount, useSessionContext } from "./sessionContext";
@@ -22,6 +23,7 @@ export type UpdateProjectsStateWithUpdatedNotesType = (notes: NoteInterface[]) =
 export type LoadProjectType = (projectId: string) => Promise<void>;
 export type CreateProjectType = (
   projectData: ProjectInterface | { title: string; src: string },
+  seedNotes?: Pick<NoteInterface, "content" | "time" | "done">[],
 ) => Promise<void>;
 export type RemoveProjectType = (_id: string) => Promise<void>;
 type WarnLocalVideoType = (project: ProjectInterface) => void;
@@ -207,12 +209,23 @@ export const ProjectsProvider = ({ children }: { children: React.ReactNode }) =>
     if (!project.src) warnLocalVideo(project);
   };
 
-  const createProject: CreateProjectType = async (projectData) => {
+  const createProject: CreateProjectType = async (projectData, seedNotes = []) => {
     const response = await projectApi(ProjectApiActions.CREATE, projectData);
     if (!response) return console.error("api error");
 
+    // one at a time, so the seeded Notes are the Project's oldest and in order
+    const notes: NoteInterface[] = [];
+    for (const seed of seedNotes) {
+      const result = await api.saveNote({
+        ...seed,
+        _id: createObjectId(),
+        project: response.project._id,
+      });
+      if (result.kind === "ok") notes.push(result.data.note);
+    }
+
     // expect project as response from server
-    const { project } = response;
+    const project = { ...response.project, notes };
 
     // add project
     setProjects((current) => [...current, project]);

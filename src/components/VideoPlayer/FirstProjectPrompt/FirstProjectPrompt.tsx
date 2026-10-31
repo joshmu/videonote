@@ -6,12 +6,7 @@ import { useSessionContext } from "@/context/sessionContext";
 import { useUiShellContext } from "@/context/uiShellContext";
 import { ModalPrimaryBtn } from "@/shared/Modal/ModalBtn";
 import { Heading2 } from "@/shared/Text/Text";
-
-// Big Buck Bunny, (c) Blender Foundation, CC BY 3.0, on Blender's own channel
-const SAMPLE_PROJECT = {
-  title: "Sample: Big Buck Bunny",
-  src: "https://www.youtube.com/watch?v=aqz-KE-bpKQ",
-};
+import { SAMPLE_PROJECT } from "@/utils/sampleProject.mjs";
 
 // A signed-in User with no Project yet has nothing else on screen to act on.
 export const FirstProjectPrompt = () => {
@@ -24,7 +19,8 @@ export const FirstProjectPrompt = () => {
 
   const trySample = async () => {
     setCreatingSample(true);
-    await createProject(SAMPLE_PROJECT);
+    const { notes, ...sample } = SAMPLE_PROJECT;
+    await createProject(sample, notes);
     setCreatingSample(false);
   };
 

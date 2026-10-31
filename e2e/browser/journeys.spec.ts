@@ -245,8 +245,14 @@ test.describe("user journeys", () => {
 
     await page.getByRole("button", { name: "Or try a sample video" }).click();
     await expect(page.getByRole("button", { name: "Or try a sample video" })).toBeHidden();
-    await addNote(page, "the bunny wakes up");
-    await expect(page.getByText("the bunny wakes up")).toBeVisible();
+    const seeded = page.getByText("Love the spray can moment, the pink really pops");
+    await expect(seeded).toBeVisible();
+    await expect(page.getByText("1:16", { exact: true })).toBeVisible();
+    await addNote(page, "my first Note");
+
+    await page.reload();
+    await expect(seeded).toBeVisible();
+    await expect(page.getByText("my first Note")).toBeVisible();
   });
 
   test("Tab stays inside an open modal", async ({ page }) => {
