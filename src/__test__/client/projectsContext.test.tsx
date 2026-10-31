@@ -90,7 +90,7 @@ describe("projectsContext open", () => {
     await waitFor(() => expect(result.current.project?._id).toBe("p2"));
     expect(projectRequests()[0].body).toMatchObject({ action: "GET", project: { _id: "p2" } });
     await waitFor(() => expect(result.current.settings.currentProject).toBe("p2"));
-    expect(result.current.alerts).toContain("CUT P2");
+    expect(result.current.alerts).not.toContain("CUT P2");
     expect(result.current.projectsExist).toBe(true);
   });
 
@@ -138,7 +138,7 @@ describe("projectsContext open", () => {
 
     expect(result.current.projects.map((p) => p._id)).toEqual(["p1"]);
     expect(result.current.project).toMatchObject({ _id: "p1", share });
-    expect(result.current.alerts).toContain("CUT P1");
+    expect(result.current.alerts).not.toContain("CUT P1");
   });
 });
 

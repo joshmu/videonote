@@ -61,7 +61,7 @@ export const Layout = ({ title, children }: { title?: string; children: ReactNod
         <link rel="shortcut icon" href="favicon.ico" />
         <meta name="msapplication-TileColor" content="#da532c" />
         <meta name="msapplication-config" content="browserconfig.xml" />
-        <meta name="theme-color" content="#ffffff" />
+        <meta name="theme-color" content="#202020" />
       </Head>
 
       <div className="relative min-h-screen overflow-hidden font-sans antialiased transition-colors duration-300 ease-in-out debug-screens">

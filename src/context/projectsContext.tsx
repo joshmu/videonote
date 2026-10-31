@@ -24,7 +24,6 @@ export type CreateProjectType = (
   projectData: ProjectInterface | { title: string; src: string },
 ) => Promise<void>;
 export type RemoveProjectType = (_id: string) => Promise<void>;
-type AlertProjectLoadedType = (project: ProjectInterface) => void;
 type WarnLocalVideoType = (project: ProjectInterface) => void;
 type ProjectApiType = (
   action: ProjectApiActions,
@@ -106,7 +105,6 @@ export const ProjectsProvider = ({ children }: { children: React.ReactNode }) =>
   const showSharedProject = (project: ProjectInterface): void => {
     setProjects([project]);
     setCurrentProject(project);
-    alertProjectLoaded(project);
   };
 
   const updateProject: UpdateProjectType = async (projectData) => {
@@ -204,8 +202,6 @@ export const ProjectsProvider = ({ children }: { children: React.ReactNode }) =>
       console.log("updating settings");
       updateSettings({ currentProject: project._id, _id: settings._id });
     }
-
-    alertProjectLoaded(project);
     if (!project.src) warnLocalVideo(project);
   };
 
@@ -224,8 +220,6 @@ export const ProjectsProvider = ({ children }: { children: React.ReactNode }) =>
 
     // update settings
     updateSettings({ currentProject: project._id });
-
-    alertProjectLoaded(project);
   };
 
   const removeProject: RemoveProjectType = async (_id) => {
@@ -247,14 +241,6 @@ export const ProjectsProvider = ({ children }: { children: React.ReactNode }) =>
         loadProject(newCurrentProject._id);
       }
     }
-  };
-
-  const alertProjectLoaded: AlertProjectLoadedType = (project) => {
-    // notification when we load a project
-    addAlert({
-      type: "project",
-      msg: `${project.title.toUpperCase()}`,
-    });
   };
 
   const projectApi: ProjectApiType = async (action, project, share) => {

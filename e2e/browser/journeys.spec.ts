@@ -165,6 +165,46 @@ test.describe("user journeys", () => {
     await expect(page.getByRole("dialog")).toBeInViewport({ ratio: 1 });
   });
 
+  test("a new User can start a Project from the empty screen", async ({ page }) => {
+    await page.goto("/login");
+    await page.getByRole("button", { name: "Register" }).click();
+    await page.getByPlaceholder("Email Address").fill(uniqueEmail());
+    await page.getByPlaceholder("Password", { exact: true }).fill(PASSWORD);
+    await page.getByPlaceholder("Confirm Password").fill(PASSWORD);
+    await page.getByRole("button", { name: "Register" }).click();
+    await expect(page).toHaveURL("/");
+    await expect(page.getByRole("dialog")).toBeVisible();
+    await page.keyboard.press("Escape");
+    await expect(page.getByRole("dialog")).toHaveCount(0);
+    await page.getByRole("button", { name: "Create Project" }).click();
+    await expect(page.getByLabel("Project Title")).toBeVisible();
+  });
+
+  test("a User marks a Note done and edits it from its own controls", async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    await logInToProject(page);
+    await addNote(page, "check the sound");
+
+    await page.getByRole("button", { name: "Mark Note done" }).click();
+    await expect(page.getByRole("button", { name: "Mark Note not done" })).toBeVisible();
+    await page.getByRole("button", { name: "Edit Note" }).click();
+    await expect(page.locator("input[value='check the sound']")).toBeFocused();
+  });
+
+  test("a saved theme is on the page before it hydrates, and a retired one falls back", async ({
+    page,
+  }) => {
+    await page.addInitScript(() => localStorage.setItem("vn:theme", "theme-light"));
+    await page.route("**/_next/static/**/*.js", (route) => route.abort());
+    await page.goto("/login");
+    await expect(page.locator("body")).toHaveClass("theme-light");
+
+    await page.unrouteAll();
+    await page.addInitScript(() => localStorage.setItem("vn:theme", "theme-hot"));
+    await page.goto("/login");
+    await expect(page.locator("body")).toHaveClass(/theme-dark/);
+  });
+
   test("Tab stays inside an open modal", async ({ page }) => {
     await logInToProject(page);
     await openMenu(page);

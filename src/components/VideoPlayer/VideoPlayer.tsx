@@ -19,6 +19,7 @@ import { useVideoContext } from "@/context/videoContext";
 import { Loader } from "@/shared/Loader/Loader";
 
 import { ActionInput } from "../ActionInput/ActionInput";
+import { FirstProjectPrompt } from "./FirstProjectPrompt/FirstProjectPrompt";
 import { Underlay } from "./Underlay/Underlay";
 import style from "./videoPlayer.module.scss";
 
@@ -108,7 +109,7 @@ export const VideoPlayer = () => {
   const isPlayerReady = !isLoading && !!playerRef.current;
 
   return (
-    <div className="relative flex w-full transition-all duration-500 ease-in-out shrink-0 md:shrink">
+    <div className="relative flex flex-col w-full transition-all duration-500 ease-in-out shrink-0 md:flex-row md:shrink">
       <Underlay show={isPlayerReady} />
 
       <div className="relative z-10 w-full my-auto">
@@ -156,6 +157,8 @@ export const VideoPlayer = () => {
         )}
 
         <Loader show={isLoading && failedUrl !== url} />
+
+        {!url && <FirstProjectPrompt />}
       </div>
 
       {/* input wrapper */}
@@ -166,7 +169,7 @@ export const VideoPlayer = () => {
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -10 }}
         >
-          <div className="absolute bottom-0 z-10 w-2/3 h-12 mb-8 transform -translate-x-1/2 left-1/2">
+          <div className="relative z-10 w-full h-12 md:absolute md:bottom-0 md:w-2/3 md:mb-8 md:-translate-x-1/2 md:left-1/2">
             <ActionInput />
           </div>
         </motion.div>

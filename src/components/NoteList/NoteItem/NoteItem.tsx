@@ -12,6 +12,7 @@
 
 import { Variants, motion } from "motion/react";
 import { ChangeEvent, KeyboardEvent, useEffect, useRef, useState } from "react";
+import { BsCheck2Circle as DoneIcon, BsPencil as EditIcon } from "react-icons/bs";
 
 import { useControlsContext } from "@/context/controlsContext";
 import { useNoteContext } from "@/context/noteContext";
@@ -126,7 +127,7 @@ export const NoteItem = ({ note, closestProximity, childVariants }: NoteItemInte
       variants={childVariants}
       className={`${
         closestProximity ? "bg-themeSelect/25" : "bg-transparent"
-      } relative border-b cursor-pointer border-themeText2 transition-colors duration-200 ease-out`}
+      } group relative border-b cursor-pointer border-themeText2 transition-colors duration-200 ease-out`}
     >
       <Select padding="p-0">
         <div className="relative flex items-center justify-start w-full h-full text-base">
@@ -165,6 +166,28 @@ export const NoteItem = ({ note, closestProximity, childVariants }: NoteItemInte
               </div>
             )}
           </div>
+
+          {checkCanEdit() && !isEditing && (
+            <div className="flex items-center shrink-0 text-themeText2 md:opacity-0 md:group-hover:opacity-100 md:focus-within:opacity-100">
+              <button
+                type="button"
+                aria-label={state.done ? "Mark Note not done" : "Mark Note done"}
+                aria-pressed={state.done}
+                onClick={handleTimeClick}
+                className={`p-2 cursor-pointer hover:text-themeAccent ${state.done ? "text-themeAccent" : ""}`}
+              >
+                <DoneIcon />
+              </button>
+              <button
+                type="button"
+                aria-label="Edit Note"
+                onClick={() => toggleEdit(true)}
+                className="p-2 cursor-pointer hover:text-themeAccent"
+              >
+                <EditIcon />
+              </button>
+            </div>
+          )}
         </div>
       </Select>
     </motion.div>

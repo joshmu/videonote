@@ -47,7 +47,9 @@ const Terms = () => {
   return (
     <div className="container max-w-[65ch] px-4 pt-4 mx-auto">
       <Heading className="mb-4">Terms of Service</Heading>
-      <SubHeading className="mt-4 mb-1 font-serif">1. Terms</SubHeading>
+      <SubHeading as="h2" className="mt-4 mb-1 font-serif">
+        1. Terms
+      </SubHeading>
       <p>
         By accessing the website at{" "}
         <a href="https://videonote.app" className="underline text-themeAccent">
@@ -59,7 +61,9 @@ const Terms = () => {
         accessing this site. The materials contained in this website are protected by applicable
         copyright and trademark law.
       </p>
-      <SubHeading className="mt-4 mb-1 font-serif">2. Use License</SubHeading>
+      <SubHeading as="h2" className="mt-4 mb-1 font-serif">
+        2. Use License
+      </SubHeading>
       <ol type="a">
         <li>
           Permission is granted to temporarily download one copy of the materials (information or
@@ -90,7 +94,9 @@ const Terms = () => {
           materials in your possession whether in electronic or printed format.
         </li>
       </ol>
-      <SubHeading className="mt-4 mb-1 font-serif">3. Disclaimer</SubHeading>
+      <SubHeading as="h2" className="mt-4 mb-1 font-serif">
+        3. Disclaimer
+      </SubHeading>
       <ol type="a">
         <li>
           The materials on VideoNote's website are provided on an 'as is' basis. VideoNote makes no
@@ -105,7 +111,9 @@ const Terms = () => {
           relating to such materials or on any sites linked to this site.
         </li>
       </ol>
-      <SubHeading className="mt-4 mb-1 font-serif">4. Limitations</SubHeading>
+      <SubHeading as="h2" className="mt-4 mb-1 font-serif">
+        4. Limitations
+      </SubHeading>
       <p>
         In no event shall VideoNote or its suppliers be liable for any damages (including, without
         limitation, damages for loss of data or profit, or due to business interruption) arising out
@@ -115,7 +123,9 @@ const Terms = () => {
         warranties, or limitations of liability for consequential or incidental damages, these
         limitations may not apply to you.
       </p>
-      <SubHeading className="mt-4 mb-1 font-serif">5. Accuracy of materials</SubHeading>
+      <SubHeading as="h2" className="mt-4 mb-1 font-serif">
+        5. Accuracy of materials
+      </SubHeading>
       <p>
         The materials appearing on VideoNote's website could include technical, typographical, or
         photographic errors. VideoNote does not warrant that any of the materials on its website are
@@ -123,19 +133,25 @@ const Terms = () => {
         website at any time without notice. However VideoNote does not make any commitment to update
         the font-serif.
       </p>
-      <SubHeading className="mt-4 mb-1 italic">6. Links</SubHeading>
+      <SubHeading as="h2" className="mt-4 mb-1 italic">
+        6. Links
+      </SubHeading>
       <p>
         VideoNote has not reviewed all of the sites linked to its website and is not responsible for
         the contents of any such linked site. The inclusion of any link does not imply endorsement
         by VideoNote of the site. Use of any such linked website is at the user's own risk.
       </p>
-      <SubHeading className="mt-4 mb-1 italic">7. Modifications</SubHeading>
+      <SubHeading as="h2" className="mt-4 mb-1 italic">
+        7. Modifications
+      </SubHeading>
       <p>
         VideoNote may revise these terms of service for its website at any time without notice. By
         using this website you are agreeing to be bound by the then current version of these terms
         of service.
       </p>
-      <SubHeading className="mt-4 mb-1 italic">8. Governing Law</SubHeading>
+      <SubHeading as="h2" className="mt-4 mb-1 italic">
+        8. Governing Law
+      </SubHeading>
       <p>
         These terms and conditions are governed by and construed in accordance with the laws of
         Australia and you irrevocably submit to the exclusive jurisdiction of the courts in that
