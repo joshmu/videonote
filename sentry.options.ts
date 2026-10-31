@@ -1,4 +1,4 @@
-import type { BrowserOptions, NodeOptions } from "@sentry/nextjs";
+import type { Breadcrumb, BrowserOptions, NodeOptions } from "@sentry/nextjs";
 
 /**
  * Settings shared by the browser and server SDKs. Sentry stays off wherever
@@ -7,13 +7,16 @@ import type { BrowserOptions, NodeOptions } from "@sentry/nextjs";
  *
  * The repo is public and Sentry holds what it collects for 30 days, so it
  * gets as little as still explains an error: no request bodies (they carry
- * notes and share passwords), cookies, local variables or user details
- * beyond the id set in `withAuthenticatedUser`.
+ * notes and share passwords), cookies, local variables, console output (it
+ * logs Notes and video URLs) or user details beyond the id set in
+ * `withAuthenticatedUser`.
  */
 export const sentryOptions = {
   dsn: process.env.NEXT_PUBLIC_SENTRY_DSN,
   environment: process.env.NEXT_PUBLIC_SENTRY_ENVIRONMENT ?? "development",
   tracesSampleRate: 0.1,
+  beforeBreadcrumb: (breadcrumb: Breadcrumb) =>
+    breadcrumb.category === "console" ? null : breadcrumb,
   dataCollection: {
     userInfo: false,
     cookies: false,
