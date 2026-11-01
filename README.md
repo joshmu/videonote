@@ -1,5 +1,8 @@
 # VideoNote
 
+> [!WARNING]
+> **This repository is deprecated and no longer maintained.** VideoNote carries on at [videonote.app](https://videonote.app), developed privately. This code is kept for reference.
+
 A video review app with slick intuitive controls to create timestamped notes on the fly. ✨
 
 ## Tech Stack
