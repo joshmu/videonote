@@ -151,7 +151,7 @@ describe("GitHub deploy role", () => {
         "token.actions.githubusercontent.com:aud": "sts.amazonaws.com",
         "token.actions.githubusercontent.com:sub": [
           `repo:joshmu/videonote:environment:${env}`,
-          `repo:joshmu/videonote-v2:environment:${env}`,
+          `repo:joshmu@1970265/videonote-v2@1440825395:environment:${env}`,
         ],
       },
     });

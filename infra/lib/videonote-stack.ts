@@ -28,8 +28,15 @@ export const CAPACITY_ALARM_RATIO = 0.8;
 
 export const VERCEL_TEAM = "joshmu";
 export const VERCEL_PROJECT = "videonote";
-/** Repos that may deploy. The old repo stays until the new one has deployed both stacks. */
-export const GITHUB_REPOS = ["joshmu/videonote", "joshmu/videonote-v2"];
+/**
+ * GitHub's OIDC subjects for the repos that may deploy. The old repo stays until the new one has
+ * deployed both stacks. A new repo's subject carries its owner and repo ids, so a rename or a
+ * recreated name can't match it.
+ */
+export const GITHUB_SUBJECTS = [
+  "repo:joshmu/videonote",
+  "repo:joshmu@1970265/videonote-v2@1440825395",
+];
 
 const VERCEL_ISSUER = `oidc.vercel.com/${VERCEL_TEAM}`;
 const VERCEL_AUDIENCE = `https://vercel.com/${VERCEL_TEAM}`;
@@ -136,12 +143,12 @@ export class VideonoteStack extends Stack {
     const qualifier = DefaultStackSynthesizer.DEFAULT_QUALIFIER;
     this.githubDeployRole = new iam.Role(this, "GitHubDeployRole", {
       roleName: `${name}-github-deploy`,
-      description: `GitHub Actions (${GITHUB_REPOS.join(", ")}, environment ${props.githubEnvironment}) -> CDK bootstrap roles`,
+      description: `GitHub Actions (joshmu/videonote, joshmu/videonote-v2, environment ${props.githubEnvironment}) -> CDK bootstrap roles`,
       assumedBy: new iam.WebIdentityPrincipal(githubProviderArn, {
         StringEquals: {
           [`${GITHUB_ISSUER}:aud`]: GITHUB_AUDIENCE,
-          [`${GITHUB_ISSUER}:sub`]: GITHUB_REPOS.map(
-            (repo) => `repo:${repo}:environment:${props.githubEnvironment}`,
+          [`${GITHUB_ISSUER}:sub`]: GITHUB_SUBJECTS.map(
+            (subject) => `${subject}:environment:${props.githubEnvironment}`,
           ),
         },
       }),
